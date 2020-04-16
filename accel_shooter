@@ -1,15 +1,18 @@
 #!/usr/bin/env python
 import json
+import os
 import sys
 import webbrowser
 
 import clickup
 import gitlab
 
-with open('./note_url') as f:
+dir_path = os.path.dirname(os.path.realpath(__file__))
+
+with open(os.path.join(dir_path, 'note_url')) as f:
     note_url = f.readline().rstrip('\n\r')
 
-with open('./project_map.json') as f:
+with open(os.path.join(dir_path, 'project_map.json')) as f:
     project_map = json.load(f)
 if sys.argv[1] in project_map:
     project_id = project_map[sys.argv[1]]
