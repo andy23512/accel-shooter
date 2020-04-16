@@ -9,9 +9,8 @@ def _get_user_id():
     return user['id']
 
 
-def get_project_id(project_name: str):
-    projects = json_requests('get', f'/projects?search={project_name}&membership=true')
-    return projects[0]['id']
+def get_project(project_id: str):
+    return json_requests('get', f'/projects/{project_id}')
 
 
 def add_issue(project_id: str, title: str, description: str):
