@@ -18,7 +18,7 @@ if sys.argv[1] in project_map:
     project_id = project_map[sys.argv[1]]
 else:
     project_id = sys.argv[1].replace('/', '%2F')
-task_id = sys.argv[2]
+task_id = sys.argv[2].replace('#', '')
 task = clickup.get_task(task_id)
 task_name = task['name']
 task_url = task['url']
