@@ -107,3 +107,4 @@ temp/
 
 # End of https://www.gitignore.io/api/node
 config.json
+.config.json
