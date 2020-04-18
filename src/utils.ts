@@ -17,11 +17,11 @@ export function callApiFactory(site: Site) {
     default:
       throw Error(`Site {site} is not supported.`);
   }
-  return async (method: HttpMethod, url: string, body?: any) {
+  return async (method: HttpMethod, url: string, body?: any) => {
     return fetch(apiUrl + url, {
       method,
       body: JSON.stringify(body),
-      headers
-    }).then(res => res.json())
-  }
+      headers,
+    }).then((res) => res.json());
+  };
 }
