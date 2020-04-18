@@ -1,0 +1,33 @@
+{
+  "name": "accel-shooter",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "bin": {
+    "accel-shooter": "./main.js"
+  },
+  "scripts": {
+    "start": "ts-node src/accel-shooter.ts",
+    "build": "tsc",
+    "precommit-build": "tsc && git add dist/"
+  },
+  "files": [
+    "main.js",
+    "dist/ctare.js",
+    "dist/constants.js"
+  ],
+  "pre-commit": [
+    "precommit-build"
+  ],
+  "dependencies": {
+    "inquirer": "^6.2.2"
+  },
+  "devDependencies": {
+    "@types/inquirer": "^6.5.0",
+    "@types/node": "^13.13.0",
+    "precommit-hook": "^3.0.0",
+    "ts-node": "^8.8.2",
+    "tslint": "^6.1.1",
+    "typescript": "^3.8.3"
+  }
+}
