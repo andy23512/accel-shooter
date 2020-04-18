@@ -13,8 +13,7 @@
   },
   "files": [
     "main.js",
-    "dist/ctare.js",
-    "dist/constants.js"
+    "dist/accel-shooter.js"
   ],
   "pre-commit": [
     "precommit-build"
