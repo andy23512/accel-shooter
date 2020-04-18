@@ -13,17 +13,21 @@
   },
   "files": [
     "main.js",
-    "dist/accel-shooter.js"
+    "dist/*.js"
   ],
   "pre-commit": [
     "precommit-build"
   ],
   "dependencies": {
-    "inquirer": "^6.2.2"
+    "inquirer": "^6.2.2",
+    "node-fetch": "^2.6.0",
+    "open": "^7.0.3"
   },
   "devDependencies": {
     "@types/inquirer": "^6.5.0",
     "@types/node": "^13.13.0",
+    "@types/node-fetch": "^2.5.6",
+    "@types/open": "^6.2.1",
     "precommit-hook": "^3.0.0",
     "ts-node": "^8.8.2",
     "tslint": "^6.1.1",
