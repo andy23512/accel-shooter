@@ -14,6 +14,14 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const config_1 = require("./config");
+function checkStatus(res) {
+    if (res.ok) {
+        return res;
+    }
+    else {
+        throw Error(res.statusText);
+    }
+}
 function callApiFactory(site) {
     let apiUrl = '';
     let headers = {};
@@ -30,11 +38,29 @@ function callApiFactory(site) {
             throw Error(`Site {site} is not supported.`);
     }
     return (method, url, body) => __awaiter(this, void 0, void 0, function* () {
-        return node_fetch_1.default(apiUrl + url, {
-            method,
-            body: JSON.stringify(body),
-            headers,
-        }).then((res) => res.json());
+        const params = new URLSearchParams();
+        if (body) {
+            Object.entries(body).forEach(([key, value]) => {
+                params.set(key, value);
+            });
+        }
+        return node_fetch_1.default(apiUrl + url, method === 'get'
+            ? {
+                method,
+                headers,
+            }
+            : { method, headers, body: params })
+            .then(checkStatus)
+            .then((res) => res.json());
     });
 }
 exports.callApiFactory = callApiFactory;
+function dashify(input) {
+    let temp = input.replace(/[^A-Za-z0-9]/g, '-').toLowerCase();
+    if (temp.length >= 100) {
+        temp = temp.substring(0, 100);
+        return temp.substring(0, temp.lastIndexOf('-'));
+    }
+    return temp;
+}
+exports.dashify = dashify;

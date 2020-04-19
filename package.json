@@ -19,7 +19,7 @@
     "precommit-build"
   ],
   "dependencies": {
-    "inquirer": "^6.2.2",
+    "inquirer": "^7.1.0",
     "node-fetch": "^2.6.0",
     "open": "^7.0.3"
   },

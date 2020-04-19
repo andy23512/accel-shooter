@@ -2,8 +2,10 @@ import { copyFileSync } from 'fs';
 import open from 'open';
 import { resolve as pathResolve } from 'path';
 import { CONFIG } from './config';
-import { getClickUpTask, setClickUpTaskStatus } from './clickup';
-import { addGitLabIssue } from './gitlab';
+import { ClickUp } from './clickup';
+import { GitLab, getGitLabBranchNameFromIssueNumberAndTitle } from './gitlab';
+import { dashify } from './utils';
+import inquirer from 'inquirer';
 
 (async () => {
   const action = process.argv[2];
@@ -15,20 +17,44 @@ import { addGitLabIssue } from './gitlab';
       break;
     case 'start':
     case 's':
-      const gitLabProjectId = getGitLabProjectId();
-      const clickUpTaskId = getClickUpTaskId();
-      const clickUpTask = await getClickUpTask(clickUpTaskId);
+      const gitLab = new GitLab(getGitLabProjectId());
+      const clickUp = new ClickUp(getClickUpTaskId());
+      const answers = await inquirer.prompt([
+        {
+          name: 'labels',
+          message: 'Choose GitLab Labels to add to new issue',
+          type: 'checkbox',
+          choices: () =>
+            gitLab
+              .listProjectLabels()
+              .then((labels) => labels.map((label: any) => label.name)),
+        },
+      ]);
+      const selectedGitLabLabels = answers.labels;
+      const clickUpTask = await clickUp.getTask();
       const clickUpTaskUrl = clickUpTask['url'];
       const gitLabIssueTitle =
         process.argv.length >= 6 ? process.argv[5] : clickUpTask['name'];
-      await setClickUpTaskStatus(clickUpTaskId, 'in progress');
-      const gitLabIssue = await addGitLabIssue(
-        gitLabProjectId,
+      await clickUp.setTaskStatus('in progress');
+      const gitLabIssue = await gitLab.createIssue(
         gitLabIssueTitle,
-        clickUpTaskUrl
+        clickUpTaskUrl,
+        selectedGitLabLabels
       );
       const gitLabIssueUrl = gitLabIssue.web_url;
       const gitLabIssueNumber = gitLabIssue.iid;
+      const gitLabBranch = await gitLab.createBranch(
+        getGitLabBranchNameFromIssueNumberAndTitle(
+          gitLabIssueNumber,
+          gitLabIssueTitle
+        )
+      );
+      await gitLab.createMergeRequest(
+        gitLabIssueNumber,
+        gitLabIssueTitle,
+        gitLabBranch.name,
+        selectedGitLabLabels
+      );
       console.log(`GitLab Issue Number: ${gitLabIssueNumber}`);
       console.log(`GitLab Issue: ${gitLabIssueUrl}`);
       console.log(`ClickUp Task: ${clickUpTaskUrl}`);
@@ -36,6 +62,7 @@ import { addGitLabIssue } from './gitlab';
       open(CONFIG.HackMDNoteUrl);
       open(clickUpTaskUrl);
       open(gitLabIssueUrl);
+      break;
     default:
       throw Error(`Action {action} is not supported`);
   }

@@ -1,10 +1,14 @@
 import { callApiFactory } from './utils';
 const callApi = callApiFactory('ClickUp');
 
-export function getClickUpTask(clickUpTaskId: string) {
-  return callApi('get', `/task/${clickUpTaskId}`);
-}
+export class ClickUp {
+  constructor(public taskId: string) {}
 
-export function setClickUpTaskStatus(clickUpTaskId: string, status: string) {
-  return callApi('put', `/task/${clickUpTaskId}`, { status });
+  public getTask() {
+    return callApi('get', `/task/${this.taskId}`);
+  }
+
+  public setTaskStatus(status: string) {
+    return callApi('put', `/task/${this.taskId}`, { status });
+  }
 }

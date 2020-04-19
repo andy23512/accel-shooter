@@ -11,25 +11,63 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("./utils");
 const callApi = utils_1.callApiFactory('GitLab');
-function getGitLabUserId() {
-    return __awaiter(this, void 0, void 0, function* () {
-        const user = yield callApi('get', '/user');
-        return user.id;
-    });
+function getGitLabBranchNameFromIssueNumberAndTitle(issueNumber, issueTitle) {
+    return utils_1.dashify(`${issueNumber}-${issueTitle}`);
 }
-function getGitLabProject(gitLabProjectId) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return callApi('get', `/projects/${gitLabProjectId}`);
-    });
-}
-exports.getGitLabProject = getGitLabProject;
-function addGitLabIssue(gitLabProjectId, title, description) {
-    return __awaiter(this, void 0, void 0, function* () {
-        return callApi('post', `/projects/${gitLabProjectId}/issues`, {
-            title: title,
-            description: description,
-            assignee_ids: yield getGitLabUserId(),
+exports.getGitLabBranchNameFromIssueNumberAndTitle = getGitLabBranchNameFromIssueNumberAndTitle;
+class GitLab {
+    constructor(projectId) {
+        this.projectId = projectId;
+    }
+    getProject() {
+        return callApi('get', `/projects/${this.projectId}`);
+    }
+    getDefaultBranchName() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const branches = yield this.listBranches();
+            return branches.find((b) => b.default).name;
         });
-    });
+    }
+    listProjectLabels() {
+        return callApi('get', `/projects/${this.projectId}/labels`);
+    }
+    createIssue(title, description, labels) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return callApi('post', `/projects/${this.projectId}/issues`, {
+                title: title,
+                description: description,
+                assignee_ids: yield this.getUserId(),
+                labels: labels.join(','),
+            });
+        });
+    }
+    createBranch(branch) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return callApi('post', `/projects/${this.projectId}/repository/branches`, {
+                branch,
+                ref: yield this.getDefaultBranchName(),
+            });
+        });
+    }
+    createMergeRequest(issueNumber, issueTitle, branch, labels) {
+        return __awaiter(this, void 0, void 0, function* () {
+            return callApi('post', `/projects/${this.projectId}/merge_requests`, {
+                source_branch: branch,
+                target_branch: yield this.getDefaultBranchName(),
+                title: `WIP: Resolve "${issueTitle}"`,
+                description: `Close #${issueNumber}`,
+                labels: labels.join(','),
+            });
+        });
+    }
+    getUserId() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = yield callApi('get', '/user');
+            return user.id;
+        });
+    }
+    listBranches() {
+        return callApi('get', `/projects/${this.projectId}/repository/branches`);
+    }
 }
-exports.addGitLabIssue = addGitLabIssue;
+exports.GitLab = GitLab;

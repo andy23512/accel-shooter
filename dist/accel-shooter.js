@@ -18,6 +18,7 @@ const path_1 = require("path");
 const config_1 = require("./config");
 const clickup_1 = require("./clickup");
 const gitlab_1 = require("./gitlab");
+const inquirer_1 = __importDefault(require("inquirer"));
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const action = process.argv[2];
     switch (action) {
@@ -28,15 +29,28 @@ const gitlab_1 = require("./gitlab");
             break;
         case 'start':
         case 's':
-            const gitLabProjectId = getGitLabProjectId();
-            const clickUpTaskId = getClickUpTaskId();
-            const clickUpTask = yield clickup_1.getClickUpTask(clickUpTaskId);
+            const gitLab = new gitlab_1.GitLab(getGitLabProjectId());
+            const clickUp = new clickup_1.ClickUp(getClickUpTaskId());
+            const answers = yield inquirer_1.default.prompt([
+                {
+                    name: 'labels',
+                    message: 'Choose GitLab Labels to add to new issue',
+                    type: 'checkbox',
+                    choices: () => gitLab
+                        .listProjectLabels()
+                        .then((labels) => labels.map((label) => label.name)),
+                },
+            ]);
+            const selectedGitLabLabels = answers.labels;
+            const clickUpTask = yield clickUp.getTask();
             const clickUpTaskUrl = clickUpTask['url'];
             const gitLabIssueTitle = process.argv.length >= 6 ? process.argv[5] : clickUpTask['name'];
-            yield clickup_1.setClickUpTaskStatus(clickUpTaskId, 'in progress');
-            const gitLabIssue = yield gitlab_1.addGitLabIssue(gitLabProjectId, gitLabIssueTitle, clickUpTaskUrl);
+            yield clickUp.setTaskStatus('in progress');
+            const gitLabIssue = yield gitLab.createIssue(gitLabIssueTitle, clickUpTaskUrl, selectedGitLabLabels);
             const gitLabIssueUrl = gitLabIssue.web_url;
             const gitLabIssueNumber = gitLabIssue.iid;
+            const gitLabBranch = yield gitLab.createBranch(gitlab_1.getGitLabBranchNameFromIssueNumberAndTitle(gitLabIssueNumber, gitLabIssueTitle));
+            yield gitLab.createMergeRequest(gitLabIssueNumber, gitLabIssueTitle, gitLabBranch.name, selectedGitLabLabels);
             console.log(`GitLab Issue Number: ${gitLabIssueNumber}`);
             console.log(`GitLab Issue: ${gitLabIssueUrl}`);
             console.log(`ClickUp Task: ${clickUpTaskUrl}`);
@@ -44,6 +58,7 @@ const gitlab_1 = require("./gitlab");
             open_1.default(config_1.CONFIG.HackMDNoteUrl);
             open_1.default(clickUpTaskUrl);
             open_1.default(gitLabIssueUrl);
+            break;
         default:
             throw Error(`Action {action} is not supported`);
     }
