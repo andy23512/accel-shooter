@@ -4,7 +4,6 @@ import { resolve as pathResolve } from 'path';
 import { CONFIG } from './config';
 import { ClickUp } from './clickup';
 import { GitLab, getGitLabBranchNameFromIssueNumberAndTitle } from './gitlab';
-import { dashify } from './utils';
 import inquirer from 'inquirer';
 
 (async () => {
