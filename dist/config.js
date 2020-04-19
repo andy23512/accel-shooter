@@ -10,7 +10,7 @@ function getConfig() {
     const configPath = getConfigPath();
     return fs_1.existsSync(configPath)
         ? JSON.parse(fs_1.readFileSync(configPath, { encoding: 'utf-8' }))
-        : null;
+        : {};
 }
 exports.getConfig = getConfig;
 exports.CONFIG = getConfig();
