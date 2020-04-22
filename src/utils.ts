@@ -51,7 +51,10 @@ export function callApiFactory(site: Site) {
 }
 
 export function dashify(input: string) {
-  let temp = input.replace(/[^A-Za-z0-9]/g, '-').toLowerCase();
+  let temp = input
+    .replace(/[^A-Za-z0-9]/g, '-')
+    .replace(/-{2,}/g, '-')
+    .toLowerCase();
   if (temp.length >= 100) {
     temp = temp.substring(0, 100);
     return temp.substring(0, temp.lastIndexOf('-'));
