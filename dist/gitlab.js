@@ -24,8 +24,8 @@ class GitLab {
     }
     getDefaultBranchName() {
         return __awaiter(this, void 0, void 0, function* () {
-            const branches = yield this.listBranches();
-            return branches.find((b) => b.default).name;
+            const project = yield this.getProject();
+            return project.default_branch;
         });
     }
     listProjectLabels() {
@@ -65,9 +65,6 @@ class GitLab {
             const user = yield callApi('get', '/user');
             return user.id;
         });
-    }
-    listBranches() {
-        return callApi('get', `/projects/${this.projectId}/repository/branches`);
     }
 }
 exports.GitLab = GitLab;

@@ -17,8 +17,8 @@ export class GitLab {
   }
 
   public async getDefaultBranchName() {
-    const branches = await this.listBranches();
-    return branches.find((b: any) => b.default).name;
+    const project = await this.getProject();
+    return project.default_branch;
   }
 
   public listProjectLabels() {
@@ -59,9 +59,5 @@ export class GitLab {
   private async getUserId() {
     const user = await callApi('get', '/user');
     return user.id;
-  }
-
-  private listBranches() {
-    return callApi('get', `/projects/${this.projectId}/repository/branches`);
   }
 }
