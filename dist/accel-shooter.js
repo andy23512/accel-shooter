@@ -19,16 +19,20 @@ const config_1 = require("./config");
 const clickup_1 = require("./clickup");
 const gitlab_1 = require("./gitlab");
 const inquirer_1 = __importDefault(require("inquirer"));
-(() => __awaiter(void 0, void 0, void 0, function* () {
-    const action = process.argv[2];
-    switch (action) {
-        case 'config':
-        case 'c':
+const actionAlias = {
+    c: 'config',
+    s: 'start',
+    o: 'open',
+};
+const actions = {
+    config() {
+        return __awaiter(this, void 0, void 0, function* () {
             const configFile = process.argv[3];
             setConfigFile(configFile);
-            break;
-        case 'start':
-        case 's':
+        });
+    },
+    start() {
+        return __awaiter(this, void 0, void 0, function* () {
             const gitLab = new gitlab_1.GitLab(getGitLabProjectId());
             const clickUp = new clickup_1.ClickUp(getClickUpTaskId());
             const answers = yield inquirer_1.default.prompt([
@@ -58,9 +62,51 @@ const inquirer_1 = __importDefault(require("inquirer"));
             open_1.default(config_1.CONFIG.HackMDNoteUrl);
             open_1.default(clickUpTaskUrl);
             open_1.default(gitLabIssueUrl);
-            break;
-        default:
-            throw Error(`Action {action} is not supported`);
+        });
+    },
+    open() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const issueNumber = process.argv[4];
+            const gitLab = new gitlab_1.GitLab(getGitLabProjectId());
+            const answers = yield inquirer_1.default.prompt([
+                {
+                    name: 'types',
+                    message: 'Choose Link Type to open',
+                    type: 'checkbox',
+                    choices: [
+                        { name: 'Issue', value: 'issue' },
+                        { name: 'Merge Request', value: 'merge-request' },
+                        { name: 'Task', value: 'task' },
+                    ],
+                },
+            ]);
+            const issue = yield gitLab.getIssue(issueNumber);
+            for (const type of answers.types) {
+                switch (type) {
+                    case 'issue':
+                        open_1.default(issue.web_url);
+                        break;
+                    case 'merge-request':
+                        const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
+                        open_1.default(mergeRequests[mergeRequests.length - 1].web_url);
+                        break;
+                    case 'task':
+                        const description = issue.description;
+                        const result = description.match(/https:\/\/app.clickup.com\/t\/\w+/);
+                        open_1.default(result[0]);
+                        break;
+                }
+            }
+        });
+    },
+};
+(() => __awaiter(void 0, void 0, void 0, function* () {
+    const action = actionAlias[process.argv[2]] || process.argv[2];
+    if (actions[action]) {
+        yield actions[action]();
+    }
+    else {
+        throw Error(`Action ${action} is not supported.`);
     }
 }))();
 function setConfigFile(configFile) {

@@ -21,8 +21,19 @@ export class GitLab {
     return project.default_branch;
   }
 
+  public getIssue(issueNumber: string) {
+    return callApi('get', `/projects/${this.projectId}/issues/${issueNumber}`);
+  }
+
   public listProjectLabels() {
     return callApi('get', `/projects/${this.projectId}/labels`);
+  }
+
+  public listMergeRequestsWillCloseIssueOnMerge(issueNumber: string) {
+    return callApi(
+      'get',
+      `/projects/${this.projectId}/issues/${issueNumber}/closed_by`
+    );
   }
 
   public async createIssue(title: string, description: string, labels: any[]) {

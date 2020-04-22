@@ -28,8 +28,14 @@ class GitLab {
             return project.default_branch;
         });
     }
+    getIssue(issueNumber) {
+        return callApi('get', `/projects/${this.projectId}/issues/${issueNumber}`);
+    }
     listProjectLabels() {
         return callApi('get', `/projects/${this.projectId}/labels`);
+    }
+    listMergeRequestsWillCloseIssueOnMerge(issueNumber) {
+        return callApi('get', `/projects/${this.projectId}/issues/${issueNumber}/closed_by`);
     }
     createIssue(title, description, labels) {
         return __awaiter(this, void 0, void 0, function* () {
