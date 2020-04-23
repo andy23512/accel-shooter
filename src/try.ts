@@ -1,6 +1,4 @@
 import { GitLab } from './gitlab';
-import markdownIt from 'markdown-it';
-import MarkdownIt from 'markdown-it';
 import { textToTree } from './text-to-tree';
 import { ClickUp } from './clickup';
 
