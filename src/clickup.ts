@@ -8,6 +8,10 @@ export class ClickUp {
     return callApi('get', `/task/${this.taskId}`);
   }
 
+  public getTaskWithSubTasks() {
+    return callApi('get', `/task/${this.taskId}?subtasks=true`);
+  }
+
   public setTaskStatus(status: string) {
     return callApi('put', `/task/${this.taskId}`, { status });
   }

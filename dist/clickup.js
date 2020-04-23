@@ -9,6 +9,9 @@ class ClickUp {
     getTask() {
         return callApi('get', `/task/${this.taskId}`);
     }
+    getTaskWithSubTasks() {
+        return callApi('get', `/task/${this.taskId}?subtasks=true`);
+    }
     setTaskStatus(status) {
         return callApi('put', `/task/${this.taskId}`, { status });
     }
