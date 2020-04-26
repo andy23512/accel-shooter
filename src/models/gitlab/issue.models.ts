@@ -1,3 +1,8 @@
+import { Label } from './label.models';
+import { References } from './references.models';
+import { TimeStats } from './time-stats.models';
+import { Author } from './author.models';
+
 export interface Issue {
   project_id: number;
   milestone: Milestone;
@@ -7,7 +12,7 @@ export interface Issue {
   iid: number;
   assignees: Author[];
   assignee: Author;
-  labels: any[];
+  labels: Label[];
   upvotes: number;
   downvotes: number;
   merge_requests_count: number;
@@ -39,28 +44,6 @@ interface Links {
   notes: string;
   award_emoji: string;
   project: string;
-}
-
-interface TimeStats {
-  time_estimate: number;
-  total_time_spent: number;
-  human_time_estimate?: any;
-  human_total_time_spent?: any;
-}
-
-interface References {
-  short: string;
-  relative: string;
-  full: string;
-}
-
-interface Author {
-  state: string;
-  web_url: string;
-  avatar_url?: any;
-  username: string;
-  id: number;
-  name: string;
 }
 
 interface Milestone {

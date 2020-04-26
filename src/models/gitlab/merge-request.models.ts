@@ -1,3 +1,8 @@
+import { Label } from './label.models';
+import { References } from './references.models';
+import { TimeStats } from './time-stats.models';
+import { Author } from './author.models';
+
 export interface MergeRequest {
   id: number;
   iid: number;
@@ -17,7 +22,7 @@ export interface MergeRequest {
   target_project_id: number;
   closed_at?: any;
   closed_by?: any;
-  labels: any[];
+  labels: Label[];
   work_in_progress: boolean;
   milestone?: any;
   merge_when_pipeline_succeeds: boolean;
@@ -32,26 +37,4 @@ export interface MergeRequest {
   reference: string;
   references: References;
   time_stats: TimeStats;
-}
-
-interface TimeStats {
-  time_estimate: number;
-  total_time_spent: number;
-  human_time_estimate?: any;
-  human_total_time_spent?: any;
-}
-
-interface References {
-  short: string;
-  relative: string;
-  full: string;
-}
-
-interface Author {
-  name: string;
-  username: string;
-  id: number;
-  state: string;
-  avatar_url: string;
-  web_url: string;
 }

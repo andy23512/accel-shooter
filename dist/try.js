@@ -30,7 +30,7 @@ const clickup_1 = require("./clickup");
         const clickUpTasks = yield clickUp.getTask();
         let clickUpChecklist = clickUpTasks.checklists.find((c) => c.name === 'GitLab synced checklist');
         if (!clickUpChecklist) {
-            clickUpChecklist = yield clickUp.createCheckList('GitLab synced checklist');
+            clickUpChecklist = (yield clickUp.createCheckList('GitLab synced checklist')).checklist;
         }
         console.log(clickUpChecklist.items);
         if (clickUpChecklist.items.length === 0) {

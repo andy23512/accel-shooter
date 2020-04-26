@@ -1,8 +1,10 @@
+import { Assignee } from './assignee.modes';
+
 export interface ChecklistResponse {
   checklist: Checklist;
 }
 
-interface Checklist {
+export interface Checklist {
   id: string;
   task_id: string;
   name: string;
@@ -22,13 +24,4 @@ interface Item {
   parent?: any;
   date_created: string;
   children: any[];
-}
-
-interface Assignee {
-  id: number;
-  username: string;
-  email: string;
-  color: string;
-  initials: string;
-  profilePicture: string;
 }

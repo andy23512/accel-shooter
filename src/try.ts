@@ -23,9 +23,9 @@ import { ClickUp } from './clickup';
       (c: any) => c.name === 'GitLab synced checklist'
     );
     if (!clickUpChecklist) {
-      clickUpChecklist = await clickUp.createCheckList(
-        'GitLab synced checklist'
-      );
+      clickUpChecklist = (
+        await clickUp.createCheckList('GitLab synced checklist')
+      ).checklist;
     }
     console.log(clickUpChecklist.items);
     if (clickUpChecklist.items.length === 0) {
