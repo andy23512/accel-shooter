@@ -93,7 +93,9 @@ const actions = {
                     case 'task':
                         const description = issue.description;
                         const result = description.match(/https:\/\/app.clickup.com\/t\/\w+/);
-                        open_1.default(result[0]);
+                        if (result) {
+                            open_1.default(result[0]);
+                        }
                         break;
                 }
             }

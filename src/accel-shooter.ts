@@ -94,7 +94,9 @@ const actions: { [key: string]: () => Promise<any> } = {
         case 'task':
           const description = issue.description;
           const result = description.match(/https:\/\/app.clickup.com\/t\/\w+/);
-          open(result[0]);
+          if (result) {
+            open(result[0]);
+          }
           break;
       }
     }

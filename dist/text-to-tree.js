@@ -1,16 +1,16 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 class TreeNode {
-    constructor(title, _level) {
-        this.title = title;
+    constructor(name, _level) {
+        this.name = name;
         this._level = _level;
         this.children = [];
         this._parent = null;
         this.checked = false;
-        if (/- \[x\]/.test(title)) {
+        if (/- \[x\]/.test(name)) {
             this.checked = true;
         }
-        this.title = this.title.replace(/- \[[x ]\] /g, '');
+        this.name = this.name.replace(/- \[[x ]\] /g, '');
     }
     get level() {
         return typeof this._level === 'undefined' ? -1 : this._level;
@@ -27,6 +27,7 @@ class TreeNode {
         return this;
     }
 }
+exports.TreeNode = TreeNode;
 function appendRec(prev, curr) {
     if (typeof curr == 'string') {
         //in the recursive call it's a object

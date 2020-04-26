@@ -1,5 +1,5 @@
 import fetch, { Response } from 'node-fetch';
-import { Site, HttpMethod } from './models';
+import { Site, HttpMethod } from './models/models';
 import { CONFIG } from './config';
 
 function checkStatus(res: Response) {
@@ -25,11 +25,11 @@ export function callApiFactory(site: Site) {
     default:
       throw Error(`Site {site} is not supported.`);
   }
-  return async (
+  return async <T>(
     method: HttpMethod,
     url: string,
-    body?: { [key: string]: string }
-  ) => {
+    body?: { [key: string]: any }
+  ): Promise<T> => {
     const params = new URLSearchParams();
     if (body) {
       Object.entries(body).forEach(([key, value]) => {

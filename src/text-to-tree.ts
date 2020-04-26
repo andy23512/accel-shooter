@@ -1,12 +1,12 @@
-class TreeNode {
+export class TreeNode {
   public children: TreeNode[] = [];
   private _parent: TreeNode | null = null;
   public checked = false;
-  constructor(public title: string, private _level?: number) {
-    if (/- \[x\]/.test(title)) {
+  constructor(public name: string, private _level?: number) {
+    if (/- \[x\]/.test(name)) {
       this.checked = true;
     }
-    this.title = this.title.replace(/- \[[x ]\] /g, '');
+    this.name = this.name.replace(/- \[[x ]\] /g, '');
   }
   get level(): number {
     return typeof this._level === 'undefined' ? -1 : this._level;

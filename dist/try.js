@@ -25,9 +25,28 @@ const clickup_1 = require("./clickup");
         const gitLabToDoListText = issueDescription
             .replace(/https:\/\/app.clickup.com\/t\/\w+/g, '')
             .trim();
-        console.log(text_to_tree_1.textToTree(gitLabToDoListText));
+        const issueChecklistTree = text_to_tree_1.textToTree(gitLabToDoListText);
         const clickUp = new clickup_1.ClickUp(clickUpTaskId);
-        const clickUpTask = yield clickUp.getTaskWithSubTasks();
-        console.log(clickUpTask);
+        const clickUpTasks = yield clickUp.getTask();
+        let clickUpChecklist = clickUpTasks.checklists.find((c) => c.name === 'GitLab synced checklist');
+        if (!clickUpChecklist) {
+            clickUpChecklist = yield clickUp.createCheckList('GitLab synced checklist');
+        }
+        console.log(clickUpChecklist.items);
+        if (clickUpChecklist.items.length === 0) {
+            yield recursiveCreateChecklistItem(clickUp, clickUpChecklist, issueChecklistTree, null);
+        }
     }
 }))();
+let counter = -1;
+function recursiveCreateChecklistItem(clickUp, clickUpChecklist, nodes, parent) {
+    return __awaiter(this, void 0, void 0, function* () {
+        for (const node of nodes) {
+            counter += 1;
+            const parentCheckListItem = yield clickUp.createCheckListItem(clickUpChecklist.id, node.name, counter.toString());
+            if (node.children.length) {
+                recursiveCreateChecklistItem(clickUp, clickUpChecklist, node.children, parentCheckListItem);
+            }
+        }
+    });
+}

@@ -9,11 +9,17 @@ class ClickUp {
     getTask() {
         return callApi('get', `/task/${this.taskId}`);
     }
-    getTaskWithSubTasks() {
-        return callApi('get', `/task/${this.taskId}?subtasks=true`);
-    }
     setTaskStatus(status) {
         return callApi('put', `/task/${this.taskId}`, { status });
+    }
+    createCheckList(name) {
+        return callApi('post', `/task/${this.taskId}/checklist`, { name });
+    }
+    createCheckListItem(checklistId, name, orderindex) {
+        return callApi('post', `/checklist/${checklistId}/checklist_item`, {
+            name,
+            orderindex,
+        });
     }
 }
 exports.ClickUp = ClickUp;

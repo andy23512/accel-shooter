@@ -1,6 +1,6 @@
 import { readFileSync, existsSync } from 'fs';
 import { resolve as pathResolve } from 'path';
-import { Config } from './models';
+import { Config } from './models/models';
 
 export function getConfigPath() {
   return pathResolve(__dirname, '../.config.json');

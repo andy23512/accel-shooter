@@ -1,4 +1,12 @@
 import { callApiFactory, dashify } from './utils';
+import {
+  Project,
+  Issue,
+  Label,
+  MergeRequest,
+  Branch,
+  User,
+} from './models/gitlab.models';
 
 const callApi = callApiFactory('GitLab');
 
@@ -13,7 +21,7 @@ export class GitLab {
   constructor(public projectId: string) {}
 
   public getProject() {
-    return callApi('get', `/projects/${this.projectId}`);
+    return callApi<Project>('get', `/projects/${this.projectId}`);
   }
 
   public async getDefaultBranchName() {
@@ -22,22 +30,25 @@ export class GitLab {
   }
 
   public getIssue(issueNumber: string) {
-    return callApi('get', `/projects/${this.projectId}/issues/${issueNumber}`);
+    return callApi<Issue>(
+      'get',
+      `/projects/${this.projectId}/issues/${issueNumber}`
+    );
   }
 
   public listProjectLabels() {
-    return callApi('get', `/projects/${this.projectId}/labels`);
+    return callApi<Label[]>('get', `/projects/${this.projectId}/labels`);
   }
 
   public listMergeRequestsWillCloseIssueOnMerge(issueNumber: string) {
-    return callApi(
+    return callApi<MergeRequest[]>(
       'get',
       `/projects/${this.projectId}/issues/${issueNumber}/closed_by`
     );
   }
 
   public async createIssue(title: string, description: string, labels: any[]) {
-    return callApi('post', `/projects/${this.projectId}/issues`, {
+    return callApi<Issue>('post', `/projects/${this.projectId}/issues`, {
       title: title,
       description: description,
       assignee_ids: await this.getUserId(),
@@ -46,10 +57,14 @@ export class GitLab {
   }
 
   public async createBranch(branch: string) {
-    return callApi('post', `/projects/${this.projectId}/repository/branches`, {
-      branch,
-      ref: await this.getDefaultBranchName(),
-    });
+    return callApi<Branch>(
+      'post',
+      `/projects/${this.projectId}/repository/branches`,
+      {
+        branch,
+        ref: await this.getDefaultBranchName(),
+      }
+    );
   }
 
   public async createMergeRequest(
@@ -58,17 +73,21 @@ export class GitLab {
     branch: string,
     labels: any[]
   ) {
-    return callApi('post', `/projects/${this.projectId}/merge_requests`, {
-      source_branch: branch,
-      target_branch: await this.getDefaultBranchName(),
-      title: `WIP: Resolve "${issueTitle}"`,
-      description: `Close #${issueNumber}`,
-      labels: labels.join(','),
-    });
+    return callApi<MergeRequest>(
+      'post',
+      `/projects/${this.projectId}/merge_requests`,
+      {
+        source_branch: branch,
+        target_branch: await this.getDefaultBranchName(),
+        title: `WIP: Resolve "${issueTitle}"`,
+        description: `Close #${issueNumber}`,
+        labels: labels.join(','),
+      }
+    );
   }
 
   private async getUserId() {
-    const user = await callApi('get', '/user');
+    const user = await callApi<User>('get', '/user');
     return user.id;
   }
 }
