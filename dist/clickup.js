@@ -12,14 +12,25 @@ class ClickUp {
     setTaskStatus(status) {
         return callApi('put', `/task/${this.taskId}`, { status });
     }
-    createCheckList(name) {
+    createChecklist(name) {
         return callApi('post', `/task/${this.taskId}/checklist`, { name });
     }
-    createCheckListItem(checklistId, name, orderindex) {
+    createChecklistItem(checklistId, name, resolved, orderindex) {
         return callApi('post', `/checklist/${checklistId}/checklist_item`, {
             name,
+            resolved,
             orderindex,
         });
+    }
+    updateChecklistItem(checklistId, checklistItemId, name, resolved, orderindex) {
+        return callApi('put', `/checklist/${checklistId}/checklist_item/${checklistItemId}`, {
+            name,
+            resolved,
+            orderindex,
+        });
+    }
+    deleteChecklistItem(checklistId, checklistItemId) {
+        return callApi('delete', `/checklist/${checklistId}/checklist_item/${checklistItemId}`);
     }
 }
 exports.ClickUp = ClickUp;

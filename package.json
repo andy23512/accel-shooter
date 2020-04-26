@@ -21,13 +21,15 @@
   "dependencies": {
     "inquirer": "^7.1.0",
     "node-fetch": "^2.6.0",
-    "open": "^7.0.3"
+    "open": "^7.0.3",
+    "set-interval-async": "^1.0.32"
   },
   "devDependencies": {
     "@types/inquirer": "^6.5.0",
     "@types/node": "^13.13.0",
     "@types/node-fetch": "^2.5.6",
     "@types/open": "^6.2.1",
+    "@types/set-interval-async": "^1.0.0",
     "precommit-hook": "^3.0.0",
     "ts-node": "^8.8.2",
     "tslint": "^6.1.1",

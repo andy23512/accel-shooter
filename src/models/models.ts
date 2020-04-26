@@ -8,3 +8,10 @@ export interface Config {
   };
   HackMDNoteUrl: string;
 }
+export type NormalizedChecklist = NormalizedChecklistItem[];
+export interface NormalizedChecklistItem {
+  name: string;
+  checked: boolean;
+  order: number;
+  id?: string;
+}

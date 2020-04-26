@@ -13,7 +13,7 @@ export class ClickUp {
     return callApi<Task>('put', `/task/${this.taskId}`, { status });
   }
 
-  public createCheckList(name: string) {
+  public createChecklist(name: string) {
     return callApi<ChecklistResponse>(
       'post',
       `/task/${this.taskId}/checklist`,
@@ -21,18 +21,45 @@ export class ClickUp {
     );
   }
 
-  public createCheckListItem(
+  public createChecklistItem(
     checklistId: string,
     name: string,
-    orderindex: string
+    resolved: boolean,
+    orderindex: number
   ) {
     return callApi<ChecklistResponse>(
       'post',
       `/checklist/${checklistId}/checklist_item`,
       {
         name,
+        resolved,
         orderindex,
       }
+    );
+  }
+
+  public updateChecklistItem(
+    checklistId: string,
+    checklistItemId: string,
+    name: string,
+    resolved: boolean,
+    orderindex: number
+  ) {
+    return callApi<ChecklistResponse>(
+      'put',
+      `/checklist/${checklistId}/checklist_item/${checklistItemId}`,
+      {
+        name,
+        resolved,
+        orderindex,
+      }
+    );
+  }
+
+  public deleteChecklistItem(checklistId: string, checklistItemId: string) {
+    return callApi<{}>(
+      'delete',
+      `/checklist/${checklistId}/checklist_item/${checklistItemId}`
     );
   }
 }

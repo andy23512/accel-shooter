@@ -12,10 +12,10 @@ export interface Checklist {
   orderindex: number;
   resolved: number;
   unresolved: number;
-  items: Item[];
+  items: ChecklistItem[];
 }
 
-interface Item {
+export interface ChecklistItem {
   id: string;
   name: string;
   orderindex: number;

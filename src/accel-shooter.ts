@@ -5,11 +5,19 @@ import { CONFIG } from './config';
 import { ClickUp } from './clickup';
 import { GitLab, getGitLabBranchNameFromIssueNumberAndTitle } from './gitlab';
 import inquirer from 'inquirer';
+import {
+  normalizeGitLabIssueChecklist,
+  normalizeClickUpChecklist,
+  getSyncChecklistActions,
+  syncChecklist,
+} from './utils';
+import { setIntervalAsync } from 'set-interval-async/dynamic';
 
 const actionAlias: { [key: string]: string } = {
   c: 'config',
-  s: 'start',
+  st: 'start',
   o: 'open',
+  sy: 'sync',
 };
 
 const actions: { [key: string]: () => Promise<any> } = {
@@ -100,6 +108,14 @@ const actions: { [key: string]: () => Promise<any> } = {
           break;
       }
     }
+  },
+  async sync() {
+    const gitLabProjectId = getGitLabProjectId();
+    const issueNumber = process.argv[4];
+    await syncChecklist(gitLabProjectId, issueNumber);
+    setIntervalAsync(async () => {
+      await syncChecklist(gitLabProjectId, issueNumber);
+    }, 2 * 60 * 1000);
   },
 };
 

@@ -14,6 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const config_1 = require("./config");
+const gitlab_1 = require("./gitlab");
+const clickup_1 = require("./clickup");
 function checkStatus(res) {
     if (res.ok) {
         return res;
@@ -67,3 +69,91 @@ function dashify(input) {
     return temp;
 }
 exports.dashify = dashify;
+function normalizeGitLabIssueChecklist(checklistText) {
+    return checklistText.split('\n').map((line, index) => ({
+        name: line
+            .replace(/- \[[x ]\] /g, '')
+            .replace(/^ +/, (space) => space.replace(/ /g, '-')),
+        checked: /- \[x\]/.test(line),
+        order: index,
+    }));
+}
+exports.normalizeGitLabIssueChecklist = normalizeGitLabIssueChecklist;
+function normalizeClickUpChecklist(checklist) {
+    return checklist
+        .sort((a, b) => a.orderindex - b.orderindex)
+        .map((item, index) => ({
+        name: item.name,
+        checked: item.resolved,
+        order: index,
+        id: item.id,
+    }));
+}
+exports.normalizeClickUpChecklist = normalizeClickUpChecklist;
+function getSyncChecklistActions(oldClickUpChecklist, newGitLabChecklist) {
+    const actions = {
+        update: [],
+        create: [],
+        delete: [],
+    };
+    const oldLength = oldClickUpChecklist.length;
+    const newLength = newGitLabChecklist.length;
+    if (newLength < oldLength) {
+        actions.delete = oldClickUpChecklist.slice(newLength);
+    }
+    else if (newLength > oldLength) {
+        actions.create = newGitLabChecklist.slice(oldLength);
+    }
+    const minLength = Math.min(oldLength, newLength);
+    for (let i = 0; i < minLength; i++) {
+        const oldItem = oldClickUpChecklist[i];
+        const newItem = newGitLabChecklist[i];
+        if (oldItem.checked !== newItem.checked || oldItem.name !== newItem.name) {
+            actions.update.push(Object.assign({ id: oldItem.id }, newItem));
+        }
+    }
+    return actions;
+}
+exports.getSyncChecklistActions = getSyncChecklistActions;
+function syncChecklist(gitLabProjectId, issueNumber) {
+    return __awaiter(this, void 0, void 0, function* () {
+        const gitLab = new gitlab_1.GitLab(gitLabProjectId);
+        const issue = yield gitLab.getIssue(issueNumber);
+        const issueDescription = issue.description;
+        const result = issueDescription.match(/https:\/\/app.clickup.com\/t\/(\w+)/);
+        if (result) {
+            const clickUpTaskId = result[1];
+            const gitLabChecklistText = issueDescription
+                .replace(/https:\/\/app.clickup.com\/t\/\w+/g, '')
+                .trim();
+            const gitLabNormalizedChecklist = normalizeGitLabIssueChecklist(gitLabChecklistText);
+            const clickUp = new clickup_1.ClickUp(clickUpTaskId);
+            const clickUpTasks = yield clickUp.getTask();
+            let clickUpChecklist = clickUpTasks.checklists.find((c) => c.name === 'GitLab synced checklist');
+            if (!clickUpChecklist) {
+                clickUpChecklist = (yield clickUp.createChecklist('GitLab synced checklist')).checklist;
+            }
+            const clickUpNormalizedChecklist = normalizeClickUpChecklist(clickUpChecklist.items);
+            const actions = getSyncChecklistActions(clickUpNormalizedChecklist, gitLabNormalizedChecklist);
+            for (const checklistItem of actions.update) {
+                yield clickUp.updateChecklistItem(clickUpChecklist.id, checklistItem.id, checklistItem.name, checklistItem.checked, checklistItem.order);
+            }
+            for (const checklistItem of actions.create) {
+                yield clickUp.createChecklistItem(clickUpChecklist.id, checklistItem.name, checklistItem.checked, checklistItem.order);
+            }
+            for (const checklistItem of actions.delete) {
+                yield clickUp.deleteChecklistItem(clickUpChecklist.id, checklistItem.id);
+            }
+            const status = Object.entries(actions)
+                .map(([action, items]) => {
+                const s = items.length.toString();
+                const n = items.length === 1 ? 'item' : 'items';
+                return `${s} ${n} ${action}d`;
+            })
+                .join(', ');
+            console.log(new Date().toLocaleString());
+            console.log(status);
+        }
+    });
+}
+exports.syncChecklist = syncChecklist;
