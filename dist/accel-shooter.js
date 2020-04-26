@@ -19,8 +19,8 @@ const config_1 = require("./config");
 const clickup_1 = require("./clickup");
 const gitlab_1 = require("./gitlab");
 const inquirer_1 = __importDefault(require("inquirer"));
-const utils_1 = require("./utils");
 const dynamic_1 = require("set-interval-async/dynamic");
+const actions_1 = require("./actions");
 const actionAlias = {
     c: 'config',
     st: 'start',
@@ -108,9 +108,9 @@ const actions = {
         return __awaiter(this, void 0, void 0, function* () {
             const gitLabProjectId = getGitLabProjectId();
             const issueNumber = process.argv[4];
-            yield utils_1.syncChecklist(gitLabProjectId, issueNumber);
+            yield actions_1.syncChecklist(gitLabProjectId, issueNumber);
             dynamic_1.setIntervalAsync(() => __awaiter(this, void 0, void 0, function* () {
-                yield utils_1.syncChecklist(gitLabProjectId, issueNumber);
+                yield actions_1.syncChecklist(gitLabProjectId, issueNumber);
             }), 2 * 60 * 1000);
         });
     },

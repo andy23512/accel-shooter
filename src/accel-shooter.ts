@@ -5,13 +5,8 @@ import { CONFIG } from './config';
 import { ClickUp } from './clickup';
 import { GitLab, getGitLabBranchNameFromIssueNumberAndTitle } from './gitlab';
 import inquirer from 'inquirer';
-import {
-  normalizeGitLabIssueChecklist,
-  normalizeClickUpChecklist,
-  getSyncChecklistActions,
-  syncChecklist,
-} from './utils';
 import { setIntervalAsync } from 'set-interval-async/dynamic';
+import { syncChecklist } from './actions';
 
 const actionAlias: { [key: string]: string } = {
   c: 'config',
