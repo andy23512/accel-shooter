@@ -19,12 +19,14 @@
     "precommit-build"
   ],
   "dependencies": {
+    "clipboardy": "^2.3.0",
     "inquirer": "^7.1.0",
     "node-fetch": "^2.6.0",
     "open": "^7.0.3",
     "set-interval-async": "^1.0.32"
   },
   "devDependencies": {
+    "@types/clipboardy": "^2.0.1",
     "@types/inquirer": "^6.5.0",
     "@types/node": "^13.13.0",
     "@types/node-fetch": "^2.5.6",

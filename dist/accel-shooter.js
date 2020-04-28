@@ -21,6 +21,7 @@ const gitlab_1 = require("./gitlab");
 const inquirer_1 = __importDefault(require("inquirer"));
 const dynamic_1 = require("set-interval-async/dynamic");
 const actions_1 = require("./actions");
+const clipboardy_1 = __importDefault(require("clipboardy"));
 const actionAlias = {
     c: 'config',
     st: 'start',
@@ -59,7 +60,9 @@ const actions = {
             const gitLabBranch = yield gitLab.createBranch(gitlab_1.getGitLabBranchNameFromIssueNumberAndTitle(gitLabIssueNumber, gitLabIssueTitle));
             yield gitLab.createMergeRequest(gitLabIssueNumber, gitLabIssueTitle, gitLabBranch.name, selectedGitLabLabels);
             console.log(`GitLab Issue Number: ${gitLabIssueNumber}`);
-            console.log(`Daily Progress string: ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`);
+            const dailyProgressString = `${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
+            console.log(`Daily Progress string: ${dailyProgressString} (Copied)`);
+            clipboardy_1.default.writeSync(dailyProgressString);
             open_1.default(config_1.CONFIG.HackMDNoteUrl);
             open_1.default(clickUpTaskUrl);
             open_1.default(gitLabIssueUrl);

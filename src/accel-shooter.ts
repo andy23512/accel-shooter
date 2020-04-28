@@ -7,6 +7,7 @@ import { GitLab, getGitLabBranchNameFromIssueNumberAndTitle } from './gitlab';
 import inquirer from 'inquirer';
 import { setIntervalAsync } from 'set-interval-async/dynamic';
 import { syncChecklist } from './actions';
+import clipboardy from 'clipboardy';
 
 const actionAlias: { [key: string]: string } = {
   c: 'config',
@@ -60,9 +61,9 @@ const actions: { [key: string]: () => Promise<any> } = {
       selectedGitLabLabels
     );
     console.log(`GitLab Issue Number: ${gitLabIssueNumber}`);
-    console.log(
-      `Daily Progress string: ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`
-    );
+    const dailyProgressString = `${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
+    console.log(`Daily Progress string: ${dailyProgressString} (Copied)`);
+    clipboardy.writeSync(dailyProgressString);
     open(CONFIG.HackMDNoteUrl);
     open(clickUpTaskUrl);
     open(gitLabIssueUrl);
