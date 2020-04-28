@@ -59,9 +59,7 @@ const actions = {
             const gitLabBranch = yield gitLab.createBranch(gitlab_1.getGitLabBranchNameFromIssueNumberAndTitle(gitLabIssueNumber, gitLabIssueTitle));
             yield gitLab.createMergeRequest(gitLabIssueNumber, gitLabIssueTitle, gitLabBranch.name, selectedGitLabLabels);
             console.log(`GitLab Issue Number: ${gitLabIssueNumber}`);
-            console.log(`GitLab Issue: ${gitLabIssueUrl}`);
-            console.log(`ClickUp Task: ${clickUpTaskUrl}`);
-            console.log(`HackMD Daily Progress: ${config_1.CONFIG.HackMDNoteUrl}`);
+            console.log(`Daily Progress string: ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`);
             open_1.default(config_1.CONFIG.HackMDNoteUrl);
             open_1.default(clickUpTaskUrl);
             open_1.default(gitLabIssueUrl);

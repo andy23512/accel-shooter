@@ -60,9 +60,9 @@ const actions: { [key: string]: () => Promise<any> } = {
       selectedGitLabLabels
     );
     console.log(`GitLab Issue Number: ${gitLabIssueNumber}`);
-    console.log(`GitLab Issue: ${gitLabIssueUrl}`);
-    console.log(`ClickUp Task: ${clickUpTaskUrl}`);
-    console.log(`HackMD Daily Progress: ${CONFIG.HackMDNoteUrl}`);
+    console.log(
+      `Daily Progress string: ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`
+    );
     open(CONFIG.HackMDNoteUrl);
     open(clickUpTaskUrl);
     open(gitLabIssueUrl);
