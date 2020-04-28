@@ -73,8 +73,7 @@ function syncChecklist(gitLabProjectId, issueNumber) {
                 return `${s} ${n} ${action}d`;
             })
                 .join(', ');
-            console.log(new Date().toLocaleString());
-            console.log(status);
+            console.log(`[${gitLabProjectId} #${issueNumber}] ${new Date().toLocaleString()} status`);
         }
     });
 }
