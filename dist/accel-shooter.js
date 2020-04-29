@@ -37,18 +37,45 @@ const actions = {
     },
     start() {
         return __awaiter(this, void 0, void 0, function* () {
-            const gitLab = new gitlab_1.GitLab(getGitLabProjectId());
-            const clickUp = new clickup_1.ClickUp(getClickUpTaskId());
             const answers = yield inquirer_1.default.prompt([
                 {
-                    name: 'labels',
-                    message: 'Choose GitLab Labels to add to new issue',
+                    name: 'gitLabProjectId',
+                    message: 'Choose GitLab Project',
                     type: 'checkbox',
-                    choices: () => gitLab
-                        .listProjectLabels()
-                        .then((labels) => labels.map((label) => label.name)),
+                    choices: Object.entries(config_1.CONFIG.GitLabProjectMap).map(([name, projectId]) => ({
+                        name: `${name} (${projectId})`,
+                        value: projectId.replace(/\//g, '%2F'),
+                    })),
+                },
+                {
+                    name: 'clickUpTaskId',
+                    message: 'Enter ClickUp Task ID',
+                    type: 'input',
+                    filter: (input) => input.replace('#', ''),
+                },
+                {
+                    name: 'issueTitle',
+                    message: 'Enter Issue Title',
+                    type: 'input',
+                    default: (answers) => __awaiter(this, void 0, void 0, function* () {
+                        return new clickup_1.ClickUp(answers.clickUpTaskId)
+                            .getTask()
+                            .then((task) => task.name);
+                    }),
+                },
+                {
+                    name: 'labels',
+                    message: 'Choose GitLab Labels to add to new Issue',
+                    type: 'checkbox',
+                    choices: ({ gitLabProjectId }) => __awaiter(this, void 0, void 0, function* () {
+                        return new gitlab_1.GitLab(gitLabProjectId)
+                            .listProjectLabels()
+                            .then((labels) => labels.map((label) => label.name));
+                    }),
                 },
             ]);
+            const gitLab = new gitlab_1.GitLab(answers.gitLabProjectId);
+            const clickUp = new clickup_1.ClickUp(answers.clickUpTaskId);
             const selectedGitLabLabels = answers.labels;
             const clickUpTask = yield clickUp.getTask();
             const clickUpTaskUrl = clickUpTask['url'];

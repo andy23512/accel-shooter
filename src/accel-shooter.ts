@@ -22,19 +22,45 @@ const actions: { [key: string]: () => Promise<any> } = {
     setConfigFile(configFile);
   },
   async start() {
-    const gitLab = new GitLab(getGitLabProjectId());
-    const clickUp = new ClickUp(getClickUpTaskId());
     const answers = await inquirer.prompt([
       {
-        name: 'labels',
-        message: 'Choose GitLab Labels to add to new issue',
+        name: 'gitLabProjectId',
+        message: 'Choose GitLab Project',
         type: 'checkbox',
-        choices: () =>
-          gitLab
+        choices: Object.entries(CONFIG.GitLabProjectMap).map(
+          ([name, projectId]) => ({
+            name: `${name} (${projectId})`,
+            value: projectId.replace(/\//g, '%2F'),
+          })
+        ),
+      },
+      {
+        name: 'clickUpTaskId',
+        message: 'Enter ClickUp Task ID',
+        type: 'input',
+        filter: (input) => input.replace('#', ''),
+      },
+      {
+        name: 'issueTitle',
+        message: 'Enter Issue Title',
+        type: 'input',
+        default: async (answers: any) =>
+          new ClickUp(answers.clickUpTaskId)
+            .getTask()
+            .then((task) => task.name),
+      },
+      {
+        name: 'labels',
+        message: 'Choose GitLab Labels to add to new Issue',
+        type: 'checkbox',
+        choices: async ({ gitLabProjectId }) =>
+          new GitLab(gitLabProjectId)
             .listProjectLabels()
             .then((labels) => labels.map((label: any) => label.name)),
       },
     ]);
+    const gitLab = new GitLab(answers.gitLabProjectId);
+    const clickUp = new ClickUp(answers.clickUpTaskId);
     const selectedGitLabLabels = answers.labels;
     const clickUpTask = await clickUp.getTask();
     const clickUpTaskUrl = clickUpTask['url'];
