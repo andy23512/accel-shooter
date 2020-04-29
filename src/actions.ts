@@ -104,7 +104,10 @@ export async function syncChecklist(
       })
       .join(', ');
     console.log(
-      `[${gitLabProjectId} #${issueNumber}] ${new Date().toLocaleString()} status`
+      `[${gitLabProjectId.replace(
+        '%2F',
+        '/'
+      )} #${issueNumber}] ${new Date().toLocaleString()} ${status}`
     );
   }
 }
