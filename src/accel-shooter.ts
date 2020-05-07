@@ -64,8 +64,7 @@ const actions: { [key: string]: () => Promise<any> } = {
     const selectedGitLabLabels = answers.labels;
     const clickUpTask = await clickUp.getTask();
     const clickUpTaskUrl = clickUpTask['url'];
-    const gitLabIssueTitle =
-      process.argv.length >= 6 ? process.argv[5] : clickUpTask['name'];
+    const gitLabIssueTitle = answers.issueTitle;
     await clickUp.setTaskStatus('in progress');
     const gitLabIssue = await gitLab.createIssue(
       gitLabIssueTitle,

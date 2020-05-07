@@ -79,7 +79,7 @@ const actions = {
             const selectedGitLabLabels = answers.labels;
             const clickUpTask = yield clickUp.getTask();
             const clickUpTaskUrl = clickUpTask['url'];
-            const gitLabIssueTitle = process.argv.length >= 6 ? process.argv[5] : clickUpTask['name'];
+            const gitLabIssueTitle = answers.issueTitle;
             yield clickUp.setTaskStatus('in progress');
             const gitLabIssue = yield gitLab.createIssue(gitLabIssueTitle, clickUpTaskUrl, selectedGitLabLabels);
             const gitLabIssueUrl = gitLabIssue.web_url;
