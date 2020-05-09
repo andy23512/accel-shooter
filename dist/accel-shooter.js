@@ -139,7 +139,7 @@ const actions = {
             yield actions_1.syncChecklist(gitLabProjectId, issueNumber);
             dynamic_1.setIntervalAsync(() => __awaiter(this, void 0, void 0, function* () {
                 yield actions_1.syncChecklist(gitLabProjectId, issueNumber);
-            }), 2 * 60 * 1000);
+            }), 5 * 60 * 1000);
         });
     },
 };

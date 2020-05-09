@@ -136,7 +136,7 @@ const actions: { [key: string]: () => Promise<any> } = {
     await syncChecklist(gitLabProjectId, issueNumber);
     setIntervalAsync(async () => {
       await syncChecklist(gitLabProjectId, issueNumber);
-    }, 2 * 60 * 1000);
+    }, 5 * 60 * 1000);
   },
 };
 
