@@ -57,6 +57,10 @@ function syncChecklist(gitLabProjectId, issueNumber) {
             }
             const clickUpNormalizedChecklist = utils_1.normalizeClickUpChecklist(clickUpChecklist.items);
             const actions = getSyncChecklistActions(clickUpNormalizedChecklist, gitLabNormalizedChecklist);
+            if (actions.update.length + actions.create.length + actions.delete.length ===
+                0) {
+                return;
+            }
             for (const checklistItem of actions.update) {
                 yield clickUp.updateChecklistItem(clickUpChecklist.id, checklistItem.id, checklistItem.name, checklistItem.checked, checklistItem.order);
             }

@@ -73,6 +73,12 @@ export async function syncChecklist(
       clickUpNormalizedChecklist,
       gitLabNormalizedChecklist
     );
+    if (
+      actions.update.length + actions.create.length + actions.delete.length ===
+      0
+    ) {
+      return;
+    }
     for (const checklistItem of actions.update) {
       await clickUp.updateChecklistItem(
         clickUpChecklist.id,
