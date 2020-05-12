@@ -37,7 +37,7 @@ export class GitLab {
   }
 
   public listProjectLabels() {
-    return callApi<Label[]>('get', `/projects/${this.projectId}/labels`);
+    return callApi<Label[]>('get', `/projects/${this.projectId}/labels?per_page=100`);
   }
 
   public listMergeRequestsWillCloseIssueOnMerge(issueNumber: string) {

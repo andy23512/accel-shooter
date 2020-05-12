@@ -32,7 +32,7 @@ class GitLab {
         return callApi('get', `/projects/${this.projectId}/issues/${issueNumber}`);
     }
     listProjectLabels() {
-        return callApi('get', `/projects/${this.projectId}/labels`);
+        return callApi('get', `/projects/${this.projectId}/labels?per_page=100`);
     }
     listMergeRequestsWillCloseIssueOnMerge(issueNumber) {
         return callApi('get', `/projects/${this.projectId}/issues/${issueNumber}/closed_by`);
