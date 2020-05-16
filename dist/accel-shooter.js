@@ -87,7 +87,7 @@ const actions = {
             const gitLabBranch = yield gitLab.createBranch(gitlab_1.getGitLabBranchNameFromIssueNumberAndTitle(gitLabIssueNumber, gitLabIssueTitle));
             yield gitLab.createMergeRequest(gitLabIssueNumber, gitLabIssueTitle, gitLabBranch.name, selectedGitLabLabels);
             console.log(`GitLab Issue Number: ${gitLabIssueNumber}`);
-            const dailyProgressString = `${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
+            const dailyProgressString = `* (Progressing) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
             console.log(`Daily Progress string: ${dailyProgressString} (Copied)`);
             clipboardy_1.default.writeSync(dailyProgressString);
             open_1.default(config_1.CONFIG.HackMDNoteUrl);
