@@ -3,7 +3,7 @@ import open from 'open';
 import { resolve as pathResolve } from 'path';
 import { CONFIG } from './config';
 import { ClickUp } from './clickup';
-import { GitLab, getGitLabBranchNameFromIssueNumberAndTitle } from './gitlab';
+import { GitLab, getGitLabBranchNameFromIssueNumberAndTitleAndTaskId } from './gitlab';
 import inquirer from 'inquirer';
 import { setIntervalAsync } from 'set-interval-async/dynamic';
 import { syncChecklist } from './actions';
@@ -74,9 +74,10 @@ const actions: { [key: string]: () => Promise<any> } = {
     const gitLabIssueUrl = gitLabIssue.web_url;
     const gitLabIssueNumber = gitLabIssue.iid;
     const gitLabBranch = await gitLab.createBranch(
-      getGitLabBranchNameFromIssueNumberAndTitle(
+      getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(
         gitLabIssueNumber,
-        gitLabIssueTitle
+        gitLabIssueTitle,
+        answers.clickUpTaskId
       )
     );
     await gitLab.createMergeRequest(

@@ -10,11 +10,12 @@ import {
 
 const callApi = callApiFactory('GitLab');
 
-export function getGitLabBranchNameFromIssueNumberAndTitle(
+export function getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(
   issueNumber: number,
-  issueTitle: string
+  issueTitle: string,
+  clickUpTaskId: string
 ) {
-  return dashify(`${issueNumber}-${issueTitle}`);
+  return dashify(`${issueNumber}-${issueTitle}`) + `_#${clickUpTaskId}`;
 }
 
 export class GitLab {

@@ -11,10 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("./utils");
 const callApi = utils_1.callApiFactory('GitLab');
-function getGitLabBranchNameFromIssueNumberAndTitle(issueNumber, issueTitle) {
-    return utils_1.dashify(`${issueNumber}-${issueTitle}`);
+function getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(issueNumber, issueTitle, clickUpTaskId) {
+    return utils_1.dashify(`${issueNumber}-${issueTitle}`) + `_#${clickUpTaskId}`;
 }
-exports.getGitLabBranchNameFromIssueNumberAndTitle = getGitLabBranchNameFromIssueNumberAndTitle;
+exports.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId = getGitLabBranchNameFromIssueNumberAndTitleAndTaskId;
 class GitLab {
     constructor(projectId) {
         this.projectId = projectId;

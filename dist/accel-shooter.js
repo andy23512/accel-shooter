@@ -84,7 +84,7 @@ const actions = {
             const gitLabIssue = yield gitLab.createIssue(gitLabIssueTitle, clickUpTaskUrl, selectedGitLabLabels);
             const gitLabIssueUrl = gitLabIssue.web_url;
             const gitLabIssueNumber = gitLabIssue.iid;
-            const gitLabBranch = yield gitLab.createBranch(gitlab_1.getGitLabBranchNameFromIssueNumberAndTitle(gitLabIssueNumber, gitLabIssueTitle));
+            const gitLabBranch = yield gitLab.createBranch(gitlab_1.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(gitLabIssueNumber, gitLabIssueTitle, answers.clickUpTaskId));
             yield gitLab.createMergeRequest(gitLabIssueNumber, gitLabIssueTitle, gitLabBranch.name, selectedGitLabLabels);
             console.log(`GitLab Issue Number: ${gitLabIssueNumber}`);
             const dailyProgressString = `* (Processing) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
