@@ -15,7 +15,7 @@ export function getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(
   issueTitle: string,
   clickUpTaskId: string
 ) {
-  return dashify(`${issueNumber}-${issueTitle}`) + `_#${clickUpTaskId}`;
+  return dashify(`${issueNumber}-${issueTitle}`) + `_%23${clickUpTaskId}`;
 }
 
 export class GitLab {
