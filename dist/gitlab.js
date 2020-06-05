@@ -12,7 +12,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const utils_1 = require("./utils");
 const callApi = utils_1.callApiFactory('GitLab');
 function getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(issueNumber, issueTitle, clickUpTaskId) {
-    return utils_1.dashify(`${issueNumber}-${issueTitle}`) + `_%23${clickUpTaskId}`;
+    return utils_1.dashify(`${issueNumber}-${issueTitle}`) + `_#${clickUpTaskId}`;
 }
 exports.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId = getGitLabBranchNameFromIssueNumberAndTitleAndTaskId;
 class GitLab {
