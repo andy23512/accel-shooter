@@ -58,13 +58,16 @@ export async function syncChecklist(
     );
     const clickUp = new ClickUp(clickUpTaskId);
     const clickUpTasks = await clickUp.getTask();
+    const clickUpChecklistTitle = `GitLab synced checklist [${gitLabProjectId.replace(
+      '%2F',
+      '/'
+    )}]`;
     let clickUpChecklist = clickUpTasks.checklists.find(
-      (c: any) => c.name === 'GitLab synced checklist'
+      (c: any) => c.name === clickUpChecklistTitle
     );
     if (!clickUpChecklist) {
-      clickUpChecklist = (
-        await clickUp.createChecklist('GitLab synced checklist')
-      ).checklist;
+      clickUpChecklist = (await clickUp.createChecklist(clickUpChecklistTitle))
+        .checklist;
     }
     const clickUpNormalizedChecklist = normalizeClickUpChecklist(
       clickUpChecklist.items
