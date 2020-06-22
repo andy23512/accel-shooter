@@ -3,7 +3,10 @@ import open from 'open';
 import { resolve as pathResolve } from 'path';
 import { CONFIG } from './config';
 import { ClickUp } from './clickup';
-import { GitLab, getGitLabBranchNameFromIssueNumberAndTitleAndTaskId } from './gitlab';
+import {
+  GitLab,
+  getGitLabBranchNameFromIssueNumberAndTitleAndTaskId,
+} from './gitlab';
 import inquirer from 'inquirer';
 import { setIntervalAsync } from 'set-interval-async/dynamic';
 import { syncChecklist } from './actions';

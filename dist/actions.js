@@ -79,7 +79,10 @@ function syncChecklist(gitLabProjectId, issueNumber) {
                 return `${s} ${n} ${action}d`;
             })
                 .join(', ');
-            console.log(`[${gitLabProjectId.replace('%2F', '/')} #${issueNumber}] ${new Date().toLocaleString()} ${status}`);
+            const fullCompleteMessage = gitLabNormalizedChecklist.every((item) => item.checked)
+                ? '(Completed)'
+                : '';
+            console.log(`[${gitLabProjectId.replace('%2F', '/')} #${issueNumber}] ${new Date().toLocaleString()} ${status} ${fullCompleteMessage}`);
         }
     });
 }

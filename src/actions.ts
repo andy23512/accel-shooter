@@ -112,11 +112,16 @@ export async function syncChecklist(
         return `${s} ${n} ${action}d`;
       })
       .join(', ');
+    const fullCompleteMessage = gitLabNormalizedChecklist.every(
+      (item) => item.checked
+    )
+      ? '(Completed)'
+      : '';
     console.log(
       `[${gitLabProjectId.replace(
         '%2F',
         '/'
-      )} #${issueNumber}] ${new Date().toLocaleString()} ${status}`
+      )} #${issueNumber}] ${new Date().toLocaleString()} ${status} ${fullCompleteMessage}`
     );
   }
 }
