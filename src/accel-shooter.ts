@@ -93,7 +93,6 @@ const actions: { [key: string]: () => Promise<any> } = {
     const dailyProgressString = `* (Processing) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
     console.log(`Daily Progress string: ${dailyProgressString} (Copied)`);
     clipboardy.writeSync(dailyProgressString);
-    open(CONFIG.HackMDNoteUrl);
     open(clickUpTaskUrl);
     open(gitLabIssueUrl);
   },

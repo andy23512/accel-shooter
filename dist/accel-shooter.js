@@ -90,7 +90,6 @@ const actions = {
             const dailyProgressString = `* (Processing) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
             console.log(`Daily Progress string: ${dailyProgressString} (Copied)`);
             clipboardy_1.default.writeSync(dailyProgressString);
-            open_1.default(config_1.CONFIG.HackMDNoteUrl);
             open_1.default(clickUpTaskUrl);
             open_1.default(gitLabIssueUrl);
         });

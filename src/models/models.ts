@@ -6,7 +6,6 @@ export interface Config {
   GitLabProjectMap: {
     [key: string]: string;
   };
-  HackMDNoteUrl: string;
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];
 export interface NormalizedChecklistItem {
