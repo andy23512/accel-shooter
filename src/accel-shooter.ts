@@ -11,6 +11,8 @@ import inquirer from 'inquirer';
 import { setIntervalAsync } from 'set-interval-async/dynamic';
 import { syncChecklist } from './actions';
 import clipboardy from 'clipboardy';
+import { promiseSpawn } from './utils';
+import os from 'os';
 
 const actionAlias: { [key: string]: string } = {
   c: 'config',
@@ -27,15 +29,13 @@ const actions: { [key: string]: () => Promise<any> } = {
   async start() {
     const answers = await inquirer.prompt([
       {
-        name: 'gitLabProjectId',
+        name: 'gitLabProject',
         message: 'Choose GitLab Project',
-        type: 'checkbox',
-        choices: Object.entries(CONFIG.GitLabProjectMap).map(
-          ([name, projectId]) => ({
-            name: `${name} (${projectId})`,
-            value: projectId.replace(/\//g, '%2F'),
-          })
-        ),
+        type: 'list',
+        choices: CONFIG.GitLabProjects.map((p) => ({
+          name: `${p.name} (${p.repo})`,
+          value: p,
+        })),
       },
       {
         name: 'clickUpTaskId',
@@ -56,13 +56,13 @@ const actions: { [key: string]: () => Promise<any> } = {
         name: 'labels',
         message: 'Choose GitLab Labels to add to new Issue',
         type: 'checkbox',
-        choices: async ({ gitLabProjectId }) =>
-          new GitLab(gitLabProjectId)
+        choices: async ({ gitLabProject }) =>
+          new GitLab(gitLabProject.id)
             .listProjectLabels()
             .then((labels) => labels.map((label: any) => label.name)),
       },
     ]);
-    const gitLab = new GitLab(answers.gitLabProjectId);
+    const gitLab = new GitLab(answers.gitLabProject.id);
     const clickUp = new ClickUp(answers.clickUpTaskId);
     const selectedGitLabLabels = answers.labels;
     const clickUpTask = await clickUp.getTask();
@@ -89,16 +89,25 @@ const actions: { [key: string]: () => Promise<any> } = {
       gitLabBranch.name,
       selectedGitLabLabels
     );
+    process.chdir(answers.gitLabProject.path.replace('~', os.homedir()));
+    await promiseSpawn('git', ['pull']);
+    await promiseSpawn('git', ['checkout', gitLabBranch.name]);
     console.log(`GitLab Issue Number: ${gitLabIssueNumber}`);
     const dailyProgressString = `* (Processing) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
     console.log(`Daily Progress string: ${dailyProgressString} (Copied)`);
     clipboardy.writeSync(dailyProgressString);
-    open(clickUpTaskUrl);
     open(gitLabIssueUrl);
+    await syncChecklist(answers.gitLabProject.id, gitLabIssueNumber.toString());
+    setIntervalAsync(async () => {
+      await syncChecklist(
+        answers.gitLabProject.id,
+        gitLabIssueNumber.toString()
+      );
+    }, 5 * 60 * 1000);
   },
   async open() {
     const issueNumber = process.argv[4];
-    const gitLab = new GitLab(getGitLabProjectId());
+    const gitLab = new GitLab(getGitLabProjectIdFromArgv());
     const answers = await inquirer.prompt([
       {
         name: 'types',
@@ -134,7 +143,7 @@ const actions: { [key: string]: () => Promise<any> } = {
     }
   },
   async sync() {
-    const gitLabProjectId = getGitLabProjectId();
+    const gitLabProjectId = getGitLabProjectIdFromArgv();
     const issueNumber = process.argv[4];
     await syncChecklist(gitLabProjectId, issueNumber);
     setIntervalAsync(async () => {
@@ -158,13 +167,20 @@ function setConfigFile(configFile: string) {
   copyFileSync(src, dest);
 }
 
-function getGitLabProjectId() {
-  return (CONFIG.GitLabProjectMap[process.argv[3]] || process.argv[3]).replace(
-    /\//g,
-    '%2F'
-  );
+function getGitLabProjectByName(n: string) {
+  console.log(n);
+  console.log(CONFIG.GitLabProjects);
+  return CONFIG.GitLabProjects.find(({ name }) => name === n);
 }
 
-function getClickUpTaskId() {
-  return process.argv[4].replace(/#/g, '');
+function getGitLabProjectIdByName(name: string) {
+  const gitLabProjectId = getGitLabProjectByName(name)?.id;
+  if (!gitLabProjectId) {
+    throw new Error('Cannot find project');
+  }
+  return gitLabProjectId;
+}
+
+function getGitLabProjectIdFromArgv() {
+  return getGitLabProjectIdByName(process.argv[3]);
 }

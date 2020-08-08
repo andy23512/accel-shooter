@@ -3,9 +3,12 @@ export type HttpMethod = 'get' | 'post' | 'put' | 'delete';
 export interface Config {
   ClickUpToken: string;
   GitLabToken: string;
-  GitLabProjectMap: {
-    [key: string]: string;
-  };
+  GitLabProjects: Array<{
+    name: string;
+    path: string;
+    repo: string;
+    id: string;
+  }>;
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];
 export interface NormalizedChecklistItem {

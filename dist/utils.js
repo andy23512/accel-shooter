@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const config_1 = require("./config");
+const child_process_1 = __importDefault(require("child_process"));
 function checkStatus(res) {
     if (res.ok) {
         return res;
@@ -70,7 +71,10 @@ function dashify(input) {
 }
 exports.dashify = dashify;
 function normalizeGitLabIssueChecklist(checklistText) {
-    return checklistText.split('\n').map((line, index) => ({
+    return checklistText
+        .split('\n')
+        .filter((line) => line && (line.includes('- [ ]') || line.includes('- [x]')))
+        .map((line, index) => ({
         name: line
             .replace(/- \[[x ]\] /g, '')
             .replace(/^ +/, (space) => space.replace(/ /g, '-')),
@@ -90,3 +94,13 @@ function normalizeClickUpChecklist(checklist) {
     }));
 }
 exports.normalizeClickUpChecklist = normalizeClickUpChecklist;
+function promiseSpawn(command, args) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return new Promise((resolve, reject) => {
+            child_process_1.default
+                .spawn(command, args, { shell: true, stdio: 'inherit' })
+                .on('close', (code) => (code === 0 ? resolve() : reject()));
+        });
+    });
+}
+exports.promiseSpawn = promiseSpawn;

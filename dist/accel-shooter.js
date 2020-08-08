@@ -22,6 +22,8 @@ const inquirer_1 = __importDefault(require("inquirer"));
 const dynamic_1 = require("set-interval-async/dynamic");
 const actions_1 = require("./actions");
 const clipboardy_1 = __importDefault(require("clipboardy"));
+const utils_1 = require("./utils");
+const os_1 = __importDefault(require("os"));
 const actionAlias = {
     c: 'config',
     st: 'start',
@@ -39,12 +41,12 @@ const actions = {
         return __awaiter(this, void 0, void 0, function* () {
             const answers = yield inquirer_1.default.prompt([
                 {
-                    name: 'gitLabProjectId',
+                    name: 'gitLabProject',
                     message: 'Choose GitLab Project',
-                    type: 'checkbox',
-                    choices: Object.entries(config_1.CONFIG.GitLabProjectMap).map(([name, projectId]) => ({
-                        name: `${name} (${projectId})`,
-                        value: projectId.replace(/\//g, '%2F'),
+                    type: 'list',
+                    choices: config_1.CONFIG.GitLabProjects.map((p) => ({
+                        name: `${p.name} (${p.repo})`,
+                        value: p,
                     })),
                 },
                 {
@@ -67,14 +69,14 @@ const actions = {
                     name: 'labels',
                     message: 'Choose GitLab Labels to add to new Issue',
                     type: 'checkbox',
-                    choices: ({ gitLabProjectId }) => __awaiter(this, void 0, void 0, function* () {
-                        return new gitlab_1.GitLab(gitLabProjectId)
+                    choices: ({ gitLabProject }) => __awaiter(this, void 0, void 0, function* () {
+                        return new gitlab_1.GitLab(gitLabProject.id)
                             .listProjectLabels()
                             .then((labels) => labels.map((label) => label.name));
                     }),
                 },
             ]);
-            const gitLab = new gitlab_1.GitLab(answers.gitLabProjectId);
+            const gitLab = new gitlab_1.GitLab(answers.gitLabProject.id);
             const clickUp = new clickup_1.ClickUp(answers.clickUpTaskId);
             const selectedGitLabLabels = answers.labels;
             const clickUpTask = yield clickUp.getTask();
@@ -86,18 +88,24 @@ const actions = {
             const gitLabIssueNumber = gitLabIssue.iid;
             const gitLabBranch = yield gitLab.createBranch(gitlab_1.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(gitLabIssueNumber, gitLabIssueTitle, answers.clickUpTaskId));
             yield gitLab.createMergeRequest(gitLabIssueNumber, gitLabIssueTitle, gitLabBranch.name, selectedGitLabLabels);
+            process.chdir(answers.gitLabProject.path.replace('~', os_1.default.homedir()));
+            yield utils_1.promiseSpawn('git', ['pull']);
+            yield utils_1.promiseSpawn('git', ['checkout', gitLabBranch.name]);
             console.log(`GitLab Issue Number: ${gitLabIssueNumber}`);
             const dailyProgressString = `* (Processing) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
             console.log(`Daily Progress string: ${dailyProgressString} (Copied)`);
             clipboardy_1.default.writeSync(dailyProgressString);
-            open_1.default(clickUpTaskUrl);
             open_1.default(gitLabIssueUrl);
+            yield actions_1.syncChecklist(answers.gitLabProject.id, gitLabIssueNumber.toString());
+            dynamic_1.setIntervalAsync(() => __awaiter(this, void 0, void 0, function* () {
+                yield actions_1.syncChecklist(answers.gitLabProject.id, gitLabIssueNumber.toString());
+            }), 5 * 60 * 1000);
         });
     },
     open() {
         return __awaiter(this, void 0, void 0, function* () {
             const issueNumber = process.argv[4];
-            const gitLab = new gitlab_1.GitLab(getGitLabProjectId());
+            const gitLab = new gitlab_1.GitLab(getGitLabProjectIdFromArgv());
             const answers = yield inquirer_1.default.prompt([
                 {
                     name: 'types',
@@ -133,7 +141,7 @@ const actions = {
     },
     sync() {
         return __awaiter(this, void 0, void 0, function* () {
-            const gitLabProjectId = getGitLabProjectId();
+            const gitLabProjectId = getGitLabProjectIdFromArgv();
             const issueNumber = process.argv[4];
             yield actions_1.syncChecklist(gitLabProjectId, issueNumber);
             dynamic_1.setIntervalAsync(() => __awaiter(this, void 0, void 0, function* () {
@@ -156,9 +164,19 @@ function setConfigFile(configFile) {
     const dest = path_1.resolve(__dirname, '../.config.json');
     fs_1.copyFileSync(src, dest);
 }
-function getGitLabProjectId() {
-    return (config_1.CONFIG.GitLabProjectMap[process.argv[3]] || process.argv[3]).replace(/\//g, '%2F');
+function getGitLabProjectByName(n) {
+    console.log(n);
+    console.log(config_1.CONFIG.GitLabProjects);
+    return config_1.CONFIG.GitLabProjects.find(({ name }) => name === n);
 }
-function getClickUpTaskId() {
-    return process.argv[4].replace(/#/g, '');
+function getGitLabProjectIdByName(name) {
+    var _a;
+    const gitLabProjectId = (_a = getGitLabProjectByName(name)) === null || _a === void 0 ? void 0 : _a.id;
+    if (!gitLabProjectId) {
+        throw new Error('Cannot find project');
+    }
+    return gitLabProjectId;
+}
+function getGitLabProjectIdFromArgv() {
+    return getGitLabProjectIdByName(process.argv[3]);
 }

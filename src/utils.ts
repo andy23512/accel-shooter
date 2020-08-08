@@ -2,6 +2,7 @@ import fetch, { Response } from 'node-fetch';
 import { Site, HttpMethod, NormalizedChecklist } from './models/models';
 import { CONFIG } from './config';
 import { ChecklistItem } from './models/clickup.models';
+import childProcess from 'child_process';
 
 function checkStatus(res: Response) {
   if (res.ok) {
@@ -68,13 +69,18 @@ export function dashify(input: string) {
 export function normalizeGitLabIssueChecklist(
   checklistText: string
 ): NormalizedChecklist {
-  return checklistText.split('\n').map((line, index) => ({
-    name: line
-      .replace(/- \[[x ]\] /g, '')
-      .replace(/^ +/, (space) => space.replace(/ /g, '-')),
-    checked: /- \[x\]/.test(line),
-    order: index,
-  }));
+  return checklistText
+    .split('\n')
+    .filter(
+      (line) => line && (line.includes('- [ ]') || line.includes('- [x]'))
+    )
+    .map((line, index) => ({
+      name: line
+        .replace(/- \[[x ]\] /g, '')
+        .replace(/^ +/, (space) => space.replace(/ /g, '-')),
+      checked: /- \[x\]/.test(line),
+      order: index,
+    }));
 }
 
 export function normalizeClickUpChecklist(
@@ -88,4 +94,12 @@ export function normalizeClickUpChecklist(
       order: index,
       id: item.id,
     }));
+}
+
+export async function promiseSpawn(command: string, args: string[]) {
+  return new Promise((resolve, reject) => {
+    childProcess
+      .spawn(command, args, { shell: true, stdio: 'inherit' })
+      .on('close', (code) => (code === 0 ? resolve() : reject()));
+  });
 }
