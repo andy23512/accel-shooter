@@ -91,6 +91,7 @@ const actions: { [key: string]: () => Promise<any> } = {
     );
     process.chdir(answers.gitLabProject.path.replace('~', os.homedir()));
     await promiseSpawn('git', ['pull']);
+    await sleep(1000);
     await promiseSpawn('git', ['checkout', gitLabBranch.name]);
     console.log(`GitLab Issue Number: ${gitLabIssueNumber}`);
     const dailyProgressString = `* (Processing) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
@@ -168,8 +169,6 @@ function setConfigFile(configFile: string) {
 }
 
 function getGitLabProjectByName(n: string) {
-  console.log(n);
-  console.log(CONFIG.GitLabProjects);
   return CONFIG.GitLabProjects.find(({ name }) => name === n);
 }
 
@@ -183,4 +182,8 @@ function getGitLabProjectIdByName(name: string) {
 
 function getGitLabProjectIdFromArgv() {
   return getGitLabProjectIdByName(process.argv[3]);
+}
+
+function sleep(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }

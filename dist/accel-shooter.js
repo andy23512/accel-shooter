@@ -90,6 +90,7 @@ const actions = {
             yield gitLab.createMergeRequest(gitLabIssueNumber, gitLabIssueTitle, gitLabBranch.name, selectedGitLabLabels);
             process.chdir(answers.gitLabProject.path.replace('~', os_1.default.homedir()));
             yield utils_1.promiseSpawn('git', ['pull']);
+            yield sleep(1000);
             yield utils_1.promiseSpawn('git', ['checkout', gitLabBranch.name]);
             console.log(`GitLab Issue Number: ${gitLabIssueNumber}`);
             const dailyProgressString = `* (Processing) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
@@ -165,8 +166,6 @@ function setConfigFile(configFile) {
     fs_1.copyFileSync(src, dest);
 }
 function getGitLabProjectByName(n) {
-    console.log(n);
-    console.log(config_1.CONFIG.GitLabProjects);
     return config_1.CONFIG.GitLabProjects.find(({ name }) => name === n);
 }
 function getGitLabProjectIdByName(name) {
@@ -179,4 +178,7 @@ function getGitLabProjectIdByName(name) {
 }
 function getGitLabProjectIdFromArgv() {
     return getGitLabProjectIdByName(process.argv[3]);
+}
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
 }
