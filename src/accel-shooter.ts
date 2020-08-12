@@ -90,7 +90,7 @@ const actions: { [key: string]: () => Promise<any> } = {
       selectedGitLabLabels
     );
     process.chdir(answers.gitLabProject.path.replace('~', os.homedir()));
-    await promiseSpawn('git', ['pull']);
+    await promiseSpawn('git', ['fetch']);
     await sleep(1000);
     await promiseSpawn('git', ['checkout', gitLabBranch.name]);
     console.log(`GitLab Issue Number: ${gitLabIssueNumber}`);
