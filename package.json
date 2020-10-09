@@ -21,7 +21,7 @@
   "dependencies": {
     "clipboardy": "^2.3.0",
     "inquirer": "^7.1.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "open": "^7.0.3",
     "set-interval-async": "^1.0.32"
   },
