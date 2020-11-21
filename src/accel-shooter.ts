@@ -13,6 +13,26 @@ import {
 } from './gitlab';
 import { promiseSpawn } from './utils';
 
+const options = {
+  endingTodo: `
+
+- [ ] ending
+  - [ ] check functionality
+  - [ ] check tooltip
+  - [ ] check overflow content handling
+  - [ ] check overflow item handling
+  - [ ] check number pipe
+  - [ ] check lint
+  - [ ] check test
+  - [ ] check lint after fix test
+  - [ ] check prod
+  - [ ] check console.log
+  - [ ] check print
+  - [ ] check i18n
+  - [ ] check conflict
+  - [ ] review code`,
+};
+
 const actionAlias: { [key: string]: string } = {
   c: 'config',
   st: 'start',
@@ -70,7 +90,7 @@ const actions: { [key: string]: () => Promise<any> } = {
     await clickUp.setTaskStatus('in progress');
     const gitLabIssue = await gitLab.createIssue(
       gitLabIssueTitle,
-      clickUpTaskUrl,
+      `${clickUpTaskUrl}${options.endingTodo}`,
       selectedGitLabLabels
     );
     const gitLabIssueUrl = gitLabIssue.web_url;

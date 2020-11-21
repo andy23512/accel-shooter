@@ -23,6 +23,25 @@ const clickup_1 = require("./clickup");
 const config_1 = require("./config");
 const gitlab_1 = require("./gitlab");
 const utils_1 = require("./utils");
+const options = {
+    endingTodo: `
+
+- [ ] ending
+  - [ ] check functionality
+  - [ ] check tooltip
+  - [ ] check overflow content handling
+  - [ ] check overflow item handling
+  - [ ] check number pipe
+  - [ ] check lint
+  - [ ] check test
+  - [ ] check lint after fix test
+  - [ ] check prod
+  - [ ] check console.log
+  - [ ] check print
+  - [ ] check i18n
+  - [ ] check conflict
+  - [ ] review code`,
+};
 const actionAlias = {
     c: 'config',
     st: 'start',
@@ -82,7 +101,7 @@ const actions = {
             const clickUpTaskUrl = clickUpTask['url'];
             const gitLabIssueTitle = answers.issueTitle;
             yield clickUp.setTaskStatus('in progress');
-            const gitLabIssue = yield gitLab.createIssue(gitLabIssueTitle, clickUpTaskUrl, selectedGitLabLabels);
+            const gitLabIssue = yield gitLab.createIssue(gitLabIssueTitle, `${clickUpTaskUrl}${options.endingTodo}`, selectedGitLabLabels);
             const gitLabIssueUrl = gitLabIssue.web_url;
             const gitLabIssueNumber = gitLabIssue.iid;
             const gitLabBranch = yield gitLab.createBranch(gitlab_1.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(gitLabIssueNumber, gitLabIssueTitle, answers.clickUpTaskId));
