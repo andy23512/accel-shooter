@@ -13,17 +13,16 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const fs_1 = require("fs");
-const open_1 = __importDefault(require("open"));
-const path_1 = require("path");
-const config_1 = require("./config");
-const clickup_1 = require("./clickup");
-const gitlab_1 = require("./gitlab");
 const inquirer_1 = __importDefault(require("inquirer"));
+const open_1 = __importDefault(require("open"));
+const os_1 = __importDefault(require("os"));
+const path_1 = require("path");
 const dynamic_1 = require("set-interval-async/dynamic");
 const actions_1 = require("./actions");
-const clipboardy_1 = __importDefault(require("clipboardy"));
+const clickup_1 = require("./clickup");
+const config_1 = require("./config");
+const gitlab_1 = require("./gitlab");
 const utils_1 = require("./utils");
-const os_1 = __importDefault(require("os"));
 const actionAlias = {
     c: 'config',
     st: 'start',
@@ -92,10 +91,12 @@ const actions = {
             yield utils_1.promiseSpawn('git', ['fetch']);
             yield sleep(1000);
             yield utils_1.promiseSpawn('git', ['checkout', gitLabBranch.name]);
-            console.log(`GitLab Issue Number: ${gitLabIssueNumber}`);
             const dailyProgressString = `* (Processing) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
-            console.log(`Daily Progress string: ${dailyProgressString} (Copied)`);
-            clipboardy_1.default.writeSync(dailyProgressString);
+            const homedir = os_1.default.homedir();
+            const dpPath = path_1.join(homedir, 'Daily Progress.md');
+            const dpContent = fs_1.readFileSync(dpPath, { encoding: 'utf-8' });
+            const updatedDpContent = dpContent.replace('## Buffer', `## Buffer\n    ${dailyProgressString}`);
+            fs_1.writeFileSync(dpPath, updatedDpContent);
             open_1.default(gitLabIssueUrl);
             yield actions_1.syncChecklist(answers.gitLabProject.id, gitLabIssueNumber.toString());
             dynamic_1.setIntervalAsync(() => __awaiter(this, void 0, void 0, function* () {

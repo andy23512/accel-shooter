@@ -1,18 +1,17 @@
-import { copyFileSync } from 'fs';
-import open from 'open';
-import { resolve as pathResolve } from 'path';
-import { CONFIG } from './config';
-import { ClickUp } from './clickup';
-import {
-  GitLab,
-  getGitLabBranchNameFromIssueNumberAndTitleAndTaskId,
-} from './gitlab';
+import { copyFileSync, readFileSync, writeFileSync } from 'fs';
 import inquirer from 'inquirer';
+import open from 'open';
+import os from 'os';
+import { join, resolve as pathResolve } from 'path';
 import { setIntervalAsync } from 'set-interval-async/dynamic';
 import { syncChecklist } from './actions';
-import clipboardy from 'clipboardy';
+import { ClickUp } from './clickup';
+import { CONFIG } from './config';
+import {
+  getGitLabBranchNameFromIssueNumberAndTitleAndTaskId,
+  GitLab,
+} from './gitlab';
 import { promiseSpawn } from './utils';
-import os from 'os';
 
 const actionAlias: { [key: string]: string } = {
   c: 'config',
@@ -93,10 +92,15 @@ const actions: { [key: string]: () => Promise<any> } = {
     await promiseSpawn('git', ['fetch']);
     await sleep(1000);
     await promiseSpawn('git', ['checkout', gitLabBranch.name]);
-    console.log(`GitLab Issue Number: ${gitLabIssueNumber}`);
     const dailyProgressString = `* (Processing) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
-    console.log(`Daily Progress string: ${dailyProgressString} (Copied)`);
-    clipboardy.writeSync(dailyProgressString);
+    const homedir = os.homedir();
+    const dpPath = join(homedir, 'Daily Progress.md');
+    const dpContent = readFileSync(dpPath, { encoding: 'utf-8' });
+    const updatedDpContent = dpContent.replace(
+      '## Buffer',
+      `## Buffer\n    ${dailyProgressString}`
+    );
+    writeFileSync(dpPath, updatedDpContent);
     open(gitLabIssueUrl);
     await syncChecklist(answers.gitLabProject.id, gitLabIssueNumber.toString());
     setIntervalAsync(async () => {
