@@ -8,10 +8,14 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
+const open_1 = __importDefault(require("open"));
+const clickup_1 = require("./clickup");
 const gitlab_1 = require("./gitlab");
 const utils_1 = require("./utils");
-const clickup_1 = require("./clickup");
 function getSyncChecklistActions(oldClickUpChecklist, newGitLabChecklist) {
     const actions = {
         update: [],
@@ -37,10 +41,13 @@ function getSyncChecklistActions(oldClickUpChecklist, newGitLabChecklist) {
     return actions;
 }
 exports.getSyncChecklistActions = getSyncChecklistActions;
-function syncChecklist(gitLabProjectId, issueNumber) {
+function syncChecklist(gitLabProjectId, issueNumber, openIssuePage) {
     return __awaiter(this, void 0, void 0, function* () {
         const gitLab = new gitlab_1.GitLab(gitLabProjectId);
         const issue = yield gitLab.getIssue(issueNumber);
+        if (openIssuePage) {
+            open_1.default(issue.web_url);
+        }
         const issueDescription = issue.description;
         const result = issueDescription.match(/https:\/\/app.clickup.com\/t\/(\w+)/);
         if (result) {

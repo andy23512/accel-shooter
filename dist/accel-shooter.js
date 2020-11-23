@@ -164,7 +164,7 @@ const actions = {
         return __awaiter(this, void 0, void 0, function* () {
             const gitLabProjectId = getGitLabProjectIdFromArgv();
             const issueNumber = process.argv[4];
-            yield actions_1.syncChecklist(gitLabProjectId, issueNumber);
+            yield actions_1.syncChecklist(gitLabProjectId, issueNumber, true);
             dynamic_1.setIntervalAsync(() => __awaiter(this, void 0, void 0, function* () {
                 yield actions_1.syncChecklist(gitLabProjectId, issueNumber);
             }), 5 * 60 * 1000);

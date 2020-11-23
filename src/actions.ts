@@ -1,10 +1,11 @@
-import { NormalizedChecklist } from './models/models';
-import { GitLab } from './gitlab';
-import {
-  normalizeGitLabIssueChecklist,
-  normalizeClickUpChecklist,
-} from './utils';
+import open from 'open';
 import { ClickUp } from './clickup';
+import { GitLab } from './gitlab';
+import { NormalizedChecklist } from './models/models';
+import {
+  normalizeClickUpChecklist,
+  normalizeGitLabIssueChecklist,
+} from './utils';
 
 export function getSyncChecklistActions(
   oldClickUpChecklist: NormalizedChecklist,
@@ -42,10 +43,14 @@ export function getSyncChecklistActions(
 
 export async function syncChecklist(
   gitLabProjectId: string,
-  issueNumber: string
+  issueNumber: string,
+  openIssuePage?: boolean
 ) {
   const gitLab = new GitLab(gitLabProjectId);
   const issue = await gitLab.getIssue(issueNumber);
+  if (openIssuePage) {
+    open(issue.web_url);
+  }
   const issueDescription: string = issue.description;
   const result = issueDescription.match(/https:\/\/app.clickup.com\/t\/(\w+)/);
   if (result) {

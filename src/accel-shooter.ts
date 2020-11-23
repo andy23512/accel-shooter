@@ -170,7 +170,7 @@ const actions: { [key: string]: () => Promise<any> } = {
   async sync() {
     const gitLabProjectId = getGitLabProjectIdFromArgv();
     const issueNumber = process.argv[4];
-    await syncChecklist(gitLabProjectId, issueNumber);
+    await syncChecklist(gitLabProjectId, issueNumber, true);
     setIntervalAsync(async () => {
       await syncChecklist(gitLabProjectId, issueNumber);
     }, 5 * 60 * 1000);
