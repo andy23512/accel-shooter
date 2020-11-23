@@ -4,7 +4,8 @@
   "main": "index.js",
   "license": "MIT",
   "bin": {
-    "accel-shooter": "./main.js"
+    "accel-shooter": "./main.js",
+    "acst": "./main.js"
   },
   "scripts": {
     "start": "ts-node src/accel-shooter.ts",
