@@ -28,17 +28,20 @@ const options = {
 
 - [ ] ending
   - [ ] check functionality
-  - [ ] check tooltip
-  - [ ] check overflow content handling
-  - [ ] check overflow item handling
-  - [ ] check number pipe
-  - [ ] check lint
-  - [ ] check test
-  - [ ] check lint after fix test
-  - [ ] check prod
-  - [ ] check console.log
-  - [ ] check print
-  - [ ] check i18n
+  - [ ] frontend
+    - [ ] check tooltip
+    - [ ] check overflow content handling
+    - [ ] check overflow item handling
+    - [ ] check number pipe
+    - [ ] check lint
+    - [ ] check test
+    - [ ] check lint after fix test
+    - [ ] check prod
+    - [ ] check console.log
+    - [ ] check i18n
+  - [ ] backend
+    - [ ] check test
+    - [ ] check print
   - [ ] check conflict
   - [ ] review code`,
 };
