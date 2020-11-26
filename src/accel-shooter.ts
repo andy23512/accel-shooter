@@ -33,7 +33,8 @@ const options = {
     - [ ] check test
     - [ ] check print
   - [ ] check conflict
-  - [ ] review code`,
+  - [ ] review code
+  - [ ] check if any not-pushed code exists`,
 };
 
 const actionAlias: { [key: string]: string } = {
