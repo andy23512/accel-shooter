@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const open_1 = __importDefault(require("open"));
+const readline_1 = __importDefault(require("readline"));
 const clickup_1 = require("./clickup");
 const gitlab_1 = require("./gitlab");
 const utils_1 = require("./utils");
@@ -94,3 +95,17 @@ function syncChecklist(gitLabProjectId, issueNumber, openIssuePage) {
     });
 }
 exports.syncChecklist = syncChecklist;
+function setUpSyncHotkey(gitLabProjectId, issueNumber) {
+    readline_1.default.emitKeypressEvents(process.stdin);
+    process.stdin.setRawMode(true);
+    process.stdin.on('keypress', (_, key) => {
+        if (key.ctrl && key.name === 'c') {
+            process.exit();
+        }
+        else if (!key.ctrl && !key.meta && !key.shift && key.name === 's') {
+            console.log(`You pressed the sync key`);
+            syncChecklist(gitLabProjectId, issueNumber);
+        }
+    });
+}
+exports.setUpSyncHotkey = setUpSyncHotkey;
