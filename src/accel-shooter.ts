@@ -177,7 +177,7 @@ const actions: { [key: string]: () => Promise<any> } = {
   async sync() {
     const gitLabProjectId = getGitLabProjectIdFromArgv();
     const issueNumber = process.argv[4];
-    setUpSyncHotkey(answers.gitLabProject.id, gitLabIssueNumber.toString());
+    setUpSyncHotkey(gitLabProjectId, issueNumber);
     await syncChecklist(gitLabProjectId, issueNumber, true);
     setIntervalAsync(async () => {
       await syncChecklist(gitLabProjectId, issueNumber);
