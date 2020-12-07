@@ -40,6 +40,7 @@ const options = {
     - [ ] check console.log
     - [ ] check i18n
   - [ ] backend
+    - [ ] check api need pagination or not
     - [ ] check test
     - [ ] check print
   - [ ] check conflict
