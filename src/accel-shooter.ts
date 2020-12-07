@@ -1,17 +1,17 @@
-import { copyFileSync, readFileSync, writeFileSync } from "fs";
-import inquirer from "inquirer";
-import open from "open";
-import os from "os";
-import { join, resolve as pathResolve } from "path";
-import { setIntervalAsync } from "set-interval-async/dynamic";
-import { syncChecklist } from "./actions";
-import { ClickUp } from "./clickup";
-import { CONFIG } from "./config";
+import { copyFileSync, readFileSync, writeFileSync } from 'fs';
+import inquirer from 'inquirer';
+import open from 'open';
+import os from 'os';
+import { join, resolve as pathResolve } from 'path';
+import { setIntervalAsync } from 'set-interval-async/dynamic';
+import { syncChecklist } from './actions';
+import { ClickUp } from './clickup';
+import { CONFIG } from './config';
 import {
   getGitLabBranchNameFromIssueNumberAndTitleAndTaskId,
   GitLab,
-} from "./gitlab";
-import { promiseSpawn } from "./utils";
+} from './gitlab';
+import { promiseSpawn } from './utils';
 
 const options = {
   endingTodo: `
@@ -33,16 +33,17 @@ const options = {
     - [ ] check api need pagination or not
     - [ ] check test
     - [ ] check print
+    - [ ] handle single file or single folder import in import command
   - [ ] check conflict
   - [ ] review code
   - [ ] check if any not-pushed code exists`,
 };
 
 const actionAlias: { [key: string]: string } = {
-  c: "config",
-  st: "start",
-  o: "open",
-  sy: "sync",
+  c: 'config',
+  st: 'start',
+  o: 'open',
+  sy: 'sync',
 };
 
 const actions: { [key: string]: () => Promise<any> } = {
@@ -53,33 +54,33 @@ const actions: { [key: string]: () => Promise<any> } = {
   async start() {
     const answers = await inquirer.prompt([
       {
-        name: "gitLabProject",
-        message: "Choose GitLab Project",
-        type: "list",
+        name: 'gitLabProject',
+        message: 'Choose GitLab Project',
+        type: 'list',
         choices: CONFIG.GitLabProjects.map((p) => ({
           name: `${p.name} (${p.repo})`,
           value: p,
         })),
       },
       {
-        name: "clickUpTaskId",
-        message: "Enter ClickUp Task ID",
-        type: "input",
-        filter: (input) => input.replace("#", ""),
+        name: 'clickUpTaskId',
+        message: 'Enter ClickUp Task ID',
+        type: 'input',
+        filter: (input) => input.replace('#', ''),
       },
       {
-        name: "issueTitle",
-        message: "Enter Issue Title",
-        type: "input",
+        name: 'issueTitle',
+        message: 'Enter Issue Title',
+        type: 'input',
         default: async (answers: any) =>
           new ClickUp(answers.clickUpTaskId)
             .getTask()
             .then((task) => task.name),
       },
       {
-        name: "labels",
-        message: "Choose GitLab Labels to add to new Issue",
-        type: "checkbox",
+        name: 'labels',
+        message: 'Choose GitLab Labels to add to new Issue',
+        type: 'checkbox',
         choices: async ({ gitLabProject }) =>
           new GitLab(gitLabProject.id)
             .listProjectLabels()
@@ -90,9 +91,9 @@ const actions: { [key: string]: () => Promise<any> } = {
     const clickUp = new ClickUp(answers.clickUpTaskId);
     const selectedGitLabLabels = answers.labels;
     const clickUpTask = await clickUp.getTask();
-    const clickUpTaskUrl = clickUpTask["url"];
+    const clickUpTaskUrl = clickUpTask['url'];
     const gitLabIssueTitle = answers.issueTitle;
-    await clickUp.setTaskStatus("in progress");
+    await clickUp.setTaskStatus('in progress');
     const gitLabIssue = await gitLab.createIssue(
       gitLabIssueTitle,
       `${clickUpTaskUrl}${options.endingTodo}`,
@@ -113,16 +114,16 @@ const actions: { [key: string]: () => Promise<any> } = {
       gitLabBranch.name,
       selectedGitLabLabels
     );
-    process.chdir(answers.gitLabProject.path.replace("~", os.homedir()));
-    await promiseSpawn("git", ["fetch"]);
+    process.chdir(answers.gitLabProject.path.replace('~', os.homedir()));
+    await promiseSpawn('git', ['fetch']);
     await sleep(1000);
-    await promiseSpawn("git", ["checkout", gitLabBranch.name]);
+    await promiseSpawn('git', ['checkout', gitLabBranch.name]);
     const dailyProgressString = `* (Processing) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
     const homedir = os.homedir();
-    const dpPath = join(homedir, "Daily Progress.md");
-    const dpContent = readFileSync(dpPath, { encoding: "utf-8" });
+    const dpPath = join(homedir, 'Daily Progress.md');
+    const dpContent = readFileSync(dpPath, { encoding: 'utf-8' });
     const updatedDpContent = dpContent.replace(
-      "## Buffer",
+      '## Buffer',
       `## Buffer\n    ${dailyProgressString}`
     );
     writeFileSync(dpPath, updatedDpContent);
@@ -140,29 +141,29 @@ const actions: { [key: string]: () => Promise<any> } = {
     const gitLab = new GitLab(getGitLabProjectIdFromArgv());
     const answers = await inquirer.prompt([
       {
-        name: "types",
-        message: "Choose Link Type to open",
-        type: "checkbox",
+        name: 'types',
+        message: 'Choose Link Type to open',
+        type: 'checkbox',
         choices: [
-          { name: "Issue", value: "issue" },
-          { name: "Merge Request", value: "merge-request" },
-          { name: "Task", value: "task" },
+          { name: 'Issue', value: 'issue' },
+          { name: 'Merge Request', value: 'merge-request' },
+          { name: 'Task', value: 'task' },
         ],
       },
     ]);
     const issue = await gitLab.getIssue(issueNumber);
     for (const type of answers.types) {
       switch (type) {
-        case "issue":
+        case 'issue':
           open(issue.web_url);
           break;
-        case "merge-request":
+        case 'merge-request':
           const mergeRequests = await gitLab.listMergeRequestsWillCloseIssueOnMerge(
             issueNumber
           );
           open(mergeRequests[mergeRequests.length - 1].web_url);
           break;
-        case "task":
+        case 'task':
           const description = issue.description;
           const result = description.match(/https:\/\/app.clickup.com\/t\/\w+/);
           if (result) {
@@ -193,7 +194,7 @@ const actions: { [key: string]: () => Promise<any> } = {
 
 function setConfigFile(configFile: string) {
   const src = pathResolve(configFile);
-  const dest = pathResolve(__dirname, "../.config.json");
+  const dest = pathResolve(__dirname, '../.config.json');
   copyFileSync(src, dest);
 }
 
@@ -204,7 +205,7 @@ function getGitLabProjectByName(n: string) {
 function getGitLabProjectIdByName(name: string) {
   const gitLabProjectId = getGitLabProjectByName(name)?.id;
   if (!gitLabProjectId) {
-    throw new Error("Cannot find project");
+    throw new Error('Cannot find project');
   }
   return gitLabProjectId;
 }
