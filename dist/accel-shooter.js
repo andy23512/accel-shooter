@@ -116,7 +116,7 @@ const actions = {
             yield utils_1.promiseSpawn("git", ["checkout", gitLabBranch.name]);
             const dailyProgressString = `* (Processing) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
             const homedir = os_1.default.homedir();
-            const dpPath = path_1.join(homedir, "Daily Progress.md");
+            const dpPath = path_1.join(homedir, "ResilioSync/Daily Progress.md");
             const dpContent = fs_1.readFileSync(dpPath, { encoding: "utf-8" });
             const updatedDpContent = dpContent.replace("## Buffer", `## Buffer\n    ${dailyProgressString}`);
             fs_1.writeFileSync(dpPath, updatedDpContent);

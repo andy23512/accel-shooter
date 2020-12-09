@@ -118,7 +118,7 @@ const actions: { [key: string]: () => Promise<any> } = {
     await promiseSpawn("git", ["checkout", gitLabBranch.name]);
     const dailyProgressString = `* (Processing) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
     const homedir = os.homedir();
-    const dpPath = join(homedir, "Daily Progress.md");
+    const dpPath = join(homedir, "ResilioSync/Daily Progress.md");
     const dpContent = readFileSync(dpPath, { encoding: "utf-8" });
     const updatedDpContent = dpContent.replace(
       "## Buffer",
