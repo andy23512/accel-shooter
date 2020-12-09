@@ -4,7 +4,7 @@ import open from "open";
 import os from "os";
 import { join, resolve as pathResolve } from "path";
 import { setIntervalAsync } from "set-interval-async/dynamic";
-import { syncChecklist } from "./actions";
+import { setUpSyncHotkey, syncChecklist } from "./actions";
 import { ClickUp } from "./clickup";
 import { CONFIG } from "./config";
 import {
@@ -30,8 +30,10 @@ const options = {
     - [ ] check console.log
     - [ ] check i18n
   - [ ] backend
+    - [ ] check api need pagination or not
     - [ ] check test
     - [ ] check print
+    - [ ] handle single file or single folder import in import command
   - [ ] check conflict
   - [ ] review code
   - [ ] check if any not-pushed code exists`,
@@ -126,6 +128,7 @@ const actions: { [key: string]: () => Promise<any> } = {
     );
     writeFileSync(dpPath, updatedDpContent);
     open(gitLabIssueUrl);
+    setUpSyncHotkey(answers.gitLabProject.id, gitLabIssueNumber.toString());
     await syncChecklist(answers.gitLabProject.id, gitLabIssueNumber.toString());
     setIntervalAsync(async () => {
       await syncChecklist(
@@ -174,6 +177,7 @@ const actions: { [key: string]: () => Promise<any> } = {
   async sync() {
     const gitLabProjectId = getGitLabProjectIdFromArgv();
     const issueNumber = process.argv[4];
+    setUpSyncHotkey(gitLabProjectId, issueNumber);
     await syncChecklist(gitLabProjectId, issueNumber, true);
     setIntervalAsync(async () => {
       await syncChecklist(gitLabProjectId, issueNumber);

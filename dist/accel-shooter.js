@@ -40,8 +40,10 @@ const options = {
     - [ ] check console.log
     - [ ] check i18n
   - [ ] backend
+    - [ ] check api need pagination or not
     - [ ] check test
     - [ ] check print
+    - [ ] handle single file or single folder import in import command
   - [ ] check conflict
   - [ ] review code
   - [ ] check if any not-pushed code exists`,
@@ -121,6 +123,7 @@ const actions = {
             const updatedDpContent = dpContent.replace("## Buffer", `## Buffer\n    ${dailyProgressString}`);
             fs_1.writeFileSync(dpPath, updatedDpContent);
             open_1.default(gitLabIssueUrl);
+            actions_1.setUpSyncHotkey(answers.gitLabProject.id, gitLabIssueNumber.toString());
             yield actions_1.syncChecklist(answers.gitLabProject.id, gitLabIssueNumber.toString());
             dynamic_1.setIntervalAsync(() => __awaiter(this, void 0, void 0, function* () {
                 yield actions_1.syncChecklist(answers.gitLabProject.id, gitLabIssueNumber.toString());
@@ -168,6 +171,7 @@ const actions = {
         return __awaiter(this, void 0, void 0, function* () {
             const gitLabProjectId = getGitLabProjectIdFromArgv();
             const issueNumber = process.argv[4];
+            actions_1.setUpSyncHotkey(gitLabProjectId, issueNumber);
             yield actions_1.syncChecklist(gitLabProjectId, issueNumber, true);
             dynamic_1.setIntervalAsync(() => __awaiter(this, void 0, void 0, function* () {
                 yield actions_1.syncChecklist(gitLabProjectId, issueNumber);

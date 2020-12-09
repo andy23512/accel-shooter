@@ -1,4 +1,5 @@
 import open from 'open';
+import readline from 'readline';
 import { ClickUp } from './clickup';
 import { GitLab } from './gitlab';
 import { NormalizedChecklist } from './models/models';
@@ -129,4 +130,17 @@ export async function syncChecklist(
       )} #${issueNumber}] ${new Date().toLocaleString()} ${status} ${fullCompleteMessage}`
     );
   }
+}
+
+export function setUpSyncHotkey(gitLabProjectId: string, issueNumber: string) {
+  readline.emitKeypressEvents(process.stdin);
+  process.stdin.setRawMode(true);
+  process.stdin.on('keypress', (_, key) => {
+    if (key.ctrl && key.name === 'c') {
+      process.exit();
+    } else if (!key.ctrl && !key.meta && !key.shift && key.name === 's') {
+      console.log(`You pressed the sync key`);
+      syncChecklist(gitLabProjectId, issueNumber);
+    }
+  });
 }
