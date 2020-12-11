@@ -43,10 +43,14 @@ const options = {
     - [ ] check api need pagination or not
     - [ ] check test
     - [ ] check print
+    - [ ] check key error
     - [ ] handle single file or single folder import in import command
   - [ ] check conflict
   - [ ] review code
-  - [ ] check if any not-pushed code exists`,
+  - [ ] check if any not-pushed code exists
+  - [ ] mark MR as resolved
+  - [ ] assign MR
+  - [ ] change ClickUp task status`,
 };
 const actionAlias = {
     c: "config",
