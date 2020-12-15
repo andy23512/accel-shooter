@@ -67,6 +67,7 @@ const actions = {
     },
     start() {
         return __awaiter(this, void 0, void 0, function* () {
+            actions_1.configReadline();
             const answers = yield inquirer_1.default.prompt([
                 {
                     name: "gitLabProject",
@@ -173,6 +174,7 @@ const actions = {
     },
     sync() {
         return __awaiter(this, void 0, void 0, function* () {
+            actions_1.configReadline();
             const gitLabProjectId = getGitLabProjectIdFromArgv();
             const issueNumber = process.argv[4];
             actions_1.setUpSyncHotkey(gitLabProjectId, issueNumber);

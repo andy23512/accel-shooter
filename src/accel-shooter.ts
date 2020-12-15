@@ -4,7 +4,7 @@ import open from "open";
 import os from "os";
 import { join, resolve as pathResolve } from "path";
 import { setIntervalAsync } from "set-interval-async/dynamic";
-import { setUpSyncHotkey, syncChecklist } from "./actions";
+import { configReadline, setUpSyncHotkey, syncChecklist } from "./actions";
 import { ClickUp } from "./clickup";
 import { CONFIG } from "./config";
 import {
@@ -56,6 +56,7 @@ const actions: { [key: string]: () => Promise<any> } = {
     setConfigFile(configFile);
   },
   async start() {
+    configReadline();
     const answers = await inquirer.prompt([
       {
         name: "gitLabProject",
@@ -179,6 +180,7 @@ const actions: { [key: string]: () => Promise<any> } = {
     }
   },
   async sync() {
+    configReadline();
     const gitLabProjectId = getGitLabProjectIdFromArgv();
     const issueNumber = process.argv[4];
     setUpSyncHotkey(gitLabProjectId, issueNumber);
