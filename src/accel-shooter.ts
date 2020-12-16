@@ -133,14 +133,6 @@ const actions: { [key: string]: () => Promise<any> } = {
     );
     writeFileSync(dpPath, updatedDpContent);
     open(gitLabIssueUrl);
-    setUpSyncHotkey(answers.gitLabProject.id, gitLabIssueNumber.toString());
-    await syncChecklist(answers.gitLabProject.id, gitLabIssueNumber.toString());
-    setIntervalAsync(async () => {
-      await syncChecklist(
-        answers.gitLabProject.id,
-        gitLabIssueNumber.toString()
-      );
-    }, 5 * 60 * 1000);
   },
   async open() {
     const issueNumber = process.argv[4];

@@ -128,11 +128,6 @@ const actions = {
             const updatedDpContent = dpContent.replace("## Buffer", `## Buffer\n    ${dailyProgressString}`);
             fs_1.writeFileSync(dpPath, updatedDpContent);
             open_1.default(gitLabIssueUrl);
-            actions_1.setUpSyncHotkey(answers.gitLabProject.id, gitLabIssueNumber.toString());
-            yield actions_1.syncChecklist(answers.gitLabProject.id, gitLabIssueNumber.toString());
-            dynamic_1.setIntervalAsync(() => __awaiter(this, void 0, void 0, function* () {
-                yield actions_1.syncChecklist(answers.gitLabProject.id, gitLabIssueNumber.toString());
-            }), 5 * 60 * 1000);
         });
     },
     open() {
