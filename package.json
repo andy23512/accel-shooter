@@ -21,6 +21,7 @@
   ],
   "dependencies": {
     "clipboardy": "^2.3.0",
+    "date-fns": "^2.16.1",
     "inquirer": "^7.1.0",
     "node-fetch": "^2.6.1",
     "open": "^7.0.3",

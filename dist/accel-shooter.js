@@ -12,6 +12,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const clipboardy_1 = __importDefault(require("clipboardy"));
+const date_fns_1 = require("date-fns");
 const fs_1 = require("fs");
 const inquirer_1 = __importDefault(require("inquirer"));
 const open_1 = __importDefault(require("open"));
@@ -53,10 +55,11 @@ const options = {
   - [ ] change ClickUp task status`,
 };
 const actionAlias = {
-    c: "config",
-    st: "start",
-    o: "open",
-    sy: "sync",
+    c: 'config',
+    st: 'start',
+    o: 'open',
+    sy: 'sync',
+    cp: 'copy',
 };
 const actions = {
     config() {
@@ -70,24 +73,24 @@ const actions = {
             actions_1.configReadline();
             const answers = yield inquirer_1.default.prompt([
                 {
-                    name: "gitLabProject",
-                    message: "Choose GitLab Project",
-                    type: "list",
+                    name: 'gitLabProject',
+                    message: 'Choose GitLab Project',
+                    type: 'list',
                     choices: config_1.CONFIG.GitLabProjects.map((p) => ({
                         name: `${p.name} (${p.repo})`,
                         value: p,
                     })),
                 },
                 {
-                    name: "clickUpTaskId",
-                    message: "Enter ClickUp Task ID",
-                    type: "input",
-                    filter: (input) => input.replace("#", ""),
+                    name: 'clickUpTaskId',
+                    message: 'Enter ClickUp Task ID',
+                    type: 'input',
+                    filter: (input) => input.replace('#', ''),
                 },
                 {
-                    name: "issueTitle",
-                    message: "Enter Issue Title",
-                    type: "input",
+                    name: 'issueTitle',
+                    message: 'Enter Issue Title',
+                    type: 'input',
                     default: (answers) => __awaiter(this, void 0, void 0, function* () {
                         return new clickup_1.ClickUp(answers.clickUpTaskId)
                             .getTask()
@@ -95,9 +98,9 @@ const actions = {
                     }),
                 },
                 {
-                    name: "labels",
-                    message: "Choose GitLab Labels to add to new Issue",
-                    type: "checkbox",
+                    name: 'labels',
+                    message: 'Choose GitLab Labels to add to new Issue',
+                    type: 'checkbox',
                     choices: ({ gitLabProject }) => __awaiter(this, void 0, void 0, function* () {
                         return new gitlab_1.GitLab(gitLabProject.id)
                             .listProjectLabels()
@@ -109,23 +112,23 @@ const actions = {
             const clickUp = new clickup_1.ClickUp(answers.clickUpTaskId);
             const selectedGitLabLabels = answers.labels;
             const clickUpTask = yield clickUp.getTask();
-            const clickUpTaskUrl = clickUpTask["url"];
+            const clickUpTaskUrl = clickUpTask['url'];
             const gitLabIssueTitle = answers.issueTitle;
-            yield clickUp.setTaskStatus("in progress");
+            yield clickUp.setTaskStatus('in progress');
             const gitLabIssue = yield gitLab.createIssue(gitLabIssueTitle, `${clickUpTaskUrl}${options.endingTodo}`, selectedGitLabLabels);
             const gitLabIssueUrl = gitLabIssue.web_url;
             const gitLabIssueNumber = gitLabIssue.iid;
             const gitLabBranch = yield gitLab.createBranch(gitlab_1.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(gitLabIssueNumber, gitLabIssueTitle, answers.clickUpTaskId));
             yield gitLab.createMergeRequest(gitLabIssueNumber, gitLabIssueTitle, gitLabBranch.name, selectedGitLabLabels);
-            process.chdir(answers.gitLabProject.path.replace("~", os_1.default.homedir()));
-            yield utils_1.promiseSpawn("git", ["fetch"]);
+            process.chdir(answers.gitLabProject.path.replace('~', os_1.default.homedir()));
+            yield utils_1.promiseSpawn('git', ['fetch']);
             yield sleep(1000);
-            yield utils_1.promiseSpawn("git", ["checkout", gitLabBranch.name]);
+            yield utils_1.promiseSpawn('git', ['checkout', gitLabBranch.name]);
             const dailyProgressString = `* (Processing) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
             const homedir = os_1.default.homedir();
-            const dpPath = path_1.join(homedir, "ResilioSync/Daily Progress.md");
-            const dpContent = fs_1.readFileSync(dpPath, { encoding: "utf-8" });
-            const updatedDpContent = dpContent.replace("## Buffer", `## Buffer\n    ${dailyProgressString}`);
+            const dpPath = path_1.join(homedir, 'ResilioSync/Daily Progress.md');
+            const dpContent = fs_1.readFileSync(dpPath, { encoding: 'utf-8' });
+            const updatedDpContent = dpContent.replace('## Buffer', `## Buffer\n    ${dailyProgressString}`);
             fs_1.writeFileSync(dpPath, updatedDpContent);
             open_1.default(gitLabIssueUrl);
         });
@@ -136,27 +139,27 @@ const actions = {
             const gitLab = new gitlab_1.GitLab(getGitLabProjectIdFromArgv());
             const answers = yield inquirer_1.default.prompt([
                 {
-                    name: "types",
-                    message: "Choose Link Type to open",
-                    type: "checkbox",
+                    name: 'types',
+                    message: 'Choose Link Type to open',
+                    type: 'checkbox',
                     choices: [
-                        { name: "Issue", value: "issue" },
-                        { name: "Merge Request", value: "merge-request" },
-                        { name: "Task", value: "task" },
+                        { name: 'Issue', value: 'issue' },
+                        { name: 'Merge Request', value: 'merge-request' },
+                        { name: 'Task', value: 'task' },
                     ],
                 },
             ]);
             const issue = yield gitLab.getIssue(issueNumber);
             for (const type of answers.types) {
                 switch (type) {
-                    case "issue":
+                    case 'issue':
                         open_1.default(issue.web_url);
                         break;
-                    case "merge-request":
+                    case 'merge-request':
                         const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
                         open_1.default(mergeRequests[mergeRequests.length - 1].web_url);
                         break;
-                    case "task":
+                    case 'task':
                         const description = issue.description;
                         const result = description.match(/https:\/\/app.clickup.com\/t\/\w+/);
                         if (result) {
@@ -179,6 +182,31 @@ const actions = {
             }), 5 * 60 * 1000);
         });
     },
+    copy() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const day = process.argv.length >= 4
+                ? process.argv[3]
+                : date_fns_1.format(new Date(), 'yyyy/MM/dd');
+            const homedir = os_1.default.homedir();
+            const dpPath = path_1.join(homedir, 'ResilioSync/Daily Progress.md');
+            const dpContent = fs_1.readFileSync(dpPath, { encoding: 'utf-8' });
+            const matchResult = dpContent.match(new RegExp(`(### ${day}.*?)\n###`, 's'));
+            if (matchResult) {
+                const record = matchResult[1];
+                if (/2\. Today\n3\./.test(record)) {
+                    console.log('Today content is empty.');
+                }
+                else {
+                    clipboardy_1.default.writeSync(record);
+                    console.log(record);
+                    console.log('Copied!');
+                }
+            }
+            else {
+                console.log('DP record does not exist.');
+            }
+        });
+    },
 };
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const action = actionAlias[process.argv[2]] || process.argv[2];
@@ -191,7 +219,7 @@ const actions = {
 }))();
 function setConfigFile(configFile) {
     const src = path_1.resolve(configFile);
-    const dest = path_1.resolve(__dirname, "../.config.json");
+    const dest = path_1.resolve(__dirname, '../.config.json');
     fs_1.copyFileSync(src, dest);
 }
 function getGitLabProjectByName(n) {
@@ -201,7 +229,7 @@ function getGitLabProjectIdByName(name) {
     var _a;
     const gitLabProjectId = (_a = getGitLabProjectByName(name)) === null || _a === void 0 ? void 0 : _a.id;
     if (!gitLabProjectId) {
-        throw new Error("Cannot find project");
+        throw new Error('Cannot find project');
     }
     return gitLabProjectId;
 }
