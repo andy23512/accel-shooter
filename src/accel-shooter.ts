@@ -136,6 +136,9 @@ const actions: { [key: string]: () => Promise<any> } = {
     );
     writeFileSync(dpPath, updatedDpContent);
     open(gitLabIssueUrl);
+    const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabIssueNumber}`;
+    clipboardy.writeSync(syncCommand);
+    console.log(`Sync command: "${syncCommand}" Copied!`);
   },
   async open() {
     const issueNumber = process.argv[4];

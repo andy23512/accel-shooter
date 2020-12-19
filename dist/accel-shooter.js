@@ -131,6 +131,9 @@ const actions = {
             const updatedDpContent = dpContent.replace('## Buffer', `## Buffer\n    ${dailyProgressString}`);
             fs_1.writeFileSync(dpPath, updatedDpContent);
             open_1.default(gitLabIssueUrl);
+            const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabIssueNumber}`;
+            clipboardy_1.default.writeSync(syncCommand);
+            console.log(`Sync command: "${syncCommand}" Copied!`);
         });
     },
     open() {
