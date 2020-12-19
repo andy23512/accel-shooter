@@ -92,9 +92,13 @@ const actions = {
                     message: 'Enter Issue Title',
                     type: 'input',
                     default: (answers) => __awaiter(this, void 0, void 0, function* () {
-                        return new clickup_1.ClickUp(answers.clickUpTaskId)
-                            .getTask()
-                            .then((task) => task.name);
+                        let task = yield new clickup_1.ClickUp(answers.clickUpTaskId).getTask();
+                        let result = task.name;
+                        while (task.parent) {
+                            task = yield new clickup_1.ClickUp(task.parent).getTask();
+                            result = `${task.name} - ${result}`;
+                        }
+                        return result;
                     }),
                 },
                 {

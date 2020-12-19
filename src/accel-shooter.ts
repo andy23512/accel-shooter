@@ -80,10 +80,15 @@ const actions: { [key: string]: () => Promise<any> } = {
         name: 'issueTitle',
         message: 'Enter Issue Title',
         type: 'input',
-        default: async (answers: any) =>
-          new ClickUp(answers.clickUpTaskId)
-            .getTask()
-            .then((task) => task.name),
+        default: async (answers: { clickUpTaskId: string }) => {
+          let task = await new ClickUp(answers.clickUpTaskId).getTask();
+          let result = task.name;
+          while (task.parent) {
+            task = await new ClickUp(task.parent).getTask();
+            result = `${task.name} - ${result}`;
+          }
+          return result;
+        },
       },
       {
         name: 'labels',
