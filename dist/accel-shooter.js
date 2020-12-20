@@ -23,7 +23,9 @@ const dynamic_1 = require("set-interval-async/dynamic");
 const actions_1 = require("./actions");
 const clickup_1 = require("./clickup");
 const config_1 = require("./config");
+const daily_progress_1 = require("./daily-progress");
 const gitlab_1 = require("./gitlab");
+const tracker_1 = require("./tracker");
 const utils_1 = require("./utils");
 const options = {
     endingTodo: `
@@ -60,6 +62,7 @@ const actionAlias = {
     o: 'open',
     sy: 'sync',
     cp: 'copy',
+    t: 'track',
 };
 const actions = {
     config() {
@@ -129,11 +132,7 @@ const actions = {
             yield sleep(1000);
             yield utils_1.promiseSpawn('git', ['checkout', gitLabBranch.name]);
             const dailyProgressString = `* (Processing) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
-            const homedir = os_1.default.homedir();
-            const dpPath = path_1.join(homedir, 'ResilioSync/Daily Progress.md');
-            const dpContent = fs_1.readFileSync(dpPath, { encoding: 'utf-8' });
-            const updatedDpContent = dpContent.replace('## Buffer', `## Buffer\n    ${dailyProgressString}`);
-            fs_1.writeFileSync(dpPath, updatedDpContent);
+            new daily_progress_1.DailyProgress().addProgressToBuffer(dailyProgressString);
             open_1.default(gitLabIssueUrl);
             const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabIssueNumber}`;
             clipboardy_1.default.writeSync(syncCommand);
@@ -194,24 +193,17 @@ const actions = {
             const day = process.argv.length >= 4
                 ? process.argv[3]
                 : date_fns_1.format(new Date(), 'yyyy/MM/dd');
-            const homedir = os_1.default.homedir();
-            const dpPath = path_1.join(homedir, 'ResilioSync/Daily Progress.md');
-            const dpContent = fs_1.readFileSync(dpPath, { encoding: 'utf-8' });
-            const matchResult = dpContent.match(new RegExp(`(### ${day}.*?)\n###`, 's'));
-            if (matchResult) {
-                const record = matchResult[1];
-                if (/2\. Today\n3\./.test(record)) {
-                    console.log('Today content is empty.');
-                }
-                else {
-                    clipboardy_1.default.writeSync(record);
-                    console.log(record);
-                    console.log('Copied!');
-                }
+            const record = new daily_progress_1.DailyProgress().getRecordByDay(day);
+            if (record) {
+                clipboardy_1.default.writeSync(record);
+                console.log(record);
+                console.log('Copied!');
             }
-            else {
-                console.log('DP record does not exist.');
-            }
+        });
+    },
+    track() {
+        return __awaiter(this, void 0, void 0, function* () {
+            new tracker_1.Tracker();
         });
     },
 };
@@ -229,12 +221,9 @@ function setConfigFile(configFile) {
     const dest = path_1.resolve(__dirname, '../.config.json');
     fs_1.copyFileSync(src, dest);
 }
-function getGitLabProjectByName(n) {
-    return config_1.CONFIG.GitLabProjects.find(({ name }) => name === n);
-}
 function getGitLabProjectIdByName(name) {
     var _a;
-    const gitLabProjectId = (_a = getGitLabProjectByName(name)) === null || _a === void 0 ? void 0 : _a.id;
+    const gitLabProjectId = (_a = utils_1.getGitLabProjectConfigByName(name)) === null || _a === void 0 ? void 0 : _a.id;
     if (!gitLabProjectId) {
         throw new Error('Cannot find project');
     }

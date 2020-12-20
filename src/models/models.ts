@@ -8,7 +8,11 @@ export interface Config {
     path: string;
     repo: string;
     id: string;
+    stagingStatus?: string;
+    deployedStatus?: string;
   }>;
+  DailyProgressFile: string;
+  TrackListFile: string;
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];
 export interface NormalizedChecklistItem {

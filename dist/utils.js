@@ -12,9 +12,9 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const child_process_1 = __importDefault(require("child_process"));
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const config_1 = require("./config");
-const child_process_1 = __importDefault(require("child_process"));
 function checkStatus(res) {
     if (res.ok) {
         return res;
@@ -104,3 +104,13 @@ function promiseSpawn(command, args) {
     });
 }
 exports.promiseSpawn = promiseSpawn;
+function getGitLabProjectConfigByName(n) {
+    return config_1.CONFIG.GitLabProjects.find(({ name }) => name === n);
+}
+exports.getGitLabProjectConfigByName = getGitLabProjectConfigByName;
+function getClickUpTaskIdFromGitLabIssue(issue) {
+    const description = issue.description;
+    const result = description.match(/https:\/\/app.clickup.com\/t\/(\w+)/);
+    return result ? result[1] : null;
+}
+exports.getClickUpTaskIdFromGitLabIssue = getClickUpTaskIdFromGitLabIssue;

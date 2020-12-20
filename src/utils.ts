@@ -1,8 +1,9 @@
+import childProcess from 'child_process';
 import fetch, { Response } from 'node-fetch';
-import { Site, HttpMethod, NormalizedChecklist } from './models/models';
 import { CONFIG } from './config';
 import { ChecklistItem } from './models/clickup.models';
-import childProcess from 'child_process';
+import { Issue } from './models/gitlab/issue.models';
+import { HttpMethod, NormalizedChecklist, Site } from './models/models';
 
 function checkStatus(res: Response) {
   if (res.ok) {
@@ -102,4 +103,14 @@ export async function promiseSpawn(command: string, args: string[]) {
       .spawn(command, args, { shell: true, stdio: 'inherit' })
       .on('close', (code) => (code === 0 ? resolve() : reject()));
   });
+}
+
+export function getGitLabProjectConfigByName(n: string) {
+  return CONFIG.GitLabProjects.find(({ name }) => name === n);
+}
+
+export function getClickUpTaskIdFromGitLabIssue(issue: Issue) {
+  const description = issue.description;
+  const result = description.match(/https:\/\/app.clickup.com\/t\/(\w+)/);
+  return result ? result[1] : null;
 }

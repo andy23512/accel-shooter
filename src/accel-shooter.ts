@@ -1,19 +1,21 @@
 import clipboardy from 'clipboardy';
 import { format } from 'date-fns';
-import { copyFileSync, readFileSync, writeFileSync } from 'fs';
+import { copyFileSync } from 'fs';
 import inquirer from 'inquirer';
 import open from 'open';
 import os from 'os';
-import { join, resolve as pathResolve } from 'path';
+import { resolve as pathResolve } from 'path';
 import { setIntervalAsync } from 'set-interval-async/dynamic';
 import { configReadline, setUpSyncHotkey, syncChecklist } from './actions';
 import { ClickUp } from './clickup';
 import { CONFIG } from './config';
+import { DailyProgress } from './daily-progress';
 import {
   getGitLabBranchNameFromIssueNumberAndTitleAndTaskId,
   GitLab,
 } from './gitlab';
-import { promiseSpawn } from './utils';
+import { Tracker } from './tracker';
+import { getGitLabProjectConfigByName, promiseSpawn } from './utils';
 
 const options = {
   endingTodo: `
@@ -51,6 +53,7 @@ const actionAlias: { [key: string]: string } = {
   o: 'open',
   sy: 'sync',
   cp: 'copy',
+  t: 'track',
 };
 
 const actions: { [key: string]: () => Promise<any> } = {
@@ -132,14 +135,7 @@ const actions: { [key: string]: () => Promise<any> } = {
     await sleep(1000);
     await promiseSpawn('git', ['checkout', gitLabBranch.name]);
     const dailyProgressString = `* (Processing) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
-    const homedir = os.homedir();
-    const dpPath = join(homedir, 'ResilioSync/Daily Progress.md');
-    const dpContent = readFileSync(dpPath, { encoding: 'utf-8' });
-    const updatedDpContent = dpContent.replace(
-      '## Buffer',
-      `## Buffer\n    ${dailyProgressString}`
-    );
-    writeFileSync(dpPath, updatedDpContent);
+    new DailyProgress().addProgressToBuffer(dailyProgressString);
     open(gitLabIssueUrl);
     const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabIssueNumber}`;
     clipboardy.writeSync(syncCommand);
@@ -197,24 +193,15 @@ const actions: { [key: string]: () => Promise<any> } = {
       process.argv.length >= 4
         ? process.argv[3]
         : format(new Date(), 'yyyy/MM/dd');
-    const homedir = os.homedir();
-    const dpPath = join(homedir, 'ResilioSync/Daily Progress.md');
-    const dpContent = readFileSync(dpPath, { encoding: 'utf-8' });
-    const matchResult = dpContent.match(
-      new RegExp(`(### ${day}.*?)\n###`, 's')
-    );
-    if (matchResult) {
-      const record = matchResult[1];
-      if (/2\. Today\n3\./.test(record)) {
-        console.log('Today content is empty.');
-      } else {
-        clipboardy.writeSync(record);
-        console.log(record);
-        console.log('Copied!');
-      }
-    } else {
-      console.log('DP record does not exist.');
+    const record = new DailyProgress().getRecordByDay(day);
+    if (record) {
+      clipboardy.writeSync(record);
+      console.log(record);
+      console.log('Copied!');
     }
+  },
+  async track() {
+    new Tracker();
   },
 };
 
@@ -233,12 +220,8 @@ function setConfigFile(configFile: string) {
   copyFileSync(src, dest);
 }
 
-function getGitLabProjectByName(n: string) {
-  return CONFIG.GitLabProjects.find(({ name }) => name === n);
-}
-
 function getGitLabProjectIdByName(name: string) {
-  const gitLabProjectId = getGitLabProjectByName(name)?.id;
+  const gitLabProjectId = getGitLabProjectConfigByName(name)?.id;
   if (!gitLabProjectId) {
     throw new Error('Cannot find project');
   }

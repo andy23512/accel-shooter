@@ -21,11 +21,13 @@
   ],
   "dependencies": {
     "clipboardy": "^2.3.0",
+    "csv-parser": "^3.0.0",
     "date-fns": "^2.16.1",
     "inquirer": "^7.1.0",
     "node-fetch": "^2.6.1",
     "open": "^7.0.3",
-    "set-interval-async": "^1.0.32"
+    "set-interval-async": "^1.0.32",
+    "untildify": "^4.0.0"
   },
   "devDependencies": {
     "@types/clipboardy": "^2.0.1",
