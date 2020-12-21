@@ -25,7 +25,7 @@ class Tracker extends base_1.BaseFileRef {
     constructor() {
         super();
         this.trackTask();
-        setTimeout(() => {
+        setInterval(() => {
             this.trackTask();
         }, 5 * 60 * 1000);
     }
