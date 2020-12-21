@@ -52,6 +52,7 @@ const options = {
   - [ ] check conflict
   - [ ] review code
   - [ ] check if any not-pushed code exists
+  - [ ] write what I do in MR
   - [ ] mark MR as resolved
   - [ ] assign MR
   - [ ] change ClickUp task status`,
