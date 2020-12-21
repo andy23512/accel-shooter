@@ -31,8 +31,8 @@ class Tracker extends base_1.BaseFileRef {
     }
     getItems() {
         const content = this.readFile();
-        const lines = content.split('\n').filter(Boolean);
-        const items = lines.map((line) => line.split(' '));
+        const lines = content.split("\n").filter(Boolean);
+        const items = lines.map((line) => line.split(" "));
         return items;
     }
     trackTask() {
@@ -40,13 +40,13 @@ class Tracker extends base_1.BaseFileRef {
             return Promise.all(this.getItems().map(([projectId, issueNumber]) => this.trackSingle(projectId, issueNumber)));
         });
     }
-    trackSingle(projectId, issueNumber) {
+    trackSingle(projectName, issueNumber) {
         return __awaiter(this, void 0, void 0, function* () {
-            const projectConfig = utils_1.getGitLabProjectConfigByName(projectId);
+            const projectConfig = utils_1.getGitLabProjectConfigByName(projectName);
             if (!(projectConfig === null || projectConfig === void 0 ? void 0 : projectConfig.deployedStatus) && !(projectConfig === null || projectConfig === void 0 ? void 0 : projectConfig.stagingStatus)) {
                 return;
             }
-            const gitLab = new gitlab_1.GitLab(projectId);
+            const gitLab = new gitlab_1.GitLab(projectConfig.id);
             const issue = yield gitLab.getIssue(issueNumber);
             const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
             if (!clickUpTaskId) {
@@ -55,15 +55,15 @@ class Tracker extends base_1.BaseFileRef {
             const clickUp = new clickup_1.ClickUp(clickUpTaskId);
             const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
             const mergeRequest = yield gitLab.getMergeRequest(mergeRequests[mergeRequests.length - 1].iid);
-            if (projectConfig.stagingStatus && mergeRequest.state === 'merged') {
+            if (projectConfig.stagingStatus && mergeRequest.state === "merged") {
                 const clickUpTask = yield clickUp.getTask();
-                if (clickUpTask.status.status === 'in review') {
+                if (clickUpTask.status.status === "in review") {
                     yield clickUp.setTaskStatus(projectConfig.stagingStatus);
                 }
                 if (projectConfig.deployedStatus &&
-                    clickUpTask.status.status === 'staging') {
+                    clickUpTask.status.status === "staging") {
                     const commit = yield gitLab.getCommit(mergeRequest.merge_commit_sha);
-                    if (commit.last_pipeline.status === 'success') {
+                    if (commit.last_pipeline.status === "success") {
                         yield clickUp.setTaskStatus(projectConfig.deployedStatus);
                     }
                 }

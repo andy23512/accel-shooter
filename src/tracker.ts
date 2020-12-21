@@ -1,12 +1,12 @@
-import untildify from 'untildify';
-import { BaseFileRef } from './base';
-import { ClickUp } from './clickup';
-import { CONFIG } from './config';
-import { GitLab } from './gitlab';
+import untildify from "untildify";
+import { BaseFileRef } from "./base";
+import { ClickUp } from "./clickup";
+import { CONFIG } from "./config";
+import { GitLab } from "./gitlab";
 import {
   getClickUpTaskIdFromGitLabIssue,
   getGitLabProjectConfigByName,
-} from './utils';
+} from "./utils";
 
 export class Tracker extends BaseFileRef {
   protected get path() {
@@ -23,8 +23,8 @@ export class Tracker extends BaseFileRef {
 
   private getItems() {
     const content = this.readFile();
-    const lines = content.split('\n').filter(Boolean);
-    const items = lines.map((line) => line.split(' '));
+    const lines = content.split("\n").filter(Boolean);
+    const items = lines.map((line) => line.split(" "));
     return items;
   }
 
@@ -36,12 +36,12 @@ export class Tracker extends BaseFileRef {
     );
   }
 
-  public async trackSingle(projectId: string, issueNumber: string) {
-    const projectConfig = getGitLabProjectConfigByName(projectId);
+  public async trackSingle(projectName: string, issueNumber: string) {
+    const projectConfig = getGitLabProjectConfigByName(projectName);
     if (!projectConfig?.deployedStatus && !projectConfig?.stagingStatus) {
       return;
     }
-    const gitLab = new GitLab(projectId);
+    const gitLab = new GitLab(projectConfig.id);
     const issue = await gitLab.getIssue(issueNumber);
     const clickUpTaskId = getClickUpTaskIdFromGitLabIssue(issue);
     if (!clickUpTaskId) {
@@ -54,17 +54,17 @@ export class Tracker extends BaseFileRef {
     const mergeRequest = await gitLab.getMergeRequest(
       mergeRequests[mergeRequests.length - 1].iid
     );
-    if (projectConfig.stagingStatus && mergeRequest.state === 'merged') {
+    if (projectConfig.stagingStatus && mergeRequest.state === "merged") {
       const clickUpTask = await clickUp.getTask();
-      if (clickUpTask.status.status === 'in review') {
+      if (clickUpTask.status.status === "in review") {
         await clickUp.setTaskStatus(projectConfig.stagingStatus);
       }
       if (
         projectConfig.deployedStatus &&
-        clickUpTask.status.status === 'staging'
+        clickUpTask.status.status === "staging"
       ) {
         const commit = await gitLab.getCommit(mergeRequest.merge_commit_sha);
-        if (commit.last_pipeline.status === 'success') {
+        if (commit.last_pipeline.status === "success") {
           await clickUp.setTaskStatus(projectConfig.deployedStatus);
         }
       }

@@ -24,15 +24,15 @@ function checkStatus(res) {
     }
 }
 function callApiFactory(site) {
-    let apiUrl = '';
+    let apiUrl = "";
     let headers = {};
     switch (site) {
-        case 'GitLab':
-            apiUrl = 'https://gitlab.com/api/v4';
-            headers = { 'Private-Token': config_1.CONFIG.GitLabToken };
+        case "GitLab":
+            apiUrl = "https://gitlab.com/api/v4";
+            headers = { "Private-Token": config_1.CONFIG.GitLabToken };
             break;
-        case 'ClickUp':
-            apiUrl = 'https://api.clickup.com/api/v2';
+        case "ClickUp":
+            apiUrl = "https://api.clickup.com/api/v2";
             headers = { Authorization: config_1.CONFIG.ClickUpToken };
             break;
         default:
@@ -45,7 +45,7 @@ function callApiFactory(site) {
                 params.set(key, value);
             });
         }
-        return node_fetch_1.default(apiUrl + url, method === 'get'
+        return node_fetch_1.default(apiUrl + url, method === "get"
             ? {
                 method,
                 headers,
@@ -58,26 +58,26 @@ function callApiFactory(site) {
 exports.callApiFactory = callApiFactory;
 function dashify(input) {
     let temp = input
-        .replace(/[^A-Za-z0-9]/g, '-')
-        .replace(/-{2,}/g, '-')
-        .replace(/-+$/, '')
-        .replace(/^-+/, '')
+        .replace(/[^A-Za-z0-9]/g, "-")
+        .replace(/-{2,}/g, "-")
+        .replace(/-+$/, "")
+        .replace(/^-+/, "")
         .toLowerCase();
     if (temp.length >= 100) {
         temp = temp.substring(0, 100);
-        return temp.substring(0, temp.lastIndexOf('-'));
+        return temp.substring(0, temp.lastIndexOf("-"));
     }
     return temp;
 }
 exports.dashify = dashify;
 function normalizeGitLabIssueChecklist(checklistText) {
     return checklistText
-        .split('\n')
-        .filter((line) => line && (line.includes('- [ ]') || line.includes('- [x]')))
+        .split("\n")
+        .filter((line) => line && (line.includes("- [ ]") || line.includes("- [x]")))
         .map((line, index) => ({
         name: line
-            .replace(/- \[[x ]\] /g, '')
-            .replace(/^ +/, (space) => space.replace(/ /g, '-')),
+            .replace(/- \[[x ]\] /g, "")
+            .replace(/^ +/, (space) => space.replace(/ /g, "-")),
         checked: /- \[x\]/.test(line),
         order: index,
     }));
@@ -98,8 +98,8 @@ function promiseSpawn(command, args) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
             child_process_1.default
-                .spawn(command, args, { shell: true, stdio: 'inherit' })
-                .on('close', (code) => (code === 0 ? resolve() : reject()));
+                .spawn(command, args, { shell: true, stdio: "inherit" })
+                .on("close", (code) => (code === 0 ? resolve() : reject()));
         });
     });
 }

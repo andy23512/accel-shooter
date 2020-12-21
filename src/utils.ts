@@ -1,9 +1,9 @@
-import childProcess from 'child_process';
-import fetch, { Response } from 'node-fetch';
-import { CONFIG } from './config';
-import { ChecklistItem } from './models/clickup.models';
-import { Issue } from './models/gitlab/issue.models';
-import { HttpMethod, NormalizedChecklist, Site } from './models/models';
+import childProcess from "child_process";
+import fetch, { Response } from "node-fetch";
+import { CONFIG } from "./config";
+import { ChecklistItem } from "./models/clickup.models";
+import { Issue } from "./models/gitlab/issue.models";
+import { HttpMethod, NormalizedChecklist, Site } from "./models/models";
 
 function checkStatus(res: Response) {
   if (res.ok) {
@@ -14,15 +14,15 @@ function checkStatus(res: Response) {
 }
 
 export function callApiFactory(site: Site) {
-  let apiUrl = '';
+  let apiUrl = "";
   let headers = {};
   switch (site) {
-    case 'GitLab':
-      apiUrl = 'https://gitlab.com/api/v4';
-      headers = { 'Private-Token': CONFIG.GitLabToken };
+    case "GitLab":
+      apiUrl = "https://gitlab.com/api/v4";
+      headers = { "Private-Token": CONFIG.GitLabToken };
       break;
-    case 'ClickUp':
-      apiUrl = 'https://api.clickup.com/api/v2';
+    case "ClickUp":
+      apiUrl = "https://api.clickup.com/api/v2";
       headers = { Authorization: CONFIG.ClickUpToken };
       break;
     default:
@@ -41,7 +41,7 @@ export function callApiFactory(site: Site) {
     }
     return fetch(
       apiUrl + url,
-      method === 'get'
+      method === "get"
         ? {
             method,
             headers,
@@ -55,14 +55,14 @@ export function callApiFactory(site: Site) {
 
 export function dashify(input: string) {
   let temp = input
-    .replace(/[^A-Za-z0-9]/g, '-')
-    .replace(/-{2,}/g, '-')
-    .replace(/-+$/, '')
-    .replace(/^-+/, '')
+    .replace(/[^A-Za-z0-9]/g, "-")
+    .replace(/-{2,}/g, "-")
+    .replace(/-+$/, "")
+    .replace(/^-+/, "")
     .toLowerCase();
   if (temp.length >= 100) {
     temp = temp.substring(0, 100);
-    return temp.substring(0, temp.lastIndexOf('-'));
+    return temp.substring(0, temp.lastIndexOf("-"));
   }
   return temp;
 }
@@ -71,14 +71,14 @@ export function normalizeGitLabIssueChecklist(
   checklistText: string
 ): NormalizedChecklist {
   return checklistText
-    .split('\n')
+    .split("\n")
     .filter(
-      (line) => line && (line.includes('- [ ]') || line.includes('- [x]'))
+      (line) => line && (line.includes("- [ ]") || line.includes("- [x]"))
     )
     .map((line, index) => ({
       name: line
-        .replace(/- \[[x ]\] /g, '')
-        .replace(/^ +/, (space) => space.replace(/ /g, '-')),
+        .replace(/- \[[x ]\] /g, "")
+        .replace(/^ +/, (space) => space.replace(/ /g, "-")),
       checked: /- \[x\]/.test(line),
       order: index,
     }));
@@ -100,8 +100,8 @@ export function normalizeClickUpChecklist(
 export async function promiseSpawn(command: string, args: string[]) {
   return new Promise((resolve, reject) => {
     childProcess
-      .spawn(command, args, { shell: true, stdio: 'inherit' })
-      .on('close', (code) => (code === 0 ? resolve() : reject()));
+      .spawn(command, args, { shell: true, stdio: "inherit" })
+      .on("close", (code) => (code === 0 ? resolve() : reject()));
   });
 }
 

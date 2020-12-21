@@ -12,16 +12,16 @@ class DailyProgress extends base_1.BaseFileRef {
     }
     addProgressToBuffer(dailyProgressString) {
         const content = this.readFile();
-        const updatedDpContent = content.replace('## Buffer', `## Buffer\n    ${dailyProgressString}`);
+        const updatedDpContent = content.replace("## Buffer", `## Buffer\n    ${dailyProgressString}`);
         this.writeFile(updatedDpContent);
     }
     getRecordByDay(day) {
         const content = this.readFile();
-        const matchResult = content.match(new RegExp(`(### ${day}.*?)\n###`, 's'));
+        const matchResult = content.match(new RegExp(`(### ${day}.*?)\n###`, "s"));
         if (matchResult) {
             const record = matchResult[1];
             if (/2\. Today\n3\./.test(record)) {
-                console.log('Today content is empty.');
+                console.log("Today content is empty.");
                 return null;
             }
             else {
@@ -29,7 +29,7 @@ class DailyProgress extends base_1.BaseFileRef {
             }
         }
         else {
-            console.log('DP record does not exist.');
+            console.log("DP record does not exist.");
             return null;
         }
     }
