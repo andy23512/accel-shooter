@@ -1,5 +1,5 @@
-export type Site = 'ClickUp' | 'GitLab';
-export type HttpMethod = 'get' | 'post' | 'put' | 'delete';
+export type Site = "ClickUp" | "GitLab";
+export type HttpMethod = "get" | "post" | "put" | "delete";
 export interface Config {
   ClickUpToken: string;
   GitLabToken: string;
@@ -13,6 +13,7 @@ export interface Config {
   }>;
   DailyProgressFile: string;
   TrackListFile: string;
+  EndingAssignee: string;
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];
 export interface NormalizedChecklistItem {

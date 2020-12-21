@@ -17,9 +17,22 @@ export class Tracker extends BaseFileRef {
   constructor() {
     super();
     this.trackTask();
+    this.setUpSyncHotKey();
     setInterval(() => {
       this.trackTask();
     }, 5 * 60 * 1000);
+  }
+
+  private setUpSyncHotKey() {
+    process.stdin.setRawMode(true);
+    process.stdin.on("keypress", (_, key) => {
+      if (key.ctrl && key.name === "c") {
+        process.exit();
+      } else if (!key.ctrl && !key.meta && !key.shift && key.name === "s") {
+        console.log(`You pressed the sync key`);
+        this.trackTask();
+      }
+    });
   }
 
   private getItems() {
@@ -30,6 +43,7 @@ export class Tracker extends BaseFileRef {
   }
 
   public async trackTask() {
+    console.log(`[Track] ${new Date().toLocaleString()}`);
     return Promise.all(
       this.getItems().map(([projectId, issueNumber]) =>
         this.trackSingle(projectId, issueNumber)

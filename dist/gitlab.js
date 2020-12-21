@@ -9,8 +9,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const config_1 = require("./config");
 const utils_1 = require("./utils");
-const callApi = utils_1.callApiFactory('GitLab');
+const callApi = utils_1.callApiFactory("GitLab");
 function getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(issueNumber, issueTitle, clickUpTaskId) {
     return `${issueNumber}_CU-${clickUpTaskId}_${utils_1.dashify(issueTitle)}`;
 }
@@ -20,7 +21,7 @@ class GitLab {
         this.projectId = projectId;
     }
     getProject() {
-        return callApi('get', `/projects/${this.projectId}`);
+        return callApi("get", `/projects/${this.projectId}`);
     }
     getDefaultBranchName() {
         return __awaiter(this, void 0, void 0, function* () {
@@ -29,34 +30,39 @@ class GitLab {
         });
     }
     getIssue(issueNumber) {
-        return callApi('get', `/projects/${this.projectId}/issues/${issueNumber}`);
+        return callApi("get", `/projects/${this.projectId}/issues/${issueNumber}`);
     }
     getMergeRequest(mergeRequestNumber) {
-        return callApi('get', `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}`);
+        return callApi("get", `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}`);
     }
     getCommit(sha) {
-        console.log(sha);
-        return callApi('get', `/projects/${this.projectId}/repository/commits/${sha}`);
+        return callApi("get", `/projects/${this.projectId}/repository/commits/${sha}`);
+    }
+    getEndingAssignee() {
+        if (!config_1.CONFIG.EndingAssignee) {
+            throw Error("No ending assignee was set");
+        }
+        return callApi("get", `/users?username=${config_1.CONFIG.EndingAssignee}`).then((users) => users[0]);
     }
     listProjectLabels() {
-        return callApi('get', `/projects/${this.projectId}/labels?per_page=100`);
+        return callApi("get", `/projects/${this.projectId}/labels?per_page=100`);
     }
     listMergeRequestsWillCloseIssueOnMerge(issueNumber) {
-        return callApi('get', `/projects/${this.projectId}/issues/${issueNumber}/closed_by`);
+        return callApi("get", `/projects/${this.projectId}/issues/${issueNumber}/closed_by`);
     }
     createIssue(title, description, labels) {
         return __awaiter(this, void 0, void 0, function* () {
-            return callApi('post', `/projects/${this.projectId}/issues`, {
+            return callApi("post", `/projects/${this.projectId}/issues`, {
                 title: title,
                 description: description,
                 assignee_ids: yield this.getUserId(),
-                labels: labels.join(','),
+                labels: labels.join(","),
             });
         });
     }
     createBranch(branch) {
         return __awaiter(this, void 0, void 0, function* () {
-            return callApi('post', `/projects/${this.projectId}/repository/branches`, {
+            return callApi("post", `/projects/${this.projectId}/repository/branches`, {
                 branch,
                 ref: yield this.getDefaultBranchName(),
             });
@@ -64,18 +70,27 @@ class GitLab {
     }
     createMergeRequest(issueNumber, issueTitle, branch, labels) {
         return __awaiter(this, void 0, void 0, function* () {
-            return callApi('post', `/projects/${this.projectId}/merge_requests`, {
+            return callApi("post", `/projects/${this.projectId}/merge_requests`, {
                 source_branch: branch,
                 target_branch: yield this.getDefaultBranchName(),
                 title: `Draft: Resolve "${issueTitle}"`,
                 description: `Close #${issueNumber}`,
-                labels: labels.join(','),
+                labels: labels.join(","),
+            });
+        });
+    }
+    markMergeRequestAsReadyAndAddAssignee(merge_request) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const assignee = yield this.getEndingAssignee();
+            yield callApi("put", `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, {
+                title: merge_request.title.replace("WIP: ", "").replace("Draft: ", ""),
+                assignee_id: assignee.id,
             });
         });
     }
     getUserId() {
         return __awaiter(this, void 0, void 0, function* () {
-            const user = yield callApi('get', '/user');
+            const user = yield callApi("get", "/user");
             return user.id;
         });
     }

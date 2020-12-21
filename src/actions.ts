@@ -1,13 +1,13 @@
-import open from 'open';
-import readline from 'readline';
-import { ClickUp } from './clickup';
-import { GitLab } from './gitlab';
-import { NormalizedChecklist } from './models/models';
+import open from "open";
+import readline from "readline";
+import { ClickUp } from "./clickup";
+import { GitLab } from "./gitlab";
+import { NormalizedChecklist } from "./models/models";
 import {
   getClickUpTaskIdFromGitLabIssue,
   normalizeClickUpChecklist,
   normalizeGitLabIssueChecklist,
-} from './utils';
+} from "./utils";
 
 export function getSyncChecklistActions(
   oldClickUpChecklist: NormalizedChecklist,
@@ -56,18 +56,18 @@ export async function syncChecklist(
   const clickUpTaskId = getClickUpTaskIdFromGitLabIssue(issue);
   if (clickUpTaskId) {
     const gitLabChecklistText = issue.description
-      .replace(/https:\/\/app.clickup.com\/t\/\w+/g, '')
+      .replace(/https:\/\/app.clickup.com\/t\/\w+/g, "")
       .trim();
     const gitLabNormalizedChecklist = normalizeGitLabIssueChecklist(
       gitLabChecklistText
     );
     const clickUp = new ClickUp(clickUpTaskId);
-    const clickUpTasks = await clickUp.getTask();
+    const clickUpTask = await clickUp.getTask();
     const clickUpChecklistTitle = `GitLab synced checklist [${gitLabProjectId.replace(
-      '%2F',
-      '/'
+      "%2F",
+      "/"
     )}]`;
-    let clickUpChecklist = clickUpTasks.checklists.find(
+    let clickUpChecklist = clickUpTask.checklists.find(
       (c: any) => c.name === clickUpChecklistTitle
     );
     if (!clickUpChecklist) {
@@ -113,19 +113,19 @@ export async function syncChecklist(
     const status = Object.entries(actions)
       .map(([action, items]) => {
         const s = items.length.toString();
-        const n = items.length === 1 ? 'item' : 'items';
+        const n = items.length === 1 ? "item" : "items";
         return `${s} ${n} ${action}d`;
       })
-      .join(', ');
+      .join(", ");
     const fullCompleteMessage = gitLabNormalizedChecklist.every(
       (item) => item.checked
     )
-      ? '(Completed)'
-      : '';
+      ? "(Completed)"
+      : "";
     console.log(
       `[${gitLabProjectId.replace(
-        '%2F',
-        '/'
+        "%2F",
+        "/"
       )} #${issueNumber}] ${new Date().toLocaleString()} ${status} ${fullCompleteMessage}`
     );
   }
@@ -137,10 +137,10 @@ export function configReadline() {
 
 export function setUpSyncHotkey(gitLabProjectId: string, issueNumber: string) {
   process.stdin.setRawMode(true);
-  process.stdin.on('keypress', (_, key) => {
-    if (key.ctrl && key.name === 'c') {
+  process.stdin.on("keypress", (_, key) => {
+    if (key.ctrl && key.name === "c") {
       process.exit();
-    } else if (!key.ctrl && !key.meta && !key.shift && key.name === 's') {
+    } else if (!key.ctrl && !key.meta && !key.shift && key.name === "s") {
       console.log(`You pressed the sync key`);
       syncChecklist(gitLabProjectId, issueNumber);
     }
