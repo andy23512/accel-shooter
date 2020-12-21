@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const child_process_1 = __importDefault(require("child_process"));
 const untildify_1 = __importDefault(require("untildify"));
 const base_1 = require("./base");
 const clickup_1 = require("./clickup");
@@ -64,7 +65,8 @@ class Tracker extends base_1.BaseFileRef {
                     clickUpTask.status.status === "staging") {
                     const commit = yield gitLab.getCommit(mergeRequest.merge_commit_sha);
                     if (commit.last_pipeline.status === "success") {
-                        yield clickUp.setTaskStatus(projectConfig.deployedStatus);
+                        child_process_1.default.execSync(`osascript -e 'display notification "${projectName} #${issueNumber} is deployed!" with title "Accel Shooter"'`);
+                        // await clickUp.setTaskStatus(projectConfig.deployedStatus);
                     }
                 }
             }

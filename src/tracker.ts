@@ -1,3 +1,4 @@
+import childProcess from "child_process";
 import untildify from "untildify";
 import { BaseFileRef } from "./base";
 import { ClickUp } from "./clickup";
@@ -65,7 +66,10 @@ export class Tracker extends BaseFileRef {
       ) {
         const commit = await gitLab.getCommit(mergeRequest.merge_commit_sha);
         if (commit.last_pipeline.status === "success") {
-          await clickUp.setTaskStatus(projectConfig.deployedStatus);
+          childProcess.execSync(
+            `osascript -e 'display notification "${projectName} #${issueNumber} is deployed!" with title "Accel Shooter"'`
+          );
+          // await clickUp.setTaskStatus(projectConfig.deployedStatus);
         }
       }
     }
