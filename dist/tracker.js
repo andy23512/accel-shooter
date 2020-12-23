@@ -77,12 +77,14 @@ class Tracker extends base_1.BaseFileRef {
                 if (clickUpTask.status.status === "in review") {
                     child_process_1.default.execSync(`osascript -e 'display notification "${projectName} #${issueNumber} is merged!" with title "Accel Shooter"'`);
                     yield clickUp.setTaskStatus(projectConfig.stagingStatus);
+                    console.log(`${projectName} #${issueNumber}: In Review -> ${projectConfig.stagingStatus}`);
                 }
                 if (projectConfig.deployedStatus &&
                     clickUpTask.status.status === "staging") {
                     const commit = yield gitLab.getCommit(mergeRequest.merge_commit_sha);
                     if (commit.last_pipeline.status === "success") {
                         child_process_1.default.execSync(`osascript -e 'display notification "${projectName} #${issueNumber} is deployed!" with title "Accel Shooter"'`);
+                        console.log(`${projectName} #${issueNumber}: After Merge Pipeline Finished`);
                         // await clickUp.setTaskStatus(projectConfig.deployedStatus);
                     }
                 }

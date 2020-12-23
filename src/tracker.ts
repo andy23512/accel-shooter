@@ -79,6 +79,7 @@ export class Tracker extends BaseFileRef {
           `osascript -e 'display notification "${projectName} #${issueNumber} is merged!" with title "Accel Shooter"'`
         );
         await clickUp.setTaskStatus(projectConfig.stagingStatus);
+        console.log(`${projectName} #${issueNumber}: In Review -> ${projectConfig.stagingStatus}`);
       }
       if (
         projectConfig.deployedStatus &&
@@ -89,6 +90,7 @@ export class Tracker extends BaseFileRef {
           childProcess.execSync(
             `osascript -e 'display notification "${projectName} #${issueNumber} is deployed!" with title "Accel Shooter"'`
           );
+          console.log(`${projectName} #${issueNumber}: After Merge Pipeline Finished`);
           // await clickUp.setTaskStatus(projectConfig.deployedStatus);
         }
       }
