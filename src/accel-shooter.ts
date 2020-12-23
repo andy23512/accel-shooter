@@ -12,13 +12,13 @@ import { CONFIG } from "./config";
 import { DailyProgress } from "./daily-progress";
 import {
   getGitLabBranchNameFromIssueNumberAndTitleAndTaskId,
-  GitLab,
+  GitLab
 } from "./gitlab";
 import { Tracker } from "./tracker";
 import {
   getClickUpTaskIdFromGitLabIssue,
   getGitLabProjectConfigByName,
-  promiseSpawn,
+  promiseSpawn
 } from "./utils";
 
 const options = {
@@ -46,10 +46,7 @@ const options = {
   - [ ] check conflict
   - [ ] review code
   - [ ] check if any not-pushed code exists
-  - [ ] write what I do in MR
-  - [ ] mark MR as resolved
-  - [ ] assign MR
-  - [ ] change ClickUp task status`,
+  - [ ] write what I do in MR`,
 };
 
 const actionAlias: { [key: string]: string } = {
