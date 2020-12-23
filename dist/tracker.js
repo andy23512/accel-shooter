@@ -26,10 +26,9 @@ class Tracker extends base_1.BaseFileRef {
     constructor() {
         super();
         this.trackTask();
-        this.setUpSyncHotKey();
         setInterval(() => {
             this.trackTask();
-        }, 5 * 60 * 1000);
+        }, 60 * 1000);
     }
     setUpSyncHotKey() {
         process.stdin.setRawMode(true);

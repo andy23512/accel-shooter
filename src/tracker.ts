@@ -6,7 +6,7 @@ import { CONFIG } from "./config";
 import { GitLab } from "./gitlab";
 import {
   getClickUpTaskIdFromGitLabIssue,
-  getGitLabProjectConfigByName,
+  getGitLabProjectConfigByName
 } from "./utils";
 
 export class Tracker extends BaseFileRef {
@@ -17,10 +17,9 @@ export class Tracker extends BaseFileRef {
   constructor() {
     super();
     this.trackTask();
-    this.setUpSyncHotKey();
     setInterval(() => {
       this.trackTask();
-    }, 5 * 60 * 1000);
+    }, 60 * 1000);
   }
 
   private setUpSyncHotKey() {
