@@ -74,7 +74,7 @@ export class Tracker extends BaseFileRef {
         childProcess.execSync(
           `osascript -e 'display notification "${projectName} #${issueNumber} is merged!" with title "Accel Shooter"'`
         );
-        // await clickUp.setTaskStatus(projectConfig.stagingStatus);
+        await clickUp.setTaskStatus(projectConfig.stagingStatus);
       }
       if (
         projectConfig.deployedStatus &&
