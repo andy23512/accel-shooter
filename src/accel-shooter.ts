@@ -143,6 +143,7 @@ const actions: { [key: string]: () => Promise<any> } = {
     const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabIssueNumber}`;
     clipboardy.writeSync(syncCommand);
     console.log(`Sync command: "${syncCommand}" Copied!`);
+    new Tracker().addItem(answers.gitLabProject.name, gitLabIssueNumber)
   },
   async open() {
     const issueNumber = process.argv[4];
@@ -204,7 +205,9 @@ const actions: { [key: string]: () => Promise<any> } = {
     }
   },
   async track() {
-    new Tracker();
+    const tracker = new Tracker();
+    tracker.startSync();
+    tracker.setUpSyncHotKey();
   },
   async end() {
     const gitLabProjectId = getGitLabProjectIdFromArgv();

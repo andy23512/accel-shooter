@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const child_process_1 = __importDefault(require("child_process"));
+const fs_1 = require("fs");
 const untildify_1 = __importDefault(require("untildify"));
 const base_1 = require("./base");
 const clickup_1 = require("./clickup");
@@ -23,8 +24,7 @@ class Tracker extends base_1.BaseFileRef {
     get path() {
         return untildify_1.default(config_1.CONFIG.TrackListFile);
     }
-    constructor() {
-        super();
+    startSync() {
         this.trackTask();
         setInterval(() => {
             this.trackTask();
@@ -42,6 +42,9 @@ class Tracker extends base_1.BaseFileRef {
             }
         });
     }
+    addItem(projectName, issueNumber) {
+        fs_1.appendFileSync(this.path, `\n${projectName} ${issueNumber}`);
+    }
     getItems() {
         const content = this.readFile();
         const lines = content.split("\n").filter(Boolean);
@@ -51,7 +54,7 @@ class Tracker extends base_1.BaseFileRef {
     trackTask() {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(`[Track] ${new Date().toLocaleString()}`);
-            return Promise.all(this.getItems().map(([projectId, issueNumber]) => this.trackSingle(projectId, issueNumber)));
+            return Promise.all(this.getItems().map(([projectName, issueNumber]) => this.trackSingle(projectName, issueNumber)));
         });
     }
     trackSingle(projectName, issueNumber) {

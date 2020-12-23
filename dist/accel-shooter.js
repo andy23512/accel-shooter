@@ -136,6 +136,7 @@ const actions = {
             const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabIssueNumber}`;
             clipboardy_1.default.writeSync(syncCommand);
             console.log(`Sync command: "${syncCommand}" Copied!`);
+            new tracker_1.Tracker().addItem(answers.gitLabProject.name, gitLabIssueNumber);
         });
     },
     open() {
@@ -202,7 +203,9 @@ const actions = {
     },
     track() {
         return __awaiter(this, void 0, void 0, function* () {
-            new tracker_1.Tracker();
+            const tracker = new tracker_1.Tracker();
+            tracker.startSync();
+            tracker.setUpSyncHotKey();
         });
     },
     end() {

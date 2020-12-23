@@ -1,4 +1,5 @@
 import childProcess from "child_process";
+import { appendFileSync } from "fs";
 import untildify from "untildify";
 import { BaseFileRef } from "./base";
 import { ClickUp } from "./clickup";
@@ -14,15 +15,14 @@ export class Tracker extends BaseFileRef {
     return untildify(CONFIG.TrackListFile);
   }
 
-  constructor() {
-    super();
+  public startSync() {
     this.trackTask();
     setInterval(() => {
       this.trackTask();
     }, 60 * 1000);
   }
 
-  private setUpSyncHotKey() {
+  public setUpSyncHotKey() {
     process.stdin.setRawMode(true);
     process.stdin.on("keypress", (_, key) => {
       if (key.ctrl && key.name === "c") {
@@ -32,6 +32,10 @@ export class Tracker extends BaseFileRef {
         this.trackTask();
       }
     });
+  }
+
+  public addItem(projectName: string, issueNumber: string | number) {
+    appendFileSync(this.path, `\n${projectName} ${issueNumber}`);
   }
 
   private getItems() {
@@ -44,8 +48,8 @@ export class Tracker extends BaseFileRef {
   public async trackTask() {
     console.log(`[Track] ${new Date().toLocaleString()}`);
     return Promise.all(
-      this.getItems().map(([projectId, issueNumber]) =>
-        this.trackSingle(projectId, issueNumber)
+      this.getItems().map(([projectName, issueNumber]) =>
+        this.trackSingle(projectName, issueNumber)
       )
     );
   }
