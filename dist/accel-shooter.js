@@ -205,7 +205,6 @@ const actions = {
         return __awaiter(this, void 0, void 0, function* () {
             const tracker = new tracker_1.Tracker();
             tracker.startSync();
-            tracker.setUpSyncHotKey();
         });
     },
     end() {

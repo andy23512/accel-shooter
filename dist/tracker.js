@@ -30,18 +30,6 @@ class Tracker extends base_1.BaseFileRef {
             this.trackTask();
         }, 60 * 1000);
     }
-    setUpSyncHotKey() {
-        process.stdin.setRawMode(true);
-        process.stdin.on("keypress", (_, key) => {
-            if (key.ctrl && key.name === "c") {
-                process.exit();
-            }
-            else if (!key.ctrl && !key.meta && !key.shift && key.name === "s") {
-                console.log(`You pressed the sync key`);
-                this.trackTask();
-            }
-        });
-    }
     addItem(projectName, issueNumber) {
         fs_1.appendFileSync(this.path, `\n${projectName} ${issueNumber}`);
     }
@@ -82,10 +70,11 @@ class Tracker extends base_1.BaseFileRef {
                 if (projectConfig.deployedStatus &&
                     clickUpTask.status.status === "staging") {
                     const commit = yield gitLab.getCommit(mergeRequest.merge_commit_sha);
-                    if (commit.last_pipeline.status === "success") {
+                    const jobs = yield gitLab.listPipelineJobs(commit.last_pipeline.id);
+                    if (commit.last_pipeline.status === "success" && jobs.find(j => j.name === 'deploy' && j.status === 'success')) {
                         child_process_1.default.execSync(`osascript -e 'display notification "${projectName} #${issueNumber} is deployed!" with title "Accel Shooter"'`);
-                        console.log(`${projectName} #${issueNumber}: After Merge Pipeline Finished`);
-                        // await clickUp.setTaskStatus(projectConfig.deployedStatus);
+                        console.log(`${projectName} #${issueNumber}: Staging -> ${projectConfig.deployedStatus}`);
+                        yield clickUp.setTaskStatus(projectConfig.deployedStatus);
                     }
                 }
             }

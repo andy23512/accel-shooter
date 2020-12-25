@@ -5,9 +5,10 @@ import {
   Label,
   MergeRequest,
   Project,
-  User,
+  User
 } from "./models/gitlab.models";
 import { Commit } from "./models/gitlab/commit.models";
+import { Job } from './models/gitlab/job.models';
 import { FullMergeRequest } from "./models/gitlab/merge-request.models";
 import { callApiFactory, dashify } from "./utils";
 
@@ -76,6 +77,13 @@ export class GitLab {
       "get",
       `/projects/${this.projectId}/issues/${issueNumber}/closed_by`
     );
+  }
+
+  public listPipelineJobs(pipelineId: number) {
+    return callApi<Job[]>(
+      "get",
+      `/projects/${this.projectId}/pipelines/${pipelineId}/jobs`
+    )
   }
 
   public async createIssue(title: string, description: string, labels: any[]) {

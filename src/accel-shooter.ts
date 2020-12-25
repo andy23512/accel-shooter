@@ -207,7 +207,6 @@ const actions: { [key: string]: () => Promise<any> } = {
   async track() {
     const tracker = new Tracker();
     tracker.startSync();
-    tracker.setUpSyncHotKey();
   },
   async end() {
     const gitLabProjectId = getGitLabProjectIdFromArgv();

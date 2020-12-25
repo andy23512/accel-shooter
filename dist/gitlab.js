@@ -50,6 +50,9 @@ class GitLab {
     listMergeRequestsWillCloseIssueOnMerge(issueNumber) {
         return callApi("get", `/projects/${this.projectId}/issues/${issueNumber}/closed_by`);
     }
+    listPipelineJobs(pipelineId) {
+        return callApi("get", `/projects/${this.projectId}/pipelines/${pipelineId}/jobs`);
+    }
     createIssue(title, description, labels) {
         return __awaiter(this, void 0, void 0, function* () {
             return callApi("post", `/projects/${this.projectId}/issues`, {
