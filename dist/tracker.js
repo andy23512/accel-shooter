@@ -66,6 +66,9 @@ class Tracker extends base_1.BaseFileRef {
                     child_process_1.default.execSync(`osascript -e 'display notification "${projectName} #${issueNumber} is merged!" with title "Accel Shooter"'`);
                     yield clickUp.setTaskStatus(projectConfig.stagingStatus);
                     console.log(`${projectName} #${issueNumber}: In Review -> ${projectConfig.stagingStatus}`);
+                    if (!projectConfig.deployedStatus) {
+                        this.closeItem(projectName, issueNumber);
+                    }
                 }
                 if (projectConfig.deployedStatus &&
                     clickUpTask.status.status === "staging") {
@@ -75,10 +78,16 @@ class Tracker extends base_1.BaseFileRef {
                         child_process_1.default.execSync(`osascript -e 'display notification "${projectName} #${issueNumber} is deployed!" with title "Accel Shooter"'`);
                         console.log(`${projectName} #${issueNumber}: Staging -> ${projectConfig.deployedStatus}`);
                         yield clickUp.setTaskStatus(projectConfig.deployedStatus);
+                        this.closeItem(projectName, issueNumber);
                     }
                 }
             }
         });
+    }
+    closeItem(projectName, issueNumber) {
+        const content = this.readFile();
+        const lines = content.split("\n").filter(Boolean).filter(line => line !== `${projectName} ${issueNumber}`);
+        this.writeFile(lines.join("\n"));
     }
 }
 exports.Tracker = Tracker;

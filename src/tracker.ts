@@ -68,6 +68,9 @@ export class Tracker extends BaseFileRef {
         );
         await clickUp.setTaskStatus(projectConfig.stagingStatus);
         console.log(`${projectName} #${issueNumber}: In Review -> ${projectConfig.stagingStatus}`);
+        if (!projectConfig.deployedStatus) {
+          this.closeItem(projectName, issueNumber);
+        }
       }
       if (
         projectConfig.deployedStatus &&
@@ -81,8 +84,15 @@ export class Tracker extends BaseFileRef {
           );
           console.log(`${projectName} #${issueNumber}: Staging -> ${projectConfig.deployedStatus}`);
           await clickUp.setTaskStatus(projectConfig.deployedStatus);
+          this.closeItem(projectName, issueNumber);
         }
       }
     }
+  }
+
+  public closeItem(projectName: string, issueNumber: string) {
+    const content = this.readFile();
+    const lines = content.split("\n").filter(Boolean).filter(line => line !== `${projectName} ${issueNumber}`);
+    this.writeFile(lines.join("\n"));
   }
 }
