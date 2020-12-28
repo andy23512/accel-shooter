@@ -13,6 +13,7 @@ export interface Config {
   }>;
   DailyProgressFile: string;
   TrackListFile: string;
+  ToDoTemplate: string;
   EndingAssignee: string;
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];

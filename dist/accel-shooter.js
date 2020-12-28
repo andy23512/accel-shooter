@@ -16,10 +16,12 @@ const clipboardy_1 = __importDefault(require("clipboardy"));
 const date_fns_1 = require("date-fns");
 const fs_1 = require("fs");
 const inquirer_1 = __importDefault(require("inquirer"));
+const mustache_1 = require("mustache");
 const open_1 = __importDefault(require("open"));
 const os_1 = __importDefault(require("os"));
 const path_1 = require("path");
 const dynamic_1 = require("set-interval-async/dynamic");
+const untildify_1 = __importDefault(require("untildify"));
 const actions_1 = require("./actions");
 const clickup_1 = require("./clickup");
 const config_1 = require("./config");
@@ -27,33 +29,6 @@ const daily_progress_1 = require("./daily-progress");
 const gitlab_1 = require("./gitlab");
 const tracker_1 = require("./tracker");
 const utils_1 = require("./utils");
-const options = {
-    endingTodo: `
-
-- [ ] ending
-  - [ ] check functionality
-  - [ ] frontend
-    - [ ] check tooltip
-    - [ ] check overflow content handling
-    - [ ] check overflow item handling
-    - [ ] check number pipe
-    - [ ] check lint
-    - [ ] check test
-    - [ ] check prod
-    - [ ] check lint after fix test and prod
-    - [ ] check console.log
-    - [ ] check i18n
-  - [ ] backend
-    - [ ] check api need pagination or not
-    - [ ] check test
-    - [ ] check print
-    - [ ] check key error
-    - [ ] handle single file or single folder import in import command
-  - [ ] check conflict
-  - [ ] review code
-  - [ ] check if any not-pushed code exists
-  - [ ] write what I do in MR`,
-};
 const actionAlias = {
     c: "config",
     st: "start",
@@ -113,6 +88,17 @@ const actions = {
                             .then((labels) => labels.map((label) => label.name));
                     }),
                 },
+                {
+                    name: "todoConfig",
+                    message: "Choose Preset To-do Config",
+                    type: "checkbox",
+                    choices: [
+                        { name: "frontend", checked: true },
+                        { name: "frontend_template", checked: true },
+                        { name: "backend", checked: true },
+                        { name: "unit_test" }
+                    ]
+                }
             ]);
             const gitLab = new gitlab_1.GitLab(answers.gitLabProject.id);
             const clickUp = new clickup_1.ClickUp(answers.clickUpTaskId);
@@ -121,7 +107,13 @@ const actions = {
             const clickUpTaskUrl = clickUpTask["url"];
             const gitLabIssueTitle = answers.issueTitle;
             yield clickUp.setTaskStatus("in progress");
-            const gitLabIssue = yield gitLab.createIssue(gitLabIssueTitle, `${clickUpTaskUrl}${options.endingTodo}`, selectedGitLabLabels);
+            const todoConfigMap = {};
+            answers.todoConfig.forEach((c) => {
+                todoConfigMap[c] = true;
+            });
+            const template = fs_1.readFileSync(untildify_1.default(config_1.CONFIG.ToDoTemplate), { encoding: 'utf-8' });
+            const endingTodo = mustache_1.render(template, todoConfigMap);
+            const gitLabIssue = yield gitLab.createIssue(gitLabIssueTitle, `${clickUpTaskUrl}\n\n${endingTodo}`, selectedGitLabLabels);
             const gitLabIssueUrl = gitLabIssue.web_url;
             const gitLabIssueNumber = gitLabIssue.iid;
             const gitLabBranch = yield gitLab.createBranch(gitlab_1.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(gitLabIssueNumber, gitLabIssueTitle, answers.clickUpTaskId));

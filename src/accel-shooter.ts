@@ -1,11 +1,13 @@
 import clipboardy from "clipboardy";
 import { format } from "date-fns";
-import { copyFileSync } from "fs";
+import { copyFileSync, readFileSync } from "fs";
 import inquirer from "inquirer";
+import { render } from "mustache";
 import open from "open";
 import os from "os";
 import { resolve as pathResolve } from "path";
 import { setIntervalAsync } from "set-interval-async/dynamic";
+import untildify from "untildify";
 import { configReadline, setUpSyncHotkey, syncChecklist } from "./actions";
 import { ClickUp } from "./clickup";
 import { CONFIG } from "./config";
@@ -20,34 +22,6 @@ import {
   getGitLabProjectConfigByName,
   promiseSpawn
 } from "./utils";
-
-const options = {
-  endingTodo: `
-
-- [ ] ending
-  - [ ] check functionality
-  - [ ] frontend
-    - [ ] check tooltip
-    - [ ] check overflow content handling
-    - [ ] check overflow item handling
-    - [ ] check number pipe
-    - [ ] check lint
-    - [ ] check test
-    - [ ] check prod
-    - [ ] check lint after fix test and prod
-    - [ ] check console.log
-    - [ ] check i18n
-  - [ ] backend
-    - [ ] check api need pagination or not
-    - [ ] check test
-    - [ ] check print
-    - [ ] check key error
-    - [ ] handle single file or single folder import in import command
-  - [ ] check conflict
-  - [ ] review code
-  - [ ] check if any not-pushed code exists
-  - [ ] write what I do in MR`,
-};
 
 const actionAlias: { [key: string]: string } = {
   c: "config",
@@ -105,6 +79,17 @@ const actions: { [key: string]: () => Promise<any> } = {
             .listProjectLabels()
             .then((labels) => labels.map((label: any) => label.name)),
       },
+      {
+        name: "todoConfig",
+        message: "Choose Preset To-do Config",
+        type: "checkbox",
+        choices: [
+          { name: "frontend", checked: true},
+          { name: "frontend_template", checked: true},
+          { name: "backend", checked: true},
+          { name: "unit_test"}
+        ]
+      }
     ]);
     const gitLab = new GitLab(answers.gitLabProject.id);
     const clickUp = new ClickUp(answers.clickUpTaskId);
@@ -113,9 +98,15 @@ const actions: { [key: string]: () => Promise<any> } = {
     const clickUpTaskUrl = clickUpTask["url"];
     const gitLabIssueTitle = answers.issueTitle;
     await clickUp.setTaskStatus("in progress");
+    const todoConfigMap: Record<string, boolean> = {};
+    answers.todoConfig.forEach((c: string) => {
+      todoConfigMap[c] = true;
+    });
+    const template = readFileSync(untildify(CONFIG.ToDoTemplate), {encoding: 'utf-8'});
+    const endingTodo = render(template, todoConfigMap);
     const gitLabIssue = await gitLab.createIssue(
       gitLabIssueTitle,
-      `${clickUpTaskUrl}${options.endingTodo}`,
+      `${clickUpTaskUrl}\n\n${endingTodo}`,
       selectedGitLabLabels
     );
     const gitLabIssueUrl = gitLabIssue.web_url;
