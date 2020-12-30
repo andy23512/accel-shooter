@@ -98,6 +98,13 @@ export class Tracker extends BaseFileRef {
           await clickUp.setTaskStatus(projectConfig.deployedStatus);
           this.closeItem(projectName, issueNumber);
         }
+        if (pipeline.status === "failed") {
+          const message = `${projectName} #${issueNumber}: Pipeline failed`;
+          childProcess.execSync(
+            `osascript -e 'display notification "${message}" with title "Accel Shooter"'`
+          );
+          console.log(message);
+        }
       }
     }
   }

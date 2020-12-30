@@ -5,6 +5,7 @@
 ### Added
  
 ### Changed
+- Show pipeline failed message in tracker
  
 ### Fixed
 

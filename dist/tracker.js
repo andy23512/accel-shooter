@@ -87,6 +87,11 @@ class Tracker extends base_1.BaseFileRef {
                         yield clickUp.setTaskStatus(projectConfig.deployedStatus);
                         this.closeItem(projectName, issueNumber);
                     }
+                    if (pipeline.status === "failed") {
+                        const message = `${projectName} #${issueNumber}: Pipeline failed`;
+                        child_process_1.default.execSync(`osascript -e 'display notification "${message}" with title "Accel Shooter"'`);
+                        console.log(message);
+                    }
                 }
             }
         });
