@@ -83,13 +83,7 @@ const actions: { [key: string]: () => Promise<any> } = {
         name: "todoConfig",
         message: "Choose Preset To-do Config",
         type: "checkbox",
-        choices: [
-          { name: "frontend", checked: true },
-          { name: "frontend_template", checked: true },
-          { name: "backend", checked: true },
-          { name: "unit_test" },
-          { name: "debug" },
-        ],
+        choices: CONFIG.ToDoConfigChoices,
       },
     ]);
     const gitLab = new GitLab(answers.gitLabProject.id);
@@ -112,7 +106,6 @@ const actions: { [key: string]: () => Promise<any> } = {
       `${clickUpTaskUrl}\n\n${endingTodo}`,
       selectedGitLabLabels
     );
-    const gitLabIssueUrl = gitLabIssue.web_url;
     const gitLabIssueNumber = gitLabIssue.iid;
     const gitLabBranch = await gitLab.createBranch(
       getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(

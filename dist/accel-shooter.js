@@ -92,13 +92,7 @@ const actions = {
                     name: "todoConfig",
                     message: "Choose Preset To-do Config",
                     type: "checkbox",
-                    choices: [
-                        { name: "frontend", checked: true },
-                        { name: "frontend_template", checked: true },
-                        { name: "backend", checked: true },
-                        { name: "unit_test" },
-                        { name: "debug" },
-                    ],
+                    choices: config_1.CONFIG.ToDoConfigChoices,
                 },
             ]);
             const gitLab = new gitlab_1.GitLab(answers.gitLabProject.id);
@@ -117,7 +111,6 @@ const actions = {
             });
             const endingTodo = mustache_1.render(template, todoConfigMap);
             const gitLabIssue = yield gitLab.createIssue(gitLabIssueTitle, `${clickUpTaskUrl}\n\n${endingTodo}`, selectedGitLabLabels);
-            const gitLabIssueUrl = gitLabIssue.web_url;
             const gitLabIssueNumber = gitLabIssue.iid;
             const gitLabBranch = yield gitLab.createBranch(gitlab_1.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(gitLabIssueNumber, gitLabIssueTitle, answers.clickUpTaskId));
             yield gitLab.createMergeRequest(gitLabIssueNumber, gitLabIssueTitle, gitLabBranch.name, selectedGitLabLabels);

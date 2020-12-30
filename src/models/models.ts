@@ -14,6 +14,7 @@ export interface Config {
   DailyProgressFile: string;
   TrackListFile: string;
   ToDoTemplate: string;
+  ToDoConfigChoices: Array<{ name: string; checked: boolean }>;
   EndingAssignee: string;
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];

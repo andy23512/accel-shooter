@@ -5,6 +5,7 @@
 ### Added
  
 ### Changed
+- Move todoConfigChoices to config file
  
 ### Fixed
 
