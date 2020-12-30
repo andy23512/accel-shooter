@@ -6,6 +6,7 @@
  
 ### Changed
 - Move todoConfigChoices to config file
+- Use environment variable to set config file path
  
 ### Fixed
 
