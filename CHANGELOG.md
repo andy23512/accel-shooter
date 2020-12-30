@@ -5,10 +5,14 @@
 ### Added
  
 ### Changed
-- Move todoConfigChoices to config file
-- Use environment variable to set config file path
  
 ### Fixed
+
+## [1.5.0] - 2020-12-31
+
+### Changed
+- Move todoConfigChoices to config file
+- Use environment variable to set config file path
 
 ## [1.4.0] - 2020-12-30
 
