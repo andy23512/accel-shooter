@@ -63,9 +63,10 @@ class Tracker extends base_1.BaseFileRef {
             if (projectConfig.stagingStatus && mergeRequest.state === "merged") {
                 const clickUpTask = yield clickUp.getTask();
                 if (clickUpTask.status.status === "in review") {
-                    child_process_1.default.execSync(`osascript -e 'display notification "${projectName} #${issueNumber} is merged!" with title "Accel Shooter"'`);
                     yield clickUp.setTaskStatus(projectConfig.stagingStatus);
-                    console.log(`${projectName} #${issueNumber}: In Review -> ${projectConfig.stagingStatus}`);
+                    const message = `${projectName} #${issueNumber}: In Review -> ${projectConfig.stagingStatus}`;
+                    child_process_1.default.execSync(`osascript -e 'display notification "${message}" with title "Accel Shooter"'`);
+                    console.log(message);
                     if (!projectConfig.deployedStatus) {
                         this.closeItem(projectName, issueNumber);
                     }
@@ -80,8 +81,9 @@ class Tracker extends base_1.BaseFileRef {
                     const jobs = yield gitLab.listPipelineJobs(pipeline.id);
                     if (pipeline.status === "success" &&
                         jobs.find((j) => j.name === "deploy" && j.status === "success")) {
-                        child_process_1.default.execSync(`osascript -e 'display notification "${projectName} #${issueNumber} is deployed!" with title "Accel Shooter"'`);
-                        console.log(`${projectName} #${issueNumber}: Staging -> ${projectConfig.deployedStatus}`);
+                        const message = `${projectName} #${issueNumber}: Staging -> ${projectConfig.deployedStatus}`;
+                        child_process_1.default.execSync(`osascript -e 'display notification "${message}" with title "Accel Shooter"'`);
+                        console.log(message);
                         yield clickUp.setTaskStatus(projectConfig.deployedStatus);
                         this.closeItem(projectName, issueNumber);
                     }

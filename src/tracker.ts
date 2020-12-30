@@ -63,13 +63,12 @@ export class Tracker extends BaseFileRef {
     if (projectConfig.stagingStatus && mergeRequest.state === "merged") {
       const clickUpTask = await clickUp.getTask();
       if (clickUpTask.status.status === "in review") {
-        childProcess.execSync(
-          `osascript -e 'display notification "${projectName} #${issueNumber} is merged!" with title "Accel Shooter"'`
-        );
         await clickUp.setTaskStatus(projectConfig.stagingStatus);
-        console.log(
-          `${projectName} #${issueNumber}: In Review -> ${projectConfig.stagingStatus}`
+        const message = `${projectName} #${issueNumber}: In Review -> ${projectConfig.stagingStatus}`;
+        childProcess.execSync(
+          `osascript -e 'display notification "${message}" with title "Accel Shooter"'`
         );
+        console.log(message);
         if (!projectConfig.deployedStatus) {
           this.closeItem(projectName, issueNumber);
         }
@@ -91,12 +90,11 @@ export class Tracker extends BaseFileRef {
           pipeline.status === "success" &&
           jobs.find((j) => j.name === "deploy" && j.status === "success")
         ) {
+          const message = `${projectName} #${issueNumber}: Staging -> ${projectConfig.deployedStatus}`;
           childProcess.execSync(
-            `osascript -e 'display notification "${projectName} #${issueNumber} is deployed!" with title "Accel Shooter"'`
+            `osascript -e 'display notification "${message}" with title "Accel Shooter"'`
           );
-          console.log(
-            `${projectName} #${issueNumber}: Staging -> ${projectConfig.deployedStatus}`
-          );
+          console.log(message);
           await clickUp.setTaskStatus(projectConfig.deployedStatus);
           this.closeItem(projectName, issueNumber);
         }

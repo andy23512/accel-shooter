@@ -7,6 +7,7 @@
  
 ### Changed
 - Do not open issue page when start
+- Change notification message of tracker
  
 ### Fixed
 
