@@ -215,6 +215,7 @@ const actions: { [key: string]: () => Promise<any> } = {
       const clickUp = new ClickUp(clickUpTaskId);
       await clickUp.setTaskStatus("in review");
     }
+    console.log("End command is executed successfully");
   },
 };
 

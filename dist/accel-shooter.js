@@ -214,6 +214,7 @@ const actions = {
                 const clickUp = new clickup_1.ClickUp(clickUpTaskId);
                 yield clickUp.setTaskStatus("in review");
             }
+            console.log("End command is executed successfully");
         });
     },
 };

@@ -3,6 +3,7 @@
 ## [Unrealeased] - yyyy-mm-dd
 
 ### Added
+- Add output message for end command
  
 ### Changed
 - Do not open issue page when start
