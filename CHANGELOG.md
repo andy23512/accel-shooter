@@ -5,6 +5,7 @@
 ### Added
  
 ### Changed
+- Do not open issue page when start
  
 ### Fixed
 

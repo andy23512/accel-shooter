@@ -132,7 +132,6 @@ const actions: { [key: string]: () => Promise<any> } = {
     await promiseSpawn("git", ["checkout", gitLabBranch.name]);
     const dailyProgressString = `* (Processing) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
     new DailyProgress().addProgressToBuffer(dailyProgressString);
-    open(gitLabIssueUrl);
     const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabIssueNumber}`;
     clipboardy.writeSync(syncCommand);
     console.log(`Sync command: "${syncCommand}" Copied!`);

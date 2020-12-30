@@ -126,7 +126,6 @@ const actions = {
             yield utils_1.promiseSpawn("git", ["checkout", gitLabBranch.name]);
             const dailyProgressString = `* (Processing) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
             new daily_progress_1.DailyProgress().addProgressToBuffer(dailyProgressString);
-            open_1.default(gitLabIssueUrl);
             const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabIssueNumber}`;
             clipboardy_1.default.writeSync(syncCommand);
             console.log(`Sync command: "${syncCommand}" Copied!`);
