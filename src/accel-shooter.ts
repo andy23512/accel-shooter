@@ -88,6 +88,7 @@ const actions: { [key: string]: () => Promise<any> } = {
           { name: "frontend_template", checked: true },
           { name: "backend", checked: true },
           { name: "unit_test" },
+          { name: "debug" },
         ],
       },
     ]);
