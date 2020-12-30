@@ -8,6 +8,11 @@
  
 ### Fixed
 
+## [1.3.0] - 2020-12-30
+
+### Fixed
+- Use commit hash and branch ref to search pipeline to avoid cannot get correct pipeline bug
+
 ## [1.2.0] - 2020-12-28
 
 ### Added
