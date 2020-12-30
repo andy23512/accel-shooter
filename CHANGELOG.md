@@ -3,13 +3,20 @@
 ## [Unrealeased] - yyyy-mm-dd
 
 ### Added
+ 
+### Changed
+ 
+### Fixed
+
+## [1.4.0] - 2020-12-30
+
+### Added
 - Add output message for end command
  
 ### Changed
 - Do not open issue page when start
 - Change notification message of tracker
- 
-### Fixed
+- Add "debug" choice to todoConfig
 
 ## [1.3.0] - 2020-12-30
 
