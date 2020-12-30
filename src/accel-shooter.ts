@@ -14,13 +14,13 @@ import { CONFIG } from "./config";
 import { DailyProgress } from "./daily-progress";
 import {
   getGitLabBranchNameFromIssueNumberAndTitleAndTaskId,
-  GitLab
+  GitLab,
 } from "./gitlab";
 import { Tracker } from "./tracker";
 import {
   getClickUpTaskIdFromGitLabIssue,
   getGitLabProjectConfigByName,
-  promiseSpawn
+  promiseSpawn,
 } from "./utils";
 
 const actionAlias: { [key: string]: string } = {
@@ -84,12 +84,12 @@ const actions: { [key: string]: () => Promise<any> } = {
         message: "Choose Preset To-do Config",
         type: "checkbox",
         choices: [
-          { name: "frontend", checked: true},
-          { name: "frontend_template", checked: true},
-          { name: "backend", checked: true},
-          { name: "unit_test"}
-        ]
-      }
+          { name: "frontend", checked: true },
+          { name: "frontend_template", checked: true },
+          { name: "backend", checked: true },
+          { name: "unit_test" },
+        ],
+      },
     ]);
     const gitLab = new GitLab(answers.gitLabProject.id);
     const clickUp = new ClickUp(answers.clickUpTaskId);
@@ -102,7 +102,9 @@ const actions: { [key: string]: () => Promise<any> } = {
     answers.todoConfig.forEach((c: string) => {
       todoConfigMap[c] = true;
     });
-    const template = readFileSync(untildify(CONFIG.ToDoTemplate), {encoding: 'utf-8'});
+    const template = readFileSync(untildify(CONFIG.ToDoTemplate), {
+      encoding: "utf-8",
+    });
     const endingTodo = render(template, todoConfigMap);
     const gitLabIssue = await gitLab.createIssue(
       gitLabIssueTitle,
@@ -134,7 +136,7 @@ const actions: { [key: string]: () => Promise<any> } = {
     const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabIssueNumber}`;
     clipboardy.writeSync(syncCommand);
     console.log(`Sync command: "${syncCommand}" Copied!`);
-    new Tracker().addItem(answers.gitLabProject.name, gitLabIssueNumber)
+    new Tracker().addItem(answers.gitLabProject.name, gitLabIssueNumber);
   },
   async open() {
     const issueNumber = process.argv[4];

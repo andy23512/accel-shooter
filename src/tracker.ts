@@ -1,4 +1,4 @@
-import childProcess from 'child_process';
+import childProcess from "child_process";
 import { appendFileSync } from "fs";
 import untildify from "untildify";
 import { BaseFileRef } from "./base";
@@ -7,7 +7,7 @@ import { CONFIG } from "./config";
 import { GitLab } from "./gitlab";
 import {
   getClickUpTaskIdFromGitLabIssue,
-  getGitLabProjectConfigByName
+  getGitLabProjectConfigByName,
 } from "./utils";
 
 export class Tracker extends BaseFileRef {
@@ -67,7 +67,9 @@ export class Tracker extends BaseFileRef {
           `osascript -e 'display notification "${projectName} #${issueNumber} is merged!" with title "Accel Shooter"'`
         );
         await clickUp.setTaskStatus(projectConfig.stagingStatus);
-        console.log(`${projectName} #${issueNumber}: In Review -> ${projectConfig.stagingStatus}`);
+        console.log(
+          `${projectName} #${issueNumber}: In Review -> ${projectConfig.stagingStatus}`
+        );
         if (!projectConfig.deployedStatus) {
           this.closeItem(projectName, issueNumber);
         }
@@ -76,13 +78,25 @@ export class Tracker extends BaseFileRef {
         projectConfig.deployedStatus &&
         clickUpTask.status.status === "staging"
       ) {
-        const commit = await gitLab.getCommit(mergeRequest.merge_commit_sha);
-        const jobs = await gitLab.listPipelineJobs(commit.last_pipeline.id);
-        if (commit.last_pipeline.status === "success" && jobs.find(j => j.name === 'deploy' && j.status === 'success')) {
+        const pipelines = await gitLab.listPipelines(
+          mergeRequest.merge_commit_sha,
+          "develop"
+        );
+        if (pipelines.length === 0) {
+          return;
+        }
+        const pipeline = pipelines[0];
+        const jobs = await gitLab.listPipelineJobs(pipeline.id);
+        if (
+          pipeline.status === "success" &&
+          jobs.find((j) => j.name === "deploy" && j.status === "success")
+        ) {
           childProcess.execSync(
             `osascript -e 'display notification "${projectName} #${issueNumber} is deployed!" with title "Accel Shooter"'`
           );
-          console.log(`${projectName} #${issueNumber}: Staging -> ${projectConfig.deployedStatus}`);
+          console.log(
+            `${projectName} #${issueNumber}: Staging -> ${projectConfig.deployedStatus}`
+          );
           await clickUp.setTaskStatus(projectConfig.deployedStatus);
           this.closeItem(projectName, issueNumber);
         }
@@ -92,7 +106,10 @@ export class Tracker extends BaseFileRef {
 
   public closeItem(projectName: string, issueNumber: string) {
     const content = this.readFile();
-    const lines = content.split("\n").filter(Boolean).filter(line => line !== `${projectName} ${issueNumber}`);
+    const lines = content
+      .split("\n")
+      .filter(Boolean)
+      .filter((line) => line !== `${projectName} ${issueNumber}`);
     this.writeFile(lines.join("\n"));
   }
 }

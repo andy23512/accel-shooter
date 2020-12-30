@@ -96,9 +96,9 @@ const actions = {
                         { name: "frontend", checked: true },
                         { name: "frontend_template", checked: true },
                         { name: "backend", checked: true },
-                        { name: "unit_test" }
-                    ]
-                }
+                        { name: "unit_test" },
+                    ],
+                },
             ]);
             const gitLab = new gitlab_1.GitLab(answers.gitLabProject.id);
             const clickUp = new clickup_1.ClickUp(answers.clickUpTaskId);
@@ -111,7 +111,9 @@ const actions = {
             answers.todoConfig.forEach((c) => {
                 todoConfigMap[c] = true;
             });
-            const template = fs_1.readFileSync(untildify_1.default(config_1.CONFIG.ToDoTemplate), { encoding: 'utf-8' });
+            const template = fs_1.readFileSync(untildify_1.default(config_1.CONFIG.ToDoTemplate), {
+                encoding: "utf-8",
+            });
             const endingTodo = mustache_1.render(template, todoConfigMap);
             const gitLabIssue = yield gitLab.createIssue(gitLabIssueTitle, `${clickUpTaskUrl}\n\n${endingTodo}`, selectedGitLabLabels);
             const gitLabIssueUrl = gitLabIssue.web_url;

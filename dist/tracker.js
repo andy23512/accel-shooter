@@ -72,9 +72,14 @@ class Tracker extends base_1.BaseFileRef {
                 }
                 if (projectConfig.deployedStatus &&
                     clickUpTask.status.status === "staging") {
-                    const commit = yield gitLab.getCommit(mergeRequest.merge_commit_sha);
-                    const jobs = yield gitLab.listPipelineJobs(commit.last_pipeline.id);
-                    if (commit.last_pipeline.status === "success" && jobs.find(j => j.name === 'deploy' && j.status === 'success')) {
+                    const pipelines = yield gitLab.listPipelines(mergeRequest.merge_commit_sha, "develop");
+                    if (pipelines.length === 0) {
+                        return;
+                    }
+                    const pipeline = pipelines[0];
+                    const jobs = yield gitLab.listPipelineJobs(pipeline.id);
+                    if (pipeline.status === "success" &&
+                        jobs.find((j) => j.name === "deploy" && j.status === "success")) {
                         child_process_1.default.execSync(`osascript -e 'display notification "${projectName} #${issueNumber} is deployed!" with title "Accel Shooter"'`);
                         console.log(`${projectName} #${issueNumber}: Staging -> ${projectConfig.deployedStatus}`);
                         yield clickUp.setTaskStatus(projectConfig.deployedStatus);
@@ -86,7 +91,10 @@ class Tracker extends base_1.BaseFileRef {
     }
     closeItem(projectName, issueNumber) {
         const content = this.readFile();
-        const lines = content.split("\n").filter(Boolean).filter(line => line !== `${projectName} ${issueNumber}`);
+        const lines = content
+            .split("\n")
+            .filter(Boolean)
+            .filter((line) => line !== `${projectName} ${issueNumber}`);
         this.writeFile(lines.join("\n"));
     }
 }

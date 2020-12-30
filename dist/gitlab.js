@@ -53,6 +53,12 @@ class GitLab {
     listPipelineJobs(pipelineId) {
         return callApi("get", `/projects/${this.projectId}/pipelines/${pipelineId}/jobs`);
     }
+    getPipeline(pipelineId) {
+        return callApi("get", `/projects/${this.projectId}/pipelines/${pipelineId}`);
+    }
+    listPipelines(sha, ref) {
+        return callApi("get", `/projects/${this.projectId}/pipelines/?sha=${sha}&ref=${ref}`);
+    }
     createIssue(title, description, labels) {
         return __awaiter(this, void 0, void 0, function* () {
             return callApi("post", `/projects/${this.projectId}/issues`, {
