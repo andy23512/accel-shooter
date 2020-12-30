@@ -5,9 +5,13 @@
 ### Added
  
 ### Changed
-- Show pipeline failed message in tracker
  
 ### Fixed
+
+## [1.6.0] - 2020-12-31
+
+### Changed
+- Show pipeline failed message in tracker
 
 ## [1.5.0] - 2020-12-31
 
