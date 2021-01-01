@@ -1,4 +1,4 @@
-interface Pipeline {
+export interface Pipeline {
   id: number;
   status: string;
   ref: string;

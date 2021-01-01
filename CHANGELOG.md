@@ -7,6 +7,8 @@
 ### Changed
  
 ### Fixed
+- Fix Pipeline type not found bug
+- Remove unused gitlab method
 
 ## [1.6.0] - 2020-12-31
 
