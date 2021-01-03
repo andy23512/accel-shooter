@@ -80,6 +80,12 @@ const actions: { [key: string]: () => Promise<any> } = {
         type: 'checkbox',
         choices: CONFIG.ToDoConfigChoices,
       },
+      {
+        name: 'clickUpListAndTagConfirm',
+        message: 'Check the ClickUp task list and tag',
+        type: 'confirm',
+        default: true,
+      },
     ]);
     const gitLab = new GitLab(answers.gitLabProject.id);
     const clickUp = new ClickUp(answers.clickUpTaskId);

@@ -3,8 +3,8 @@
 ## [Unrealeased] - yyyy-mm-dd
 
 ### Added
-
 - Update task status in dp when copy
+- Add check clickup task list and tag confirm
 
 ### Changed
 
