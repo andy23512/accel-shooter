@@ -1,65 +1,60 @@
-import clipboardy from "clipboardy";
-import { format } from "date-fns";
-import { copyFileSync, readFileSync } from "fs";
-import inquirer from "inquirer";
-import { render } from "mustache";
-import open from "open";
-import os from "os";
-import { resolve as pathResolve } from "path";
-import { setIntervalAsync } from "set-interval-async/dynamic";
-import untildify from "untildify";
-import { configReadline, setUpSyncHotkey, syncChecklist } from "./actions";
-import { ClickUp } from "./clickup";
-import { CONFIG } from "./config";
-import { DailyProgress } from "./daily-progress";
+import clipboardy from 'clipboardy';
+import { format } from 'date-fns';
+import { readFileSync } from 'fs';
+import inquirer from 'inquirer';
+import { render } from 'mustache';
+import open from 'open';
+import os from 'os';
+import { setIntervalAsync } from 'set-interval-async/dynamic';
+import untildify from 'untildify';
+import { configReadline, setUpSyncHotkey, syncChecklist } from './actions';
+import { ClickUp } from './clickup';
+import { CONFIG } from './config';
+import { DailyProgress } from './daily-progress';
 import {
   getGitLabBranchNameFromIssueNumberAndTitleAndTaskId,
   GitLab,
-} from "./gitlab";
-import { Tracker } from "./tracker";
+} from './gitlab';
+import { Tracker } from './tracker';
 import {
   getClickUpTaskIdFromGitLabIssue,
   getGitLabProjectConfigByName,
   promiseSpawn,
-} from "./utils";
+  updateTaskStatusInDp,
+} from './utils';
 
 const actionAlias: { [key: string]: string } = {
-  c: "config",
-  st: "start",
-  o: "open",
-  sy: "sync",
-  cp: "copy",
-  t: "track",
-  e: "end",
+  st: 'start',
+  o: 'open',
+  sy: 'sync',
+  c: 'copy',
+  t: 'track',
+  e: 'end',
 };
 
 const actions: { [key: string]: () => Promise<any> } = {
-  async config() {
-    const configFile = process.argv[3];
-    setConfigFile(configFile);
-  },
   async start() {
     configReadline();
     const answers = await inquirer.prompt([
       {
-        name: "gitLabProject",
-        message: "Choose GitLab Project",
-        type: "list",
+        name: 'gitLabProject',
+        message: 'Choose GitLab Project',
+        type: 'list',
         choices: CONFIG.GitLabProjects.map((p) => ({
           name: `${p.name} (${p.repo})`,
           value: p,
         })),
       },
       {
-        name: "clickUpTaskId",
-        message: "Enter ClickUp Task ID",
-        type: "input",
-        filter: (input) => input.replace("#", ""),
+        name: 'clickUpTaskId',
+        message: 'Enter ClickUp Task ID',
+        type: 'input',
+        filter: (input) => input.replace('#', ''),
       },
       {
-        name: "issueTitle",
-        message: "Enter Issue Title",
-        type: "input",
+        name: 'issueTitle',
+        message: 'Enter Issue Title',
+        type: 'input',
         default: async (answers: { clickUpTaskId: string }) => {
           let task = await new ClickUp(answers.clickUpTaskId).getTask();
           let result = task.name;
@@ -71,18 +66,18 @@ const actions: { [key: string]: () => Promise<any> } = {
         },
       },
       {
-        name: "labels",
-        message: "Choose GitLab Labels to add to new Issue",
-        type: "checkbox",
+        name: 'labels',
+        message: 'Choose GitLab Labels to add to new Issue',
+        type: 'checkbox',
         choices: async ({ gitLabProject }) =>
           new GitLab(gitLabProject.id)
             .listProjectLabels()
             .then((labels) => labels.map((label: any) => label.name)),
       },
       {
-        name: "todoConfig",
-        message: "Choose Preset To-do Config",
-        type: "checkbox",
+        name: 'todoConfig',
+        message: 'Choose Preset To-do Config',
+        type: 'checkbox',
         choices: CONFIG.ToDoConfigChoices,
       },
     ]);
@@ -90,15 +85,15 @@ const actions: { [key: string]: () => Promise<any> } = {
     const clickUp = new ClickUp(answers.clickUpTaskId);
     const selectedGitLabLabels = answers.labels;
     const clickUpTask = await clickUp.getTask();
-    const clickUpTaskUrl = clickUpTask["url"];
+    const clickUpTaskUrl = clickUpTask['url'];
     const gitLabIssueTitle = answers.issueTitle;
-    await clickUp.setTaskStatus("in progress");
+    await clickUp.setTaskStatus('in progress');
     const todoConfigMap: Record<string, boolean> = {};
     answers.todoConfig.forEach((c: string) => {
       todoConfigMap[c] = true;
     });
     const template = readFileSync(untildify(CONFIG.ToDoTemplate), {
-      encoding: "utf-8",
+      encoding: 'utf-8',
     });
     const endingTodo = render(template, todoConfigMap);
     const gitLabIssue = await gitLab.createIssue(
@@ -120,11 +115,11 @@ const actions: { [key: string]: () => Promise<any> } = {
       gitLabBranch.name,
       selectedGitLabLabels
     );
-    process.chdir(answers.gitLabProject.path.replace("~", os.homedir()));
-    await promiseSpawn("git", ["fetch"]);
+    process.chdir(answers.gitLabProject.path.replace('~', os.homedir()));
+    await promiseSpawn('git', ['fetch']);
     await sleep(1000);
-    await promiseSpawn("git", ["checkout", gitLabBranch.name]);
-    const dailyProgressString = `* (Processing) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
+    await promiseSpawn('git', ['checkout', gitLabBranch.name]);
+    const dailyProgressString = `* (In Progress) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
     new DailyProgress().addProgressToBuffer(dailyProgressString);
     const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabIssueNumber}`;
     clipboardy.writeSync(syncCommand);
@@ -136,29 +131,29 @@ const actions: { [key: string]: () => Promise<any> } = {
     const gitLab = new GitLab(getGitLabProjectIdFromArgv());
     const answers = await inquirer.prompt([
       {
-        name: "types",
-        message: "Choose Link Type to open",
-        type: "checkbox",
+        name: 'types',
+        message: 'Choose Link Type to open',
+        type: 'checkbox',
         choices: [
-          { name: "Issue", value: "issue" },
-          { name: "Merge Request", value: "merge-request" },
-          { name: "Task", value: "task" },
+          { name: 'Issue', value: 'issue' },
+          { name: 'Merge Request', value: 'merge-request' },
+          { name: 'Task', value: 'task' },
         ],
       },
     ]);
     const issue = await gitLab.getIssue(issueNumber);
     for (const type of answers.types) {
       switch (type) {
-        case "issue":
+        case 'issue':
           open(issue.web_url);
           break;
-        case "merge-request":
+        case 'merge-request':
           const mergeRequests = await gitLab.listMergeRequestsWillCloseIssueOnMerge(
             issueNumber
           );
           open(mergeRequests[mergeRequests.length - 1].web_url);
           break;
-        case "task":
+        case 'task':
           const description = issue.description;
           const result = description.match(/https:\/\/app.clickup.com\/t\/\w+/);
           if (result) {
@@ -182,12 +177,15 @@ const actions: { [key: string]: () => Promise<any> } = {
     const day =
       process.argv.length >= 4
         ? process.argv[3]
-        : format(new Date(), "yyyy/MM/dd");
-    const record = new DailyProgress().getRecordByDay(day);
+        : format(new Date(), 'yyyy/MM/dd');
+    const dp = new DailyProgress();
+    const record = dp.getRecordByDay(day);
     if (record) {
-      clipboardy.writeSync(record);
-      console.log(record);
-      console.log("Copied!");
+      const newDpRecord = await updateTaskStatusInDp(record);
+      dp.writeRecordByDay(day, newDpRecord);
+      clipboardy.writeSync(newDpRecord);
+      console.log(newDpRecord);
+      console.log('Copied!');
     }
   },
   async track() {
@@ -207,9 +205,9 @@ const actions: { [key: string]: () => Promise<any> } = {
     const clickUpTaskId = getClickUpTaskIdFromGitLabIssue(issue);
     if (clickUpTaskId) {
       const clickUp = new ClickUp(clickUpTaskId);
-      await clickUp.setTaskStatus("in review");
+      await clickUp.setTaskStatus('in review');
     }
-    console.log("End command is executed successfully");
+    console.log('End command is executed successfully');
   },
 };
 
@@ -222,16 +220,10 @@ const actions: { [key: string]: () => Promise<any> } = {
   }
 })();
 
-function setConfigFile(configFile: string) {
-  const src = pathResolve(configFile);
-  const dest = pathResolve(__dirname, "../.config.json");
-  copyFileSync(src, dest);
-}
-
 function getGitLabProjectIdByName(name: string) {
   const gitLabProjectId = getGitLabProjectConfigByName(name)?.id;
   if (!gitLabProjectId) {
-    throw new Error("Cannot find project");
+    throw new Error('Cannot find project');
   }
   return gitLabProjectId;
 }
