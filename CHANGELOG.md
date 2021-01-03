@@ -3,6 +3,14 @@
 ## [Unrealeased] - yyyy-mm-dd
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.7.0] - 2021-01-03
+
+### Added
 - Update task status in dp when copy
 - Add check clickup task list and tag confirm
 
