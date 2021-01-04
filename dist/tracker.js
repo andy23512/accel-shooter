@@ -28,7 +28,7 @@ class Tracker extends base_1.BaseFileRef {
         this.trackTask();
         setInterval(() => {
             this.trackTask();
-        }, 60 * 1000);
+        }, config_1.CONFIG.TrackIntervalInMinutes * 60 * 1000);
     }
     addItem(projectName, issueNumber) {
         fs_1.appendFileSync(this.path, `\n${projectName} ${issueNumber}`);

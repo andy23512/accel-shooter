@@ -19,7 +19,7 @@ export class Tracker extends BaseFileRef {
     this.trackTask();
     setInterval(() => {
       this.trackTask();
-    }, 60 * 1000);
+    }, CONFIG.TrackIntervalInMinutes * 60 * 1000);
   }
 
   public addItem(projectName: string, issueNumber: string | number) {

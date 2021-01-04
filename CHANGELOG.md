@@ -4,6 +4,7 @@
 
 ### Added
 - Can comment out track item
+- Add interval config
 
 ### Changed
 

@@ -16,6 +16,8 @@ export interface Config {
   ToDoTemplate: string;
   ToDoConfigChoices: Array<{ name: string; checked: boolean }>;
   EndingAssignee: string;
+  SyncIntervalInMinutes: number;
+  TrackIntervalInMinutes: number;
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];
 export interface NormalizedChecklistItem {
