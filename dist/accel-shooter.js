@@ -86,12 +86,6 @@ const actions = {
                     type: "checkbox",
                     choices: config_1.CONFIG.ToDoConfigChoices,
                 },
-                {
-                    name: "clickUpListAndTagConfirm",
-                    message: "Check the ClickUp task list and tag",
-                    type: "confirm",
-                    default: true,
-                },
             ]);
             const gitLab = new gitlab_1.GitLab(answers.gitLabProject.id);
             const clickUp = new clickup_1.ClickUp(answers.clickUpTaskId);

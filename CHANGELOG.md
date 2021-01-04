@@ -7,6 +7,7 @@
 - Add interval config
 
 ### Changed
+- Remove confirm
 
 ### Fixed
 
