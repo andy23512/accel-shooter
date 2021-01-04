@@ -35,7 +35,10 @@ class Tracker extends base_1.BaseFileRef {
     }
     getItems() {
         const content = this.readFile();
-        const lines = content.split("\n").filter(Boolean);
+        const lines = content
+            .split("\n")
+            .filter(Boolean)
+            .filter((line) => !line.startsWith("#"));
         const items = lines.map((line) => line.split(" "));
         return items;
     }

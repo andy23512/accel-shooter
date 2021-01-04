@@ -3,6 +3,7 @@
 ## [Unrealeased] - yyyy-mm-dd
 
 ### Added
+- Can comment out track item
 
 ### Changed
 
