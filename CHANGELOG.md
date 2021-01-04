@@ -3,13 +3,19 @@
 ## [Unrealeased] - yyyy-mm-dd
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.8.0] - 2021-01-05
+
+### Added
 - Can comment out track item
 - Add interval config
 
 ### Changed
 - Remove confirm
-
-### Fixed
 
 ## [1.7.0] - 2021-01-03
 
