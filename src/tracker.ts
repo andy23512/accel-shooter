@@ -1,5 +1,6 @@
 import childProcess from "child_process";
 import { appendFileSync } from "fs";
+import nodeNotifier from "node-notifier";
 import untildify from "untildify";
 import { BaseFileRef } from "./base";
 import { ClickUp } from "./clickup";
@@ -95,18 +96,20 @@ export class Tracker extends BaseFileRef {
           }
           if (pipeline.status === "failed") {
             const message = `${projectName} #${issueNumber}: Pipeline failed`;
-            childProcess.execSync(
-              `osascript -e 'display notification "${message}" with title "Accel Shooter"'`
-            );
+            nodeNotifier.notify({
+              title: "Accel Shooter",
+              message,
+            });
             console.log(message);
           }
           if (job.status === "success") {
             await clickUp.setTaskStatus(projectConfig.deployedStatus);
             this.closeItem(projectName, issueNumber);
             const message = `${projectName} #${issueNumber}: Staging -> ${projectConfig.deployedStatus}`;
-            childProcess.execSync(
-              `osascript -e 'display notification "${message}" with title "Accel Shooter"'`
-            );
+            nodeNotifier.notify({
+              title: "Accel Shooter",
+              message,
+            });
             console.log(message);
           }
           break;

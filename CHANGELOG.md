@@ -7,6 +7,7 @@
 - Search for deploy job in all pipelines
 
 ### Changed
+- Use cross platform notifier
 
 ### Fixed
 

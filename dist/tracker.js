@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const child_process_1 = __importDefault(require("child_process"));
 const fs_1 = require("fs");
+const node_notifier_1 = __importDefault(require("node-notifier"));
 const untildify_1 = __importDefault(require("untildify"));
 const base_1 = require("./base");
 const clickup_1 = require("./clickup");
@@ -88,14 +89,20 @@ class Tracker extends base_1.BaseFileRef {
                         }
                         if (pipeline.status === "failed") {
                             const message = `${projectName} #${issueNumber}: Pipeline failed`;
-                            child_process_1.default.execSync(`osascript -e 'display notification "${message}" with title "Accel Shooter"'`);
+                            node_notifier_1.default.notify({
+                                title: "Accel Shooter",
+                                message,
+                            });
                             console.log(message);
                         }
                         if (job.status === "success") {
                             yield clickUp.setTaskStatus(projectConfig.deployedStatus);
                             this.closeItem(projectName, issueNumber);
                             const message = `${projectName} #${issueNumber}: Staging -> ${projectConfig.deployedStatus}`;
-                            child_process_1.default.execSync(`osascript -e 'display notification "${message}" with title "Accel Shooter"'`);
+                            node_notifier_1.default.notify({
+                                title: "Accel Shooter",
+                                message,
+                            });
                             console.log(message);
                         }
                         break;
