@@ -80,20 +80,25 @@ class Tracker extends base_1.BaseFileRef {
                     if (pipelines.length === 0) {
                         return;
                     }
-                    const pipeline = pipelines[0];
-                    const jobs = yield gitLab.listPipelineJobs(pipeline.id);
-                    if (pipeline.status === "success" &&
-                        jobs.find((j) => j.name === "deploy" && j.status === "success")) {
-                        const message = `${projectName} #${issueNumber}: Staging -> ${projectConfig.deployedStatus}`;
-                        child_process_1.default.execSync(`osascript -e 'display notification "${message}" with title "Accel Shooter"'`);
-                        console.log(message);
-                        yield clickUp.setTaskStatus(projectConfig.deployedStatus);
-                        this.closeItem(projectName, issueNumber);
-                    }
-                    if (pipeline.status === "failed") {
-                        const message = `${projectName} #${issueNumber}: Pipeline failed`;
-                        child_process_1.default.execSync(`osascript -e 'display notification "${message}" with title "Accel Shooter"'`);
-                        console.log(message);
+                    for (const pipeline of pipelines) {
+                        const jobs = yield gitLab.listPipelineJobs(pipeline.id);
+                        const job = jobs.find((j) => j.name === "deploy");
+                        if (!job) {
+                            continue;
+                        }
+                        if (pipeline.status === "failed") {
+                            const message = `${projectName} #${issueNumber}: Pipeline failed`;
+                            child_process_1.default.execSync(`osascript -e 'display notification "${message}" with title "Accel Shooter"'`);
+                            console.log(message);
+                        }
+                        if (job.status === "success") {
+                            yield clickUp.setTaskStatus(projectConfig.deployedStatus);
+                            this.closeItem(projectName, issueNumber);
+                            const message = `${projectName} #${issueNumber}: Staging -> ${projectConfig.deployedStatus}`;
+                            child_process_1.default.execSync(`osascript -e 'display notification "${message}" with title "Accel Shooter"'`);
+                            console.log(message);
+                        }
+                        break;
                     }
                 }
             }

@@ -4,6 +4,7 @@
 
 ### Added
 - Add retry to api request
+- Search for deploy job in all pipelines
 
 ### Changed
 
