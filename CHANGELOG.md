@@ -3,14 +3,20 @@
 ## [Unrealeased] - yyyy-mm-dd
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.9.0] - 2021-01-06
+
+### Added
 - Add retry to api request
 - Search for deploy job in all pipelines
 - Add ending hot key for sync command
 
 ### Changed
 - Use cross platform notifier
-
-### Fixed
 
 ## [1.8.0] - 2021-01-05
 
