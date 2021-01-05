@@ -17,24 +17,62 @@ const node_fetch_1 = __importDefault(require("node-fetch"));
 const case_utils_1 = require("./case-utils");
 const clickup_1 = require("./clickup");
 const config_1 = require("./config");
+const RETRY_SETTING = {
+    retry: 5,
+    pause: 12 * 1000,
+};
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+function fetchRetry(url, opts) {
+    return __awaiter(this, void 0, void 0, function* () {
+        let retry = (opts && opts.retry) || 3;
+        while (retry > 0) {
+            try {
+                return yield node_fetch_1.default(url, opts);
+            }
+            catch (e) {
+                if (opts === null || opts === void 0 ? void 0 : opts.callback) {
+                    opts.callback(retry);
+                }
+                retry = retry - 1;
+                if (retry == 0) {
+                    throw e;
+                }
+                if (opts === null || opts === void 0 ? void 0 : opts.pause) {
+                    if (!(opts === null || opts === void 0 ? void 0 : opts.silent))
+                        console.log("pausing..");
+                    yield sleep(opts.pause);
+                    if (!(opts === null || opts === void 0 ? void 0 : opts.silent))
+                        console.log("done pausing...");
+                }
+            }
+        }
+    });
+}
 function checkStatus(res) {
-    if (res.ok) {
-        return res;
+    if (res) {
+        if (res.ok) {
+            return res;
+        }
+        else {
+            throw Error(res.statusText);
+        }
     }
     else {
-        throw Error(res.statusText);
+        throw Error("Response is undefined.");
     }
 }
 function callApiFactory(site) {
-    let apiUrl = '';
+    let apiUrl = "";
     let headers = {};
     switch (site) {
-        case 'GitLab':
-            apiUrl = 'https://gitlab.com/api/v4';
-            headers = { 'Private-Token': config_1.CONFIG.GitLabToken };
+        case "GitLab":
+            apiUrl = "https://gitlab.com/api/v4";
+            headers = { "Private-Token": config_1.CONFIG.GitLabToken };
             break;
-        case 'ClickUp':
-            apiUrl = 'https://api.clickup.com/api/v2';
+        case "ClickUp":
+            apiUrl = "https://api.clickup.com/api/v2";
             headers = { Authorization: config_1.CONFIG.ClickUpToken };
             break;
         default:
@@ -47,12 +85,9 @@ function callApiFactory(site) {
                 params.set(key, value);
             });
         }
-        return node_fetch_1.default(apiUrl + url, method === 'get'
-            ? {
-                method,
-                headers,
-            }
-            : { method, headers, body: params })
+        return fetchRetry(apiUrl + url, method === "get"
+            ? Object.assign({ method,
+                headers }, RETRY_SETTING) : Object.assign({ method, headers, body: params }, RETRY_SETTING))
             .then(checkStatus)
             .then((res) => res.json());
     });
@@ -60,26 +95,26 @@ function callApiFactory(site) {
 exports.callApiFactory = callApiFactory;
 function dashify(input) {
     let temp = input
-        .replace(/[^A-Za-z0-9]/g, '-')
-        .replace(/-{2,}/g, '-')
-        .replace(/-+$/, '')
-        .replace(/^-+/, '')
+        .replace(/[^A-Za-z0-9]/g, "-")
+        .replace(/-{2,}/g, "-")
+        .replace(/-+$/, "")
+        .replace(/^-+/, "")
         .toLowerCase();
     if (temp.length >= 100) {
         temp = temp.substring(0, 100);
-        return temp.substring(0, temp.lastIndexOf('-'));
+        return temp.substring(0, temp.lastIndexOf("-"));
     }
     return temp;
 }
 exports.dashify = dashify;
 function normalizeGitLabIssueChecklist(checklistText) {
     return checklistText
-        .split('\n')
-        .filter((line) => line && (line.includes('- [ ]') || line.includes('- [x]')))
+        .split("\n")
+        .filter((line) => line && (line.includes("- [ ]") || line.includes("- [x]")))
         .map((line, index) => ({
         name: line
-            .replace(/- \[[x ]\] /g, '')
-            .replace(/^ +/, (space) => space.replace(/ /g, '-')),
+            .replace(/- \[[x ]\] /g, "")
+            .replace(/^ +/, (space) => space.replace(/ /g, "-")),
         checked: /- \[x\]/.test(line),
         order: index,
     }));
@@ -100,8 +135,8 @@ function promiseSpawn(command, args) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
             child_process_1.default
-                .spawn(command, args, { shell: true, stdio: 'inherit' })
-                .on('close', (code) => (code === 0 ? resolve() : reject()));
+                .spawn(command, args, { shell: true, stdio: "inherit" })
+                .on("close", (code) => (code === 0 ? resolve() : reject()));
         });
     });
 }
