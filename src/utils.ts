@@ -156,6 +156,10 @@ export function getGitLabProjectConfigByName(n: string) {
   return CONFIG.GitLabProjects.find(({ name }) => name === n);
 }
 
+export function getGitLabProjectConfigById(inputId: string) {
+  return CONFIG.GitLabProjects.find(({ id }) => id === inputId);
+}
+
 export function getClickUpTaskIdFromGitLabIssue(issue: Issue) {
   const description = issue.description;
   const result = description.match(/https:\/\/app.clickup.com\/t\/(\w+)/);

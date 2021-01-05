@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const clipboardy_1 = __importDefault(require("clipboardy"));
 const open_1 = __importDefault(require("open"));
 const readline_1 = __importDefault(require("readline"));
 const clickup_1 = require("./clickup");
@@ -99,7 +100,8 @@ function configReadline() {
 exports.configReadline = configReadline;
 function setUpSyncHotkey(gitLabProjectId, issueNumber) {
     process.stdin.setRawMode(true);
-    process.stdin.on("keypress", (_, key) => {
+    process.stdin.on("keypress", (_, key) => __awaiter(this, void 0, void 0, function* () {
+        var _a;
         if (key.ctrl && key.name === "c") {
             process.exit();
         }
@@ -107,6 +109,15 @@ function setUpSyncHotkey(gitLabProjectId, issueNumber) {
             console.log(`You pressed the sync key`);
             syncChecklist(gitLabProjectId, issueNumber);
         }
-    });
+        else if (!key.ctrl && !key.meta && !key.shift && key.name === "e") {
+            console.log(`You pressed the end key`);
+            yield syncChecklist(gitLabProjectId, issueNumber);
+            const projectName = (_a = utils_1.getGitLabProjectConfigById(gitLabProjectId)) === null || _a === void 0 ? void 0 : _a.name;
+            const syncCommand = `acst end ${projectName} ${issueNumber}`;
+            clipboardy_1.default.writeSync(syncCommand);
+            console.log(`Sync command: "${syncCommand}" Copied!`);
+            process.exit();
+        }
+    }));
 }
 exports.setUpSyncHotkey = setUpSyncHotkey;

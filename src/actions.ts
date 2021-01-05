@@ -1,3 +1,4 @@
+import clipboardy from "clipboardy";
 import open from "open";
 import readline from "readline";
 import { ClickUp } from "./clickup";
@@ -5,6 +6,7 @@ import { GitLab } from "./gitlab";
 import { NormalizedChecklist } from "./models/models";
 import {
   getClickUpTaskIdFromGitLabIssue,
+  getGitLabProjectConfigById,
   normalizeClickUpChecklist,
   normalizeGitLabIssueChecklist,
 } from "./utils";
@@ -137,12 +139,20 @@ export function configReadline() {
 
 export function setUpSyncHotkey(gitLabProjectId: string, issueNumber: string) {
   process.stdin.setRawMode(true);
-  process.stdin.on("keypress", (_, key) => {
+  process.stdin.on("keypress", async (_, key) => {
     if (key.ctrl && key.name === "c") {
       process.exit();
     } else if (!key.ctrl && !key.meta && !key.shift && key.name === "s") {
       console.log(`You pressed the sync key`);
       syncChecklist(gitLabProjectId, issueNumber);
+    } else if (!key.ctrl && !key.meta && !key.shift && key.name === "e") {
+      console.log(`You pressed the end key`);
+      await syncChecklist(gitLabProjectId, issueNumber);
+      const projectName = getGitLabProjectConfigById(gitLabProjectId)?.name;
+      const syncCommand = `acst end ${projectName} ${issueNumber}`;
+      clipboardy.writeSync(syncCommand);
+      console.log(`Sync command: "${syncCommand}" Copied!`);
+      process.exit();
     }
   });
 }
