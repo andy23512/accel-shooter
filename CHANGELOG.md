@@ -6,6 +6,7 @@
 - Add revert end command
 
 ### Changed
+- Open clickup task page when start sync
 
 ### Fixed
 
