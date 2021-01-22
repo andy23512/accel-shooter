@@ -3,6 +3,7 @@
 ## [Unrealeased] - yyyy-mm-dd
 
 ### Added
+- Add revert end command
 
 ### Changed
 
