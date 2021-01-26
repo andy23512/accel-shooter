@@ -3,12 +3,18 @@
 ## [Unrealeased] - yyyy-mm-dd
 
 ### Added
+
+### Changed
+
+### Fixed
+
+## [1.10.0] - 2021-01-26
+
+### Added
 - Add revert end command
 
 ### Changed
 - Open clickup task page when start sync
-
-### Fixed
 
 ## [1.9.0] - 2021-01-06
 
