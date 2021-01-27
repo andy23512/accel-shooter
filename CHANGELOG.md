@@ -5,6 +5,7 @@
 ### Added
 
 ### Changed
+- Show error url in console
 
 ### Fixed
 

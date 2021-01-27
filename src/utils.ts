@@ -96,7 +96,11 @@ export function callApiFactory(site: Site) {
         : { method, headers, body: params, ...RETRY_SETTING }
     )
       .then(checkStatus)
-      .then((res) => res.json());
+      .then((res) => res.json())
+      .catch((error) => {
+        console.log(apiUrl + url);
+        throw error;
+      });
   };
 }
 

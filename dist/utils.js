@@ -89,7 +89,11 @@ function callApiFactory(site) {
             ? Object.assign({ method,
                 headers }, RETRY_SETTING) : Object.assign({ method, headers, body: params }, RETRY_SETTING))
             .then(checkStatus)
-            .then((res) => res.json());
+            .then((res) => res.json())
+            .catch((error) => {
+            console.log(apiUrl + url);
+            throw error;
+        });
     });
 }
 exports.callApiFactory = callApiFactory;
