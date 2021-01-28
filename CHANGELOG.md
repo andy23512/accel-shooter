@@ -5,10 +5,14 @@
 ### Added
 
 ### Changed
-- Show error url in console
-- Change execution order in start command
 
 ### Fixed
+
+## [1.11.0] - 2021-01-28
+
+### Changed
+- Show error url in console
+- Change execution order in start command
 
 ## [1.10.0] - 2021-01-26
 
