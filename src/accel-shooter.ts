@@ -116,16 +116,16 @@ const actions: { [key: string]: () => Promise<any> } = {
       gitLabBranch.name,
       selectedGitLabLabels
     );
-    process.chdir(answers.gitLabProject.path.replace('~', os.homedir()));
-    await promiseSpawn('git', ['fetch']);
-    await sleep(1000);
-    await promiseSpawn('git', ['checkout', gitLabBranch.name]);
     const dailyProgressString = `* (In Progress) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
     new DailyProgress().addProgressToBuffer(dailyProgressString);
     const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabIssueNumber}`;
     clipboardy.writeSync(syncCommand);
     console.log(`Sync command: "${syncCommand}" Copied!`);
     new Tracker().addItem(answers.gitLabProject.name, gitLabIssueNumber);
+    process.chdir(answers.gitLabProject.path.replace('~', os.homedir()));
+    await promiseSpawn('git', ['fetch']);
+    await sleep(1000);
+    await promiseSpawn('git', ['checkout', gitLabBranch.name]);
   },
   async open() {
     const issueNumber = process.argv[4];

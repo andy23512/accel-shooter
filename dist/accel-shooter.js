@@ -107,16 +107,16 @@ const actions = {
             const gitLabIssueNumber = gitLabIssue.iid;
             const gitLabBranch = yield gitLab.createBranch(gitlab_1.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(gitLabIssueNumber, gitLabIssueTitle, answers.clickUpTaskId));
             yield gitLab.createMergeRequest(gitLabIssueNumber, gitLabIssueTitle, gitLabBranch.name, selectedGitLabLabels);
-            process.chdir(answers.gitLabProject.path.replace('~', os_1.default.homedir()));
-            yield utils_1.promiseSpawn('git', ['fetch']);
-            yield sleep(1000);
-            yield utils_1.promiseSpawn('git', ['checkout', gitLabBranch.name]);
             const dailyProgressString = `* (In Progress) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
             new daily_progress_1.DailyProgress().addProgressToBuffer(dailyProgressString);
             const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabIssueNumber}`;
             clipboardy_1.default.writeSync(syncCommand);
             console.log(`Sync command: "${syncCommand}" Copied!`);
             new tracker_1.Tracker().addItem(answers.gitLabProject.name, gitLabIssueNumber);
+            process.chdir(answers.gitLabProject.path.replace('~', os_1.default.homedir()));
+            yield utils_1.promiseSpawn('git', ['fetch']);
+            yield sleep(1000);
+            yield utils_1.promiseSpawn('git', ['checkout', gitLabBranch.name]);
         });
     },
     open() {

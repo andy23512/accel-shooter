@@ -6,6 +6,7 @@
 
 ### Changed
 - Show error url in console
+- Change execution order in start command
 
 ### Fixed
 
