@@ -34,6 +34,7 @@ const actionAlias = {
     sy: 'sync',
     c: 'copy',
     t: 'track',
+    tn: 'trackNew',
     e: 'end',
     re: 'revertEnd',
 };
@@ -188,6 +189,12 @@ const actions = {
         return __awaiter(this, void 0, void 0, function* () {
             const tracker = new tracker_1.Tracker();
             tracker.startSync();
+        });
+    },
+    trackNew() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const tracker = new tracker_1.Tracker();
+            tracker.startSyncNew();
         });
     },
     end() {

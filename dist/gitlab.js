@@ -57,8 +57,11 @@ class GitLab {
     listPipelineJobs(pipelineId) {
         return callApi('get', `/projects/${this.projectId}/pipelines/${pipelineId}/jobs`);
     }
-    listPipelines(sha, ref) {
-        return callApi('get', `/projects/${this.projectId}/pipelines/`, { sha, ref });
+    listPipelines(query) {
+        return __awaiter(this, void 0, void 0, function* () {
+            query.ref = query.ref || (yield this.getDefaultBranchName());
+            return callApi('get', `/projects/${this.projectId}/pipelines/`, query);
+        });
     }
     createIssue(title, description, labels) {
         return __awaiter(this, void 0, void 0, function* () {

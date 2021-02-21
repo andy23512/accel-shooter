@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const child_process_1 = __importDefault(require("child_process"));
+const date_fns_1 = require("date-fns");
 const fs_1 = require("fs");
 const node_notifier_1 = __importDefault(require("node-notifier"));
 const untildify_1 = __importDefault(require("untildify"));
@@ -22,6 +23,10 @@ const config_1 = require("./config");
 const gitlab_1 = require("./gitlab");
 const utils_1 = require("./utils");
 class Tracker extends base_1.BaseFileRef {
+    constructor() {
+        super(...arguments);
+        this.lastDeployedCommitMap = {};
+    }
     get path() {
         return untildify_1.default(config_1.CONFIG.TrackListFile);
     }
@@ -31,22 +36,98 @@ class Tracker extends base_1.BaseFileRef {
             this.trackTask();
         }, config_1.CONFIG.TrackIntervalInMinutes * 60 * 1000);
     }
+    startSyncNew() {
+        this.trackTaskNew();
+        setInterval(() => {
+            this.trackTaskNew();
+        }, config_1.CONFIG.TrackIntervalInMinutes * 60 * 1000);
+    }
     addItem(projectName, issueNumber) {
         fs_1.appendFileSync(this.path, `\n${projectName} ${issueNumber}`);
     }
     getItems() {
         const content = this.readFile();
         const lines = content
-            .split("\n")
+            .split('\n')
             .filter(Boolean)
-            .filter((line) => !line.startsWith("#"));
-        const items = lines.map((line) => line.split(" "));
+            .filter((line) => !line.startsWith('#'));
+        const items = lines.map((line) => line.split(' '));
         return items;
     }
     trackTask() {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(`[Track] ${new Date().toLocaleString()}`);
             return Promise.all(this.getItems().map(([projectName, issueNumber]) => this.trackSingle(projectName, issueNumber)));
+        });
+    }
+    trackTaskNew() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const checkDeployProjects = config_1.CONFIG.GitLabProjects.filter((p) => !!p.deployedStatus);
+            for (const project of checkDeployProjects) {
+                const gitLab = new gitlab_1.GitLab(project.id);
+                const successPipelines = yield gitLab.listPipelines({
+                    status: 'success',
+                    per_page: 100,
+                });
+                // get last commit with success pipeline with deploy job
+                for (const pipeline of successPipelines) {
+                    const jobs = yield gitLab.listPipelineJobs(pipeline.id);
+                    const job = jobs.find((j) => j.name === 'deploy');
+                    if (!job) {
+                        continue;
+                    }
+                    this.lastDeployedCommitMap[project.name] = job.commit;
+                    break;
+                }
+            }
+            return Promise.all(this.getItems().map(([projectName, issueNumber]) => this.trackSingleNew(projectName, issueNumber)));
+        });
+    }
+    trackSingleNew(projectName, issueNumber) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const projectConfig = utils_1.getGitLabProjectConfigByName(projectName);
+            if (!(projectConfig === null || projectConfig === void 0 ? void 0 : projectConfig.deployedStatus) && !(projectConfig === null || projectConfig === void 0 ? void 0 : projectConfig.stagingStatus)) {
+                return;
+            }
+            const gitLab = new gitlab_1.GitLab(projectConfig.id);
+            const issue = yield gitLab.getIssue(issueNumber);
+            const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
+            if (!clickUpTaskId) {
+                return;
+            }
+            const clickUp = new clickup_1.ClickUp(clickUpTaskId);
+            const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
+            const mergeRequest = yield gitLab.getMergeRequest(mergeRequests[mergeRequests.length - 1].iid);
+            if (projectConfig.stagingStatus && mergeRequest.state === 'merged') {
+                const clickUpTask = yield clickUp.getTask();
+                if (clickUpTask.status.status === 'in review') {
+                    yield clickUp.setTaskStatus(projectConfig.stagingStatus);
+                    const message = `${projectName} #${issueNumber}: In Review -> ${projectConfig.stagingStatus}`;
+                    child_process_1.default.execSync(`osascript -e 'display notification "${message}" with title "Accel Shooter"'`);
+                    console.log(message);
+                    if (!projectConfig.deployedStatus) {
+                        this.closeItem(projectName, issueNumber);
+                    }
+                }
+                if (projectConfig.deployedStatus &&
+                    clickUpTask.status.status === 'staging' &&
+                    this.lastDeployedCommitMap[projectName]) {
+                    const commit = yield gitLab.getCommit(mergeRequest.merge_commit_sha);
+                    const deployedCommitDate = date_fns_1.parseISO(this.lastDeployedCommitMap[projectName].created_at);
+                    const mergeCommitDate = date_fns_1.parseISO(commit.created_at);
+                    const compareTime = date_fns_1.compareAsc(deployedCommitDate, mergeCommitDate);
+                    if (compareTime === 1 || compareTime === 0) {
+                        yield clickUp.setTaskStatus(projectConfig.deployedStatus);
+                        this.closeItem(projectName, issueNumber);
+                        const message = `${projectName} #${issueNumber}: Staging -> ${projectConfig.deployedStatus}`;
+                        node_notifier_1.default.notify({
+                            title: 'Accel Shooter',
+                            message,
+                        });
+                        console.log(message);
+                    }
+                }
+            }
         });
     }
     trackSingle(projectName, issueNumber) {
@@ -64,9 +145,9 @@ class Tracker extends base_1.BaseFileRef {
             const clickUp = new clickup_1.ClickUp(clickUpTaskId);
             const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
             const mergeRequest = yield gitLab.getMergeRequest(mergeRequests[mergeRequests.length - 1].iid);
-            if (projectConfig.stagingStatus && mergeRequest.state === "merged") {
+            if (projectConfig.stagingStatus && mergeRequest.state === 'merged') {
                 const clickUpTask = yield clickUp.getTask();
-                if (clickUpTask.status.status === "in review") {
+                if (clickUpTask.status.status === 'in review') {
                     yield clickUp.setTaskStatus(projectConfig.stagingStatus);
                     const message = `${projectName} #${issueNumber}: In Review -> ${projectConfig.stagingStatus}`;
                     child_process_1.default.execSync(`osascript -e 'display notification "${message}" with title "Accel Shooter"'`);
@@ -76,31 +157,34 @@ class Tracker extends base_1.BaseFileRef {
                     }
                 }
                 if (projectConfig.deployedStatus &&
-                    clickUpTask.status.status === "staging") {
-                    const pipelines = yield gitLab.listPipelines(mergeRequest.merge_commit_sha, "develop");
+                    clickUpTask.status.status === 'staging') {
+                    const pipelines = yield gitLab.listPipelines({
+                        sha: mergeRequest.merge_commit_sha,
+                        ref: 'develop',
+                    });
                     if (pipelines.length === 0) {
                         return;
                     }
                     for (const pipeline of pipelines) {
                         const jobs = yield gitLab.listPipelineJobs(pipeline.id);
-                        const job = jobs.find((j) => j.name === "deploy");
+                        const job = jobs.find((j) => j.name === 'deploy');
                         if (!job) {
                             continue;
                         }
-                        if (pipeline.status === "failed") {
+                        if (pipeline.status === 'failed') {
                             const message = `${projectName} #${issueNumber}: Pipeline failed`;
                             node_notifier_1.default.notify({
-                                title: "Accel Shooter",
+                                title: 'Accel Shooter',
                                 message,
                             });
                             console.log(message);
                         }
-                        if (job.status === "success") {
+                        if (job.status === 'success') {
                             yield clickUp.setTaskStatus(projectConfig.deployedStatus);
                             this.closeItem(projectName, issueNumber);
                             const message = `${projectName} #${issueNumber}: Staging -> ${projectConfig.deployedStatus}`;
                             node_notifier_1.default.notify({
-                                title: "Accel Shooter",
+                                title: 'Accel Shooter',
                                 message,
                             });
                             console.log(message);
@@ -114,10 +198,10 @@ class Tracker extends base_1.BaseFileRef {
     closeItem(projectName, issueNumber) {
         const content = this.readFile();
         const lines = content
-            .split("\n")
+            .split('\n')
             .filter(Boolean)
             .filter((line) => line !== `${projectName} ${issueNumber}`);
-        this.writeFile(lines.join("\n"));
+        this.writeFile(lines.join('\n'));
     }
 }
 exports.Tracker = Tracker;

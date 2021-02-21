@@ -29,6 +29,7 @@ const actionAlias: { [key: string]: string } = {
   sy: 'sync',
   c: 'copy',
   t: 'track',
+  tn: 'trackNew',
   e: 'end',
   re: 'revertEnd',
 };
@@ -192,6 +193,10 @@ const actions: { [key: string]: () => Promise<any> } = {
   async track() {
     const tracker = new Tracker();
     tracker.startSync();
+  },
+  async trackNew() {
+    const tracker = new Tracker();
+    tracker.startSyncNew();
   },
   async end() {
     const gitLabProjectId = getGitLabProjectIdFromArgv();

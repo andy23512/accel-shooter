@@ -85,11 +85,17 @@ export class GitLab {
     );
   }
 
-  public listPipelines(sha: string, ref: string) {
+  public async listPipelines(query: {
+    sha?: string;
+    ref?: string;
+    status?: string;
+    per_page?: number;
+  }) {
+    query.ref = query.ref || (await this.getDefaultBranchName());
     return callApi<Pipeline[]>(
       'get',
       `/projects/${this.projectId}/pipelines/`,
-      { sha, ref }
+      query
     );
   }
 
