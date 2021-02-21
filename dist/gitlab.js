@@ -42,10 +42,14 @@ class GitLab {
         if (!config_1.CONFIG.EndingAssignee) {
             throw Error('No ending assignee was set');
         }
-        return callApi('get', `/users?username=${config_1.CONFIG.EndingAssignee}`).then((users) => users[0]);
+        return callApi('get', `/users`, {
+            username: config_1.CONFIG.EndingAssignee,
+        }).then((users) => users[0]);
     }
     listProjectLabels() {
-        return callApi('get', `/projects/${this.projectId}/labels?per_page=100`);
+        return callApi('get', `/projects/${this.projectId}/labels`, {
+            per_page: 100,
+        });
     }
     listMergeRequestsWillCloseIssueOnMerge(issueNumber) {
         return callApi('get', `/projects/${this.projectId}/issues/${issueNumber}/closed_by`);
@@ -54,11 +58,11 @@ class GitLab {
         return callApi('get', `/projects/${this.projectId}/pipelines/${pipelineId}/jobs`);
     }
     listPipelines(sha, ref) {
-        return callApi('get', `/projects/${this.projectId}/pipelines/?sha=${sha}&ref=${ref}`);
+        return callApi('get', `/projects/${this.projectId}/pipelines/`, { sha, ref });
     }
     createIssue(title, description, labels) {
         return __awaiter(this, void 0, void 0, function* () {
-            return callApi('post', `/projects/${this.projectId}/issues`, {
+            return callApi('post', `/projects/${this.projectId}/issues`, null, {
                 title: title,
                 description: description,
                 assignee_ids: yield this.getUserId(),
@@ -68,7 +72,7 @@ class GitLab {
     }
     createBranch(branch) {
         return __awaiter(this, void 0, void 0, function* () {
-            return callApi('post', `/projects/${this.projectId}/repository/branches`, {
+            return callApi('post', `/projects/${this.projectId}/repository/branches`, null, {
                 branch,
                 ref: yield this.getDefaultBranchName(),
             });
@@ -76,7 +80,7 @@ class GitLab {
     }
     createMergeRequest(issueNumber, issueTitle, branch, labels) {
         return __awaiter(this, void 0, void 0, function* () {
-            return callApi('post', `/projects/${this.projectId}/merge_requests`, {
+            return callApi('post', `/projects/${this.projectId}/merge_requests`, null, {
                 source_branch: branch,
                 target_branch: yield this.getDefaultBranchName(),
                 title: `Draft: Resolve "${issueTitle}"`,
@@ -88,7 +92,7 @@ class GitLab {
     markMergeRequestAsReadyAndAddAssignee(merge_request) {
         return __awaiter(this, void 0, void 0, function* () {
             const assignee = yield this.getEndingAssignee();
-            yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, {
+            yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
                 title: merge_request.title.replace('WIP: ', '').replace('Draft: ', ''),
                 assignee_id: assignee.id,
             });
@@ -96,7 +100,7 @@ class GitLab {
     }
     markMergeRequestAsUnreadyAndRemoveAssignee(merge_request) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, {
+            yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
                 title: 'Draft: ' +
                     merge_request.title.replace('WIP: ', '').replace('Draft: ', ''),
                 assignee_id: 0,

@@ -60,17 +60,15 @@ export class GitLab {
     if (!CONFIG.EndingAssignee) {
       throw Error('No ending assignee was set');
     }
-    return callApi<User[]>(
-      'get',
-      `/users?username=${CONFIG.EndingAssignee}`
-    ).then((users) => users[0]);
+    return callApi<User[]>('get', `/users`, {
+      username: CONFIG.EndingAssignee,
+    }).then((users) => users[0]);
   }
 
   public listProjectLabels() {
-    return callApi<Label[]>(
-      'get',
-      `/projects/${this.projectId}/labels?per_page=100`
-    );
+    return callApi<Label[]>('get', `/projects/${this.projectId}/labels`, {
+      per_page: 100,
+    });
   }
 
   public listMergeRequestsWillCloseIssueOnMerge(issueNumber: string) {
@@ -90,12 +88,13 @@ export class GitLab {
   public listPipelines(sha: string, ref: string) {
     return callApi<Pipeline[]>(
       'get',
-      `/projects/${this.projectId}/pipelines/?sha=${sha}&ref=${ref}`
+      `/projects/${this.projectId}/pipelines/`,
+      { sha, ref }
     );
   }
 
   public async createIssue(title: string, description: string, labels: any[]) {
-    return callApi<Issue>('post', `/projects/${this.projectId}/issues`, {
+    return callApi<Issue>('post', `/projects/${this.projectId}/issues`, null, {
       title: title,
       description: description,
       assignee_ids: await this.getUserId(),
@@ -107,6 +106,7 @@ export class GitLab {
     return callApi<Branch>(
       'post',
       `/projects/${this.projectId}/repository/branches`,
+      null,
       {
         branch,
         ref: await this.getDefaultBranchName(),
@@ -123,6 +123,7 @@ export class GitLab {
     return callApi<MergeRequest>(
       'post',
       `/projects/${this.projectId}/merge_requests`,
+      null,
       {
         source_branch: branch,
         target_branch: await this.getDefaultBranchName(),
@@ -140,6 +141,7 @@ export class GitLab {
     await callApi(
       'put',
       `/projects/${this.projectId}/merge_requests/${merge_request.iid}`,
+      null,
       {
         title: merge_request.title.replace('WIP: ', '').replace('Draft: ', ''),
         assignee_id: assignee.id,
@@ -153,6 +155,7 @@ export class GitLab {
     await callApi(
       'put',
       `/projects/${this.projectId}/merge_requests/${merge_request.iid}`,
+      null,
       {
         title:
           'Draft: ' +

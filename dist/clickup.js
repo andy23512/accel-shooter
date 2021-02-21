@@ -10,20 +10,20 @@ class ClickUp {
         return callApi('get', `/task/${this.taskId}`);
     }
     setTaskStatus(status) {
-        return callApi('put', `/task/${this.taskId}`, { status });
+        return callApi('put', `/task/${this.taskId}`, null, { status });
     }
     createChecklist(name) {
-        return callApi('post', `/task/${this.taskId}/checklist`, { name });
+        return callApi('post', `/task/${this.taskId}/checklist`, null, { name });
     }
     createChecklistItem(checklistId, name, resolved, orderindex) {
-        return callApi('post', `/checklist/${checklistId}/checklist_item`, {
+        return callApi('post', `/checklist/${checklistId}/checklist_item`, null, {
             name,
             resolved,
             orderindex,
         });
     }
     updateChecklistItem(checklistId, checklistItemId, name, resolved, orderindex) {
-        return callApi('put', `/checklist/${checklistId}/checklist_item/${checklistItemId}`, {
+        return callApi('put', `/checklist/${checklistId}/checklist_item/${checklistItemId}`, null, {
             name,
             resolved,
             orderindex,

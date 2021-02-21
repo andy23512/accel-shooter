@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 const child_process_1 = __importDefault(require("child_process"));
 const node_fetch_1 = __importDefault(require("node-fetch"));
+const querystring_1 = __importDefault(require("querystring"));
 const case_utils_1 = require("./case-utils");
 const clickup_1 = require("./clickup");
 const config_1 = require("./config");
@@ -41,10 +42,10 @@ function fetchRetry(url, opts) {
                 }
                 if (opts === null || opts === void 0 ? void 0 : opts.pause) {
                     if (!(opts === null || opts === void 0 ? void 0 : opts.silent))
-                        console.log("pausing..");
+                        console.log('pausing..');
                     yield sleep(opts.pause);
                     if (!(opts === null || opts === void 0 ? void 0 : opts.silent))
-                        console.log("done pausing...");
+                        console.log('done pausing...');
                 }
             }
         }
@@ -60,32 +61,35 @@ function checkStatus(res) {
         }
     }
     else {
-        throw Error("Response is undefined.");
+        throw Error('Response is undefined.');
     }
 }
 function callApiFactory(site) {
-    let apiUrl = "";
+    let apiUrl = '';
     let headers = {};
     switch (site) {
-        case "GitLab":
-            apiUrl = "https://gitlab.com/api/v4";
-            headers = { "Private-Token": config_1.CONFIG.GitLabToken };
+        case 'GitLab':
+            apiUrl = 'https://gitlab.com/api/v4';
+            headers = { 'Private-Token': config_1.CONFIG.GitLabToken };
             break;
-        case "ClickUp":
-            apiUrl = "https://api.clickup.com/api/v2";
+        case 'ClickUp':
+            apiUrl = 'https://api.clickup.com/api/v2';
             headers = { Authorization: config_1.CONFIG.ClickUpToken };
             break;
         default:
             throw Error(`Site {site} is not supported.`);
     }
-    return (method, url, body) => __awaiter(this, void 0, void 0, function* () {
+    return (method, url, queryParams, body) => __awaiter(this, void 0, void 0, function* () {
         const params = new URLSearchParams();
         if (body) {
             Object.entries(body).forEach(([key, value]) => {
                 params.set(key, value);
             });
         }
-        return fetchRetry(apiUrl + url, method === "get"
+        if (queryParams) {
+            url += '?' + querystring_1.default.stringify(queryParams);
+        }
+        return fetchRetry(apiUrl + url, method === 'get'
             ? Object.assign({ method,
                 headers }, RETRY_SETTING) : Object.assign({ method, headers, body: params }, RETRY_SETTING))
             .then(checkStatus)
@@ -99,26 +103,26 @@ function callApiFactory(site) {
 exports.callApiFactory = callApiFactory;
 function dashify(input) {
     let temp = input
-        .replace(/[^A-Za-z0-9]/g, "-")
-        .replace(/-{2,}/g, "-")
-        .replace(/-+$/, "")
-        .replace(/^-+/, "")
+        .replace(/[^A-Za-z0-9]/g, '-')
+        .replace(/-{2,}/g, '-')
+        .replace(/-+$/, '')
+        .replace(/^-+/, '')
         .toLowerCase();
     if (temp.length >= 100) {
         temp = temp.substring(0, 100);
-        return temp.substring(0, temp.lastIndexOf("-"));
+        return temp.substring(0, temp.lastIndexOf('-'));
     }
     return temp;
 }
 exports.dashify = dashify;
 function normalizeGitLabIssueChecklist(checklistText) {
     return checklistText
-        .split("\n")
-        .filter((line) => line && (line.includes("- [ ]") || line.includes("- [x]")))
+        .split('\n')
+        .filter((line) => line && (line.includes('- [ ]') || line.includes('- [x]')))
         .map((line, index) => ({
         name: line
-            .replace(/- \[[x ]\] /g, "")
-            .replace(/^ +/, (space) => space.replace(/ /g, "-")),
+            .replace(/- \[[x ]\] /g, '')
+            .replace(/^ +/, (space) => space.replace(/ /g, '-')),
         checked: /- \[x\]/.test(line),
         order: index,
     }));
@@ -139,8 +143,8 @@ function promiseSpawn(command, args) {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
             child_process_1.default
-                .spawn(command, args, { shell: true, stdio: "inherit" })
-                .on("close", (code) => (code === 0 ? resolve() : reject()));
+                .spawn(command, args, { shell: true, stdio: 'inherit' })
+                .on('close', (code) => (code === 0 ? resolve(1) : reject()));
         });
     });
 }

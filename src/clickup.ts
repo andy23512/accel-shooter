@@ -1,5 +1,5 @@
+import { ChecklistResponse, Task } from './models/clickup.models';
 import { callApiFactory } from './utils';
-import { Task, ChecklistResponse } from './models/clickup.models';
 const callApi = callApiFactory('ClickUp');
 
 export class ClickUp {
@@ -10,13 +10,14 @@ export class ClickUp {
   }
 
   public setTaskStatus(status: string) {
-    return callApi<Task>('put', `/task/${this.taskId}`, { status });
+    return callApi<Task>('put', `/task/${this.taskId}`, null, { status });
   }
 
   public createChecklist(name: string) {
     return callApi<ChecklistResponse>(
       'post',
       `/task/${this.taskId}/checklist`,
+      null,
       { name }
     );
   }
@@ -30,6 +31,7 @@ export class ClickUp {
     return callApi<ChecklistResponse>(
       'post',
       `/checklist/${checklistId}/checklist_item`,
+      null,
       {
         name,
         resolved,
@@ -48,6 +50,7 @@ export class ClickUp {
     return callApi<ChecklistResponse>(
       'put',
       `/checklist/${checklistId}/checklist_item/${checklistItemId}`,
+      null,
       {
         name,
         resolved,
