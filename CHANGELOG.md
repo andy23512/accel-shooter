@@ -3,11 +3,15 @@
 ## [Unrealeased] - yyyy-mm-dd
 
 ### Added
-- Add trackNew command
 
 ### Changed
 
 ### Fixed
+
+## [1.12.0] - 2021-02-22
+
+### Added
+- Add trackNew command
 
 ## [1.11.0] - 2021-01-28
 
