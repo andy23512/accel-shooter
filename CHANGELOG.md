@@ -9,6 +9,11 @@
 
 ### Fixed
 
+## [1.13.0] - 2021-02-22
+
+### Added
+- Add console info when track task start
+
 ## [1.12.0] - 2021-02-22
 
 ### Added
