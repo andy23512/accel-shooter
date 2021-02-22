@@ -62,6 +62,7 @@ class Tracker extends base_1.BaseFileRef {
     }
     trackTaskNew() {
         return __awaiter(this, void 0, void 0, function* () {
+            console.log(`[TrackNew] ${new Date().toLocaleString()}`);
             const checkDeployProjects = config_1.CONFIG.GitLabProjects.filter((p) => !!p.deployedStatus);
             for (const project of checkDeployProjects) {
                 const gitLab = new gitlab_1.GitLab(project.id);

@@ -3,6 +3,7 @@
 ## [Unrealeased] - yyyy-mm-dd
 
 ### Added
+- Add console info when track task start
 
 ### Changed
 

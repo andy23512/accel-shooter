@@ -57,6 +57,7 @@ export class Tracker extends BaseFileRef {
   }
 
   public async trackTaskNew() {
+    console.log(`[TrackNew] ${new Date().toLocaleString()}`);
     const checkDeployProjects = CONFIG.GitLabProjects.filter(
       (p) => !!p.deployedStatus
     );
