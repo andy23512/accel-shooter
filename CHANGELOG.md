@@ -7,6 +7,10 @@
 ### Changed
 
 ### Fixed
+
+## [1.13.1] - 2021-02-24
+
+### Fixed
 - Fix revertEnd not revert assignee bug
 
 ## [1.13.0] - 2021-02-22
