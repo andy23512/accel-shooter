@@ -101,12 +101,12 @@ class GitLab {
             });
         });
     }
-    markMergeRequestAsUnreadyAndRemoveAssignee(merge_request) {
+    markMergeRequestAsUnreadyAndSetAssigneeToSelf(merge_request) {
         return __awaiter(this, void 0, void 0, function* () {
             yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
                 title: 'Draft: ' +
                     merge_request.title.replace('WIP: ', '').replace('Draft: ', ''),
-                assignee_id: 0,
+                assignee_id: yield this.getUserId(),
             });
         });
     }

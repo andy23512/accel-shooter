@@ -3,11 +3,11 @@
 ## [Unrealeased] - yyyy-mm-dd
 
 ### Added
-- Add console info when track task start
 
 ### Changed
 
 ### Fixed
+- Fix revertEnd not revert assignee bug
 
 ## [1.13.0] - 2021-02-22
 

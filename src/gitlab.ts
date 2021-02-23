@@ -155,7 +155,7 @@ export class GitLab {
     );
   }
 
-  public async markMergeRequestAsUnreadyAndRemoveAssignee(
+  public async markMergeRequestAsUnreadyAndSetAssigneeToSelf(
     merge_request: MergeRequest
   ) {
     await callApi(
@@ -166,7 +166,7 @@ export class GitLab {
         title:
           'Draft: ' +
           merge_request.title.replace('WIP: ', '').replace('Draft: ', ''),
-        assignee_id: 0,
+        assignee_id: await this.getUserId(),
       }
     );
   }

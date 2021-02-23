@@ -224,7 +224,7 @@ const actions: { [key: string]: () => Promise<any> } = {
       issueNumber
     );
     const mergeRequest = mergeRequests[mergeRequests.length - 1];
-    await gitLab.markMergeRequestAsUnreadyAndRemoveAssignee(mergeRequest);
+    await gitLab.markMergeRequestAsUnreadyAndSetAssigneeToSelf(mergeRequest);
     const clickUpTaskId = getClickUpTaskIdFromGitLabIssue(issue);
     if (clickUpTaskId) {
       const clickUp = new ClickUp(clickUpTaskId);

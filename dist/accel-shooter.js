@@ -222,7 +222,7 @@ const actions = {
             const issue = yield gitLab.getIssue(issueNumber);
             const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
             const mergeRequest = mergeRequests[mergeRequests.length - 1];
-            yield gitLab.markMergeRequestAsUnreadyAndRemoveAssignee(mergeRequest);
+            yield gitLab.markMergeRequestAsUnreadyAndSetAssigneeToSelf(mergeRequest);
             const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
             if (clickUpTaskId) {
                 const clickUp = new clickup_1.ClickUp(clickUpTaskId);
