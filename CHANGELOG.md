@@ -3,11 +3,15 @@
 ## [Unrealeased] - yyyy-mm-dd
 
 ### Added
-- Add completion check in end command
 
 ### Changed
 
 ### Fixed
+
+## [1.14.0] - 2021-02-24
+
+### Added
+- Add completion check in end command
 
 ## [1.13.1] - 2021-02-24
 
