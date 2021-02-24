@@ -19,6 +19,7 @@ import { Tracker } from './tracker';
 import {
   getClickUpTaskIdFromGitLabIssue,
   getGitLabProjectConfigByName,
+  normalizeGitLabIssueChecklist,
   promiseSpawn,
   updateTaskStatusInDp,
 } from './utils';
@@ -203,6 +204,19 @@ const actions: { [key: string]: () => Promise<any> } = {
     const issueNumber = process.argv[4];
     const gitLab = new GitLab(gitLabProjectId);
     const issue = await gitLab.getIssue(issueNumber);
+    const gitLabChecklistText = issue.description
+      .replace(/https:\/\/app.clickup.com\/t\/\w+/g, '')
+      .trim();
+    const gitLabNormalizedChecklist = normalizeGitLabIssueChecklist(
+      gitLabChecklistText
+    );
+    const fullCompleted = gitLabNormalizedChecklist.every(
+      (item) => item.checked
+    );
+    if (!fullCompleted) {
+      console.log('This task has uncompleted todo(s).');
+      return;
+    }
     const mergeRequests = await gitLab.listMergeRequestsWillCloseIssueOnMerge(
       issueNumber
     );

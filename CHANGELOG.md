@@ -3,6 +3,7 @@
 ## [Unrealeased] - yyyy-mm-dd
 
 ### Added
+- Add completion check in end command
 
 ### Changed
 

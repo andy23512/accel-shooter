@@ -203,6 +203,15 @@ const actions = {
             const issueNumber = process.argv[4];
             const gitLab = new gitlab_1.GitLab(gitLabProjectId);
             const issue = yield gitLab.getIssue(issueNumber);
+            const gitLabChecklistText = issue.description
+                .replace(/https:\/\/app.clickup.com\/t\/\w+/g, '')
+                .trim();
+            const gitLabNormalizedChecklist = utils_1.normalizeGitLabIssueChecklist(gitLabChecklistText);
+            const fullCompleted = gitLabNormalizedChecklist.every((item) => item.checked);
+            if (!fullCompleted) {
+                console.log('This task has uncompleted todo(s).');
+                return;
+            }
             const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
             const mergeRequest = mergeRequests[mergeRequests.length - 1];
             yield gitLab.markMergeRequestAsReadyAndAddAssignee(mergeRequest);
