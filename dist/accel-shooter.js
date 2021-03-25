@@ -240,6 +240,46 @@ const actions = {
             console.log('Revert end command is executed successfully');
         });
     },
+    crossChecklist() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const answers = yield inquirer_1.default.prompt([
+                {
+                    name: 'initialSpaces',
+                    message: 'Enter prefix spaces',
+                    type: 'input',
+                },
+                {
+                    name: 'firstLevel',
+                    message: 'Enter first level items',
+                    type: 'editor',
+                },
+                {
+                    name: 'secondLevel',
+                    message: 'Enter second level items',
+                    type: 'editor',
+                    default: config_1.CONFIG.CrossChecklistDefaultSecondLevel.join('\n'),
+                },
+            ]);
+            const firstLevelItems = answers.firstLevel
+                .split('\n')
+                .filter(Boolean);
+            const secondLevelItems = answers.secondLevel
+                .split('\n')
+                .filter(Boolean);
+            const result = firstLevelItems
+                .map((e) => answers.initialSpaces +
+                '  - [ ] ' +
+                e +
+                '\n' +
+                secondLevelItems
+                    .map((f) => `${answers.initialSpaces}    - [ ] ${f}`)
+                    .join('\n'))
+                .join('\n');
+            clipboardy_1.default.writeSync(result);
+            console.log(result);
+            console.log('Copied!');
+        });
+    },
 };
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const action = actionAlias[process.argv[2]] || process.argv[2];

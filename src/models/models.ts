@@ -1,5 +1,5 @@
-export type Site = "ClickUp" | "GitLab";
-export type HttpMethod = "get" | "post" | "put" | "delete";
+export type Site = 'ClickUp' | 'GitLab';
+export type HttpMethod = 'get' | 'post' | 'put' | 'delete';
 export interface Config {
   ClickUpToken: string;
   GitLabToken: string;
@@ -18,6 +18,7 @@ export interface Config {
   EndingAssignee: string;
   SyncIntervalInMinutes: number;
   TrackIntervalInMinutes: number;
+  CrossChecklistDefaultSecondLevel: string[];
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];
 export interface NormalizedChecklistItem {
