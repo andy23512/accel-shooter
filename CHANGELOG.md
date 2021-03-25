@@ -3,11 +3,14 @@
 ## [Unrealeased] - yyyy-mm-dd
 
 ### Added
-- Add cross checklist command
 
 ### Changed
 
 ### Fixed
+
+## [1.15.0] - 2021-03-25
+### Added
+- Add cross checklist command
 
 ## [1.14.0] - 2021-02-24
 
