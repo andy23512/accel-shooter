@@ -8,6 +8,10 @@
 
 ### Fixed
 
+## [1.15.1] - 2021-04-07
+### Changed
+- Update deploy job name
+
 ## [1.15.0] - 2021-03-25
 ### Added
 - Add cross checklist command
