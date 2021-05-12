@@ -8,6 +8,13 @@
 
 ### Fixed
 
+## [1.16.0] - 2021-05-21
+### Added
+- Add conditional status feature
+
+### Changed
+- update track command to track new
+
 ## [1.15.1] - 2021-04-07
 ### Changed
 - Update deploy job name
