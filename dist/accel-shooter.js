@@ -29,14 +29,13 @@ const gitlab_1 = require("./gitlab");
 const tracker_1 = require("./tracker");
 const utils_1 = require("./utils");
 const actionAlias = {
-    st: 'start',
-    o: 'open',
-    sy: 'sync',
-    c: 'copy',
-    t: 'track',
-    tn: 'trackNew',
-    e: 'end',
-    re: 'revertEnd',
+    st: "start",
+    o: "open",
+    sy: "sync",
+    c: "copy",
+    t: "track",
+    e: "end",
+    re: "revertEnd",
 };
 const actions = {
     start() {
@@ -44,24 +43,24 @@ const actions = {
             actions_1.configReadline();
             const answers = yield inquirer_1.default.prompt([
                 {
-                    name: 'gitLabProject',
-                    message: 'Choose GitLab Project',
-                    type: 'list',
+                    name: "gitLabProject",
+                    message: "Choose GitLab Project",
+                    type: "list",
                     choices: config_1.CONFIG.GitLabProjects.map((p) => ({
                         name: `${p.name} (${p.repo})`,
                         value: p,
                     })),
                 },
                 {
-                    name: 'clickUpTaskId',
-                    message: 'Enter ClickUp Task ID',
-                    type: 'input',
-                    filter: (input) => input.replace('#', ''),
+                    name: "clickUpTaskId",
+                    message: "Enter ClickUp Task ID",
+                    type: "input",
+                    filter: (input) => input.replace("#", ""),
                 },
                 {
-                    name: 'issueTitle',
-                    message: 'Enter Issue Title',
-                    type: 'input',
+                    name: "issueTitle",
+                    message: "Enter Issue Title",
+                    type: "input",
                     default: (answers) => __awaiter(this, void 0, void 0, function* () {
                         let task = yield new clickup_1.ClickUp(answers.clickUpTaskId).getTask();
                         let result = task.name;
@@ -73,9 +72,9 @@ const actions = {
                     }),
                 },
                 {
-                    name: 'labels',
-                    message: 'Choose GitLab Labels to add to new Issue',
-                    type: 'checkbox',
+                    name: "labels",
+                    message: "Choose GitLab Labels to add to new Issue",
+                    type: "checkbox",
                     choices: ({ gitLabProject }) => __awaiter(this, void 0, void 0, function* () {
                         return new gitlab_1.GitLab(gitLabProject.id)
                             .listProjectLabels()
@@ -83,9 +82,9 @@ const actions = {
                     }),
                 },
                 {
-                    name: 'todoConfig',
-                    message: 'Choose Preset To-do Config',
-                    type: 'checkbox',
+                    name: "todoConfig",
+                    message: "Choose Preset To-do Config",
+                    type: "checkbox",
                     choices: config_1.CONFIG.ToDoConfigChoices,
                 },
             ]);
@@ -93,15 +92,15 @@ const actions = {
             const clickUp = new clickup_1.ClickUp(answers.clickUpTaskId);
             const selectedGitLabLabels = answers.labels;
             const clickUpTask = yield clickUp.getTask();
-            const clickUpTaskUrl = clickUpTask['url'];
+            const clickUpTaskUrl = clickUpTask["url"];
             const gitLabIssueTitle = answers.issueTitle;
-            yield clickUp.setTaskStatus('in progress');
+            yield clickUp.setTaskStatus("in progress");
             const todoConfigMap = {};
             answers.todoConfig.forEach((c) => {
                 todoConfigMap[c] = true;
             });
             const template = fs_1.readFileSync(untildify_1.default(config_1.CONFIG.ToDoTemplate), {
-                encoding: 'utf-8',
+                encoding: "utf-8",
             });
             const endingTodo = mustache_1.render(template, todoConfigMap);
             const gitLabIssue = yield gitLab.createIssue(gitLabIssueTitle, `${clickUpTaskUrl}\n\n${endingTodo}`, selectedGitLabLabels);
@@ -114,10 +113,10 @@ const actions = {
             clipboardy_1.default.writeSync(syncCommand);
             console.log(`Sync command: "${syncCommand}" Copied!`);
             new tracker_1.Tracker().addItem(answers.gitLabProject.name, gitLabIssueNumber);
-            process.chdir(answers.gitLabProject.path.replace('~', os_1.default.homedir()));
-            yield utils_1.promiseSpawn('git', ['fetch']);
+            process.chdir(answers.gitLabProject.path.replace("~", os_1.default.homedir()));
+            yield utils_1.promiseSpawn("git", ["fetch"]);
             yield sleep(1000);
-            yield utils_1.promiseSpawn('git', ['checkout', gitLabBranch.name]);
+            yield utils_1.promiseSpawn("git", ["checkout", gitLabBranch.name]);
         });
     },
     open() {
@@ -126,27 +125,27 @@ const actions = {
             const gitLab = new gitlab_1.GitLab(getGitLabProjectIdFromArgv());
             const answers = yield inquirer_1.default.prompt([
                 {
-                    name: 'types',
-                    message: 'Choose Link Type to open',
-                    type: 'checkbox',
+                    name: "types",
+                    message: "Choose Link Type to open",
+                    type: "checkbox",
                     choices: [
-                        { name: 'Issue', value: 'issue' },
-                        { name: 'Merge Request', value: 'merge-request' },
-                        { name: 'Task', value: 'task' },
+                        { name: "Issue", value: "issue" },
+                        { name: "Merge Request", value: "merge-request" },
+                        { name: "Task", value: "task" },
                     ],
                 },
             ]);
             const issue = yield gitLab.getIssue(issueNumber);
             for (const type of answers.types) {
                 switch (type) {
-                    case 'issue':
+                    case "issue":
                         open_1.default(issue.web_url);
                         break;
-                    case 'merge-request':
+                    case "merge-request":
                         const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
                         open_1.default(mergeRequests[mergeRequests.length - 1].web_url);
                         break;
-                    case 'task':
+                    case "task":
                         const description = issue.description;
                         const result = description.match(/https:\/\/app.clickup.com\/t\/\w+/);
                         if (result) {
@@ -173,7 +172,7 @@ const actions = {
         return __awaiter(this, void 0, void 0, function* () {
             const day = process.argv.length >= 4
                 ? process.argv[3]
-                : date_fns_1.format(new Date(), 'yyyy/MM/dd');
+                : date_fns_1.format(new Date(), "yyyy/MM/dd");
             const dp = new daily_progress_1.DailyProgress();
             const record = dp.getRecordByDay(day);
             if (record) {
@@ -181,7 +180,7 @@ const actions = {
                 dp.writeRecordByDay(day, newDpRecord);
                 clipboardy_1.default.writeSync(newDpRecord);
                 console.log(newDpRecord);
-                console.log('Copied!');
+                console.log("Copied!");
             }
         });
     },
@@ -191,12 +190,6 @@ const actions = {
             tracker.startSync();
         });
     },
-    trackNew() {
-        return __awaiter(this, void 0, void 0, function* () {
-            const tracker = new tracker_1.Tracker();
-            tracker.startSyncNew();
-        });
-    },
     end() {
         return __awaiter(this, void 0, void 0, function* () {
             const gitLabProjectId = getGitLabProjectIdFromArgv();
@@ -204,12 +197,12 @@ const actions = {
             const gitLab = new gitlab_1.GitLab(gitLabProjectId);
             const issue = yield gitLab.getIssue(issueNumber);
             const gitLabChecklistText = issue.description
-                .replace(/https:\/\/app.clickup.com\/t\/\w+/g, '')
+                .replace(/https:\/\/app.clickup.com\/t\/\w+/g, "")
                 .trim();
             const gitLabNormalizedChecklist = utils_1.normalizeGitLabIssueChecklist(gitLabChecklistText);
             const fullCompleted = gitLabNormalizedChecklist.every((item) => item.checked);
             if (!fullCompleted) {
-                console.log('This task has uncompleted todo(s).');
+                console.log("This task has uncompleted todo(s).");
                 return;
             }
             const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
@@ -218,9 +211,9 @@ const actions = {
             const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
             if (clickUpTaskId) {
                 const clickUp = new clickup_1.ClickUp(clickUpTaskId);
-                yield clickUp.setTaskStatus('in review');
+                yield clickUp.setTaskStatus("in review");
             }
-            console.log('End command is executed successfully');
+            console.log("End command is executed successfully");
         });
     },
     revertEnd() {
@@ -235,49 +228,49 @@ const actions = {
             const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
             if (clickUpTaskId) {
                 const clickUp = new clickup_1.ClickUp(clickUpTaskId);
-                yield clickUp.setTaskStatus('in progress');
+                yield clickUp.setTaskStatus("in progress");
             }
-            console.log('Revert end command is executed successfully');
+            console.log("Revert end command is executed successfully");
         });
     },
     crossChecklist() {
         return __awaiter(this, void 0, void 0, function* () {
             const answers = yield inquirer_1.default.prompt([
                 {
-                    name: 'initialSpaces',
-                    message: 'Enter prefix spaces',
-                    type: 'input',
+                    name: "initialSpaces",
+                    message: "Enter prefix spaces",
+                    type: "input",
                 },
                 {
-                    name: 'firstLevel',
-                    message: 'Enter first level items',
-                    type: 'editor',
+                    name: "firstLevel",
+                    message: "Enter first level items",
+                    type: "editor",
                 },
                 {
-                    name: 'secondLevel',
-                    message: 'Enter second level items',
-                    type: 'editor',
-                    default: config_1.CONFIG.CrossChecklistDefaultSecondLevel.join('\n'),
+                    name: "secondLevel",
+                    message: "Enter second level items",
+                    type: "editor",
+                    default: config_1.CONFIG.CrossChecklistDefaultSecondLevel.join("\n"),
                 },
             ]);
             const firstLevelItems = answers.firstLevel
-                .split('\n')
+                .split("\n")
                 .filter(Boolean);
             const secondLevelItems = answers.secondLevel
-                .split('\n')
+                .split("\n")
                 .filter(Boolean);
             const result = firstLevelItems
                 .map((e) => answers.initialSpaces +
-                '  - [ ] ' +
+                "  - [ ] " +
                 e +
-                '\n' +
+                "\n" +
                 secondLevelItems
                     .map((f) => `${answers.initialSpaces}    - [ ] ${f}`)
-                    .join('\n'))
-                .join('\n');
+                    .join("\n"))
+                .join("\n");
             clipboardy_1.default.writeSync(result);
             console.log(result);
-            console.log('Copied!');
+            console.log("Copied!");
         });
     },
 };
@@ -294,7 +287,7 @@ function getGitLabProjectIdByName(name) {
     var _a;
     const gitLabProjectId = (_a = utils_1.getGitLabProjectConfigByName(name)) === null || _a === void 0 ? void 0 : _a.id;
     if (!gitLabProjectId) {
-        throw new Error('Cannot find project');
+        throw new Error("Cannot find project");
     }
     return gitLabProjectId;
 }

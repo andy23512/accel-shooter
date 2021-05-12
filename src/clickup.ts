@@ -1,21 +1,26 @@
-import { ChecklistResponse, Task } from './models/clickup.models';
-import { callApiFactory } from './utils';
-const callApi = callApiFactory('ClickUp');
+import { ChecklistResponse, Task } from "./models/clickup.models";
+import { List } from "./models/clickup/list.models";
+import { callApiFactory } from "./utils";
+const callApi = callApiFactory("ClickUp");
 
 export class ClickUp {
   constructor(public taskId: string) {}
 
+  public static getList(listId: string) {
+    return callApi<List>("get", `/list/${listId}`);
+  }
+
   public getTask() {
-    return callApi<Task>('get', `/task/${this.taskId}`);
+    return callApi<Task>("get", `/task/${this.taskId}`);
   }
 
   public setTaskStatus(status: string) {
-    return callApi<Task>('put', `/task/${this.taskId}`, null, { status });
+    return callApi<Task>("put", `/task/${this.taskId}`, null, { status });
   }
 
   public createChecklist(name: string) {
     return callApi<ChecklistResponse>(
-      'post',
+      "post",
       `/task/${this.taskId}/checklist`,
       null,
       { name }
@@ -29,7 +34,7 @@ export class ClickUp {
     orderindex: number
   ) {
     return callApi<ChecklistResponse>(
-      'post',
+      "post",
       `/checklist/${checklistId}/checklist_item`,
       null,
       {
@@ -48,7 +53,7 @@ export class ClickUp {
     orderindex: number
   ) {
     return callApi<ChecklistResponse>(
-      'put',
+      "put",
       `/checklist/${checklistId}/checklist_item/${checklistItemId}`,
       null,
       {
@@ -61,7 +66,7 @@ export class ClickUp {
 
   public deleteChecklistItem(checklistId: string, checklistItemId: string) {
     return callApi<{}>(
-      'delete',
+      "delete",
       `/checklist/${checklistId}/checklist_item/${checklistItemId}`
     );
   }

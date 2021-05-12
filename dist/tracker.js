@@ -36,12 +36,6 @@ class Tracker extends base_1.BaseFileRef {
             this.trackTask();
         }, config_1.CONFIG.TrackIntervalInMinutes * 60 * 1000);
     }
-    startSyncNew() {
-        this.trackTaskNew();
-        setInterval(() => {
-            this.trackTaskNew();
-        }, config_1.CONFIG.TrackIntervalInMinutes * 60 * 1000);
-    }
     addItem(projectName, issueNumber) {
         fs_1.appendFileSync(this.path, `\n${projectName} ${issueNumber}`);
     }
@@ -55,12 +49,6 @@ class Tracker extends base_1.BaseFileRef {
         return items;
     }
     trackTask() {
-        return __awaiter(this, void 0, void 0, function* () {
-            console.log(`[Track] ${new Date().toLocaleString()}`);
-            return Promise.all(this.getItems().map(([projectName, issueNumber]) => this.trackSingle(projectName, issueNumber)));
-        });
-    }
-    trackTaskNew() {
         return __awaiter(this, void 0, void 0, function* () {
             console.log(`[TrackNew] ${new Date().toLocaleString()}`);
             const checkDeployProjects = config_1.CONFIG.GitLabProjects.filter((p) => !!p.deployedStatus);
@@ -81,10 +69,10 @@ class Tracker extends base_1.BaseFileRef {
                     break;
                 }
             }
-            return Promise.all(this.getItems().map(([projectName, issueNumber]) => this.trackSingleNew(projectName, issueNumber)));
+            return Promise.all(this.getItems().map(([projectName, issueNumber]) => this.trackSingle(projectName, issueNumber)));
         });
     }
-    trackSingleNew(projectName, issueNumber) {
+    trackSingle(projectName, issueNumber) {
         return __awaiter(this, void 0, void 0, function* () {
             const projectConfig = utils_1.getGitLabProjectConfigByName(projectName);
             if (!(projectConfig === null || projectConfig === void 0 ? void 0 : projectConfig.deployedStatus) && !(projectConfig === null || projectConfig === void 0 ? void 0 : projectConfig.stagingStatus)) {
@@ -124,79 +112,17 @@ class Tracker extends base_1.BaseFileRef {
                     });
                     const compareTime = date_fns_1.compareAsc(deployedCommitDate, mergeCommitDate);
                     if (compareTime === 1 || compareTime === 0) {
-                        yield clickUp.setTaskStatus(projectConfig.deployedStatus);
+                        const list = yield clickup_1.ClickUp.getList(clickUpTask.list.id);
+                        const deployedStatus = projectConfig.deployedStatus[list.name] ||
+                            projectConfig.deployedStatus["*"];
+                        yield clickUp.setTaskStatus(deployedStatus);
                         this.closeItem(projectName, issueNumber);
-                        const message = `${projectName} #${issueNumber}: Staging -> ${projectConfig.deployedStatus}`;
+                        const message = `${projectName} #${issueNumber} (Under List ${list.name}): Staging -> ${deployedStatus}`;
                         node_notifier_1.default.notify({
                             title: "Accel Shooter",
                             message,
                         });
                         console.log(message);
-                    }
-                }
-            }
-        });
-    }
-    trackSingle(projectName, issueNumber) {
-        return __awaiter(this, void 0, void 0, function* () {
-            const projectConfig = utils_1.getGitLabProjectConfigByName(projectName);
-            if (!(projectConfig === null || projectConfig === void 0 ? void 0 : projectConfig.deployedStatus) && !(projectConfig === null || projectConfig === void 0 ? void 0 : projectConfig.stagingStatus)) {
-                return;
-            }
-            const gitLab = new gitlab_1.GitLab(projectConfig.id);
-            const issue = yield gitLab.getIssue(issueNumber);
-            const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
-            if (!clickUpTaskId) {
-                return;
-            }
-            const clickUp = new clickup_1.ClickUp(clickUpTaskId);
-            const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
-            const mergeRequest = yield gitLab.getMergeRequest(mergeRequests[mergeRequests.length - 1].iid);
-            if (projectConfig.stagingStatus && mergeRequest.state === "merged") {
-                const clickUpTask = yield clickUp.getTask();
-                if (clickUpTask.status.status === "in review") {
-                    yield clickUp.setTaskStatus(projectConfig.stagingStatus);
-                    const message = `${projectName} #${issueNumber}: In Review -> ${projectConfig.stagingStatus}`;
-                    child_process_1.default.execSync(`osascript -e 'display notification "${message}" with title "Accel Shooter"'`);
-                    console.log(message);
-                    if (!projectConfig.deployedStatus) {
-                        this.closeItem(projectName, issueNumber);
-                    }
-                }
-                if (projectConfig.deployedStatus &&
-                    clickUpTask.status.status === "staging") {
-                    const pipelines = yield gitLab.listPipelines({
-                        sha: mergeRequest.merge_commit_sha,
-                        ref: "develop",
-                    });
-                    if (pipelines.length === 0) {
-                        return;
-                    }
-                    for (const pipeline of pipelines) {
-                        const jobs = yield gitLab.listPipelineJobs(pipeline.id);
-                        const job = jobs.find((j) => j.name === "deploy");
-                        if (!job) {
-                            continue;
-                        }
-                        if (pipeline.status === "failed") {
-                            const message = `${projectName} #${issueNumber}: Pipeline failed`;
-                            node_notifier_1.default.notify({
-                                title: "Accel Shooter",
-                                message,
-                            });
-                            console.log(message);
-                        }
-                        if (job.status === "success") {
-                            yield clickUp.setTaskStatus(projectConfig.deployedStatus);
-                            this.closeItem(projectName, issueNumber);
-                            const message = `${projectName} #${issueNumber}: Staging -> ${projectConfig.deployedStatus}`;
-                            node_notifier_1.default.notify({
-                                title: "Accel Shooter",
-                                message,
-                            });
-                            console.log(message);
-                        }
-                        break;
                     }
                 }
             }

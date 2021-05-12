@@ -1,5 +1,5 @@
-export type Site = 'ClickUp' | 'GitLab';
-export type HttpMethod = 'get' | 'post' | 'put' | 'delete';
+export type Site = "ClickUp" | "GitLab";
+export type HttpMethod = "get" | "post" | "put" | "delete";
 export interface Config {
   ClickUpToken: string;
   GitLabToken: string;
@@ -9,7 +9,7 @@ export interface Config {
     repo: string;
     id: string;
     stagingStatus?: string;
-    deployedStatus?: string;
+    deployedStatus?: Record<string, string>;
   }>;
   DailyProgressFile: string;
   TrackListFile: string;
