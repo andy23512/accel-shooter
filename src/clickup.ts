@@ -1,13 +1,31 @@
 import { ChecklistResponse, Task } from "./models/clickup.models";
 import { List } from "./models/clickup/list.models";
+import { Team } from "./models/clickup/team.models";
+import { User } from "./models/clickup/user.models";
 import { callApiFactory } from "./utils";
 const callApi = callApiFactory("ClickUp");
 
 export class ClickUp {
   constructor(public taskId: string) {}
 
+  public static getCurrentUser() {
+    return callApi<{ user: User }>("get", `/user/`);
+  }
+
   public static getList(listId: string) {
     return callApi<List>("get", `/list/${listId}`);
+  }
+
+  public static getTeams() {
+    return callApi<{ teams: Team[] }>("get", `/team/`);
+  }
+
+  public static getRTVTasks(teamId: string, userID: number) {
+    return callApi<{ tasks: Task[] }>("get", `/team/${teamId}/task/`, {
+      "statuses[]": "ready to verify",
+      include_closed: true,
+      "assignees[]": userID,
+    });
   }
 
   public getTask() {

@@ -1,4 +1,4 @@
-import { Assignee } from './assignee.modes';
+import { Assignee } from './assignee.models';
 
 export interface ChecklistResponse {
   checklist: Checklist;

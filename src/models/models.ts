@@ -19,6 +19,7 @@ export interface Config {
   SyncIntervalInMinutes: number;
   TrackIntervalInMinutes: number;
   CrossChecklistDefaultSecondLevel: string[];
+  ClickUpTeam: string;
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];
 export interface NormalizedChecklistItem {

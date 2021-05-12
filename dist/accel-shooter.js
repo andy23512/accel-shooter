@@ -273,6 +273,18 @@ const actions = {
             console.log("Copied!");
         });
     },
+    RTVTasks() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = (yield clickup_1.ClickUp.getCurrentUser()).user;
+            const team = (yield clickup_1.ClickUp.getTeams()).teams.find((t) => t.name === config_1.CONFIG.ClickUpTeam);
+            if (!team) {
+                console.log("Team does not exist.");
+                return;
+            }
+            const tasks = (yield clickup_1.ClickUp.getRTVTasks(team.id, user.id)).tasks;
+            console.log(tasks.map((t) => `- ${t.name} (${t.url})`).join("\n"));
+        });
+    },
 };
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const action = actionAlias[process.argv[2]] || process.argv[2];

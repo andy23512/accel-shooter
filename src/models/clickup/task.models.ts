@@ -1,4 +1,4 @@
-import { Assignee } from './assignee.modes';
+import { Assignee } from './assignee.models';
 import { Checklist } from './checklist.models';
 
 export interface Task {

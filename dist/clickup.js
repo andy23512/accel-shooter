@@ -6,8 +6,21 @@ class ClickUp {
     constructor(taskId) {
         this.taskId = taskId;
     }
+    static getCurrentUser() {
+        return callApi("get", `/user/`);
+    }
     static getList(listId) {
         return callApi("get", `/list/${listId}`);
+    }
+    static getTeams() {
+        return callApi("get", `/team/`);
+    }
+    static getRTVTasks(teamId, userID) {
+        return callApi("get", `/team/${teamId}/task/`, {
+            "statuses[]": "ready to verify",
+            include_closed: true,
+            "assignees[]": userID,
+        });
     }
     getTask() {
         return callApi("get", `/task/${this.taskId}`);
