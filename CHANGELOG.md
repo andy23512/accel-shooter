@@ -8,6 +8,10 @@
 
 ### Fixed
 
+## [1.17.0] - 2021-05-21
+### Added
+- Add RTVTasks command
+
 ## [1.16.0] - 2021-05-21
 ### Added
 - Add conditional status feature
