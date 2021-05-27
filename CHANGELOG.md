@@ -8,6 +8,10 @@
 
 ### Fixed
 
+## [1.19.0] - 2021-05-27
+### Changed
+- Remove gitlab label choice
+
 ## [1.18.0] - 2021-05-27
 ### Added
 - Add webpage alias

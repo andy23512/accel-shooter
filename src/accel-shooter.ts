@@ -68,15 +68,6 @@ const actions: { [key: string]: () => Promise<any> } = {
         },
       },
       {
-        name: "labels",
-        message: "Choose GitLab Labels to add to new Issue",
-        type: "checkbox",
-        choices: async ({ gitLabProject }) =>
-          new GitLab(gitLabProject.id)
-            .listProjectLabels()
-            .then((labels) => labels.map((label: any) => label.name)),
-      },
-      {
         name: "todoConfig",
         message: "Choose Preset To-do Config",
         type: "checkbox",
@@ -85,7 +76,6 @@ const actions: { [key: string]: () => Promise<any> } = {
     ]);
     const gitLab = new GitLab(answers.gitLabProject.id);
     const clickUp = new ClickUp(answers.clickUpTaskId);
-    const selectedGitLabLabels = answers.labels;
     const clickUpTask = await clickUp.getTask();
     const clickUpTaskUrl = clickUpTask["url"];
     const gitLabIssueTitle = answers.issueTitle;
@@ -101,7 +91,6 @@ const actions: { [key: string]: () => Promise<any> } = {
     const gitLabIssue = await gitLab.createIssue(
       gitLabIssueTitle,
       `${clickUpTaskUrl}\n\n${endingTodo}`,
-      selectedGitLabLabels
     );
     const gitLabIssueNumber = gitLabIssue.iid;
     const gitLabBranch = await gitLab.createBranch(
@@ -115,7 +104,6 @@ const actions: { [key: string]: () => Promise<any> } = {
       gitLabIssueNumber,
       gitLabIssueTitle,
       gitLabBranch.name,
-      selectedGitLabLabels
     );
     const dailyProgressString = `* (In Progress) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
     new DailyProgress().addProgressToBuffer(dailyProgressString);

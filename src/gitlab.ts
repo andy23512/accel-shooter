@@ -5,7 +5,7 @@ import {
   Label,
   MergeRequest,
   Project,
-  User,
+  User
 } from './models/gitlab.models';
 import { Commit } from './models/gitlab/commit.models';
 import { Job } from './models/gitlab/job.models';
@@ -99,12 +99,11 @@ export class GitLab {
     );
   }
 
-  public async createIssue(title: string, description: string, labels: any[]) {
+  public async createIssue(title: string, description: string) {
     return callApi<Issue>('post', `/projects/${this.projectId}/issues`, null, {
       title: title,
       description: description,
       assignee_ids: await this.getUserId(),
-      labels: labels.join(','),
     });
   }
 
@@ -124,7 +123,6 @@ export class GitLab {
     issueNumber: number,
     issueTitle: string,
     branch: string,
-    labels: any[]
   ) {
     return callApi<MergeRequest>(
       'post',
@@ -135,7 +133,6 @@ export class GitLab {
         target_branch: await this.getDefaultBranchName(),
         title: `Draft: Resolve "${issueTitle}"`,
         description: `Close #${issueNumber}`,
-        labels: labels.join(','),
       }
     );
   }

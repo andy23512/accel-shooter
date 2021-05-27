@@ -72,16 +72,6 @@ const actions = {
                     }),
                 },
                 {
-                    name: "labels",
-                    message: "Choose GitLab Labels to add to new Issue",
-                    type: "checkbox",
-                    choices: ({ gitLabProject }) => __awaiter(this, void 0, void 0, function* () {
-                        return new gitlab_1.GitLab(gitLabProject.id)
-                            .listProjectLabels()
-                            .then((labels) => labels.map((label) => label.name));
-                    }),
-                },
-                {
                     name: "todoConfig",
                     message: "Choose Preset To-do Config",
                     type: "checkbox",
@@ -90,7 +80,6 @@ const actions = {
             ]);
             const gitLab = new gitlab_1.GitLab(answers.gitLabProject.id);
             const clickUp = new clickup_1.ClickUp(answers.clickUpTaskId);
-            const selectedGitLabLabels = answers.labels;
             const clickUpTask = yield clickUp.getTask();
             const clickUpTaskUrl = clickUpTask["url"];
             const gitLabIssueTitle = answers.issueTitle;
@@ -103,10 +92,10 @@ const actions = {
                 encoding: "utf-8",
             });
             const endingTodo = mustache_1.render(template, todoConfigMap);
-            const gitLabIssue = yield gitLab.createIssue(gitLabIssueTitle, `${clickUpTaskUrl}\n\n${endingTodo}`, selectedGitLabLabels);
+            const gitLabIssue = yield gitLab.createIssue(gitLabIssueTitle, `${clickUpTaskUrl}\n\n${endingTodo}`);
             const gitLabIssueNumber = gitLabIssue.iid;
             const gitLabBranch = yield gitLab.createBranch(gitlab_1.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(gitLabIssueNumber, gitLabIssueTitle, answers.clickUpTaskId));
-            yield gitLab.createMergeRequest(gitLabIssueNumber, gitLabIssueTitle, gitLabBranch.name, selectedGitLabLabels);
+            yield gitLab.createMergeRequest(gitLabIssueNumber, gitLabIssueTitle, gitLabBranch.name);
             const dailyProgressString = `* (In Progress) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
             new daily_progress_1.DailyProgress().addProgressToBuffer(dailyProgressString);
             const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabIssueNumber}`;

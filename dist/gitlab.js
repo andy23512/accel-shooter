@@ -63,13 +63,12 @@ class GitLab {
             return callApi('get', `/projects/${this.projectId}/pipelines/`, query);
         });
     }
-    createIssue(title, description, labels) {
+    createIssue(title, description) {
         return __awaiter(this, void 0, void 0, function* () {
             return callApi('post', `/projects/${this.projectId}/issues`, null, {
                 title: title,
                 description: description,
                 assignee_ids: yield this.getUserId(),
-                labels: labels.join(','),
             });
         });
     }
@@ -81,14 +80,13 @@ class GitLab {
             });
         });
     }
-    createMergeRequest(issueNumber, issueTitle, branch, labels) {
+    createMergeRequest(issueNumber, issueTitle, branch) {
         return __awaiter(this, void 0, void 0, function* () {
             return callApi('post', `/projects/${this.projectId}/merge_requests`, null, {
                 source_branch: branch,
                 target_branch: yield this.getDefaultBranchName(),
                 title: `Draft: Resolve "${issueTitle}"`,
                 description: `Close #${issueNumber}`,
-                labels: labels.join(','),
             });
         });
     }
