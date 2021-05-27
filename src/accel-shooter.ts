@@ -13,7 +13,7 @@ import { CONFIG } from "./config";
 import { DailyProgress } from "./daily-progress";
 import {
   getGitLabBranchNameFromIssueNumberAndTitleAndTaskId,
-  GitLab,
+  GitLab
 } from "./gitlab";
 import { Tracker } from "./tracker";
 import {
@@ -21,7 +21,7 @@ import {
   getGitLabProjectConfigByName,
   normalizeGitLabIssueChecklist,
   promiseSpawn,
-  updateTaskStatusInDp,
+  updateTaskStatusInDp
 } from "./utils";
 
 const actionAlias: { [key: string]: string } = {
@@ -300,6 +300,8 @@ const actions: { [key: string]: () => Promise<any> } = {
   const action = actionAlias[process.argv[2]] || process.argv[2];
   if (actions[action]) {
     await actions[action]();
+  } else if (CONFIG.WebPageAlias[action]) {
+    open(CONFIG.WebPageAlias[action])
   } else {
     throw Error(`Action ${action} is not supported.`);
   }

@@ -8,6 +8,10 @@
 
 ### Fixed
 
+## [1.18.0] - 2021-05-27
+### Added
+- Add webpage alias
+
 ## [1.17.0] - 2021-05-21
 ### Added
 - Add RTVTasks command

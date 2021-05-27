@@ -291,6 +291,9 @@ const actions = {
     if (actions[action]) {
         yield actions[action]();
     }
+    else if (config_1.CONFIG.WebPageAlias[action]) {
+        open_1.default(config_1.CONFIG.WebPageAlias[action]);
+    }
     else {
         throw Error(`Action ${action} is not supported.`);
     }

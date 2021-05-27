@@ -20,6 +20,7 @@ export interface Config {
   TrackIntervalInMinutes: number;
   CrossChecklistDefaultSecondLevel: string[];
   ClickUpTeam: string;
+  WebPageAlias: Record<string, string>;
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];
 export interface NormalizedChecklistItem {
