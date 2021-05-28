@@ -183,6 +183,14 @@ chalk@^3.0.0:
     ansi-styles "^4.1.0"
     supports-color "^7.1.0"
 
+chalk@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.yarnpkg.com/chalk/-/chalk-4.1.1.tgz#c80b3fab28bf6371e6863325eee67e618b77e6ad"
+  integrity sha512-diHzdDKxcU+bAsUboHLPEDQiw0qEe0qd7SYUn3HgcFlWgbDcfLGswOHYeGrHKzG9z6UYf01d9VFMfZxPM1xZSg==
+  dependencies:
+    ansi-styles "^4.1.0"
+    supports-color "^7.1.0"
+
 chardet@^0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/chardet/-/chardet-0.7.0.tgz#90094849f0937f2eedc2425d0d28a9e5f0cbad9e"
@@ -194,6 +202,11 @@ cli-cursor@^3.1.0:
   integrity sha512-I/zHAwsKf9FqGoXM4WWRACob9+SNukZTd94DWF57E4toouRulbCxcUh6RKUEOQlYTHJnzkPMySvPNaaSLNfLZw==
   dependencies:
     restore-cursor "^3.1.0"
+
+cli-spinner@^0.2.10:
+  version "0.2.10"
+  resolved "https://registry.yarnpkg.com/cli-spinner/-/cli-spinner-0.2.10.tgz#f7d617a36f5c47a7bc6353c697fc9338ff782a47"
+  integrity sha512-U0sSQ+JJvSLi1pAYuJykwiA8Dsr15uHEy85iCJ6A+0DjVxivr3d+N2Wjvodeg89uP5K6TswFkKBfAD7B3YSn/Q==
 
 cli-width@^2.0.0:
   version "2.2.1"
@@ -340,6 +353,11 @@ domutils@1.5:
   dependencies:
     dom-serializer "0"
     domelementtype "1"
+
+emoji-progress@^0.1.4:
+  version "0.1.4"
+  resolved "https://registry.yarnpkg.com/emoji-progress/-/emoji-progress-0.1.4.tgz#29a88dad3a3b366a9418133d3222e09186aeffbb"
+  integrity sha512-Yyr+qAGIGJdE8HevA6GhkoMMXdsGwLM1MOUz5vDnJJ76oCivOaFgfujce4JpHsEnurZw/ecGu7MkcU8ziHCMHg==
 
 emoji-regex@^8.0.0:
   version "8.0.0"
@@ -579,6 +597,11 @@ jshint@*:
     shelljs "0.3.x"
     strip-json-comments "1.0.x"
 
+lodash.toarray@^4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/lodash.toarray/-/lodash.toarray-4.4.0.tgz#24c4bfcd6b2fba38bfd0594db1179d8e9b656561"
+  integrity sha1-JMS/zWsvuji/0FlNsRedjptlZWE=
+
 lodash@^4.17.15, lodash@~4.17.11:
   version "4.17.21"
   resolved "https://registry.yarnpkg.com/lodash/-/lodash-4.17.21.tgz#679591c564c3bffaae8454cf0b3df370c3d6911c"
@@ -646,6 +669,13 @@ nice-try@^1.0.4:
   version "1.0.5"
   resolved "https://registry.yarnpkg.com/nice-try/-/nice-try-1.0.5.tgz#a3378a7696ce7d223e88fc9b764bd7ef1089e366"
   integrity sha512-1nh45deeb5olNY7eX82BkPO7SSxR5SSYJiPTrTdFUVYwAl8CKMA5N9PjTYkHiRjisVcxcQ1HXdLhx2qxxJzLNQ==
+
+node-emoji@^1.10.0:
+  version "1.10.0"
+  resolved "https://registry.yarnpkg.com/node-emoji/-/node-emoji-1.10.0.tgz#8886abd25d9c7bb61802a658523d1f8d2a89b2da"
+  integrity sha512-Yt3384If5H6BYGVHiHwTL+99OzJKHhgp82S8/dktEK73T26BazdgZ4JZh92xSVtGNJvz9UbXdNAc5hcrXV42vw==
+  dependencies:
+    lodash.toarray "^4.4.0"
 
 node-fetch@^2.6.1:
   version "2.6.1"
@@ -725,6 +755,15 @@ precommit-hook@^3.0.0:
   dependencies:
     git-validate "^2.0.0"
     jshint "*"
+
+progress-logs@^0.0.2:
+  version "0.0.2"
+  resolved "https://registry.yarnpkg.com/progress-logs/-/progress-logs-0.0.2.tgz#18a79da56a2f75905de9ec4655986d26d9f84af4"
+  integrity sha512-MzZ9kfQL9fQ1bY1enaQBXmEQLZod2FfCbMzLjOxOXEULoNHcBr0OWr/cBLPdemXpBN84GHjcCdiISueQD0bztw==
+  dependencies:
+    chalk "^4.1.1"
+    cli-spinner "^0.2.10"
+    node-emoji "^1.10.0"
 
 pump@^3.0.0:
   version "3.0.0"

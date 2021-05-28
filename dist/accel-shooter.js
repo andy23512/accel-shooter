@@ -26,6 +26,7 @@ const clickup_1 = require("./clickup");
 const config_1 = require("./config");
 const daily_progress_1 = require("./daily-progress");
 const gitlab_1 = require("./gitlab");
+const progress_log_1 = require("./progress-log");
 const tracker_1 = require("./tracker");
 const utils_1 = require("./utils");
 const actionAlias = {
@@ -78,12 +79,27 @@ const actions = {
                     choices: config_1.CONFIG.ToDoConfigChoices,
                 },
             ]);
+            const p = new progress_log_1.CustomProgressLog("Start", [
+                "Get ClickUp Task",
+                "Set ClickUp Task Status",
+                "Render Todo List",
+                "Create GitLab Issue",
+                "Create GitLab Branch",
+                "Create GitLab Merge Request",
+                "Add Daily Progress Entry",
+                "Copy Sync Command",
+                "Add Tracker Item",
+                "Do Git Fetch and Checkout",
+            ]);
             const gitLab = new gitlab_1.GitLab(answers.gitLabProject.id);
             const clickUp = new clickup_1.ClickUp(answers.clickUpTaskId);
+            p.start();
             const clickUpTask = yield clickUp.getTask();
             const clickUpTaskUrl = clickUpTask["url"];
             const gitLabIssueTitle = answers.issueTitle;
+            p.next();
             yield clickUp.setTaskStatus("in progress");
+            p.next();
             const todoConfigMap = {};
             answers.todoConfig.forEach((c) => {
                 todoConfigMap[c] = true;
@@ -92,20 +108,28 @@ const actions = {
                 encoding: "utf-8",
             });
             const endingTodo = mustache_1.render(template, todoConfigMap);
+            p.next();
             const gitLabIssue = yield gitLab.createIssue(gitLabIssueTitle, `${clickUpTaskUrl}\n\n${endingTodo}`);
             const gitLabIssueNumber = gitLabIssue.iid;
+            p.next();
             const gitLabBranch = yield gitLab.createBranch(gitlab_1.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(gitLabIssueNumber, gitLabIssueTitle, answers.clickUpTaskId));
+            p.next();
             yield gitLab.createMergeRequest(gitLabIssueNumber, gitLabIssueTitle, gitLabBranch.name);
+            p.next();
             const dailyProgressString = `* (In Progress) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
             new daily_progress_1.DailyProgress().addProgressToBuffer(dailyProgressString);
+            p.next();
             const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabIssueNumber}`;
             clipboardy_1.default.writeSync(syncCommand);
             console.log(`Sync command: "${syncCommand}" Copied!`);
+            p.next();
             new tracker_1.Tracker().addItem(answers.gitLabProject.name, gitLabIssueNumber);
+            p.next();
             process.chdir(answers.gitLabProject.path.replace("~", os_1.default.homedir()));
             yield utils_1.promiseSpawn("git", ["fetch"]);
             yield sleep(1000);
             yield utils_1.promiseSpawn("git", ["checkout", gitLabBranch.name]);
+            p.end(0);
         });
     },
     open() {
