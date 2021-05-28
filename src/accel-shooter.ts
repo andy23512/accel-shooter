@@ -13,7 +13,7 @@ import { CONFIG } from "./config";
 import { DailyProgress } from "./daily-progress";
 import {
   getGitLabBranchNameFromIssueNumberAndTitleAndTaskId,
-  GitLab
+  GitLab,
 } from "./gitlab";
 import { Tracker } from "./tracker";
 import {
@@ -21,7 +21,7 @@ import {
   getGitLabProjectConfigByName,
   normalizeGitLabIssueChecklist,
   promiseSpawn,
-  updateTaskStatusInDp
+  updateTaskStatusInDp,
 } from "./utils";
 
 const actionAlias: { [key: string]: string } = {
@@ -90,7 +90,7 @@ const actions: { [key: string]: () => Promise<any> } = {
     const endingTodo = render(template, todoConfigMap);
     const gitLabIssue = await gitLab.createIssue(
       gitLabIssueTitle,
-      `${clickUpTaskUrl}\n\n${endingTodo}`,
+      `${clickUpTaskUrl}\n\n${endingTodo}`
     );
     const gitLabIssueNumber = gitLabIssue.iid;
     const gitLabBranch = await gitLab.createBranch(
@@ -103,7 +103,7 @@ const actions: { [key: string]: () => Promise<any> } = {
     await gitLab.createMergeRequest(
       gitLabIssueNumber,
       gitLabIssueTitle,
-      gitLabBranch.name,
+      gitLabBranch.name
     );
     const dailyProgressString = `* (In Progress) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
     new DailyProgress().addProgressToBuffer(dailyProgressString);
@@ -154,8 +154,19 @@ const actions: { [key: string]: () => Promise<any> } = {
   },
   async sync() {
     configReadline();
-    const gitLabProjectId = getGitLabProjectIdFromArgv();
+    const gitLabProject = getGitLabProjectFromArgv();
+    if (!gitLabProject) {
+      return;
+    }
+    const gitLabProjectId = gitLabProject.id;
     const issueNumber = process.argv[4];
+    const gitLab = new GitLab(gitLabProject.id);
+    const mergeRequests = await gitLab.listMergeRequestsWillCloseIssueOnMerge(
+      issueNumber
+    );
+    const lastMergeRequest = mergeRequests[mergeRequests.length - 1];
+    process.chdir(gitLabProject.path.replace("~", os.homedir()));
+    await promiseSpawn("git", ["checkout", lastMergeRequest.source_branch]);
     setUpSyncHotkey(gitLabProjectId, issueNumber);
     await syncChecklist(gitLabProjectId, issueNumber, true);
     setIntervalAsync(async () => {
@@ -289,7 +300,7 @@ const actions: { [key: string]: () => Promise<any> } = {
   if (actions[action]) {
     await actions[action]();
   } else if (CONFIG.WebPageAlias[action]) {
-    open(CONFIG.WebPageAlias[action])
+    open(CONFIG.WebPageAlias[action]);
   } else {
     throw Error(`Action ${action} is not supported.`);
   }
@@ -305,6 +316,10 @@ function getGitLabProjectIdByName(name: string) {
 
 function getGitLabProjectIdFromArgv() {
   return getGitLabProjectIdByName(process.argv[3]);
+}
+
+function getGitLabProjectFromArgv() {
+  return getGitLabProjectConfigByName(process.argv[3]);
 }
 
 function sleep(ms: number) {

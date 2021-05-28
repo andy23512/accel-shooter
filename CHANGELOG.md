@@ -8,6 +8,10 @@
 
 ### Fixed
 
+## [1.20.0] - 2021-05-28
+### Changed
+- Check out branch when execute sync
+
 ## [1.19.0] - 2021-05-27
 ### Changed
 - Remove gitlab label choice

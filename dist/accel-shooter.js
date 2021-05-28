@@ -148,8 +148,17 @@ const actions = {
     sync() {
         return __awaiter(this, void 0, void 0, function* () {
             actions_1.configReadline();
-            const gitLabProjectId = getGitLabProjectIdFromArgv();
+            const gitLabProject = getGitLabProjectFromArgv();
+            if (!gitLabProject) {
+                return;
+            }
+            const gitLabProjectId = gitLabProject.id;
             const issueNumber = process.argv[4];
+            const gitLab = new gitlab_1.GitLab(gitLabProject.id);
+            const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
+            const lastMergeRequest = mergeRequests[mergeRequests.length - 1];
+            process.chdir(gitLabProject.path.replace("~", os_1.default.homedir()));
+            yield utils_1.promiseSpawn("git", ["checkout", lastMergeRequest.source_branch]);
             actions_1.setUpSyncHotkey(gitLabProjectId, issueNumber);
             yield actions_1.syncChecklist(gitLabProjectId, issueNumber, true);
             dynamic_1.setIntervalAsync(() => __awaiter(this, void 0, void 0, function* () {
@@ -297,6 +306,9 @@ function getGitLabProjectIdByName(name) {
 }
 function getGitLabProjectIdFromArgv() {
     return getGitLabProjectIdByName(process.argv[3]);
+}
+function getGitLabProjectFromArgv() {
+    return utils_1.getGitLabProjectConfigByName(process.argv[3]);
 }
 function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
