@@ -8,6 +8,10 @@
 
 ### Fixed
 
+## [1.21.0] - 2021-05-28
+### Changed
+- Add log for start command
+
 ## [1.20.0] - 2021-05-28
 ### Changed
 - Check out branch when execute sync
