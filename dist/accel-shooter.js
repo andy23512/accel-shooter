@@ -25,6 +25,7 @@ const actions_1 = require("./actions");
 const clickup_1 = require("./clickup");
 const config_1 = require("./config");
 const daily_progress_1 = require("./daily-progress");
+const emoji_progress_1 = require("./emoji-progress");
 const gitlab_1 = require("./gitlab");
 const progress_log_1 = require("./progress-log");
 const tracker_1 = require("./tracker");
@@ -183,10 +184,11 @@ const actions = {
             const lastMergeRequest = mergeRequests[mergeRequests.length - 1];
             process.chdir(gitLabProject.path.replace("~", os_1.default.homedir()));
             yield utils_1.promiseSpawn("git", ["checkout", lastMergeRequest.source_branch]);
-            actions_1.setUpSyncHotkey(gitLabProjectId, issueNumber);
-            yield actions_1.syncChecklist(gitLabProjectId, issueNumber, true);
+            const ep = new emoji_progress_1.CustomEmojiProgress(0, 100);
+            actions_1.setUpSyncHotkey(gitLabProjectId, issueNumber, ep);
+            yield actions_1.syncChecklist(gitLabProjectId, issueNumber, ep, true);
             dynamic_1.setIntervalAsync(() => __awaiter(this, void 0, void 0, function* () {
-                yield actions_1.syncChecklist(gitLabProjectId, issueNumber);
+                yield actions_1.syncChecklist(gitLabProjectId, issueNumber, ep, false);
             }), config_1.CONFIG.SyncIntervalInMinutes * 60 * 1000);
         });
     },
@@ -217,6 +219,13 @@ const actions = {
             const gitLabProjectId = getGitLabProjectIdFromArgv();
             const issueNumber = process.argv[4];
             const gitLab = new gitlab_1.GitLab(gitLabProjectId);
+            const p = new progress_log_1.CustomProgressLog("End", [
+                "Get GitLab Issue",
+                "Get GitLab Merge Request",
+                "Update GitLab Merge Request Ready Status and Assignee",
+                "Update ClickUp Task Status",
+            ]);
+            p.start();
             const issue = yield gitLab.getIssue(issueNumber);
             const gitLabChecklistText = issue.description
                 .replace(/https:\/\/app.clickup.com\/t\/\w+/g, "")
@@ -227,15 +236,18 @@ const actions = {
                 console.log("This task has uncompleted todo(s).");
                 return;
             }
+            p.next();
             const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
             const mergeRequest = mergeRequests[mergeRequests.length - 1];
+            p.next();
             yield gitLab.markMergeRequestAsReadyAndAddAssignee(mergeRequest);
+            p.next();
             const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
             if (clickUpTaskId) {
                 const clickUp = new clickup_1.ClickUp(clickUpTaskId);
                 yield clickUp.setTaskStatus("in review");
             }
-            console.log("End command is executed successfully");
+            p.end(0);
         });
     },
     revertEnd() {
@@ -243,16 +255,26 @@ const actions = {
             const gitLabProjectId = getGitLabProjectIdFromArgv();
             const issueNumber = process.argv[4];
             const gitLab = new gitlab_1.GitLab(gitLabProjectId);
+            const p = new progress_log_1.CustomProgressLog("End", [
+                "Get GitLab Issue",
+                "Get GitLab Merge Request",
+                "Update GitLab Merge Request Ready Status and Assignee",
+                "Update ClickUp Task Status",
+            ]);
+            p.start();
             const issue = yield gitLab.getIssue(issueNumber);
+            p.next();
             const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
             const mergeRequest = mergeRequests[mergeRequests.length - 1];
+            p.next();
             yield gitLab.markMergeRequestAsUnreadyAndSetAssigneeToSelf(mergeRequest);
+            p.next();
             const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
             if (clickUpTaskId) {
                 const clickUp = new clickup_1.ClickUp(clickUpTaskId);
                 yield clickUp.setTaskStatus("in progress");
             }
-            console.log("Revert end command is executed successfully");
+            p.end(0);
         });
     },
     crossChecklist() {

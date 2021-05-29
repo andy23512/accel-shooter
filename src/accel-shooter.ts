@@ -11,6 +11,7 @@ import { configReadline, setUpSyncHotkey, syncChecklist } from "./actions";
 import { ClickUp } from "./clickup";
 import { CONFIG } from "./config";
 import { DailyProgress } from "./daily-progress";
+import { CustomEmojiProgress } from "./emoji-progress";
 import {
   getGitLabBranchNameFromIssueNumberAndTitleAndTaskId,
   GitLab,
@@ -191,10 +192,11 @@ const actions: { [key: string]: () => Promise<any> } = {
     const lastMergeRequest = mergeRequests[mergeRequests.length - 1];
     process.chdir(gitLabProject.path.replace("~", os.homedir()));
     await promiseSpawn("git", ["checkout", lastMergeRequest.source_branch]);
-    setUpSyncHotkey(gitLabProjectId, issueNumber);
-    await syncChecklist(gitLabProjectId, issueNumber, true);
+    const ep = new CustomEmojiProgress(0, 100);
+    setUpSyncHotkey(gitLabProjectId, issueNumber, ep);
+    await syncChecklist(gitLabProjectId, issueNumber, ep, true);
     setIntervalAsync(async () => {
-      await syncChecklist(gitLabProjectId, issueNumber);
+      await syncChecklist(gitLabProjectId, issueNumber, ep, false);
     }, CONFIG.SyncIntervalInMinutes * 60 * 1000);
   },
   async copy() {
@@ -220,6 +222,13 @@ const actions: { [key: string]: () => Promise<any> } = {
     const gitLabProjectId = getGitLabProjectIdFromArgv();
     const issueNumber = process.argv[4];
     const gitLab = new GitLab(gitLabProjectId);
+    const p = new CustomProgressLog("End", [
+      "Get GitLab Issue",
+      "Get GitLab Merge Request",
+      "Update GitLab Merge Request Ready Status and Assignee",
+      "Update ClickUp Task Status",
+    ]);
+    p.start();
     const issue = await gitLab.getIssue(issueNumber);
     const gitLabChecklistText = issue.description
       .replace(/https:\/\/app.clickup.com\/t\/\w+/g, "")
@@ -233,34 +242,47 @@ const actions: { [key: string]: () => Promise<any> } = {
       console.log("This task has uncompleted todo(s).");
       return;
     }
+    p.next();
     const mergeRequests = await gitLab.listMergeRequestsWillCloseIssueOnMerge(
       issueNumber
     );
     const mergeRequest = mergeRequests[mergeRequests.length - 1];
+    p.next();
     await gitLab.markMergeRequestAsReadyAndAddAssignee(mergeRequest);
+    p.next();
     const clickUpTaskId = getClickUpTaskIdFromGitLabIssue(issue);
     if (clickUpTaskId) {
       const clickUp = new ClickUp(clickUpTaskId);
       await clickUp.setTaskStatus("in review");
     }
-    console.log("End command is executed successfully");
+    p.end(0);
   },
   async revertEnd() {
     const gitLabProjectId = getGitLabProjectIdFromArgv();
     const issueNumber = process.argv[4];
     const gitLab = new GitLab(gitLabProjectId);
+    const p = new CustomProgressLog("End", [
+      "Get GitLab Issue",
+      "Get GitLab Merge Request",
+      "Update GitLab Merge Request Ready Status and Assignee",
+      "Update ClickUp Task Status",
+    ]);
+    p.start();
     const issue = await gitLab.getIssue(issueNumber);
+    p.next();
     const mergeRequests = await gitLab.listMergeRequestsWillCloseIssueOnMerge(
       issueNumber
     );
     const mergeRequest = mergeRequests[mergeRequests.length - 1];
+    p.next();
     await gitLab.markMergeRequestAsUnreadyAndSetAssigneeToSelf(mergeRequest);
+    p.next();
     const clickUpTaskId = getClickUpTaskIdFromGitLabIssue(issue);
     if (clickUpTaskId) {
       const clickUp = new ClickUp(clickUpTaskId);
       await clickUp.setTaskStatus("in progress");
     }
-    console.log("Revert end command is executed successfully");
+    p.end(0);
   },
 
   async crossChecklist() {

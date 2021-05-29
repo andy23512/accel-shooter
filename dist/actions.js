@@ -43,7 +43,7 @@ function getSyncChecklistActions(oldClickUpChecklist, newGitLabChecklist) {
     return actions;
 }
 exports.getSyncChecklistActions = getSyncChecklistActions;
-function syncChecklist(gitLabProjectId, issueNumber, openPage) {
+function syncChecklist(gitLabProjectId, issueNumber, ep, openPage) {
     return __awaiter(this, void 0, void 0, function* () {
         const gitLab = new gitlab_1.GitLab(gitLabProjectId);
         const issue = yield gitLab.getIssue(issueNumber);
@@ -57,12 +57,12 @@ function syncChecklist(gitLabProjectId, issueNumber, openPage) {
         const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
         if (clickUpTaskId) {
             const gitLabChecklistText = issue.description
-                .replace(/https:\/\/app.clickup.com\/t\/\w+/g, '')
+                .replace(/https:\/\/app.clickup.com\/t\/\w+/g, "")
                 .trim();
             const gitLabNormalizedChecklist = utils_1.normalizeGitLabIssueChecklist(gitLabChecklistText);
             const clickUp = new clickup_1.ClickUp(clickUpTaskId);
             const clickUpTask = yield clickUp.getTask();
-            const clickUpChecklistTitle = `GitLab synced checklist [${gitLabProjectId.replace('%2F', '/')}]`;
+            const clickUpChecklistTitle = `GitLab synced checklist [${gitLabProjectId.replace("%2F", "/")}]`;
             let clickUpChecklist = clickUpTask.checklists.find((c) => c.name === clickUpChecklistTitle);
             if (!clickUpChecklist) {
                 clickUpChecklist = (yield clickUp.createChecklist(clickUpChecklistTitle))
@@ -86,14 +86,17 @@ function syncChecklist(gitLabProjectId, issueNumber, openPage) {
             const status = Object.entries(actions)
                 .map(([action, items]) => {
                 const s = items.length.toString();
-                const n = items.length === 1 ? 'item' : 'items';
+                const n = items.length === 1 ? "item" : "items";
                 return `${s} ${n} ${action}d`;
             })
-                .join(', ');
+                .join(", ");
             const fullCompleteMessage = gitLabNormalizedChecklist.every((item) => item.checked)
-                ? '(Completed)'
-                : '';
-            console.log(`[${gitLabProjectId.replace('%2F', '/')} #${issueNumber}] ${new Date().toLocaleString()} ${status} ${fullCompleteMessage}`);
+                ? "(Completed)"
+                : "";
+            const checkedCount = gitLabNormalizedChecklist.filter((item) => item.checked).length;
+            const totalCount = gitLabNormalizedChecklist.length;
+            ep.setValueAndEndValue(checkedCount, totalCount);
+            console.log(`[${gitLabProjectId.replace("%2F", "/")} #${issueNumber}] ${new Date().toLocaleString()} ${status} ${fullCompleteMessage}`);
         }
     });
 }
@@ -102,20 +105,20 @@ function configReadline() {
     readline_1.default.emitKeypressEvents(process.stdin);
 }
 exports.configReadline = configReadline;
-function setUpSyncHotkey(gitLabProjectId, issueNumber) {
+function setUpSyncHotkey(gitLabProjectId, issueNumber, ep) {
     process.stdin.setRawMode(true);
-    process.stdin.on('keypress', (_, key) => __awaiter(this, void 0, void 0, function* () {
+    process.stdin.on("keypress", (_, key) => __awaiter(this, void 0, void 0, function* () {
         var _a;
-        if (key.ctrl && key.name === 'c') {
+        if (key.ctrl && key.name === "c") {
             process.exit();
         }
-        else if (!key.ctrl && !key.meta && !key.shift && key.name === 's') {
+        else if (!key.ctrl && !key.meta && !key.shift && key.name === "s") {
             console.log(`You pressed the sync key`);
-            syncChecklist(gitLabProjectId, issueNumber);
+            syncChecklist(gitLabProjectId, issueNumber, ep);
         }
-        else if (!key.ctrl && !key.meta && !key.shift && key.name === 'e') {
+        else if (!key.ctrl && !key.meta && !key.shift && key.name === "e") {
             console.log(`You pressed the end key`);
-            yield syncChecklist(gitLabProjectId, issueNumber);
+            yield syncChecklist(gitLabProjectId, issueNumber, ep);
             const projectName = (_a = utils_1.getGitLabProjectConfigById(gitLabProjectId)) === null || _a === void 0 ? void 0 : _a.name;
             const syncCommand = `acst end ${projectName} ${issueNumber}`;
             clipboardy_1.default.writeSync(syncCommand);

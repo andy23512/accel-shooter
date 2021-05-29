@@ -1,15 +1,16 @@
-import clipboardy from 'clipboardy';
-import open from 'open';
-import readline from 'readline';
-import { ClickUp } from './clickup';
-import { GitLab } from './gitlab';
-import { NormalizedChecklist } from './models/models';
+import clipboardy from "clipboardy";
+import open from "open";
+import readline from "readline";
+import { ClickUp } from "./clickup";
+import { CustomEmojiProgress } from "./emoji-progress";
+import { GitLab } from "./gitlab";
+import { NormalizedChecklist } from "./models/models";
 import {
   getClickUpTaskIdFromGitLabIssue,
   getGitLabProjectConfigById,
   normalizeClickUpChecklist,
   normalizeGitLabIssueChecklist,
-} from './utils';
+} from "./utils";
 
 export function getSyncChecklistActions(
   oldClickUpChecklist: NormalizedChecklist,
@@ -48,6 +49,7 @@ export function getSyncChecklistActions(
 export async function syncChecklist(
   gitLabProjectId: string,
   issueNumber: string,
+  ep: CustomEmojiProgress,
   openPage?: boolean
 ) {
   const gitLab = new GitLab(gitLabProjectId);
@@ -62,16 +64,15 @@ export async function syncChecklist(
   const clickUpTaskId = getClickUpTaskIdFromGitLabIssue(issue);
   if (clickUpTaskId) {
     const gitLabChecklistText = issue.description
-      .replace(/https:\/\/app.clickup.com\/t\/\w+/g, '')
+      .replace(/https:\/\/app.clickup.com\/t\/\w+/g, "")
       .trim();
-    const gitLabNormalizedChecklist = normalizeGitLabIssueChecklist(
-      gitLabChecklistText
-    );
+    const gitLabNormalizedChecklist =
+      normalizeGitLabIssueChecklist(gitLabChecklistText);
     const clickUp = new ClickUp(clickUpTaskId);
     const clickUpTask = await clickUp.getTask();
     const clickUpChecklistTitle = `GitLab synced checklist [${gitLabProjectId.replace(
-      '%2F',
-      '/'
+      "%2F",
+      "/"
     )}]`;
     let clickUpChecklist = clickUpTask.checklists.find(
       (c: any) => c.name === clickUpChecklistTitle
@@ -119,19 +120,24 @@ export async function syncChecklist(
     const status = Object.entries(actions)
       .map(([action, items]) => {
         const s = items.length.toString();
-        const n = items.length === 1 ? 'item' : 'items';
+        const n = items.length === 1 ? "item" : "items";
         return `${s} ${n} ${action}d`;
       })
-      .join(', ');
+      .join(", ");
     const fullCompleteMessage = gitLabNormalizedChecklist.every(
       (item) => item.checked
     )
-      ? '(Completed)'
-      : '';
+      ? "(Completed)"
+      : "";
+    const checkedCount = gitLabNormalizedChecklist.filter(
+      (item) => item.checked
+    ).length;
+    const totalCount = gitLabNormalizedChecklist.length;
+    ep.setValueAndEndValue(checkedCount, totalCount);
     console.log(
       `[${gitLabProjectId.replace(
-        '%2F',
-        '/'
+        "%2F",
+        "/"
       )} #${issueNumber}] ${new Date().toLocaleString()} ${status} ${fullCompleteMessage}`
     );
   }
@@ -141,17 +147,21 @@ export function configReadline() {
   readline.emitKeypressEvents(process.stdin);
 }
 
-export function setUpSyncHotkey(gitLabProjectId: string, issueNumber: string) {
+export function setUpSyncHotkey(
+  gitLabProjectId: string,
+  issueNumber: string,
+  ep: CustomEmojiProgress
+) {
   process.stdin.setRawMode(true);
-  process.stdin.on('keypress', async (_, key) => {
-    if (key.ctrl && key.name === 'c') {
+  process.stdin.on("keypress", async (_, key) => {
+    if (key.ctrl && key.name === "c") {
       process.exit();
-    } else if (!key.ctrl && !key.meta && !key.shift && key.name === 's') {
+    } else if (!key.ctrl && !key.meta && !key.shift && key.name === "s") {
       console.log(`You pressed the sync key`);
-      syncChecklist(gitLabProjectId, issueNumber);
-    } else if (!key.ctrl && !key.meta && !key.shift && key.name === 'e') {
+      syncChecklist(gitLabProjectId, issueNumber, ep);
+    } else if (!key.ctrl && !key.meta && !key.shift && key.name === "e") {
       console.log(`You pressed the end key`);
-      await syncChecklist(gitLabProjectId, issueNumber);
+      await syncChecklist(gitLabProjectId, issueNumber, ep);
       const projectName = getGitLabProjectConfigById(gitLabProjectId)?.name;
       const syncCommand = `acst end ${projectName} ${issueNumber}`;
       clipboardy.writeSync(syncCommand);

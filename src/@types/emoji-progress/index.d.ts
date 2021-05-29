@@ -16,6 +16,7 @@ declare module "emoji-progress" {
   }
   class EmojiProgress {
     public value: number;
+    public endValue: number;
     constructor(options: Partial<EmojiProgressOption>);
 
     public start(): void;
