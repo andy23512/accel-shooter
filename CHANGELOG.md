@@ -3,11 +3,17 @@
 ## [Unrealeased] - yyyy-mm-dd
 
 ### Added
-- Add progress for other command
 
 ### Changed
 
 ### Fixed
+
+## [1.22.0] - 2021-05-30
+### Added
+- Implement slow version check command
+
+### Changed
+- Add progress for other command
 
 ## [1.21.0] - 2021-05-28
 ### Changed
