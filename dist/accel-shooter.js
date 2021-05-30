@@ -391,14 +391,8 @@ const actions = {
             }
             if (backendChanges.length) {
                 process.chdir(path_1.join(gitLabProject.path).replace("~", os_1.default.homedir()));
-                p = new progress_log_1.CustomProgressLog("Backend", [
-                    "test (unittest)",
-                    "test (pytest)",
-                    "check print",
-                ]);
+                p = new progress_log_1.CustomProgressLog("Backend", ["test", "check print"]);
                 p.start();
-                result = yield utils_1.promiseSpawn("docker-compose", ["exec", "-T", "backend", "./manage.py", "test", "--noinput"], "pipe");
-                p.next(result.code);
                 result = yield utils_1.promiseSpawn("docker-compose", ["exec", "-T", "backend", "pytest", "."], "pipe");
                 p.next(result.code);
                 const hasPrint = backendChanges.some((c) => c.diff.includes("print("))

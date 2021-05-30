@@ -421,18 +421,8 @@ const actions: { [key: string]: () => Promise<any> } = {
     }
     if (backendChanges.length) {
       process.chdir(join(gitLabProject.path).replace("~", os.homedir()));
-      p = new CustomProgressLog("Backend", [
-        "test (unittest)",
-        "test (pytest)",
-        "check print",
-      ]);
+      p = new CustomProgressLog("Backend", ["test", "check print"]);
       p.start();
-      result = await promiseSpawn(
-        "docker-compose",
-        ["exec", "-T", "backend", "./manage.py", "test", "--noinput"],
-        "pipe"
-      );
-      p.next(result.code);
       result = await promiseSpawn(
         "docker-compose",
         ["exec", "-T", "backend", "pytest", "."],
