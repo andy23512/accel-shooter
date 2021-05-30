@@ -20,7 +20,7 @@ declare module "progress-logs" {
   }
   class ProgressLog {
     private queue;
-    private currentLogItem;
+    protected currentLogItem: any;
     private tracker;
     private readonly options;
     constructor(options: ProgressLogOptions);
@@ -38,16 +38,16 @@ declare module "progress-logs" {
     /**
      * Start run the log queue
      */
-    start(): void;
+    public start(): void;
     /**
      * run next log item in the log queue
      */
-    next(): void;
+    public next(): void;
     /**
      * Stop the log queue with exit code
      * @param exitCode exit status code
      */
-    end(exitCode: StopExitCode): void;
+    public end(exitCode: StopExitCode): void;
     /**
      * set global log item's emoji
      * @param options: the emoji options eg: { success: 'heart' }
@@ -76,7 +76,7 @@ declare module "progress-logs" {
     /**
      * Run log queue start the log item
      */
-    private run;
+    protected run(): void;
   }
   export = ProgressLog;
 }

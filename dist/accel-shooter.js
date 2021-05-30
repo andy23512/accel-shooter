@@ -19,6 +19,7 @@ const inquirer_1 = __importDefault(require("inquirer"));
 const mustache_1 = require("mustache");
 const open_1 = __importDefault(require("open"));
 const os_1 = __importDefault(require("os"));
+const path_1 = require("path");
 const dynamic_1 = require("set-interval-async/dynamic");
 const untildify_1 = __importDefault(require("untildify"));
 const actions_1 = require("./actions");
@@ -327,6 +328,84 @@ const actions = {
             }
             const tasks = (yield clickup_1.ClickUp.getRTVTasks(team.id, user.id)).tasks;
             console.log(tasks.map((t) => `- ${t.name} (${t.url})`).join("\n"));
+        });
+    },
+    check() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let p;
+            let result;
+            const gitLabProject = getGitLabProjectFromArgv();
+            if (!gitLabProject) {
+                return;
+            }
+            const gitLabProjectId = gitLabProject.id;
+            const issueNumber = process.argv[4];
+            const gitLab = new gitlab_1.GitLab(gitLabProjectId);
+            const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
+            const mergeRequest = mergeRequests[mergeRequests.length - 1];
+            const mergeRequestChanges = yield gitLab.getMergeRequestChanges(mergeRequest.iid);
+            process.chdir(gitLabProject.path.replace("~", os_1.default.homedir()));
+            yield utils_1.promiseSpawn("git", ["checkout", mergeRequest.source_branch]);
+            p = new progress_log_1.CustomProgressLog("Global", [
+                "Check Non-Pushed Changes",
+                "Check Conflict",
+            ]);
+            p.start();
+            result = yield utils_1.promiseSpawn("git", ["status"], "pipe");
+            result.code =
+                result.stdout.includes("Your branch is up to date with") &&
+                    result.stdout.includes("nothing to commit, working tree clean")
+                    ? 0
+                    : 1;
+            p.next(result.code);
+            const fullMergeRequest = yield gitLab.getMergeRequest(mergeRequest.iid);
+            const isConflict = fullMergeRequest.has_conflicts;
+            p.next(isConflict ? 1 : 0);
+            const changes = mergeRequestChanges.changes;
+            const frontendChanges = changes.filter((c) => c.old_path.startsWith("frontend") || c.new_path.startsWith("frontend"));
+            const backendChanges = changes.filter((c) => c.old_path.startsWith("backend") || c.new_path.startsWith("backend"));
+            if (frontendChanges.length) {
+                p = new progress_log_1.CustomProgressLog("Frontend", [
+                    "lint",
+                    "test",
+                    "prod",
+                    "check console.log",
+                    "check long import",
+                ]);
+                process.chdir(path_1.join(gitLabProject.path).replace("~", os_1.default.homedir()));
+                p.start();
+                result = yield utils_1.promiseSpawn("yarn", ["lint"], "pipe");
+                p.next(result.code);
+                result = yield utils_1.promiseSpawn("docker-compose", ["exec", "frontend", "yarn", "jest", "--coverage=false"], "pipe");
+                p.next(result.code);
+                yield utils_1.promiseSpawn("docker-compose", ["exec", "frontend", "yarn", "prod"], "pipe");
+                p.next(result.code);
+                const hasConsole = frontendChanges.some((c) => c.diff.includes("console.log"))
+                    ? 1
+                    : 0;
+                p.next(hasConsole);
+                const hasLong = frontendChanges.some((c) => c.diff.includes("../../"))
+                    ? 1
+                    : 0;
+                p.next(hasLong);
+            }
+            if (backendChanges.length) {
+                process.chdir(path_1.join(gitLabProject.path).replace("~", os_1.default.homedir()));
+                p = new progress_log_1.CustomProgressLog("Backend", [
+                    "test (unittest)",
+                    "test (pytest)",
+                    "check print",
+                ]);
+                p.start();
+                result = yield utils_1.promiseSpawn("docker-compose", ["exec", "-T", "backend", "./manage.py", "test", "--noinput"], "pipe");
+                p.next(result.code);
+                result = yield utils_1.promiseSpawn("docker-compose", ["exec", "-T", "backend", "pytest", "."], "pipe");
+                p.next(result.code);
+                const hasPrint = backendChanges.some((c) => c.diff.includes("print("))
+                    ? 1
+                    : 0;
+                p.next(hasPrint);
+            }
         });
     },
 };

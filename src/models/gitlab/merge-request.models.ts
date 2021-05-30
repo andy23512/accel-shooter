@@ -1,7 +1,7 @@
-import { Author } from './author.models';
-import { Label } from './label.models';
-import { References } from './references.models';
-import { TimeStats } from './time-stats.models';
+import { Author } from "./author.models";
+import { Label } from "./label.models";
+import { References } from "./references.models";
+import { TimeStats } from "./time-stats.models";
 
 export interface MergeRequest {
   id: number;
@@ -122,20 +122,6 @@ interface Timestats {
   human_total_time_spent?: any;
 }
 
-interface Milestone {
-  id: number;
-  iid: number;
-  project_id: number;
-  title: string;
-  description: string;
-  state: string;
-  created_at: string;
-  updated_at: string;
-  due_date: string;
-  start_date: string;
-  web_url: string;
-}
-
 interface Assignee {
   name: string;
   username: string;
@@ -147,4 +133,81 @@ interface Assignee {
 
 interface User {
   can_merge: boolean;
+}
+
+export interface MergeRequestChanges {
+  id: number;
+  iid: number;
+  project_id: number;
+  title: string;
+  state: string;
+  created_at: string;
+  updated_at: string;
+  target_branch: string;
+  source_branch: string;
+  upvotes: number;
+  downvotes: number;
+  author: Author;
+  assignee: Author;
+  assignees: Author[];
+  reviewers: Author[];
+  source_project_id: number;
+  target_project_id: number;
+  labels: any[];
+  description: string;
+  work_in_progress: boolean;
+  milestone: Milestone;
+  merge_when_pipeline_succeeds: boolean;
+  merge_status: string;
+  subscribed: boolean;
+  sha: string;
+  merge_commit_sha?: any;
+  squash_commit_sha?: any;
+  user_notes_count: number;
+  changes_count: string;
+  should_remove_source_branch: boolean;
+  force_remove_source_branch: boolean;
+  squash: boolean;
+  web_url: string;
+  references: References;
+  discussion_locked: boolean;
+  time_stats: Timestats;
+  task_completion_status: Taskcompletionstatus;
+  changes: Change[];
+  overflow: boolean;
+}
+
+interface Change {
+  old_path: string;
+  new_path: string;
+  a_mode: string;
+  b_mode: string;
+  diff: string;
+  new_file: boolean;
+  renamed_file: boolean;
+  deleted_file: boolean;
+}
+
+interface Taskcompletionstatus {
+  count: number;
+  completed_count: number;
+}
+
+interface Timestats {
+  time_estimate: number;
+  total_time_spent: number;
+  human_time_estimate?: any;
+  human_total_time_spent?: any;
+}
+
+interface Milestone {
+  id: number;
+  iid: number;
+  project_id: number;
+  title: string;
+  description: string;
+  state: string;
+  created_at: string;
+  updated_at: string;
+  due_date?: any;
 }

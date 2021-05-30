@@ -139,12 +139,35 @@ function normalizeClickUpChecklist(checklist) {
     }));
 }
 exports.normalizeClickUpChecklist = normalizeClickUpChecklist;
-function promiseSpawn(command, args) {
+function promiseSpawn(command, args, stdio = "inherit") {
     return __awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
-            child_process_1.default
-                .spawn(command, args, { shell: true, stdio: "inherit" })
-                .on("close", (code) => (code === 0 ? resolve(1) : reject()));
+            var _a, _b;
+            const child = child_process_1.default.spawn(command, args, {
+                shell: true,
+                stdio,
+            });
+            if (stdio === "pipe") {
+                let stdout = "";
+                let stderr = "";
+                (_a = child.stdout) === null || _a === void 0 ? void 0 : _a.on("data", (d) => {
+                    const output = d.toString();
+                    stdout += output;
+                });
+                (_b = child.stderr) === null || _b === void 0 ? void 0 : _b.on("data", (d) => {
+                    const output = d.toString();
+                    stderr += output;
+                });
+                child.on("close", (code) => {
+                    resolve({ stdout, stderr, code });
+                });
+            }
+            else {
+                child.on("close", (code) => (code === 0 ? resolve(1) : reject()));
+            }
+            child.on("error", (err) => {
+                console.log(err);
+            });
         });
     });
 }

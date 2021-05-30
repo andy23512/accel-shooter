@@ -1,4 +1,4 @@
-import childProcess from "child_process";
+import childProcess, { StdioOptions } from "child_process";
 import fetch, { RequestInfo, RequestInit, Response } from "node-fetch";
 import querystring from "querystring";
 import { titleCase } from "./case-utils";
@@ -153,11 +153,46 @@ export function normalizeClickUpChecklist(
     }));
 }
 
-export async function promiseSpawn(command: string, args: string[]) {
+export async function promiseSpawn(
+  command: string,
+  args: string[],
+  stdio?: "pipe"
+): Promise<{ stdout: string; stderr: string; code: number }>;
+export async function promiseSpawn(
+  command: string,
+  args: string[],
+  stdio?: "inherit"
+): Promise<number>;
+export async function promiseSpawn(
+  command: string,
+  args: string[],
+  stdio: StdioOptions = "inherit"
+) {
   return new Promise((resolve, reject) => {
-    childProcess
-      .spawn(command, args, { shell: true, stdio: "inherit" })
-      .on("close", (code) => (code === 0 ? resolve(1) : reject()));
+    const child = childProcess.spawn(command, args, {
+      shell: true,
+      stdio,
+    });
+    if (stdio === "pipe") {
+      let stdout = "";
+      let stderr = "";
+      child.stdout?.on("data", (d) => {
+        const output = d.toString();
+        stdout += output;
+      });
+      child.stderr?.on("data", (d) => {
+        const output = d.toString();
+        stderr += output;
+      });
+      child.on("close", (code) => {
+        resolve({ stdout, stderr, code });
+      });
+    } else {
+      child.on("close", (code) => (code === 0 ? resolve(1) : reject()));
+    }
+    child.on("error", (err) => {
+      console.log(err);
+    });
   });
 }
 
