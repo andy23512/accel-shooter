@@ -8,6 +8,10 @@
 
 ### Fixed
 
+## [1.22.2] - 2021-05-31
+### Changed
+- Remove additional output from commands
+
 ## [1.22.1] - 2021-05-31
 ### Fixed
 - Fix sync progress not work bug
