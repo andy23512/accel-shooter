@@ -177,7 +177,7 @@ export interface MergeRequestChanges {
   overflow: boolean;
 }
 
-interface Change {
+export interface Change {
   old_path: string;
   new_path: string;
   a_mode: string;
