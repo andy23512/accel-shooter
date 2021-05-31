@@ -88,6 +88,11 @@ export async function syncChecklist(
       clickUpNormalizedChecklist,
       gitLabNormalizedChecklist
     );
+    const checkedCount = gitLabNormalizedChecklist.filter(
+      (item) => item.checked
+    ).length;
+    const totalCount = gitLabNormalizedChecklist.length;
+    ep.setValueAndEndValue(checkedCount, totalCount);
     if (
       actions.update.length + actions.create.length + actions.delete.length ===
       0
@@ -129,11 +134,6 @@ export async function syncChecklist(
     )
       ? "(Completed)"
       : "";
-    const checkedCount = gitLabNormalizedChecklist.filter(
-      (item) => item.checked
-    ).length;
-    const totalCount = gitLabNormalizedChecklist.length;
-    ep.setValueAndEndValue(checkedCount, totalCount);
     console.log(
       `[${gitLabProjectId.replace(
         "%2F",

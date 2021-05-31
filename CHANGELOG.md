@@ -8,6 +8,10 @@
 
 ### Fixed
 
+## [1.22.1] - 2021-05-31
+### Fixed
+- Fix sync progress not work bug
+
 ## [1.22.0] - 2021-05-30
 ### Added
 - Implement slow version check command

@@ -70,6 +70,9 @@ function syncChecklist(gitLabProjectId, issueNumber, ep, openPage) {
             }
             const clickUpNormalizedChecklist = utils_1.normalizeClickUpChecklist(clickUpChecklist.items);
             const actions = getSyncChecklistActions(clickUpNormalizedChecklist, gitLabNormalizedChecklist);
+            const checkedCount = gitLabNormalizedChecklist.filter((item) => item.checked).length;
+            const totalCount = gitLabNormalizedChecklist.length;
+            ep.setValueAndEndValue(checkedCount, totalCount);
             if (actions.update.length + actions.create.length + actions.delete.length ===
                 0) {
                 return;
@@ -93,9 +96,6 @@ function syncChecklist(gitLabProjectId, issueNumber, ep, openPage) {
             const fullCompleteMessage = gitLabNormalizedChecklist.every((item) => item.checked)
                 ? "(Completed)"
                 : "";
-            const checkedCount = gitLabNormalizedChecklist.filter((item) => item.checked).length;
-            const totalCount = gitLabNormalizedChecklist.length;
-            ep.setValueAndEndValue(checkedCount, totalCount);
             console.log(`[${gitLabProjectId.replace("%2F", "/")} #${issueNumber}] ${new Date().toLocaleString()} ${status} ${fullCompleteMessage}`);
         }
     });
