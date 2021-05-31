@@ -41,11 +41,7 @@ function fetchRetry(url, opts) {
                     throw e;
                 }
                 if (opts === null || opts === void 0 ? void 0 : opts.pause) {
-                    if (!(opts === null || opts === void 0 ? void 0 : opts.silent))
-                        console.log("pausing..");
                     yield sleep(opts.pause);
-                    if (!(opts === null || opts === void 0 ? void 0 : opts.silent))
-                        console.log("done pausing...");
                 }
             }
         }

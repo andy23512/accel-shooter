@@ -23,7 +23,6 @@ async function fetchRetry(
     retry?: number;
     callback?: (retry?: number) => any;
     pause?: number;
-    silent?: boolean;
   }
 ) {
   let retry = (opts && opts.retry) || 3;
@@ -40,9 +39,7 @@ async function fetchRetry(
       }
 
       if (opts?.pause) {
-        if (!opts?.silent) console.log("pausing..");
         await sleep(opts.pause);
-        if (!opts?.silent) console.log("done pausing...");
       }
     }
   }

@@ -104,12 +104,6 @@ class Tracker extends base_1.BaseFileRef {
                     const commit = yield gitLab.getCommit(mergeRequest.merge_commit_sha);
                     const deployedCommitDate = date_fns_1.parseISO(this.lastDeployedCommitMap[projectName].created_at);
                     const mergeCommitDate = date_fns_1.parseISO(commit.created_at);
-                    console.log({
-                        projectName,
-                        issueNumber,
-                        deployedCommitDate,
-                        mergeCommitDate,
-                    });
                     const compareTime = date_fns_1.compareAsc(deployedCommitDate, mergeCommitDate);
                     if (compareTime === 1 || compareTime === 0) {
                         const list = yield clickup_1.ClickUp.getList(clickUpTask.list.id);

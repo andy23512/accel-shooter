@@ -110,12 +110,6 @@ export class Tracker extends BaseFileRef {
           this.lastDeployedCommitMap[projectName].created_at
         );
         const mergeCommitDate = parseISO(commit.created_at);
-        console.log({
-          projectName,
-          issueNumber,
-          deployedCommitDate,
-          mergeCommitDate,
-        });
         const compareTime = compareAsc(deployedCommitDate, mergeCommitDate);
         if (compareTime === 1 || compareTime === 0) {
           const list = await ClickUp.getList(clickUpTask.list.id);

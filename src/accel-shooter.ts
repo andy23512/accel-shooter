@@ -192,7 +192,11 @@ const actions: { [key: string]: () => Promise<any> } = {
     );
     const lastMergeRequest = mergeRequests[mergeRequests.length - 1];
     process.chdir(gitLabProject.path.replace("~", os.homedir()));
-    await promiseSpawn("git", ["checkout", lastMergeRequest.source_branch]);
+    await promiseSpawn(
+      "git",
+      ["checkout", lastMergeRequest.source_branch],
+      "pipe"
+    );
     const ep = new CustomEmojiProgress(0, 100);
     setUpSyncHotkey(gitLabProjectId, issueNumber, ep);
     await syncChecklist(gitLabProjectId, issueNumber, ep, true);
