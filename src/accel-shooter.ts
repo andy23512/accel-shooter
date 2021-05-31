@@ -9,6 +9,7 @@ import { join } from "path";
 import { setIntervalAsync } from "set-interval-async/dynamic";
 import untildify from "untildify";
 import { configReadline, setUpSyncHotkey, syncChecklist } from "./actions";
+import { Checker } from "./checker";
 import { ClickUp } from "./clickup";
 import { CONFIG } from "./config";
 import { DailyProgress } from "./daily-progress";
@@ -438,6 +439,16 @@ const actions: { [key: string]: () => Promise<any> } = {
         : 0;
       p.next(hasPrint);
     }
+  },
+
+  async newCheck() {
+    const gitLabProject = getGitLabProjectFromArgv();
+    if (!gitLabProject) {
+      return;
+    }
+    const issueNumber = process.argv[4];
+    const checker = new Checker(gitLabProject, issueNumber);
+    await checker.start();
   },
 };
 

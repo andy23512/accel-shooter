@@ -23,6 +23,7 @@ const path_1 = require("path");
 const dynamic_1 = require("set-interval-async/dynamic");
 const untildify_1 = __importDefault(require("untildify"));
 const actions_1 = require("./actions");
+const checker_1 = require("./checker");
 const clickup_1 = require("./clickup");
 const config_1 = require("./config");
 const daily_progress_1 = require("./daily-progress");
@@ -400,6 +401,17 @@ const actions = {
                     : 0;
                 p.next(hasPrint);
             }
+        });
+    },
+    newCheck() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const gitLabProject = getGitLabProjectFromArgv();
+            if (!gitLabProject) {
+                return;
+            }
+            const issueNumber = process.argv[4];
+            const checker = new checker_1.Checker(gitLabProject, issueNumber);
+            yield checker.start();
         });
     },
 };
