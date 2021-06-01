@@ -116,7 +116,6 @@ const actions: { [key: string]: () => Promise<any> } = {
     const gitLabBranch = await gitLab.createBranch(
       getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(
         gitLabIssueNumber,
-        gitLabIssueTitle,
         answers.clickUpTaskId
       )
     );

@@ -14,16 +14,15 @@ import {
   MergeRequestChanges,
 } from "./models/gitlab/merge-request.models";
 import { Pipeline } from "./models/gitlab/pipeline.models";
-import { callApiFactory, dashify } from "./utils";
+import { callApiFactory } from "./utils";
 
 const callApi = callApiFactory("GitLab");
 
 export function getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(
   issueNumber: number,
-  issueTitle: string,
   clickUpTaskId: string
 ) {
-  return `${issueNumber}_CU-${clickUpTaskId}_${dashify(issueTitle)}`;
+  return `${issueNumber}_CU-${clickUpTaskId}}`;
 }
 
 export class GitLab {
