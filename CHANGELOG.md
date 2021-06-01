@@ -5,6 +5,9 @@
 ### Added
 
 ### Changed
+- Show gitlab project name in dp
+- Reduce start command output
+- Do submodule update in start command
 
 ### Fixed
 

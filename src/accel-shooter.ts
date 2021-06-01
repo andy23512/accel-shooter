@@ -126,19 +126,23 @@ const actions: { [key: string]: () => Promise<any> } = {
       gitLabBranch.name
     );
     p.next();
-    const dailyProgressString = `* (In Progress) ${gitLabIssue.title} (#${gitLabIssueNumber}, ${clickUpTaskUrl})`;
+    const dailyProgressString = `* (In Progress) ${gitLabIssue.title} (${answers.gitLabProject.name} ${gitLabIssueNumber}, ${clickUpTaskUrl})`;
     new DailyProgress().addProgressToBuffer(dailyProgressString);
     p.next();
     const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabIssueNumber}`;
     clipboardy.writeSync(syncCommand);
-    console.log(`Sync command: "${syncCommand}" Copied!`);
     p.next();
     new Tracker().addItem(answers.gitLabProject.name, gitLabIssueNumber);
     p.next();
     process.chdir(answers.gitLabProject.path.replace("~", os.homedir()));
-    await promiseSpawn("git", ["fetch"]);
+    await promiseSpawn("git", ["fetch"], "pipe");
     await sleep(1000);
-    await promiseSpawn("git", ["checkout", gitLabBranch.name]);
+    await promiseSpawn("git", ["checkout", gitLabBranch.name], "pipe");
+    await promiseSpawn(
+      "git",
+      ["submodule", "update", "--init", "--recursive"],
+      "pipe"
+    );
     p.end(0);
   },
   async open() {
