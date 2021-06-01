@@ -5,11 +5,14 @@
 ### Added
 
 ### Changed
+
+### Fixed
+
+## [1.24.0] - 2021-06-01
+### Changed
 - Show gitlab project name in dp
 - Reduce start command output
 - Do submodule update in start command
-
-### Fixed
 
 ## [1.23.0] - 2021-06-01
 ### Changed
