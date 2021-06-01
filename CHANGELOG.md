@@ -8,6 +8,10 @@
 
 ### Fixed
 
+## [1.23.0] - 2021-06-01
+### Changed
+- Reduce branch name
+
 ## [1.22.2] - 2021-05-31
 ### Changed
 - Remove additional output from commands
