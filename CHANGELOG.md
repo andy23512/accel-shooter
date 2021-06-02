@@ -8,6 +8,10 @@
 
 ### Fixed
 
+## [1.24.1] - 2021-06-02
+### Fixed
+- Remove additional symbol in branch name
+
 ## [1.24.0] - 2021-06-01
 ### Changed
 - Show gitlab project name in dp
