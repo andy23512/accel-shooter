@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.titleCase = void 0;
 const KEEP_LOWERCASE_WORD_LIST = [
     'and',
     'as',

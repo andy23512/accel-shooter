@@ -22,7 +22,7 @@ export function getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(
   issueNumber: number,
   clickUpTaskId: string
 ) {
-  return `${issueNumber}_CU-${clickUpTaskId}}`;
+  return `${issueNumber}_CU-${clickUpTaskId}`;
 }
 
 export class GitLab {

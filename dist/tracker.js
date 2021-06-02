@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Tracker = void 0;
 const child_process_1 = __importDefault(require("child_process"));
 const date_fns_1 = require("date-fns");
 const fs_1 = require("fs");

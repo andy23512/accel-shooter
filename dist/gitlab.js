@@ -9,11 +9,12 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.GitLab = exports.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId = void 0;
 const config_1 = require("./config");
 const utils_1 = require("./utils");
 const callApi = utils_1.callApiFactory("GitLab");
 function getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(issueNumber, clickUpTaskId) {
-    return `${issueNumber}_CU-${clickUpTaskId}}`;
+    return `${issueNumber}_CU-${clickUpTaskId}`;
 }
 exports.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId = getGitLabBranchNameFromIssueNumberAndTitleAndTaskId;
 class GitLab {

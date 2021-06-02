@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.textToTree = exports.TreeNode = void 0;
 class TreeNode {
     constructor(name, _level) {
         this.name = name;
