@@ -1,9 +1,25 @@
 import os from "os";
-import { concat, defer, of } from "rxjs";
+import { combineLatest, concat, defer, interval, of } from "rxjs";
+import { map } from "rxjs/operators";
 import { GitLab } from "./gitlab";
 import { Change, MergeRequest } from "./models/gitlab/merge-request.models";
 import { GitLabProject } from "./models/models";
 import { promiseSpawn } from "./utils";
+
+const SPINNER = [
+  "🕛",
+  "🕐",
+  "🕑",
+  "🕒",
+  "🕓",
+  "🕔",
+  "🕕",
+  "🕖",
+  "🕗",
+  "🕘",
+  "🕙",
+  "🕚",
+];
 
 interface CheckContext {
   mergeRequest: MergeRequest;
@@ -16,15 +32,34 @@ class CheckItem {
   constructor(
     public group: string,
     public name: string,
-    public run: (
-      context: CheckContext
-    ) => Promise<{ stdout?: string; stderr?: string; code: number }>
+    public run: (context: CheckContext) => Promise<{
+      stdout?: string;
+      stderr?: string;
+      code: number;
+    }>
   ) {}
 
   public getObs(context: CheckContext) {
     return concat(
-      of({ code: -1 }),
-      defer(() => this.run(context))
+      of({
+        group: this.group,
+        name: this.name,
+        code: -1,
+      }),
+      defer(() => this.run(context)).pipe(
+        map((d: any) => {
+          const result: {
+            group?: string;
+            name?: string;
+            code: number;
+            stdout?: string;
+            stderr?: string;
+          } = d;
+          result.group = this.group;
+          result.name = this.name;
+          return result;
+        })
+      )
     );
   }
 }
@@ -51,21 +86,21 @@ const items: CheckItem[] = [
   new CheckItem("Frontend", "Check Lint", async () => {
     return promiseSpawn(
       "docker-compose",
-      ["exec", "frontend", "yarn", "lint"],
+      ["exec", "-T", "frontend", "yarn", "lint"],
       "pipe"
     );
   }),
   new CheckItem("Frontend", "Check Test", async () => {
     return promiseSpawn(
       "docker-compose",
-      ["exec", "frontend", "yarn", "jest", "--coverage=false"],
+      ["exec", "-T", "frontend", "yarn", "jest", "--coverage=false"],
       "pipe"
     );
   }),
   new CheckItem("Frontend", "Check Prod", async () => {
     return promiseSpawn(
       "docker-compose",
-      ["exec", "frontend", "yarn", "prod"],
+      ["exec", "-T", "frontend", "yarn", "prod"],
       "pipe"
     );
   }),
@@ -96,7 +131,7 @@ const items: CheckItem[] = [
       "pipe"
     );
   }),
-  new CheckItem("Backend", "Check print", async ({ backendChanges }) => {
+  new CheckItem("Backend", "Check Print", async ({ backendChanges }) => {
     return {
       code: backendChanges.some((c) => c.diff.includes("print(")) ? 1 : 0,
     };
@@ -148,5 +183,33 @@ export class Checker {
       frontendChanges,
       backendChanges,
     };
+    const obss = runningItems.map((r) => r.getObs(context));
+    const checkStream = combineLatest(obss);
+    const s = combineLatest([interval(60), checkStream]).subscribe(
+      ([count, statusList]) => {
+        console.log(
+          statusList.map((s, index) => {
+            let emoji = "";
+            switch (s.code) {
+              case -1:
+                emoji = SPINNER[count % SPINNER.length];
+                break;
+              case 0:
+                emoji = index % 2 === 0 ? "🐰" : "🥕";
+                break;
+              case 1:
+                emoji = "❌";
+                break;
+              default:
+                emoji = "🔴";
+            }
+            return `${emoji} [${s.group}] ${s.name}`;
+          })
+        );
+        if (statusList.every((s) => s.code !== -1)) {
+          s.unsubscribe();
+        }
+      }
+    );
   }
 }

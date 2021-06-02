@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.setUpSyncHotkey = exports.configReadline = exports.syncChecklist = exports.getSyncChecklistActions = void 0;
 const clipboardy_1 = __importDefault(require("clipboardy"));
 const open_1 = __importDefault(require("open"));
 const readline_1 = __importDefault(require("readline"));

@@ -12,10 +12,26 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Checker = void 0;
 const os_1 = __importDefault(require("os"));
 const rxjs_1 = require("rxjs");
+const operators_1 = require("rxjs/operators");
 const gitlab_1 = require("./gitlab");
 const utils_1 = require("./utils");
+const SPINNER = [
+    "🕛",
+    "🕐",
+    "🕑",
+    "🕒",
+    "🕓",
+    "🕔",
+    "🕕",
+    "🕖",
+    "🕗",
+    "🕘",
+    "🕙",
+    "🕚",
+];
 class CheckItem {
     constructor(group, name, run) {
         this.group = group;
@@ -23,7 +39,16 @@ class CheckItem {
         this.run = run;
     }
     getObs(context) {
-        return rxjs_1.concat(rxjs_1.of({ code: -1 }), rxjs_1.defer(() => this.run(context)));
+        return rxjs_1.concat(rxjs_1.of({
+            group: this.group,
+            name: this.name,
+            code: -1,
+        }), rxjs_1.defer(() => this.run(context)).pipe(operators_1.map((d) => {
+            const result = d;
+            result.group = this.group;
+            result.name = this.name;
+            return result;
+        })));
     }
 }
 const items = [
@@ -42,13 +67,13 @@ const items = [
         return { code: isConflict ? 1 : 0 };
     })),
     new CheckItem("Frontend", "Check Lint", () => __awaiter(void 0, void 0, void 0, function* () {
-        return utils_1.promiseSpawn("docker-compose", ["exec", "frontend", "yarn", "lint"], "pipe");
+        return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "frontend", "yarn", "lint"], "pipe");
     })),
     new CheckItem("Frontend", "Check Test", () => __awaiter(void 0, void 0, void 0, function* () {
-        return utils_1.promiseSpawn("docker-compose", ["exec", "frontend", "yarn", "jest", "--coverage=false"], "pipe");
+        return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "frontend", "yarn", "jest", "--coverage=false"], "pipe");
     })),
     new CheckItem("Frontend", "Check Prod", () => __awaiter(void 0, void 0, void 0, function* () {
-        return utils_1.promiseSpawn("docker-compose", ["exec", "frontend", "yarn", "prod"], "pipe");
+        return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "frontend", "yarn", "prod"], "pipe");
     })),
     new CheckItem("Frontend", "Check console.log", ({ frontendChanges }) => __awaiter(void 0, void 0, void 0, function* () {
         return {
@@ -65,7 +90,7 @@ const items = [
     new CheckItem("Backend", "Check Test", () => __awaiter(void 0, void 0, void 0, function* () {
         return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "backend", "pytest", "."], "pipe");
     })),
-    new CheckItem("Backend", "Check print", ({ backendChanges }) => __awaiter(void 0, void 0, void 0, function* () {
+    new CheckItem("Backend", "Check Print", ({ backendChanges }) => __awaiter(void 0, void 0, void 0, function* () {
         return {
             code: backendChanges.some((c) => c.diff.includes("print(")) ? 1 : 0,
         };
@@ -101,6 +126,30 @@ class Checker {
                 frontendChanges,
                 backendChanges,
             };
+            const obss = runningItems.map((r) => r.getObs(context));
+            const checkStream = rxjs_1.combineLatest(obss);
+            const s = rxjs_1.combineLatest([rxjs_1.interval(60), checkStream]).subscribe(([count, statusList]) => {
+                console.log(statusList.map((s, index) => {
+                    let emoji = "";
+                    switch (s.code) {
+                        case -1:
+                            emoji = SPINNER[count % SPINNER.length];
+                            break;
+                        case 0:
+                            emoji = index % 2 === 0 ? "🐰" : "🥕";
+                            break;
+                        case 1:
+                            emoji = "❌";
+                            break;
+                        default:
+                            emoji = "🔴";
+                    }
+                    return `${emoji} [${s.group}] ${s.name}`;
+                }));
+                if (statusList.every((s) => s.code !== -1)) {
+                    s.unsubscribe();
+                }
+            });
         });
     }
 }

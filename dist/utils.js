@@ -12,6 +12,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabIssue = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = exports.normalizeClickUpChecklist = exports.normalizeGitLabIssueChecklist = exports.dashify = exports.callApiFactory = void 0;
 const child_process_1 = __importDefault(require("child_process"));
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const querystring_1 = __importDefault(require("querystring"));

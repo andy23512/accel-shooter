@@ -3,6 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.CONFIG = exports.getConfig = exports.getConfigPath = void 0;
 const fs_1 = require("fs");
 const untildify_1 = __importDefault(require("untildify"));
 function getConfigPath() {
