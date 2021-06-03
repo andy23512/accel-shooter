@@ -8,6 +8,7 @@ import {
   User,
 } from "./models/gitlab.models";
 import { Commit } from "./models/gitlab/commit.models";
+import { Compare } from "./models/gitlab/compare.models";
 import { Job } from "./models/gitlab/job.models";
 import {
   FullMergeRequest,
@@ -91,6 +92,18 @@ export class GitLab {
     return callApi<Job[]>(
       "get",
       `/projects/${this.projectId}/pipelines/${pipelineId}/jobs`
+    );
+  }
+
+  public getCompare(from: string, to: string) {
+    return callApi<Compare>(
+      "get",
+      `/projects/${this.projectId}/repository/compare`,
+      {
+        from,
+        to,
+        straight: true,
+      }
     );
   }
 

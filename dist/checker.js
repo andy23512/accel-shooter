@@ -104,6 +104,32 @@ const items = [
             code: backendChanges.some((c) => c.diff.includes("print(")) ? 1 : 0,
         };
     })),
+    new CheckItem("Backend", "Check Migration Conflict", ({ mergeRequest, backendChanges, gitLab }) => __awaiter(void 0, void 0, void 0, function* () {
+        if (!backendChanges.some((c) => c.new_path.includes("migrations"))) {
+            return { code: 0 };
+        }
+        const branchName = mergeRequest.source_branch;
+        const defaultBranch = yield gitLab.getDefaultBranchName();
+        const compare = yield gitLab.getCompare(defaultBranch, branchName);
+        const migrationDiffs = compare.diffs.filter((d) => (d.new_file || d.deleted_file) && d.new_path.includes("migration"));
+        const plusFiles = new Set(migrationDiffs
+            .filter((d) => d.new_file)
+            .map((d) => {
+            const match = d.new_path.match(/backend\/(\w+)\/migrations\/(\d+)/);
+            return match ? match[1] + "_" + match[2] : null;
+        })
+            .filter(Boolean));
+        const minusFiles = new Set(migrationDiffs
+            .filter((d) => d.deleted_file)
+            .map((d) => {
+            const match = d.new_path.match(/backend\/(\w+)\/migrations\/(\d+)/);
+            return match ? match[1] + "_" + match[2] : null;
+        })
+            .filter(Boolean));
+        return {
+            code: [...plusFiles].filter((f) => minusFiles.has(f)).length > 0 ? 1 : 0,
+        };
+    })),
 ];
 class Checker {
     constructor(gitLabProject, issueNumber) {

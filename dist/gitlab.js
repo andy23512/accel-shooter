@@ -61,6 +61,13 @@ class GitLab {
     listPipelineJobs(pipelineId) {
         return callApi("get", `/projects/${this.projectId}/pipelines/${pipelineId}/jobs`);
     }
+    getCompare(from, to) {
+        return callApi("get", `/projects/${this.projectId}/repository/compare`, {
+            from,
+            to,
+            straight: true,
+        });
+    }
     listPipelines(query) {
         return __awaiter(this, void 0, void 0, function* () {
             query.ref = query.ref || (yield this.getDefaultBranchName());
