@@ -160,7 +160,7 @@ export class Checker {
       mergeRequest.iid
     );
     process.chdir(this.gitLabProject.path.replace("~", os.homedir()));
-    await promiseSpawn("git", ["checkout", mergeRequest.source_branch]);
+    await promiseSpawn("git", ["checkout", mergeRequest.source_branch], "pipe");
     const changes = mergeRequestChanges.changes;
     const frontendChanges = changes.filter(
       (c) =>
@@ -185,26 +185,32 @@ export class Checker {
     };
     const obss = runningItems.map((r) => r.getObs(context));
     const checkStream = combineLatest(obss);
+    process.stdout.write(runningItems.map((r) => "").join("\n"));
     const s = combineLatest([interval(60), checkStream]).subscribe(
       ([count, statusList]) => {
-        console.log(
-          statusList.map((s, index) => {
-            let emoji = "";
-            switch (s.code) {
-              case -1:
-                emoji = SPINNER[count % SPINNER.length];
-                break;
-              case 0:
-                emoji = index % 2 === 0 ? "🐰" : "🥕";
-                break;
-              case 1:
-                emoji = "❌";
-                break;
-              default:
-                emoji = "🔴";
-            }
-            return `${emoji} [${s.group}] ${s.name}`;
-          })
+        process.stdout.moveCursor(0, -statusList.length + 1);
+        process.stdout.cursorTo(0);
+        process.stdout.clearScreenDown();
+        process.stdout.write(
+          statusList
+            .map((s, index) => {
+              let emoji = "";
+              switch (s.code) {
+                case -1:
+                  emoji = SPINNER[count % SPINNER.length];
+                  break;
+                case 0:
+                  emoji = index % 2 === 0 ? "🐰" : "🥕";
+                  break;
+                case 1:
+                  emoji = "❌";
+                  break;
+                default:
+                  emoji = "🔴";
+              }
+              return `${emoji} [${s.group}] ${s.name}`;
+            })
+            .join("\n")
         );
         if (statusList.every((s) => s.code !== -1)) {
           s.unsubscribe();

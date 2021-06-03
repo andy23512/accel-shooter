@@ -109,7 +109,7 @@ class Checker {
             const mergeRequest = mergeRequests[mergeRequests.length - 1];
             const mergeRequestChanges = yield this.gitLab.getMergeRequestChanges(mergeRequest.iid);
             process.chdir(this.gitLabProject.path.replace("~", os_1.default.homedir()));
-            yield utils_1.promiseSpawn("git", ["checkout", mergeRequest.source_branch]);
+            yield utils_1.promiseSpawn("git", ["checkout", mergeRequest.source_branch], "pipe");
             const changes = mergeRequestChanges.changes;
             const frontendChanges = changes.filter((c) => c.old_path.startsWith("frontend") || c.new_path.startsWith("frontend"));
             const backendChanges = changes.filter((c) => c.old_path.startsWith("backend") || c.new_path.startsWith("backend"));
@@ -128,8 +128,13 @@ class Checker {
             };
             const obss = runningItems.map((r) => r.getObs(context));
             const checkStream = rxjs_1.combineLatest(obss);
+            process.stdout.write(runningItems.map((r) => "").join("\n"));
             const s = rxjs_1.combineLatest([rxjs_1.interval(60), checkStream]).subscribe(([count, statusList]) => {
-                console.log(statusList.map((s, index) => {
+                process.stdout.moveCursor(0, -statusList.length + 1);
+                process.stdout.cursorTo(0);
+                process.stdout.clearScreenDown();
+                process.stdout.write(statusList
+                    .map((s, index) => {
                     let emoji = "";
                     switch (s.code) {
                         case -1:
@@ -145,7 +150,8 @@ class Checker {
                             emoji = "🔴";
                     }
                     return `${emoji} [${s.group}] ${s.name}`;
-                }));
+                })
+                    .join("\n"));
                 if (statusList.every((s) => s.code !== -1)) {
                     s.unsubscribe();
                 }
