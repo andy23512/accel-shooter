@@ -6,9 +6,13 @@
 
 ### Changed
 
-- Let check command output log file
-
 ### Fixed
+
+## [1.28.0] - 2021-06-03
+
+### Changed
+
+- Let check command output log file
 
 ## [1.27.1] - 2021-06-03
 
