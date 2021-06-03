@@ -8,6 +8,12 @@
 
 ### Fixed
 
+## [1.29.1] - 2021-06-04
+
+## Fixed
+
+- Remove verified status item in track list
+
 ## [1.29.0] - 2021-06-04
 
 ### Added
