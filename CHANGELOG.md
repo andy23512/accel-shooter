@@ -8,6 +8,12 @@
 
 ### Fixed
 
+## [1.26.0] - 2021-06-03
+
+### Added
+
+- Support list based staging status
+
 ## [1.25.0] - 2021-06-03
 
 ### Changed
