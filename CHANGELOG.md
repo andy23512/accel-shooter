@@ -8,6 +8,12 @@
 
 ### Fixed
 
+## [1.27.0] - 2021-06-03
+
+### Added
+
+- Add check test unittest check item
+
 ## [1.26.0] - 2021-06-03
 
 ### Added
