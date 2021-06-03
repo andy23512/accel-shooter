@@ -8,18 +8,30 @@
 
 ### Fixed
 
+## [1.25.0] - 2021-06-03
+
+### Changed
+
+- Use new check
+
 ## [1.24.1] - 2021-06-02
+
 ### Fixed
+
 - Remove additional symbol in branch name
 
 ## [1.24.0] - 2021-06-01
+
 ### Changed
+
 - Show gitlab project name in dp
 - Reduce start command output
 - Do submodule update in start command
 
 ## [1.23.0] - 2021-06-01
+
 ### Changed
+
 - Reduce branch name
 
 ## [1.22.2] - 2021-05-31
