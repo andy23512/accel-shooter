@@ -87,7 +87,10 @@ const items = [
             code: frontendChanges.some((c) => c.diff.includes("../../")) ? 1 : 0,
         };
     })),
-    new CheckItem("Backend", "Check Test", () => __awaiter(void 0, void 0, void 0, function* () {
+    new CheckItem("Backend", "Check Test (unittest)", () => __awaiter(void 0, void 0, void 0, function* () {
+        return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "backend", "./manage.py", "test"], "pipe");
+    })),
+    new CheckItem("Backend", "Check Test (pytest)", () => __awaiter(void 0, void 0, void 0, function* () {
         return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "backend", "pytest", "."], "pipe");
     })),
     new CheckItem("Backend", "Check Print", ({ backendChanges }) => __awaiter(void 0, void 0, void 0, function* () {

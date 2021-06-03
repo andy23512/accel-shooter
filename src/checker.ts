@@ -124,7 +124,14 @@ const items: CheckItem[] = [
       };
     }
   ),
-  new CheckItem("Backend", "Check Test", async () => {
+  new CheckItem("Backend", "Check Test (unittest)", async () => {
+    return promiseSpawn(
+      "docker-compose",
+      ["exec", "-T", "backend", "./manage.py", "test"],
+      "pipe"
+    );
+  }),
+  new CheckItem("Backend", "Check Test (pytest)", async () => {
     return promiseSpawn(
       "docker-compose",
       ["exec", "-T", "backend", "pytest", "."],
