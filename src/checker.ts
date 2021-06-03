@@ -120,7 +120,11 @@ const items: CheckItem[] = [
     "Check long import",
     async ({ frontendChanges }) => {
       return {
-        code: frontendChanges.some((c) => c.diff.includes("../../")) ? 1 : 0,
+        code: frontendChanges.some(
+          (c) => c.new_path.endsWith(".ts") && c.diff.includes("../../lib/")
+        )
+          ? 1
+          : 0,
       };
     }
   ),
@@ -169,13 +173,11 @@ export class Checker {
     process.chdir(this.gitLabProject.path.replace("~", os.homedir()));
     await promiseSpawn("git", ["checkout", mergeRequest.source_branch], "pipe");
     const changes = mergeRequestChanges.changes;
-    const frontendChanges = changes.filter(
-      (c) =>
-        c.old_path.startsWith("frontend") || c.new_path.startsWith("frontend")
+    const frontendChanges = changes.filter((c) =>
+      c.new_path.startsWith("frontend")
     );
-    const backendChanges = changes.filter(
-      (c) =>
-        c.old_path.startsWith("backend") || c.new_path.startsWith("backend")
+    const backendChanges = changes.filter((c) =>
+      c.new_path.startsWith("backend")
     );
     let runningItems = items;
     if (frontendChanges.length === 0) {

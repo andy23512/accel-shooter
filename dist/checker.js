@@ -84,7 +84,9 @@ const items = [
     })),
     new CheckItem("Frontend", "Check long import", ({ frontendChanges }) => __awaiter(void 0, void 0, void 0, function* () {
         return {
-            code: frontendChanges.some((c) => c.diff.includes("../../")) ? 1 : 0,
+            code: frontendChanges.some((c) => c.new_path.endsWith(".ts") && c.diff.includes("../../lib/"))
+                ? 1
+                : 0,
         };
     })),
     new CheckItem("Backend", "Check Test (unittest)", () => __awaiter(void 0, void 0, void 0, function* () {
@@ -114,8 +116,8 @@ class Checker {
             process.chdir(this.gitLabProject.path.replace("~", os_1.default.homedir()));
             yield utils_1.promiseSpawn("git", ["checkout", mergeRequest.source_branch], "pipe");
             const changes = mergeRequestChanges.changes;
-            const frontendChanges = changes.filter((c) => c.old_path.startsWith("frontend") || c.new_path.startsWith("frontend"));
-            const backendChanges = changes.filter((c) => c.old_path.startsWith("backend") || c.new_path.startsWith("backend"));
+            const frontendChanges = changes.filter((c) => c.new_path.startsWith("frontend"));
+            const backendChanges = changes.filter((c) => c.new_path.startsWith("backend"));
             let runningItems = items;
             if (frontendChanges.length === 0) {
                 runningItems = items.filter((item) => item.group !== "Frontend");
