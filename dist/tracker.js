@@ -95,6 +95,9 @@ class Tracker extends base_1.BaseFileRef {
                     const stagingStatus = projectConfig.stagingStatus[list.name] ||
                         projectConfig.stagingStatus["*"];
                     yield clickUp.setTaskStatus(stagingStatus);
+                    if (stagingStatus === "verified") {
+                        this.closeItem(projectName, issueNumber);
+                    }
                     const message = `${projectName} #${issueNumber}: In Review -> ${stagingStatus}`;
                     child_process_1.default.execSync(`osascript -e 'display notification "${message}" with title "Accel Shooter"'`);
                     console.log(message);
