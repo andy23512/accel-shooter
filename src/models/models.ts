@@ -5,7 +5,7 @@ export interface GitLabProject {
   path: string;
   repo: string;
   id: string;
-  stagingStatus?: string;
+  stagingStatus?: Record<string, string>;
   deployedStatus?: Record<string, string>;
 }
 export interface Config {

@@ -90,8 +90,12 @@ export class Tracker extends BaseFileRef {
     if (projectConfig.stagingStatus && mergeRequest.state === "merged") {
       const clickUpTask = await clickUp.getTask();
       if (clickUpTask.status.status === "in review") {
-        await clickUp.setTaskStatus(projectConfig.stagingStatus);
-        const message = `${projectName} #${issueNumber}: In Review -> ${projectConfig.stagingStatus}`;
+        const list = await ClickUp.getList(clickUpTask.list.id);
+        const stagingStatus =
+          projectConfig.stagingStatus[list.name] ||
+          projectConfig.stagingStatus["*"];
+        await clickUp.setTaskStatus(stagingStatus);
+        const message = `${projectName} #${issueNumber}: In Review -> ${stagingStatus}`;
         childProcess.execSync(
           `osascript -e 'display notification "${message}" with title "Accel Shooter"'`
         );
