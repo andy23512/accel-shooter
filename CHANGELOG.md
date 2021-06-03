@@ -8,6 +8,12 @@
 
 ### Fixed
 
+## [1.29.0] - 2021-06-04
+
+### Added
+
+- Add check for migration conflict
+
 ## [1.28.0] - 2021-06-03
 
 ### Changed
