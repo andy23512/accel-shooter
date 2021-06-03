@@ -5,10 +5,10 @@ import inquirer from "inquirer";
 import { render } from "mustache";
 import open from "open";
 import os from "os";
-import { join } from "path";
 import { setIntervalAsync } from "set-interval-async/dynamic";
 import untildify from "untildify";
 import { configReadline, setUpSyncHotkey, syncChecklist } from "./actions";
+import { Checker } from "./checker";
 import { ClickUp } from "./clickup";
 import { CONFIG } from "./config";
 import { DailyProgress } from "./daily-progress";
@@ -349,98 +349,13 @@ const actions: { [key: string]: () => Promise<any> } = {
   },
 
   async check() {
-    let p;
-    let result;
     const gitLabProject = getGitLabProjectFromArgv();
     if (!gitLabProject) {
       return;
     }
-    const gitLabProjectId = gitLabProject.id;
     const issueNumber = process.argv[4];
-    const gitLab = new GitLab(gitLabProjectId);
-    const mergeRequests = await gitLab.listMergeRequestsWillCloseIssueOnMerge(
-      issueNumber
-    );
-    const mergeRequest = mergeRequests[mergeRequests.length - 1];
-    const mergeRequestChanges = await gitLab.getMergeRequestChanges(
-      mergeRequest.iid
-    );
-    process.chdir(gitLabProject.path.replace("~", os.homedir()));
-    await promiseSpawn("git", ["checkout", mergeRequest.source_branch]);
-    p = new CustomProgressLog("Global", [
-      "Check Non-Pushed Changes",
-      "Check Conflict",
-    ]);
-    p.start();
-    result = await promiseSpawn("git", ["status"], "pipe");
-    result.code =
-      result.stdout.includes("Your branch is up to date with") &&
-      result.stdout.includes("nothing to commit, working tree clean")
-        ? 0
-        : 1;
-    p.next(result.code);
-    const fullMergeRequest = await gitLab.getMergeRequest(mergeRequest.iid);
-    const isConflict = fullMergeRequest.has_conflicts;
-    p.next(isConflict ? 1 : 0);
-    const changes = mergeRequestChanges.changes;
-    const frontendChanges = changes.filter(
-      (c) =>
-        c.old_path.startsWith("frontend") || c.new_path.startsWith("frontend")
-    );
-    const backendChanges = changes.filter(
-      (c) =>
-        c.old_path.startsWith("backend") || c.new_path.startsWith("backend")
-    );
-    if (frontendChanges.length) {
-      p = new CustomProgressLog("Frontend", [
-        "lint",
-        "test",
-        "prod",
-        "check console.log",
-        "check long import",
-      ]);
-      process.chdir(join(gitLabProject.path).replace("~", os.homedir()));
-      p.start();
-      result = await promiseSpawn("yarn", ["lint"], "pipe");
-      p.next(result.code);
-      result = await promiseSpawn(
-        "docker-compose",
-        ["exec", "frontend", "yarn", "jest", "--coverage=false"],
-        "pipe"
-      );
-      p.next(result.code);
-      await promiseSpawn(
-        "docker-compose",
-        ["exec", "frontend", "yarn", "prod"],
-        "pipe"
-      );
-      p.next(result.code);
-      const hasConsole = frontendChanges.some((c) =>
-        c.diff.includes("console.log")
-      )
-        ? 1
-        : 0;
-      p.next(hasConsole);
-      const hasLong = frontendChanges.some((c) => c.diff.includes("../../"))
-        ? 1
-        : 0;
-      p.next(hasLong);
-    }
-    if (backendChanges.length) {
-      process.chdir(join(gitLabProject.path).replace("~", os.homedir()));
-      p = new CustomProgressLog("Backend", ["test", "check print"]);
-      p.start();
-      result = await promiseSpawn(
-        "docker-compose",
-        ["exec", "-T", "backend", "pytest", "."],
-        "pipe"
-      );
-      p.next(result.code);
-      const hasPrint = backendChanges.some((c) => c.diff.includes("print("))
-        ? 1
-        : 0;
-      p.next(hasPrint);
-    }
+    const checker = new Checker(gitLabProject, issueNumber);
+    await checker.start();
   },
 };
 

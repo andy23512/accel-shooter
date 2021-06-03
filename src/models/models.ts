@@ -1,16 +1,17 @@
 export type Site = "ClickUp" | "GitLab";
 export type HttpMethod = "get" | "post" | "put" | "delete";
+export interface GitLabProject {
+  name: string;
+  path: string;
+  repo: string;
+  id: string;
+  stagingStatus?: string;
+  deployedStatus?: Record<string, string>;
+}
 export interface Config {
   ClickUpToken: string;
   GitLabToken: string;
-  GitLabProjects: Array<{
-    name: string;
-    path: string;
-    repo: string;
-    id: string;
-    stagingStatus?: string;
-    deployedStatus?: Record<string, string>;
-  }>;
+  GitLabProjects: GitLabProject[];
   DailyProgressFile: string;
   TrackListFile: string;
   ToDoTemplate: string;
