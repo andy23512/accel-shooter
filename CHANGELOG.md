@@ -8,6 +8,12 @@
 
 ### Fixed
 
+## [1.27.1] - 2021-06-03
+
+### Fixed
+
+- Check only ts file and cross lib import in long path check
+
 ## [1.27.0] - 2021-06-03
 
 ### Added
