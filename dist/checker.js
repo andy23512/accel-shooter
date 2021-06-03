@@ -13,9 +13,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Checker = void 0;
+const fs_1 = require("fs");
 const os_1 = __importDefault(require("os"));
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
+const untildify_1 = __importDefault(require("untildify"));
 const gitlab_1 = require("./gitlab");
 const utils_1 = require("./utils");
 const SPINNER = [
@@ -43,6 +45,8 @@ class CheckItem {
             group: this.group,
             name: this.name,
             code: -1,
+            stdout: "",
+            stderr: "",
         }), rxjs_1.defer(() => this.run(context)).pipe(operators_1.map((d) => {
             const result = d;
             result.group = this.group;
@@ -159,6 +163,12 @@ class Checker {
                     .join("\n"));
                 if (statusList.every((s) => s.code !== -1)) {
                     s.unsubscribe();
+                    const nonSuccessStatusList = statusList.filter((s) => s.code !== 0);
+                    if (nonSuccessStatusList.length > 0) {
+                        fs_1.writeFile(untildify_1.default("~/ac-checker-log"), nonSuccessStatusList
+                            .map((s) => `[${s.group}] ${s.name} ${s.code}\n${s.stdout}\n${s.stderr}`)
+                            .join("\n\n"), () => { });
+                    }
                 }
             });
         });

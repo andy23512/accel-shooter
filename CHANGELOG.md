@@ -6,6 +6,8 @@
 
 ### Changed
 
+- Let check command output log file
+
 ### Fixed
 
 ## [1.27.1] - 2021-06-03

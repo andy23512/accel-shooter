@@ -1,6 +1,8 @@
+import { writeFile } from "fs";
 import os from "os";
 import { combineLatest, concat, defer, interval, of } from "rxjs";
 import { map } from "rxjs/operators";
+import untildify from "untildify";
 import { GitLab } from "./gitlab";
 import { Change, MergeRequest } from "./models/gitlab/merge-request.models";
 import { GitLabProject } from "./models/models";
@@ -45,6 +47,8 @@ class CheckItem {
         group: this.group,
         name: this.name,
         code: -1,
+        stdout: "",
+        stderr: "",
       }),
       defer(() => this.run(context)).pipe(
         map((d: any) => {
@@ -223,6 +227,19 @@ export class Checker {
         );
         if (statusList.every((s) => s.code !== -1)) {
           s.unsubscribe();
+          const nonSuccessStatusList = statusList.filter((s) => s.code !== 0);
+          if (nonSuccessStatusList.length > 0) {
+            writeFile(
+              untildify("~/ac-checker-log"),
+              nonSuccessStatusList
+                .map(
+                  (s) =>
+                    `[${s.group}] ${s.name} ${s.code}\n${s.stdout}\n${s.stderr}`
+                )
+                .join("\n\n"),
+              () => {}
+            );
+          }
         }
       }
     );
