@@ -8,9 +8,15 @@
 
 ### Fixed
 
+## [1.30.0] - 2021-06-06
+
+### Added
+
+- Add my tasks command
+
 ## [1.29.1] - 2021-06-04
 
-## Fixed
+### Fixed
 
 - Remove verified status item in track list
 
