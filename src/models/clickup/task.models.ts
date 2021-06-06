@@ -1,5 +1,5 @@
-import { Assignee } from './assignee.models';
-import { Checklist } from './checklist.models';
+import { Assignee } from "./assignee.models";
+import { Checklist } from "./checklist.models";
 
 export interface Task {
   id: string;
@@ -14,8 +14,13 @@ export interface Task {
   checklists: Checklist[];
   tags: any[];
   parent: string;
-  priority?: any;
-  due_date?: any;
+  priority: null | {
+    id: string;
+    priority: string;
+    color: string;
+    orderindex: string;
+  };
+  due_date: null | string;
   start_date?: any;
   time_estimate?: any;
   time_spent?: any;

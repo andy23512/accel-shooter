@@ -15,7 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabIssue = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = exports.normalizeClickUpChecklist = exports.normalizeGitLabIssueChecklist = exports.callApiFactory = void 0;
 const child_process_1 = __importDefault(require("child_process"));
 const node_fetch_1 = __importDefault(require("node-fetch"));
-const querystring_1 = __importDefault(require("querystring"));
+const qs_1 = __importDefault(require("qs"));
 const case_utils_1 = require("./case-utils");
 const clickup_1 = require("./clickup");
 const config_1 = require("./config");
@@ -84,7 +84,7 @@ function callApiFactory(site) {
             });
         }
         if (queryParams) {
-            url += "?" + querystring_1.default.stringify(queryParams);
+            url += "?" + qs_1.default.stringify(queryParams, { arrayFormat: "brackets" });
         }
         return fetchRetry(apiUrl + url, method === "get"
             ? Object.assign({ method,

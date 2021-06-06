@@ -18,9 +18,16 @@ class ClickUp {
     }
     static getRTVTasks(teamId, userID) {
         return callApi("get", `/team/${teamId}/task/`, {
-            "statuses[]": "ready to verify",
+            statuses: ["ready to verify"],
             include_closed: true,
-            "assignees[]": userID,
+            assignees: [userID],
+        });
+    }
+    static getMyTasks(teamId, userID) {
+        return callApi("get", `/team/${teamId}/task/`, {
+            statuses: ["Open", "pending", "ready to do", "in progress"],
+            assignees: [userID],
+            subtasks: true,
         });
     }
     getTask() {

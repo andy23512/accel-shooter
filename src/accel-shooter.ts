@@ -1,11 +1,14 @@
+import chalk from "chalk";
 import clipboardy from "clipboardy";
 import { format } from "date-fns";
 import { readFileSync } from "fs";
 import inquirer from "inquirer";
+import moment from "moment";
 import { render } from "mustache";
 import open from "open";
 import os from "os";
 import { setIntervalAsync } from "set-interval-async/dynamic";
+import { table } from "table";
 import untildify from "untildify";
 import { configReadline, setUpSyncHotkey, syncChecklist } from "./actions";
 import { Checker } from "./checker";
@@ -356,6 +359,117 @@ const actions: { [key: string]: () => Promise<any> } = {
     const issueNumber = process.argv[4];
     const checker = new Checker(gitLabProject, issueNumber);
     await checker.start();
+  },
+
+  async myTasks() {
+    const user = (await ClickUp.getCurrentUser()).user;
+    const team = (await ClickUp.getTeams()).teams.find(
+      (t) => t.name === CONFIG.ClickUpTeam
+    );
+    if (!team) {
+      console.log("Team does not exist.");
+      return;
+    }
+    const tasks = (await ClickUp.getMyTasks(team.id, user.id)).tasks;
+    const summarizedTasks: any[] = [];
+    for (const task of tasks) {
+      const taskPath = [task];
+      let t = task;
+      while (t.parent) {
+        t = await new ClickUp(task.parent).getTask();
+        taskPath.push(t);
+      }
+      const simpleTaskPath = taskPath.map((t) => ({
+        name: t.name,
+        id: t.id,
+        priority: t.priority,
+        due_date: t.due_date,
+      }));
+      const reducedTask = simpleTaskPath.reduce((a, c) => ({
+        name: a.name,
+        id: a.id,
+        priority:
+          (a.priority === null && c.priority !== null) ||
+          (a.priority !== null &&
+            c.priority !== null &&
+            parseInt(a.priority.orderindex) > parseInt(c.priority.orderindex))
+            ? c.priority
+            : a.priority,
+        due_date:
+          (a.due_date === null && c.due_date !== null) ||
+          (a.due_date !== null &&
+            c.due_date !== null &&
+            parseInt(a.due_date) > parseInt(c.due_date))
+            ? c.due_date
+            : a.due_date,
+      }));
+      summarizedTasks.push({
+        name: task.name,
+        id: task.id,
+        priority: reducedTask.priority,
+        due_date: reducedTask.due_date,
+        original_priority: task.priority,
+        original_due_date: task.due_date,
+      });
+    }
+    const compare = (a: null | string, b: null | string) => {
+      if (a === b) {
+        return 0;
+      } else if (a === null || typeof a === "undefined") {
+        return 1;
+      } else if (b === null || typeof b === "undefined") {
+        return -1;
+      }
+      return parseInt(a) - parseInt(b);
+    };
+    const colorPriority = (priority: string | undefined) => {
+      switch (priority) {
+        case "urgent":
+          return chalk.redBright(priority);
+        case "high":
+          return chalk.yellowBright(priority);
+        case "normal":
+          return chalk.cyanBright(priority);
+        default:
+          return chalk.white(priority);
+      }
+    };
+    const topDueDateTasks = summarizedTasks
+      .filter((t) => t.due_date)
+      .sort((a, b) => {
+        return (
+          compare(a.due_date, b.due_date) ||
+          compare(a.priority?.orderindex, b.priority?.orderindex)
+        );
+      });
+    console.log("Sort by Due Date:");
+    console.log(
+      table(
+        topDueDateTasks.map((t) => [
+          t.name,
+          colorPriority(t.priority?.priority),
+          moment(+t.due_date).format("YYYY-MM-DD"),
+        ])
+      )
+    );
+    const topPriorityTasks = summarizedTasks
+      .filter((t) => t.priority)
+      .sort((a, b) => {
+        return (
+          compare(a.priority?.orderindex, b.priority?.orderindex) ||
+          compare(a.due_date, b.due_date)
+        );
+      });
+    console.log("Sort by Priority:");
+    console.log(
+      table(
+        topPriorityTasks.map((t) => [
+          t.name,
+          colorPriority(t.priority?.priority),
+          t.due_date ? moment(+t.due_date).format("YYYY-MM-DD") : "",
+        ])
+      )
+    );
   },
 };
 

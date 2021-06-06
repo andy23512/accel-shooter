@@ -23,18 +23,22 @@
   ],
   "dependencies": {
     "@types/node-notifier": "^8.0.0",
+    "@types/qs": "^6.9.6",
     "clipboardy": "^2.3.0",
     "csv-parser": "^3.0.0",
     "date-fns": "^2.22.1",
     "emoji-progress": "^0.1.4",
     "inquirer": "^8.1.0",
+    "moment": "^2.29.1",
     "mustache": "^4.2.0",
     "node-fetch": "^2.6.1",
     "node-notifier": "^10.0.0",
     "open": "^8.2.0",
     "progress-logs": "^0.0.2",
+    "qs": "^6.10.1",
     "rxjs": "^7.1.0",
     "set-interval-async": "^2.0.3",
+    "table": "^6.7.1",
     "untildify": "^4.0.0"
   },
   "devDependencies": {

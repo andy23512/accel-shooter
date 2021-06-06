@@ -22,9 +22,17 @@ export class ClickUp {
 
   public static getRTVTasks(teamId: string, userID: number) {
     return callApi<{ tasks: Task[] }>("get", `/team/${teamId}/task/`, {
-      "statuses[]": "ready to verify",
+      statuses: ["ready to verify"],
       include_closed: true,
-      "assignees[]": userID,
+      assignees: [userID],
+    });
+  }
+
+  public static getMyTasks(teamId: string, userID: number) {
+    return callApi<{ tasks: Task[] }>("get", `/team/${teamId}/task/`, {
+      statuses: ["Open", "pending", "ready to do", "in progress"],
+      assignees: [userID],
+      subtasks: true,
     });
   }
 

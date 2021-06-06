@@ -12,14 +12,17 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+const chalk_1 = __importDefault(require("chalk"));
 const clipboardy_1 = __importDefault(require("clipboardy"));
 const date_fns_1 = require("date-fns");
 const fs_1 = require("fs");
 const inquirer_1 = __importDefault(require("inquirer"));
+const moment_1 = __importDefault(require("moment"));
 const mustache_1 = require("mustache");
 const open_1 = __importDefault(require("open"));
 const os_1 = __importDefault(require("os"));
 const dynamic_1 = require("set-interval-async/dynamic");
+const table_1 = require("table");
 const untildify_1 = __importDefault(require("untildify"));
 const actions_1 = require("./actions");
 const checker_1 = require("./checker");
@@ -339,6 +342,112 @@ const actions = {
             const issueNumber = process.argv[4];
             const checker = new checker_1.Checker(gitLabProject, issueNumber);
             yield checker.start();
+        });
+    },
+    myTasks() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const user = (yield clickup_1.ClickUp.getCurrentUser()).user;
+            const team = (yield clickup_1.ClickUp.getTeams()).teams.find((t) => t.name === config_1.CONFIG.ClickUpTeam);
+            if (!team) {
+                console.log("Team does not exist.");
+                return;
+            }
+            const tasks = (yield clickup_1.ClickUp.getMyTasks(team.id, user.id)).tasks;
+            const summarizedTasks = [];
+            for (const task of tasks) {
+                const taskPath = [task];
+                let t = task;
+                while (t.parent) {
+                    t = yield new clickup_1.ClickUp(task.parent).getTask();
+                    taskPath.push(t);
+                }
+                const simpleTaskPath = taskPath.map((t) => ({
+                    name: t.name,
+                    id: t.id,
+                    priority: t.priority,
+                    due_date: t.due_date,
+                }));
+                const reducedTask = simpleTaskPath.reduce((a, c) => ({
+                    name: a.name,
+                    id: a.id,
+                    priority: (a.priority === null && c.priority !== null) ||
+                        (a.priority !== null &&
+                            c.priority !== null &&
+                            parseInt(a.priority.orderindex) > parseInt(c.priority.orderindex))
+                        ? c.priority
+                        : a.priority,
+                    due_date: (a.due_date === null && c.due_date !== null) ||
+                        (a.due_date !== null &&
+                            c.due_date !== null &&
+                            parseInt(a.due_date) > parseInt(c.due_date))
+                        ? c.due_date
+                        : a.due_date,
+                }));
+                summarizedTasks.push({
+                    name: task.name,
+                    id: task.id,
+                    priority: reducedTask.priority,
+                    due_date: reducedTask.due_date,
+                    original_priority: task.priority,
+                    original_due_date: task.due_date,
+                });
+            }
+            const compare = (a, b) => {
+                if (a === b) {
+                    return 0;
+                }
+                else if (a === null || typeof a === "undefined") {
+                    return 1;
+                }
+                else if (b === null || typeof b === "undefined") {
+                    return -1;
+                }
+                return parseInt(a) - parseInt(b);
+            };
+            const colorPriority = (priority) => {
+                switch (priority) {
+                    case "urgent":
+                        return chalk_1.default.redBright(priority);
+                    case "high":
+                        return chalk_1.default.yellowBright(priority);
+                    case "normal":
+                        return chalk_1.default.cyanBright(priority);
+                    default:
+                        return chalk_1.default.white(priority);
+                }
+            };
+            const topDueDateTasks = summarizedTasks
+                .filter((t) => t.due_date)
+                .sort((a, b) => {
+                var _a, _b;
+                return (compare(a.due_date, b.due_date) ||
+                    compare((_a = a.priority) === null || _a === void 0 ? void 0 : _a.orderindex, (_b = b.priority) === null || _b === void 0 ? void 0 : _b.orderindex));
+            });
+            console.log("Sort by Due Date:");
+            console.log(table_1.table(topDueDateTasks.map((t) => {
+                var _a;
+                return [
+                    t.name,
+                    colorPriority((_a = t.priority) === null || _a === void 0 ? void 0 : _a.priority),
+                    moment_1.default(+t.due_date).format("YYYY-MM-DD"),
+                ];
+            })));
+            const topPriorityTasks = summarizedTasks
+                .filter((t) => t.priority)
+                .sort((a, b) => {
+                var _a, _b;
+                return (compare((_a = a.priority) === null || _a === void 0 ? void 0 : _a.orderindex, (_b = b.priority) === null || _b === void 0 ? void 0 : _b.orderindex) ||
+                    compare(a.due_date, b.due_date));
+            });
+            console.log("Sort by Priority:");
+            console.log(table_1.table(topPriorityTasks.map((t) => {
+                var _a;
+                return [
+                    t.name,
+                    colorPriority((_a = t.priority) === null || _a === void 0 ? void 0 : _a.priority),
+                    t.due_date ? moment_1.default(+t.due_date).format("YYYY-MM-DD") : "",
+                ];
+            })));
         });
     },
 };

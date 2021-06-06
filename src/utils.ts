@@ -1,6 +1,6 @@
 import childProcess, { StdioOptions } from "child_process";
 import fetch, { RequestInfo, RequestInit, Response } from "node-fetch";
-import querystring from "querystring";
+import qs from "qs";
 import { titleCase } from "./case-utils";
 import { ClickUp } from "./clickup";
 import { CONFIG } from "./config";
@@ -85,7 +85,7 @@ export function callApiFactory(site: Site) {
       });
     }
     if (queryParams) {
-      url += "?" + querystring.stringify(queryParams);
+      url += "?" + qs.stringify(queryParams, { arrayFormat: "brackets" });
     }
     return fetchRetry(
       apiUrl + url,
