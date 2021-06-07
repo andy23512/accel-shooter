@@ -194,7 +194,7 @@ export function getClickUpTaskIdFromGitLabIssue(issue: Issue) {
 }
 
 const dpItemRegex =
-  /\* \([A-Za-z ]+\) .*? \(#([0-9]+|\?), https:\/\/app.clickup.com\/t\/(\w+)\)/g;
+  /\* \([A-Za-z ]+\) .*? \((#[0-9]+|#\?|\w+ \d+), https:\/\/app.clickup.com\/t\/(\w+)\)/g;
 
 export async function updateTaskStatusInDp(dp: string) {
   let match: RegExpExecArray | null = null;

@@ -169,7 +169,7 @@ function getClickUpTaskIdFromGitLabIssue(issue) {
     return result ? result[1] : null;
 }
 exports.getClickUpTaskIdFromGitLabIssue = getClickUpTaskIdFromGitLabIssue;
-const dpItemRegex = /\* \([A-Za-z ]+\) .*? \(#([0-9]+|\?), https:\/\/app.clickup.com\/t\/(\w+)\)/g;
+const dpItemRegex = /\* \([A-Za-z ]+\) .*? \((#[0-9]+|#\?|\w+ \d+), https:\/\/app.clickup.com\/t\/(\w+)\)/g;
 function updateTaskStatusInDp(dp) {
     return __awaiter(this, void 0, void 0, function* () {
         let match = null;
