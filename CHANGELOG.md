@@ -8,6 +8,12 @@
 
 ### Fixed
 
+## [1.30.1] - 2021-06-07
+
+### Fixed
+
+- Fix up copy not update status bug
+
 ## [1.30.0] - 2021-06-06
 
 ### Added
