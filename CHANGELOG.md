@@ -8,6 +8,20 @@
 
 ### Fixed
 
+## [1.31.0] - 2021-06-08
+
+### Added
+
+- Add ignore check item config
+- Add comment command
+
+### Changed
+
+- Run sync after start
+- Auto get gitlab project and issue number from path and branch name
+- Add ###### in each item output start
+- Remove passed result in frontend test output
+
 ## [1.30.1] - 2021-06-07
 
 ### Fixed
