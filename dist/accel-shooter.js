@@ -337,6 +337,22 @@ const actions = {
             yield checker.start();
         });
     },
+    comment() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const answers = yield inquirer_1.default.prompt([
+                {
+                    name: "content",
+                    message: "Enter comment content",
+                    type: "editor",
+                },
+            ]);
+            const { gitLabProject, issueNumber } = getGitLabProjectAndIssueNumber();
+            const gitLab = new gitlab_1.GitLab(gitLabProject.id);
+            const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
+            const mergeRequest = mergeRequests[mergeRequests.length - 1];
+            yield gitLab.createMergeRequestNote(mergeRequest, answers.content);
+        });
+    },
     myTasks() {
         return __awaiter(this, void 0, void 0, function* () {
             const user = (yield clickup_1.ClickUp.getCurrentUser()).user;

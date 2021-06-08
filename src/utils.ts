@@ -76,13 +76,17 @@ export function callApiFactory(site: Site) {
     method: HttpMethod,
     url: string,
     queryParams?: { [key: string]: any } | null,
-    body?: { [key: string]: any }
+    body?: { [key: string]: any } | string
   ): Promise<T> => {
-    const params = new URLSearchParams();
-    if (body) {
+    let params: any;
+    if (typeof body === "object") {
+      params = new URLSearchParams();
       Object.entries(body).forEach(([key, value]) => {
         params.set(key, value);
       });
+    }
+    if (typeof body === "string") {
+      params = body;
     }
     if (queryParams) {
       url += "?" + qs.stringify(queryParams, { arrayFormat: "brackets" });

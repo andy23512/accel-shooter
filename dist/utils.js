@@ -77,11 +77,15 @@ function callApiFactory(site) {
             throw Error(`Site {site} is not supported.`);
     }
     return (method, url, queryParams, body) => __awaiter(this, void 0, void 0, function* () {
-        const params = new URLSearchParams();
-        if (body) {
+        let params;
+        if (typeof body === "object") {
+            params = new URLSearchParams();
             Object.entries(body).forEach(([key, value]) => {
                 params.set(key, value);
             });
+        }
+        if (typeof body === "string") {
+            params = body;
         }
         if (queryParams) {
             url += "?" + qs_1.default.stringify(queryParams, { arrayFormat: "brackets" });

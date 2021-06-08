@@ -159,6 +159,18 @@ export class GitLab {
     );
   }
 
+  public async createMergeRequestNote(
+    merge_request: MergeRequest,
+    content: string
+  ) {
+    await callApi(
+      "post",
+      `/projects/${this.projectId}/merge_requests/${merge_request.iid}/notes`,
+      null,
+      content
+    );
+  }
+
   public async markMergeRequestAsReadyAndAddAssignee(
     merge_request: MergeRequest
   ) {

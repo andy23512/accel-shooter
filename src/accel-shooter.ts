@@ -354,6 +354,23 @@ const actions: { [key: string]: () => Promise<any> } = {
     await checker.start();
   },
 
+  async comment() {
+    const answers = await inquirer.prompt([
+      {
+        name: "content",
+        message: "Enter comment content",
+        type: "editor",
+      },
+    ]);
+    const { gitLabProject, issueNumber } = getGitLabProjectAndIssueNumber();
+    const gitLab = new GitLab(gitLabProject.id);
+    const mergeRequests = await gitLab.listMergeRequestsWillCloseIssueOnMerge(
+      issueNumber
+    );
+    const mergeRequest = mergeRequests[mergeRequests.length - 1];
+    await gitLab.createMergeRequestNote(mergeRequest, answers.content);
+  },
+
   async myTasks() {
     const user = (await ClickUp.getCurrentUser()).user;
     const team = (await ClickUp.getTeams()).teams.find(
