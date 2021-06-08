@@ -1,4 +1,5 @@
 import chalk from "chalk";
+import { execSync } from "child_process";
 import clipboardy from "clipboardy";
 import { format } from "date-fns";
 import { readFileSync } from "fs";
@@ -186,12 +187,8 @@ const actions: { [key: string]: () => Promise<any> } = {
   },
   async sync() {
     configReadline();
-    const gitLabProject = getGitLabProjectFromArgv();
-    if (!gitLabProject) {
-      return;
-    }
+    const { gitLabProject, issueNumber } = getGitLabProjectAndIssueNumber();
     const gitLabProjectId = gitLabProject.id;
-    const issueNumber = process.argv[4];
     const gitLab = new GitLab(gitLabProject.id);
     const mergeRequests = await gitLab.listMergeRequestsWillCloseIssueOnMerge(
       issueNumber
@@ -352,11 +349,7 @@ const actions: { [key: string]: () => Promise<any> } = {
   },
 
   async check() {
-    const gitLabProject = getGitLabProjectFromArgv();
-    if (!gitLabProject) {
-      return;
-    }
-    const issueNumber = process.argv[4];
+    const { gitLabProject, issueNumber } = getGitLabProjectAndIssueNumber();
     const checker = new Checker(gitLabProject, issueNumber);
     await checker.start();
   },
@@ -498,6 +491,33 @@ function getGitLabProjectIdFromArgv() {
 
 function getGitLabProjectFromArgv() {
   return getGitLabProjectConfigByName(process.argv[3]);
+}
+
+function getGitLabProjectAndIssueNumber() {
+  if (process.argv.length === 3) {
+    const directory = execSync("pwd", { encoding: "utf-8" });
+    const gitLabProject = CONFIG.GitLabProjects.find((p) =>
+      directory.startsWith(p.path)
+    );
+    if (!gitLabProject) {
+      throw Error("No such project");
+    }
+    const branchName = execSync("git branch --show-current", {
+      encoding: "utf-8",
+    });
+    const match = branchName.match(/^[0-9]+/);
+    if (!match) {
+      throw Error("Cannot get issue number from branch");
+    }
+    const issueNumber = match[0];
+    return { gitLabProject, issueNumber };
+  } else {
+    const gitLabProject = getGitLabProjectFromArgv();
+    if (!gitLabProject) {
+      throw Error("No such project");
+    }
+    return { gitLabProject, issueNumber: process.argv[4] };
+  }
 }
 
 function sleep(ms: number) {

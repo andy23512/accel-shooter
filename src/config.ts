@@ -12,9 +12,17 @@ export function getConfigPath() {
 
 export function getConfig(): Config {
   const configPath = getConfigPath();
-  return existsSync(configPath)
-    ? JSON.parse(readFileSync(configPath, { encoding: "utf-8" }))
-    : {};
+  if (!existsSync) {
+    throw Error("config file does not exist");
+  }
+  const config = JSON.parse(
+    readFileSync(configPath, { encoding: "utf-8" })
+  ) as Config;
+  config.GitLabProjects = config.GitLabProjects.map((p) => ({
+    ...p,
+    path: untildify(p.path),
+  }));
+  return config;
 }
 
 export const CONFIG = getConfig();

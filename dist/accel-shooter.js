@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const chalk_1 = __importDefault(require("chalk"));
+const child_process_1 = require("child_process");
 const clipboardy_1 = __importDefault(require("clipboardy"));
 const date_fns_1 = require("date-fns");
 const fs_1 = require("fs");
@@ -177,12 +178,8 @@ const actions = {
     sync() {
         return __awaiter(this, void 0, void 0, function* () {
             actions_1.configReadline();
-            const gitLabProject = getGitLabProjectFromArgv();
-            if (!gitLabProject) {
-                return;
-            }
+            const { gitLabProject, issueNumber } = getGitLabProjectAndIssueNumber();
             const gitLabProjectId = gitLabProject.id;
-            const issueNumber = process.argv[4];
             const gitLab = new gitlab_1.GitLab(gitLabProject.id);
             const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
             const lastMergeRequest = mergeRequests[mergeRequests.length - 1];
@@ -335,11 +332,7 @@ const actions = {
     },
     check() {
         return __awaiter(this, void 0, void 0, function* () {
-            const gitLabProject = getGitLabProjectFromArgv();
-            if (!gitLabProject) {
-                return;
-            }
-            const issueNumber = process.argv[4];
+            const { gitLabProject, issueNumber } = getGitLabProjectAndIssueNumber();
             const checker = new checker_1.Checker(gitLabProject, issueNumber);
             yield checker.start();
         });
@@ -476,6 +469,31 @@ function getGitLabProjectIdFromArgv() {
 }
 function getGitLabProjectFromArgv() {
     return utils_1.getGitLabProjectConfigByName(process.argv[3]);
+}
+function getGitLabProjectAndIssueNumber() {
+    if (process.argv.length === 3) {
+        const directory = child_process_1.execSync("pwd", { encoding: "utf-8" });
+        const gitLabProject = config_1.CONFIG.GitLabProjects.find((p) => directory.startsWith(p.path));
+        if (!gitLabProject) {
+            throw Error("No such project");
+        }
+        const branchName = child_process_1.execSync("git branch --show-current", {
+            encoding: "utf-8",
+        });
+        const match = branchName.match(/^[0-9]+/);
+        if (!match) {
+            throw Error("Cannot get issue number from branch");
+        }
+        const issueNumber = match[0];
+        return { gitLabProject, issueNumber };
+    }
+    else {
+        const gitLabProject = getGitLabProjectFromArgv();
+        if (!gitLabProject) {
+            throw Error("No such project");
+        }
+        return { gitLabProject, issueNumber: process.argv[4] };
+    }
 }
 function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
