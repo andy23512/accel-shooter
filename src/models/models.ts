@@ -7,6 +7,7 @@ export interface GitLabProject {
   id: string;
   stagingStatus?: Record<string, string>;
   deployedStatus?: Record<string, string>;
+  ignoredCheck?: string[];
 }
 export interface Config {
   ClickUpToken: string;

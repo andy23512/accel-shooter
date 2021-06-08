@@ -241,6 +241,15 @@ export class Checker {
     if (backendChanges.length === 0) {
       runningItems = items.filter((item) => item.group !== "Backend");
     }
+    if (
+      this.gitLabProject.ignoredCheck &&
+      this.gitLabProject.ignoredCheck.length > 0
+    ) {
+      const ignoredCheck = this.gitLabProject.ignoredCheck;
+      runningItems = items.filter(
+        (item) => !ignoredCheck.includes(`${item.group}/${item.name}`)
+      );
+    }
     const context = {
       mergeRequest,
       gitLab: this.gitLab,
