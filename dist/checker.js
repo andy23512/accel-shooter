@@ -35,10 +35,11 @@ const SPINNER = [
     "🕚",
 ];
 class CheckItem {
-    constructor(group, name, run) {
+    constructor(group, name, run, stdoutReducer) {
         this.group = group;
         this.name = name;
         this.run = run;
+        this.stdoutReducer = stdoutReducer;
     }
     getObs(context) {
         return rxjs_1.concat(rxjs_1.of({
@@ -51,6 +52,9 @@ class CheckItem {
             const result = d;
             result.group = this.group;
             result.name = this.name;
+            if (this.stdoutReducer && result.stdout) {
+                result.stdout = this.stdoutReducer(result.stdout);
+            }
             return result;
         })));
     }
@@ -75,7 +79,10 @@ const items = [
     })),
     new CheckItem("Frontend", "Check Test", () => __awaiter(void 0, void 0, void 0, function* () {
         return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "frontend", "yarn", "jest", "--coverage=false"], "pipe");
-    })),
+    }), (stdout) => stdout
+        .split("\n")
+        .filter((line) => !line.startsWith("PASS"))
+        .join("\n")),
     new CheckItem("Frontend", "Check Prod", () => __awaiter(void 0, void 0, void 0, function* () {
         return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "frontend", "yarn", "prod"], "pipe");
     })),

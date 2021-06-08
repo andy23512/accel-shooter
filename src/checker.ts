@@ -38,7 +38,8 @@ class CheckItem {
       stdout?: string;
       stderr?: string;
       code: number;
-    }>
+    }>,
+    public stdoutReducer?: (output: string) => string
   ) {}
 
   public getObs(context: CheckContext) {
@@ -61,6 +62,9 @@ class CheckItem {
           } = d;
           result.group = this.group;
           result.name = this.name;
+          if (this.stdoutReducer && result.stdout) {
+            result.stdout = this.stdoutReducer(result.stdout);
+          }
           return result;
         })
       )
@@ -94,13 +98,22 @@ const items: CheckItem[] = [
       "pipe"
     );
   }),
-  new CheckItem("Frontend", "Check Test", async () => {
-    return promiseSpawn(
-      "docker-compose",
-      ["exec", "-T", "frontend", "yarn", "jest", "--coverage=false"],
-      "pipe"
-    );
-  }),
+  new CheckItem(
+    "Frontend",
+    "Check Test",
+    async () => {
+      return promiseSpawn(
+        "docker-compose",
+        ["exec", "-T", "frontend", "yarn", "jest", "--coverage=false"],
+        "pipe"
+      );
+    },
+    (stdout) =>
+      stdout
+        .split("\n")
+        .filter((line) => !line.startsWith("PASS"))
+        .join("\n")
+  ),
   new CheckItem("Frontend", "Check Prod", async () => {
     return promiseSpawn(
       "docker-compose",
