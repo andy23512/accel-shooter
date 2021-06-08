@@ -199,7 +199,7 @@ class Checker {
                     const nonSuccessStatusList = statusList.filter((s) => s.code !== 0);
                     if (nonSuccessStatusList.length > 0) {
                         fs_1.writeFile(untildify_1.default("~/ac-checker-log"), nonSuccessStatusList
-                            .map((s) => `[${s.group}] ${s.name} ${s.code}\n${s.stdout}\n${s.stderr}`)
+                            .map((s) => `###### [${s.group}] ${s.name} ${s.code}\n${s.stdout}\n${s.stderr}`)
                             .join("\n\n"), () => { });
                     }
                 }

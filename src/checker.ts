@@ -285,7 +285,7 @@ export class Checker {
               nonSuccessStatusList
                 .map(
                   (s) =>
-                    `[${s.group}] ${s.name} ${s.code}\n${s.stdout}\n${s.stderr}`
+                    `###### [${s.group}] ${s.name} ${s.code}\n${s.stdout}\n${s.stderr}`
                 )
                 .join("\n\n"),
               () => {}
