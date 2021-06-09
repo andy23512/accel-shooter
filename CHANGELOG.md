@@ -8,6 +8,12 @@
 
 ### Fixed
 
+## [1.31.1] - 2021-06-09
+
+### Fixed
+
+- Fix bug in check item filter
+
 ## [1.31.0] - 2021-06-08
 
 ### Added
