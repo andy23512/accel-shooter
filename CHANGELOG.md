@@ -8,6 +8,12 @@
 
 ### Fixed
 
+## [1.31.3] - 2021-06-10
+
+### Fixed
+
+- Ignore removed line when check word contain
+
 ## [1.31.2] - 2021-06-10
 
 ### Changed
