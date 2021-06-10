@@ -8,6 +8,8 @@
 
 ### Fixed
 
+- Fix comment command bug
+
 ## [1.31.3] - 2021-06-10
 
 ### Fixed
