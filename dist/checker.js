@@ -88,14 +88,20 @@ const items = [
     })),
     new CheckItem("Frontend", "Check console.log", ({ frontendChanges }) => __awaiter(void 0, void 0, void 0, function* () {
         return {
-            code: frontendChanges.some((c) => c.diff.includes("console.log"))
+            code: frontendChanges.some((c) => c.new_path.endsWith(".ts") &&
+                c.diff
+                    .split("\n")
+                    .some((line) => !line.startsWith("-") && line.includes("console.log")))
                 ? 1
                 : 0,
         };
     })),
     new CheckItem("Frontend", "Check long import", ({ frontendChanges }) => __awaiter(void 0, void 0, void 0, function* () {
         return {
-            code: frontendChanges.some((c) => c.new_path.endsWith(".ts") && c.diff.includes("../../lib/"))
+            code: frontendChanges.some((c) => c.new_path.endsWith(".ts") &&
+                c.diff
+                    .split("\n")
+                    .some((line) => !line.startsWith("-") && line.includes("../../lib/")))
                 ? 1
                 : 0,
         };
@@ -108,7 +114,12 @@ const items = [
     })),
     new CheckItem("Backend", "Check Print", ({ backendChanges }) => __awaiter(void 0, void 0, void 0, function* () {
         return {
-            code: backendChanges.some((c) => c.diff.includes("print(")) ? 1 : 0,
+            code: backendChanges.some((c) => c.new_path.endsWith(".py") &&
+                c.diff
+                    .split("\n")
+                    .some((line) => !line.startsWith("-") && line.includes("print(")))
+                ? 1
+                : 0,
         };
     })),
     new CheckItem("Backend", "Check Migration Conflict", ({ mergeRequest, backendChanges, gitLab }) => __awaiter(void 0, void 0, void 0, function* () {

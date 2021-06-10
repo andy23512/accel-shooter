@@ -126,7 +126,15 @@ const items: CheckItem[] = [
     "Check console.log",
     async ({ frontendChanges }) => {
       return {
-        code: frontendChanges.some((c) => c.diff.includes("console.log"))
+        code: frontendChanges.some(
+          (c) =>
+            c.new_path.endsWith(".ts") &&
+            c.diff
+              .split("\n")
+              .some(
+                (line) => !line.startsWith("-") && line.includes("console.log")
+              )
+        )
           ? 1
           : 0,
       };
@@ -138,7 +146,13 @@ const items: CheckItem[] = [
     async ({ frontendChanges }) => {
       return {
         code: frontendChanges.some(
-          (c) => c.new_path.endsWith(".ts") && c.diff.includes("../../lib/")
+          (c) =>
+            c.new_path.endsWith(".ts") &&
+            c.diff
+              .split("\n")
+              .some(
+                (line) => !line.startsWith("-") && line.includes("../../lib/")
+              )
         )
           ? 1
           : 0,
@@ -161,7 +175,15 @@ const items: CheckItem[] = [
   }),
   new CheckItem("Backend", "Check Print", async ({ backendChanges }) => {
     return {
-      code: backendChanges.some((c) => c.diff.includes("print(")) ? 1 : 0,
+      code: backendChanges.some(
+        (c) =>
+          c.new_path.endsWith(".py") &&
+          c.diff
+            .split("\n")
+            .some((line) => !line.startsWith("-") && line.includes("print("))
+      )
+        ? 1
+        : 0,
     };
   }),
   new CheckItem(
