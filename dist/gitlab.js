@@ -103,7 +103,7 @@ class GitLab {
     }
     createMergeRequestNote(merge_request, content) {
         return __awaiter(this, void 0, void 0, function* () {
-            yield callApi("post", `/projects/${this.projectId}/merge_requests/${merge_request.iid}/notes`, null, content);
+            yield callApi("post", `/projects/${this.projectId}/merge_requests/${merge_request.iid}/notes`, { body: content });
         });
     }
     markMergeRequestAsReadyAndAddAssignee(merge_request) {

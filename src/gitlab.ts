@@ -166,8 +166,7 @@ export class GitLab {
     await callApi(
       "post",
       `/projects/${this.projectId}/merge_requests/${merge_request.iid}/notes`,
-      null,
-      content
+      { body: content }
     );
   }
 
