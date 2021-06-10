@@ -8,6 +8,12 @@
 
 ### Fixed
 
+## [1.31.2] - 2021-06-10
+
+### Changed
+
+- Remove sync after start feature
+
 ## [1.31.1] - 2021-06-09
 
 ### Fixed

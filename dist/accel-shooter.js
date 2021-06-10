@@ -136,7 +136,6 @@ const actions = {
             yield utils_1.promiseSpawn("git", ["checkout", gitLabBranch.name], "pipe");
             yield utils_1.promiseSpawn("git", ["submodule", "update", "--init", "--recursive"], "pipe");
             p.end(0);
-            yield actions.sync();
         });
     },
     open() {

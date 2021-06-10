@@ -148,7 +148,6 @@ const actions: { [key: string]: () => Promise<any> } = {
       "pipe"
     );
     p.end(0);
-    await actions.sync();
   },
   async open() {
     const issueNumber = process.argv[4];
