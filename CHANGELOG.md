@@ -8,6 +8,8 @@
 
 ### Changed
 
+- Show whole path title in myTasks command
+
 ### Fixed
 
 - Fix comment command bug

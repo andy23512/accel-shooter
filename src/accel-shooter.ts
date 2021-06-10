@@ -397,7 +397,7 @@ const actions: { [key: string]: () => Promise<any> } = {
         due_date: t.due_date,
       }));
       const reducedTask = simpleTaskPath.reduce((a, c) => ({
-        name: a.name,
+        name: c.name + " - " + a.name,
         id: a.id,
         priority:
           (a.priority === null && c.priority !== null) ||
@@ -415,7 +415,7 @@ const actions: { [key: string]: () => Promise<any> } = {
             : a.due_date,
       }));
       summarizedTasks.push({
-        name: task.name,
+        name: reducedTask.name,
         id: task.id,
         priority: reducedTask.priority,
         due_date: reducedTask.due_date,
