@@ -43,6 +43,7 @@ const actionAlias = {
     t: "track",
     e: "end",
     re: "revertEnd",
+    ls: "list",
 };
 const actions = {
     start() {
@@ -457,6 +458,14 @@ const actions = {
                     t.due_date ? moment_1.default(+t.due_date).format("YYYY-MM-DD") : "",
                 ];
             })));
+        });
+    },
+    list() {
+        return __awaiter(this, void 0, void 0, function* () {
+            const { gitLabProject, issueNumber } = getGitLabProjectAndIssueNumber();
+            const gitLab = new gitlab_1.GitLab(gitLabProject.id);
+            const issue = yield gitLab.getIssue(issueNumber);
+            console.log(issue.title);
         });
     },
 };

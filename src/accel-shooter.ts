@@ -39,6 +39,7 @@ const actionAlias: { [key: string]: string } = {
   t: "track",
   e: "end",
   re: "revertEnd",
+  ls: "list",
 };
 
 const actions: { [key: string]: () => Promise<any> } = {
@@ -480,6 +481,13 @@ const actions: { [key: string]: () => Promise<any> } = {
         ])
       )
     );
+  },
+
+  async list() {
+    const { gitLabProject, issueNumber } = getGitLabProjectAndIssueNumber();
+    const gitLab = new GitLab(gitLabProject.id);
+    const issue = await gitLab.getIssue(issueNumber);
+    console.log(issue.title);
   },
 };
 

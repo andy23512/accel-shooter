@@ -4,6 +4,8 @@
 
 ### Added
 
+- Add list command
+
 ### Changed
 
 ### Fixed
