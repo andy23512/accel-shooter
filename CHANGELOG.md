@@ -3,12 +3,19 @@
 ## [Unrealeased] - yyyy-mm-dd
 
 ### Added
+### Changed
+### Fixed
+
+## [1.32.0] - 2021-06-11
+
+### Added
 
 - Add list command
 
 ### Changed
 
 - Show whole path title in myTasks command
+- Split actions into files
 
 ### Fixed
 
