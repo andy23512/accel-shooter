@@ -3,10 +3,10 @@ import os from "os";
 import { combineLatest, concat, defer, interval, of } from "rxjs";
 import { map } from "rxjs/operators";
 import untildify from "untildify";
-import { GitLab } from "./gitlab";
-import { Change, MergeRequest } from "./models/gitlab/merge-request.models";
-import { GitLabProject } from "./models/models";
-import { promiseSpawn } from "./utils";
+import { GitLab } from "./gitlab.class";
+import { Change, MergeRequest } from "../models/gitlab/merge-request.models";
+import { GitLabProject } from "../models/models";
+import { promiseSpawn } from "../utils";
 
 const SPINNER = [
   "🕛",

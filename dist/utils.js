@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -12,12 +31,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabIssue = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = exports.normalizeClickUpChecklist = exports.normalizeGitLabIssueChecklist = exports.callApiFactory = void 0;
-const child_process_1 = __importDefault(require("child_process"));
+exports.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId = exports.getGitLabFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabIssue = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = exports.normalizeClickUpChecklist = exports.normalizeGitLabIssueChecklist = exports.callApiFactory = exports.sleep = void 0;
+const child_process_1 = __importStar(require("child_process"));
 const node_fetch_1 = __importDefault(require("node-fetch"));
 const qs_1 = __importDefault(require("qs"));
 const case_utils_1 = require("./case-utils");
-const clickup_1 = require("./clickup");
+const clickup_class_1 = require("./classes/clickup.class");
+const gitlab_class_1 = require("./classes/gitlab.class");
 const config_1 = require("./config");
 const RETRY_SETTING = {
     retry: 5,
@@ -26,6 +46,7 @@ const RETRY_SETTING = {
 function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
 }
+exports.sleep = sleep;
 function fetchRetry(url, opts) {
     return __awaiter(this, void 0, void 0, function* () {
         let retry = (opts && opts.retry) || 3;
@@ -181,7 +202,7 @@ function updateTaskStatusInDp(dp) {
         while ((match = dpItemRegex.exec(dp))) {
             const full = match[0];
             const clickUpTaskId = match[2];
-            const clickUp = new clickup_1.ClickUp(clickUpTaskId);
+            const clickUp = new clickup_class_1.ClickUp(clickUpTaskId);
             const task = yield clickUp.getTask();
             const updatedFull = full.replace(/\* \([A-Za-z ]+\)/, `* (${case_utils_1.titleCase(task.status.status)})`);
             resultDp = resultDp.replace(full, updatedFull);
@@ -190,3 +211,38 @@ function updateTaskStatusInDp(dp) {
     });
 }
 exports.updateTaskStatusInDp = updateTaskStatusInDp;
+function getGitLabFromArgv() {
+    if (process.argv.length === 3) {
+        const directory = child_process_1.execSync("pwd", { encoding: "utf-8" });
+        const gitLabProject = config_1.CONFIG.GitLabProjects.find((p) => directory.startsWith(p.path));
+        if (!gitLabProject) {
+            throw Error("No such project");
+        }
+        const branchName = child_process_1.execSync("git branch --show-current", {
+            encoding: "utf-8",
+        });
+        const match = branchName.match(/^[0-9]+/);
+        if (!match) {
+            throw Error("Cannot get issue number from branch");
+        }
+        const issueNumber = match[0];
+        const gitLab = new gitlab_class_1.GitLab(gitLabProject.id);
+        return { gitLab, gitLabProject, issueNumber };
+    }
+    else {
+        const gitLabProject = getGitLabProjectFromArgv();
+        if (!gitLabProject) {
+            throw Error("No such project");
+        }
+        const gitLab = new gitlab_class_1.GitLab(gitLabProject.id);
+        return { gitLab, gitLabProject, issueNumber: process.argv[4] };
+    }
+}
+exports.getGitLabFromArgv = getGitLabFromArgv;
+function getGitLabProjectFromArgv() {
+    return getGitLabProjectConfigByName(process.argv[3]);
+}
+function getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(issueNumber, clickUpTaskId) {
+    return `${issueNumber}_CU-${clickUpTaskId}`;
+}
+exports.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId = getGitLabBranchNameFromIssueNumberAndTitleAndTaskId;

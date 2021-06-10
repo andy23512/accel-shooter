@@ -16,8 +16,8 @@ exports.setUpSyncHotkey = exports.configReadline = exports.syncChecklist = expor
 const clipboardy_1 = __importDefault(require("clipboardy"));
 const open_1 = __importDefault(require("open"));
 const readline_1 = __importDefault(require("readline"));
-const clickup_1 = require("./clickup");
-const gitlab_1 = require("./gitlab");
+const clickup_class_1 = require("./classes/clickup.class");
+const gitlab_class_1 = require("./classes/gitlab.class");
 const utils_1 = require("./utils");
 function getSyncChecklistActions(oldClickUpChecklist, newGitLabChecklist) {
     const actions = {
@@ -46,7 +46,7 @@ function getSyncChecklistActions(oldClickUpChecklist, newGitLabChecklist) {
 exports.getSyncChecklistActions = getSyncChecklistActions;
 function syncChecklist(gitLabProjectId, issueNumber, ep, openPage) {
     return __awaiter(this, void 0, void 0, function* () {
-        const gitLab = new gitlab_1.GitLab(gitLabProjectId);
+        const gitLab = new gitlab_class_1.GitLab(gitLabProjectId);
         const issue = yield gitLab.getIssue(issueNumber);
         if (openPage) {
             open_1.default(issue.web_url);
@@ -61,7 +61,7 @@ function syncChecklist(gitLabProjectId, issueNumber, ep, openPage) {
                 .replace(/https:\/\/app.clickup.com\/t\/\w+/g, "")
                 .trim();
             const gitLabNormalizedChecklist = utils_1.normalizeGitLabIssueChecklist(gitLabChecklistText);
-            const clickUp = new clickup_1.ClickUp(clickUpTaskId);
+            const clickUp = new clickup_class_1.ClickUp(clickUpTaskId);
             const clickUpTask = yield clickUp.getTask();
             const clickUpChecklistTitle = `GitLab synced checklist [${gitLabProjectId.replace("%2F", "/")}]`;
             let clickUpChecklist = clickUpTask.checklists.find((c) => c.name === clickUpChecklistTitle);

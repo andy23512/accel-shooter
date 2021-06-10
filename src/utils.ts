@@ -1,8 +1,9 @@
-import childProcess, { StdioOptions } from "child_process";
+import childProcess, { execSync, StdioOptions } from "child_process";
 import fetch, { RequestInfo, RequestInit, Response } from "node-fetch";
 import qs from "qs";
 import { titleCase } from "./case-utils";
-import { ClickUp } from "./clickup";
+import { ClickUp } from "./classes/clickup.class";
+import { GitLab } from "./classes/gitlab.class";
 import { CONFIG } from "./config";
 import { ChecklistItem } from "./models/clickup.models";
 import { Issue } from "./models/gitlab/issue.models";
@@ -13,7 +14,7 @@ const RETRY_SETTING = {
   pause: 12 * 1000,
 };
 
-function sleep(ms: number) {
+export function sleep(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
@@ -216,4 +217,44 @@ export async function updateTaskStatusInDp(dp: string) {
     resultDp = resultDp.replace(full, updatedFull);
   }
   return resultDp;
+}
+
+export function getGitLabFromArgv() {
+  if (process.argv.length === 3) {
+    const directory = execSync("pwd", { encoding: "utf-8" });
+    const gitLabProject = CONFIG.GitLabProjects.find((p) =>
+      directory.startsWith(p.path)
+    );
+    if (!gitLabProject) {
+      throw Error("No such project");
+    }
+    const branchName = execSync("git branch --show-current", {
+      encoding: "utf-8",
+    });
+    const match = branchName.match(/^[0-9]+/);
+    if (!match) {
+      throw Error("Cannot get issue number from branch");
+    }
+    const issueNumber = match[0];
+    const gitLab = new GitLab(gitLabProject.id);
+    return { gitLab, gitLabProject, issueNumber };
+  } else {
+    const gitLabProject = getGitLabProjectFromArgv();
+    if (!gitLabProject) {
+      throw Error("No such project");
+    }
+    const gitLab = new GitLab(gitLabProject.id);
+    return { gitLab, gitLabProject, issueNumber: process.argv[4] };
+  }
+}
+
+function getGitLabProjectFromArgv() {
+  return getGitLabProjectConfigByName(process.argv[3]);
+}
+
+export function getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(
+  issueNumber: number,
+  clickUpTaskId: string
+) {
+  return `${issueNumber}_CU-${clickUpTaskId}`;
 }

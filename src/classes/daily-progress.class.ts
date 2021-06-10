@@ -1,6 +1,6 @@
 import untildify from 'untildify';
-import { BaseFileRef } from './base';
-import { CONFIG } from './config';
+import { BaseFileRef } from './base-file-ref.class';
+import { CONFIG } from '../config';
 
 export class DailyProgress extends BaseFileRef {
   protected get path() {

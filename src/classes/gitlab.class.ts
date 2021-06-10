@@ -1,4 +1,4 @@
-import { CONFIG } from "./config";
+import { CONFIG } from "../config";
 import {
   Branch,
   Issue,
@@ -6,25 +6,18 @@ import {
   MergeRequest,
   Project,
   User,
-} from "./models/gitlab.models";
-import { Commit } from "./models/gitlab/commit.models";
-import { Compare } from "./models/gitlab/compare.models";
-import { Job } from "./models/gitlab/job.models";
+} from "../models/gitlab.models";
+import { Commit } from "../models/gitlab/commit.models";
+import { Compare } from "../models/gitlab/compare.models";
+import { Job } from "../models/gitlab/job.models";
 import {
   FullMergeRequest,
   MergeRequestChanges,
-} from "./models/gitlab/merge-request.models";
-import { Pipeline } from "./models/gitlab/pipeline.models";
-import { callApiFactory } from "./utils";
+} from "../models/gitlab/merge-request.models";
+import { Pipeline } from "../models/gitlab/pipeline.models";
+import { callApiFactory } from "../utils";
 
 const callApi = callApiFactory("GitLab");
-
-export function getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(
-  issueNumber: number,
-  clickUpTaskId: string
-) {
-  return `${issueNumber}_CU-${clickUpTaskId}`;
-}
 
 export class GitLab {
   constructor(public projectId: string) {}

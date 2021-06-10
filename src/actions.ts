@@ -1,9 +1,9 @@
 import clipboardy from "clipboardy";
 import open from "open";
 import readline from "readline";
-import { ClickUp } from "./clickup";
-import { CustomEmojiProgress } from "./emoji-progress";
-import { GitLab } from "./gitlab";
+import { ClickUp } from "./classes/clickup.class";
+import { CustomEmojiProgress } from "./classes/emoji-progress.class";
+import { GitLab } from "./classes/gitlab.class";
 import { NormalizedChecklist } from "./models/models";
 import {
   getClickUpTaskIdFromGitLabIssue,

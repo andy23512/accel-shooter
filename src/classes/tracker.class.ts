@@ -3,15 +3,15 @@ import { compareAsc, parseISO } from "date-fns";
 import { appendFileSync } from "fs";
 import nodeNotifier from "node-notifier";
 import untildify from "untildify";
-import { BaseFileRef } from "./base";
-import { ClickUp } from "./clickup";
-import { CONFIG } from "./config";
-import { GitLab } from "./gitlab";
-import { Job } from "./models/gitlab/job.models";
+import { BaseFileRef } from "./base-file-ref.class";
+import { ClickUp } from "./clickup.class";
+import { CONFIG } from "../config";
+import { GitLab } from "./gitlab.class";
+import { Job } from "../models/gitlab/job.models";
 import {
   getClickUpTaskIdFromGitLabIssue,
   getGitLabProjectConfigByName,
-} from "./utils";
+} from "../utils";
 
 export class Tracker extends BaseFileRef {
   public lastDeployedCommitMap: Record<string, Job["commit"]> = {};
