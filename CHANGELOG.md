@@ -6,6 +6,12 @@
 ### Changed
 ### Fixed
 
+## [1.32.2] - 2021-06-11
+
+### Fixed
+
+- Fix file not found bug
+
 ## [1.32.1] - 2021-06-11
 
 ### Fixed

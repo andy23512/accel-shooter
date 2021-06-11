@@ -16,7 +16,9 @@
   },
   "files": [
     "main.js",
-    "dist/*.js"
+    "dist/*.js",
+    "dist/classes/*.js",
+    "dist/actions/*.js"
   ],
   "pre-commit": [
     "precommit-build"
