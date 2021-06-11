@@ -1,3 +1,4 @@
+import { callApiFactory } from "../api.utils";
 import { CONFIG } from "../config";
 import {
   Branch,
@@ -15,7 +16,6 @@ import {
   MergeRequestChanges,
 } from "../models/gitlab/merge-request.models";
 import { Pipeline } from "../models/gitlab/pipeline.models";
-import { callApiFactory } from "../utils";
 
 const callApi = callApiFactory("GitLab");
 

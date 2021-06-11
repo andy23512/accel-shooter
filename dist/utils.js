@@ -27,102 +27,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId = exports.getGitLabFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabIssue = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = exports.normalizeClickUpChecklist = exports.normalizeGitLabIssueChecklist = exports.callApiFactory = exports.sleep = void 0;
+exports.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId = exports.getGitLabFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabIssue = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = exports.normalizeClickUpChecklist = exports.normalizeGitLabIssueChecklist = void 0;
 const child_process_1 = __importStar(require("child_process"));
-const node_fetch_1 = __importDefault(require("node-fetch"));
-const qs_1 = __importDefault(require("qs"));
 const case_utils_1 = require("./case-utils");
 const clickup_class_1 = require("./classes/clickup.class");
 const gitlab_class_1 = require("./classes/gitlab.class");
 const config_1 = require("./config");
-const RETRY_SETTING = {
-    retry: 5,
-    pause: 12 * 1000,
-};
-function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}
-exports.sleep = sleep;
-function fetchRetry(url, opts) {
-    return __awaiter(this, void 0, void 0, function* () {
-        let retry = (opts && opts.retry) || 3;
-        while (retry > 0) {
-            try {
-                return yield node_fetch_1.default(url, opts);
-            }
-            catch (e) {
-                if (opts === null || opts === void 0 ? void 0 : opts.callback) {
-                    opts.callback(retry);
-                }
-                retry = retry - 1;
-                if (retry == 0) {
-                    throw e;
-                }
-                if (opts === null || opts === void 0 ? void 0 : opts.pause) {
-                    yield sleep(opts.pause);
-                }
-            }
-        }
-    });
-}
-function checkStatus(res) {
-    if (res) {
-        if (res.ok) {
-            return res;
-        }
-        else {
-            throw Error(res.statusText);
-        }
-    }
-    else {
-        throw Error("Response is undefined.");
-    }
-}
-function callApiFactory(site) {
-    let apiUrl = "";
-    let headers = {};
-    switch (site) {
-        case "GitLab":
-            apiUrl = "https://gitlab.com/api/v4";
-            headers = { "Private-Token": config_1.CONFIG.GitLabToken };
-            break;
-        case "ClickUp":
-            apiUrl = "https://api.clickup.com/api/v2";
-            headers = { Authorization: config_1.CONFIG.ClickUpToken };
-            break;
-        default:
-            throw Error(`Site {site} is not supported.`);
-    }
-    return (method, url, queryParams, body) => __awaiter(this, void 0, void 0, function* () {
-        let params;
-        if (typeof body === "object") {
-            params = new URLSearchParams();
-            Object.entries(body).forEach(([key, value]) => {
-                params.set(key, value);
-            });
-        }
-        if (typeof body === "string") {
-            params = body;
-        }
-        if (queryParams) {
-            url += "?" + qs_1.default.stringify(queryParams, { arrayFormat: "brackets" });
-        }
-        return fetchRetry(apiUrl + url, method === "get"
-            ? Object.assign({ method,
-                headers }, RETRY_SETTING) : Object.assign({ method, headers, body: params }, RETRY_SETTING))
-            .then(checkStatus)
-            .then((res) => res.json())
-            .catch((error) => {
-            console.log(apiUrl + url);
-            throw error;
-        });
-    });
-}
-exports.callApiFactory = callApiFactory;
 function normalizeGitLabIssueChecklist(checklistText) {
     return checklistText
         .split("\n")

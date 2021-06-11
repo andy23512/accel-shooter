@@ -26,6 +26,7 @@ const gitlab_class_1 = require("../classes/gitlab.class");
 const progress_log_class_1 = require("../classes/progress-log.class");
 const tracker_class_1 = require("../classes/tracker.class");
 const config_1 = require("../config");
+const sleep_utils_1 = require("../sleep.utils");
 const utils_1 = require("../utils");
 function startAction() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -114,7 +115,7 @@ function startAction() {
         p.next();
         process.chdir(answers.gitLabProject.path.replace("~", os_1.default.homedir()));
         yield utils_1.promiseSpawn("git", ["fetch"], "pipe");
-        yield utils_1.sleep(1000);
+        yield sleep_utils_1.sleep(1000);
         yield utils_1.promiseSpawn("git", ["checkout", gitLabBranch.name], "pipe");
         yield utils_1.promiseSpawn("git", ["submodule", "update", "--init", "--recursive"], "pipe");
         p.end(0);

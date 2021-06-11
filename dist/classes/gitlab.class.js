@@ -10,9 +10,9 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GitLab = void 0;
+const api_utils_1 = require("../api.utils");
 const config_1 = require("../config");
-const utils_1 = require("../utils");
-const callApi = utils_1.callApiFactory("GitLab");
+const callApi = api_utils_1.callApiFactory("GitLab");
 class GitLab {
     constructor(projectId) {
         this.projectId = projectId;

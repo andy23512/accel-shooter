@@ -11,10 +11,10 @@ import { GitLab } from "../classes/gitlab.class";
 import { CustomProgressLog } from "../classes/progress-log.class";
 import { Tracker } from "../classes/tracker.class";
 import { CONFIG } from "../config";
+import { sleep } from "../sleep.utils";
 import {
   getGitLabBranchNameFromIssueNumberAndTitleAndTaskId,
   promiseSpawn,
-  sleep,
 } from "../utils";
 
 export async function startAction() {

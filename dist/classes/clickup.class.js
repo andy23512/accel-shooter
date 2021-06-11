@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClickUp = void 0;
-const utils_1 = require("../utils");
-const callApi = utils_1.callApiFactory("ClickUp");
+const api_utils_1 = require("../api.utils");
+const callApi = api_utils_1.callApiFactory("ClickUp");
 class ClickUp {
     constructor(taskId) {
         this.taskId = taskId;
