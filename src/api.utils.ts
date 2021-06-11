@@ -1,3 +1,4 @@
+import fetch, { RequestInfo, RequestInit, Response } from "node-fetch";
 import qs from "qs";
 import { CONFIG } from "./config";
 import { HttpMethod, Site } from "./models/models";

@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.callApiFactory = void 0;
+const node_fetch_1 = __importDefault(require("node-fetch"));
 const qs_1 = __importDefault(require("qs"));
 const config_1 = require("./config");
 const sleep_utils_1 = require("./sleep.utils");
@@ -25,7 +26,7 @@ function fetchRetry(url, opts) {
         let retry = (opts && opts.retry) || 3;
         while (retry > 0) {
             try {
-                return yield fetch(url, opts);
+                return yield node_fetch_1.default(url, opts);
             }
             catch (e) {
                 if (opts === null || opts === void 0 ? void 0 : opts.callback) {
