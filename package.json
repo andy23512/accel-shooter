@@ -1,6 +1,6 @@
 {
   "name": "accel-shooter",
-  "version": "1.32.3",
+  "version": "1.33.0",
   "main": "index.js",
   "license": "MIT",
   "bin": {

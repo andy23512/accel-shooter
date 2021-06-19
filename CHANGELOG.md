@@ -6,6 +6,12 @@
 ### Changed
 ### Fixed
 
+## [1.33.0] - 2021-06-19
+
+### Change
+
+- Run sync after start
+
 ## [1.32.3] - 2021-06-11
 
 ### Fixed
