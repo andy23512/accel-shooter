@@ -97,6 +97,7 @@ function configReadline() {
 exports.configReadline = configReadline;
 function setUpSyncHotkey(gitLabProjectId, issueNumber, ep) {
     process.stdin.setRawMode(true);
+    process.stdin.resume();
     process.stdin.on("keypress", (_, key) => __awaiter(this, void 0, void 0, function* () {
         var _a;
         if (key.ctrl && key.name === "c") {

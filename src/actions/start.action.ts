@@ -4,7 +4,6 @@ import inquirer from "inquirer";
 import { render } from "mustache";
 import os from "os";
 import untildify from "untildify";
-import { configReadline } from "../actions";
 import { ClickUp } from "../classes/clickup.class";
 import { DailyProgress } from "../classes/daily-progress.class";
 import { GitLab } from "../classes/gitlab.class";
@@ -16,9 +15,9 @@ import {
   getGitLabBranchNameFromIssueNumberAndTitleAndTaskId,
   promiseSpawn,
 } from "../utils";
+import { syncAction } from "./sync.action";
 
 export async function startAction() {
-  configReadline();
   const answers = await inquirer.prompt([
     {
       name: "gitLabProject",
@@ -123,4 +122,5 @@ export async function startAction() {
     "pipe"
   );
   p.end(0);
+  await syncAction();
 }

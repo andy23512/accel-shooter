@@ -135,6 +135,7 @@ export function setUpSyncHotkey(
   ep: CustomEmojiProgress
 ) {
   process.stdin.setRawMode(true);
+  process.stdin.resume();
   process.stdin.on("keypress", async (_, key) => {
     if (key.ctrl && key.name === "c") {
       process.exit();

@@ -19,7 +19,6 @@ const inquirer_1 = __importDefault(require("inquirer"));
 const mustache_1 = require("mustache");
 const os_1 = __importDefault(require("os"));
 const untildify_1 = __importDefault(require("untildify"));
-const actions_1 = require("../actions");
 const clickup_class_1 = require("../classes/clickup.class");
 const daily_progress_class_1 = require("../classes/daily-progress.class");
 const gitlab_class_1 = require("../classes/gitlab.class");
@@ -28,9 +27,9 @@ const tracker_class_1 = require("../classes/tracker.class");
 const config_1 = require("../config");
 const sleep_utils_1 = require("../sleep.utils");
 const utils_1 = require("../utils");
+const sync_action_1 = require("./sync.action");
 function startAction() {
     return __awaiter(this, void 0, void 0, function* () {
-        actions_1.configReadline();
         const answers = yield inquirer_1.default.prompt([
             {
                 name: "gitLabProject",
@@ -119,6 +118,7 @@ function startAction() {
         yield utils_1.promiseSpawn("git", ["checkout", gitLabBranch.name], "pipe");
         yield utils_1.promiseSpawn("git", ["submodule", "update", "--init", "--recursive"], "pipe");
         p.end(0);
+        yield sync_action_1.syncAction();
     });
 }
 exports.startAction = startAction;
