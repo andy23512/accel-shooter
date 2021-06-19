@@ -6,6 +6,12 @@
 ### Changed
 ### Fixed
 
+## [1.34.0] - 2021-06-19
+
+### Added
+
+- Add select feature in check command
+
 ## [1.33.0] - 2021-06-19
 
 ### Change

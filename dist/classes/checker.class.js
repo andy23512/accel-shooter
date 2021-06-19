@@ -14,12 +14,13 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Checker = void 0;
 const fs_1 = require("fs");
+const inquirer_1 = __importDefault(require("inquirer"));
 const os_1 = __importDefault(require("os"));
 const rxjs_1 = require("rxjs");
 const operators_1 = require("rxjs/operators");
 const untildify_1 = __importDefault(require("untildify"));
-const gitlab_class_1 = require("./gitlab.class");
 const utils_1 = require("../utils");
+const gitlab_class_1 = require("./gitlab.class");
 const SPINNER = [
     "🕛",
     "🕐",
@@ -35,11 +36,13 @@ const SPINNER = [
     "🕚",
 ];
 class CheckItem {
-    constructor(group, name, run, stdoutReducer) {
+    constructor(group, name, defaultChecked, run, stdoutReducer) {
         this.group = group;
         this.name = name;
+        this.defaultChecked = defaultChecked;
         this.run = run;
         this.stdoutReducer = stdoutReducer;
+        this.displayName = `[${this.group}] ${this.name}`;
     }
     getObs(context) {
         return rxjs_1.concat(rxjs_1.of({
@@ -60,7 +63,7 @@ class CheckItem {
     }
 }
 const items = [
-    new CheckItem("Global", "Check Non-Pushed Changes", () => __awaiter(void 0, void 0, void 0, function* () {
+    new CheckItem("Global", "Check Non-Pushed Changes", true, () => __awaiter(void 0, void 0, void 0, function* () {
         const result = yield utils_1.promiseSpawn("git", ["status"], "pipe");
         result.code =
             result.stdout.includes("Your branch is up to date with") &&
@@ -69,24 +72,24 @@ const items = [
                 : 1;
         return result;
     })),
-    new CheckItem("Global", "Check Conflict", ({ mergeRequest, gitLab }) => __awaiter(void 0, void 0, void 0, function* () {
+    new CheckItem("Global", "Check Conflict", true, ({ mergeRequest, gitLab }) => __awaiter(void 0, void 0, void 0, function* () {
         const fullMergeRequest = yield gitLab.getMergeRequest(mergeRequest.iid);
         const isConflict = fullMergeRequest.has_conflicts;
         return { code: isConflict ? 1 : 0 };
     })),
-    new CheckItem("Frontend", "Check Lint", () => __awaiter(void 0, void 0, void 0, function* () {
+    new CheckItem("Frontend", "Check Lint", false, () => __awaiter(void 0, void 0, void 0, function* () {
         return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "frontend", "yarn", "lint"], "pipe");
     })),
-    new CheckItem("Frontend", "Check Test", () => __awaiter(void 0, void 0, void 0, function* () {
+    new CheckItem("Frontend", "Check Test", false, () => __awaiter(void 0, void 0, void 0, function* () {
         return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "frontend", "yarn", "jest", "--coverage=false"], "pipe");
     }), (stdout) => stdout
         .split("\n")
         .filter((line) => !line.startsWith("PASS"))
         .join("\n")),
-    new CheckItem("Frontend", "Check Prod", () => __awaiter(void 0, void 0, void 0, function* () {
+    new CheckItem("Frontend", "Check Prod", false, () => __awaiter(void 0, void 0, void 0, function* () {
         return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "frontend", "yarn", "prod"], "pipe");
     })),
-    new CheckItem("Frontend", "Check console.log", ({ frontendChanges }) => __awaiter(void 0, void 0, void 0, function* () {
+    new CheckItem("Frontend", "Check console.log", true, ({ frontendChanges }) => __awaiter(void 0, void 0, void 0, function* () {
         return {
             code: frontendChanges.some((c) => c.new_path.endsWith(".ts") &&
                 c.diff
@@ -96,7 +99,7 @@ const items = [
                 : 0,
         };
     })),
-    new CheckItem("Frontend", "Check long import", ({ frontendChanges }) => __awaiter(void 0, void 0, void 0, function* () {
+    new CheckItem("Frontend", "Check long import", true, ({ frontendChanges }) => __awaiter(void 0, void 0, void 0, function* () {
         return {
             code: frontendChanges.some((c) => c.new_path.endsWith(".ts") &&
                 c.diff
@@ -106,13 +109,13 @@ const items = [
                 : 0,
         };
     })),
-    new CheckItem("Backend", "Check Test (unittest)", () => __awaiter(void 0, void 0, void 0, function* () {
+    new CheckItem("Backend", "Check Test (unittest)", false, () => __awaiter(void 0, void 0, void 0, function* () {
         return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "backend", "./manage.py", "test"], "pipe");
     })),
-    new CheckItem("Backend", "Check Test (pytest)", () => __awaiter(void 0, void 0, void 0, function* () {
+    new CheckItem("Backend", "Check Test (pytest)", false, () => __awaiter(void 0, void 0, void 0, function* () {
         return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "backend", "pytest", "."], "pipe");
     })),
-    new CheckItem("Backend", "Check Print", ({ backendChanges }) => __awaiter(void 0, void 0, void 0, function* () {
+    new CheckItem("Backend", "Check Print", true, ({ backendChanges }) => __awaiter(void 0, void 0, void 0, function* () {
         return {
             code: backendChanges.some((c) => c.new_path.endsWith(".py") &&
                 c.diff
@@ -122,7 +125,7 @@ const items = [
                 : 0,
         };
     })),
-    new CheckItem("Backend", "Check Migration Conflict", ({ mergeRequest, backendChanges, gitLab }) => __awaiter(void 0, void 0, void 0, function* () {
+    new CheckItem("Backend", "Check Migration Conflict", true, ({ mergeRequest, backendChanges, gitLab }) => __awaiter(void 0, void 0, void 0, function* () {
         if (!backendChanges.some((c) => c.new_path.includes("migrations"))) {
             return { code: 0 };
         }
@@ -158,6 +161,7 @@ class Checker {
     }
     start() {
         return __awaiter(this, void 0, void 0, function* () {
+            const selectMode = process.argv.includes("-s") || process.argv.includes("--select");
             const mergeRequests = yield this.gitLab.listMergeRequestsWillCloseIssueOnMerge(this.issueNumber);
             const mergeRequest = mergeRequests[mergeRequests.length - 1];
             const mergeRequestChanges = yield this.gitLab.getMergeRequestChanges(mergeRequest.iid);
@@ -177,6 +181,21 @@ class Checker {
                 this.gitLabProject.ignoredCheck.length > 0) {
                 const ignoredCheck = this.gitLabProject.ignoredCheck;
                 runningItems = runningItems.filter((item) => !ignoredCheck.includes(`${item.group}/${item.name}`));
+            }
+            if (selectMode) {
+                const answers = yield inquirer_1.default.prompt([
+                    {
+                        name: "selectedCheckItems",
+                        message: "Choose Check Items to Run",
+                        type: "checkbox",
+                        choices: runningItems.map((r) => ({
+                            name: r.displayName,
+                            checked: r.defaultChecked,
+                        })),
+                        pageSize: runningItems.length,
+                    },
+                ]);
+                runningItems = runningItems.filter((r) => answers.selectedCheckItems.includes(r.displayName));
             }
             const context = {
                 mergeRequest,
