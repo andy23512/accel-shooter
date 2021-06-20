@@ -6,6 +6,13 @@
 ### Changed
 ### Fixed
 
+## [1.34.1] - 2021-06-20
+
+### Fixed
+
+- Retry when 4xx error happened
+- fix mytask list table bug
+
 ## [1.34.0] - 2021-06-19
 
 ### Added
