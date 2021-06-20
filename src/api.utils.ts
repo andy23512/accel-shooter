@@ -20,7 +20,7 @@ async function fetchRetry(
   let retry = (opts && opts.retry) || 3;
   while (retry > 0) {
     try {
-      return await fetch(url, opts);
+      return await fetch(url, opts).then(checkStatus);
     } catch (e) {
       if (opts?.callback) {
         opts.callback(retry);
@@ -93,8 +93,7 @@ export function callApiFactory(site: Site) {
           }
         : { method, headers, body: params, ...RETRY_SETTING }
     )
-      .then(checkStatus)
-      .then((res) => res.json())
+      .then((res) => res?.json())
       .catch((error) => {
         console.log(apiUrl + url);
         throw error;

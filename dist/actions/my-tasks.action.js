@@ -14,8 +14,8 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.myTasksAction = void 0;
 const chalk_1 = __importDefault(require("chalk"));
-const console_1 = require("console");
 const moment_1 = __importDefault(require("moment"));
+const table_1 = require("table");
 const clickup_class_1 = require("../classes/clickup.class");
 const config_1 = require("../config");
 function myTasksAction() {
@@ -32,7 +32,7 @@ function myTasksAction() {
             const taskPath = [task];
             let t = task;
             while (t.parent) {
-                t = yield new clickup_class_1.ClickUp(task.parent).getTask();
+                t = yield new clickup_class_1.ClickUp(t.parent).getTask();
                 taskPath.push(t);
             }
             const simpleTaskPath = taskPath.map((t) => ({
@@ -42,7 +42,7 @@ function myTasksAction() {
                 due_date: t.due_date,
             }));
             const reducedTask = simpleTaskPath.reduce((a, c) => ({
-                name: c.name + " - " + a.name,
+                name: a.name,
                 id: a.id,
                 priority: (a.priority === null && c.priority !== null) ||
                     (a.priority !== null &&
@@ -98,7 +98,7 @@ function myTasksAction() {
                 compare((_a = a.priority) === null || _a === void 0 ? void 0 : _a.orderindex, (_b = b.priority) === null || _b === void 0 ? void 0 : _b.orderindex));
         });
         console.log("Sort by Due Date:");
-        console.log(console_1.table(topDueDateTasks.map((t) => {
+        console.log(table_1.table(topDueDateTasks.map((t) => {
             var _a;
             return [
                 t.name,
@@ -114,7 +114,7 @@ function myTasksAction() {
                 compare(a.due_date, b.due_date));
         });
         console.log("Sort by Priority:");
-        console.log(console_1.table(topPriorityTasks.map((t) => {
+        console.log(table_1.table(topPriorityTasks.map((t) => {
             var _a;
             return [
                 t.name,

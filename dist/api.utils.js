@@ -26,7 +26,7 @@ function fetchRetry(url, opts) {
         let retry = (opts && opts.retry) || 3;
         while (retry > 0) {
             try {
-                return yield node_fetch_1.default(url, opts);
+                return yield node_fetch_1.default(url, opts).then(checkStatus);
             }
             catch (e) {
                 if (opts === null || opts === void 0 ? void 0 : opts.callback) {
@@ -88,8 +88,7 @@ function callApiFactory(site) {
         return fetchRetry(apiUrl + url, method === "get"
             ? Object.assign({ method,
                 headers }, RETRY_SETTING) : Object.assign({ method, headers, body: params }, RETRY_SETTING))
-            .then(checkStatus)
-            .then((res) => res.json())
+            .then((res) => res === null || res === void 0 ? void 0 : res.json())
             .catch((error) => {
             console.log(apiUrl + url);
             throw error;

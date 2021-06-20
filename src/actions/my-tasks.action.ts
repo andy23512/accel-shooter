@@ -1,6 +1,6 @@
 import chalk from "chalk";
-import { table } from "console";
 import moment from "moment";
+import { table } from "table";
 import { ClickUp } from "../classes/clickup.class";
 import { CONFIG } from "../config";
 
@@ -19,7 +19,7 @@ export async function myTasksAction() {
     const taskPath = [task];
     let t = task;
     while (t.parent) {
-      t = await new ClickUp(task.parent).getTask();
+      t = await new ClickUp(t.parent).getTask();
       taskPath.push(t);
     }
     const simpleTaskPath = taskPath.map((t) => ({
@@ -29,7 +29,7 @@ export async function myTasksAction() {
       due_date: t.due_date,
     }));
     const reducedTask = simpleTaskPath.reduce((a, c) => ({
-      name: c.name + " - " + a.name,
+      name: a.name,
       id: a.id,
       priority:
         (a.priority === null && c.priority !== null) ||
