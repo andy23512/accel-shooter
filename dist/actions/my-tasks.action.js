@@ -17,6 +17,7 @@ const chalk_1 = __importDefault(require("chalk"));
 const moment_1 = __importDefault(require("moment"));
 const table_1 = require("table");
 const clickup_class_1 = require("../classes/clickup.class");
+const emoji_progress_class_1 = require("../classes/emoji-progress.class");
 const config_1 = require("../config");
 function myTasksAction() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -28,6 +29,7 @@ function myTasksAction() {
         }
         const tasks = (yield clickup_class_1.ClickUp.getMyTasks(team.id, user.id)).tasks;
         const summarizedTasks = [];
+        const ep = new emoji_progress_class_1.CustomEmojiProgress(0, tasks.length);
         for (const task of tasks) {
             const taskPath = [task];
             let t = task;
@@ -66,6 +68,7 @@ function myTasksAction() {
                 original_priority: task.priority,
                 original_due_date: task.due_date,
             });
+            ep.increase(1);
         }
         const compare = (a, b) => {
             if (a === b) {

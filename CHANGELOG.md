@@ -1,10 +1,19 @@
 # Change Log
 
-## [Unrealeased] - yyyy-mm-dd
+## Template
+```
+## [Unrealased] - yyyy-mm-dd
 
 ### Added
 ### Changed
 ### Fixed
+```
+
+## [Unrealeased] - yyyy-mm-dd
+
+### Added
+
+- Add progress bar to my task command
 
 ## [1.35.0] - 2021-06-21
 

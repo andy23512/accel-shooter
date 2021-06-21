@@ -2,6 +2,7 @@ import chalk from "chalk";
 import moment from "moment";
 import { table } from "table";
 import { ClickUp } from "../classes/clickup.class";
+import { CustomEmojiProgress } from "../classes/emoji-progress.class";
 import { CONFIG } from "../config";
 
 export async function myTasksAction() {
@@ -15,6 +16,7 @@ export async function myTasksAction() {
   }
   const tasks = (await ClickUp.getMyTasks(team.id, user.id)).tasks;
   const summarizedTasks: any[] = [];
+  const ep = new CustomEmojiProgress(0, tasks.length);
   for (const task of tasks) {
     const taskPath = [task];
     let t = task;
@@ -55,6 +57,7 @@ export async function myTasksAction() {
       original_priority: task.priority,
       original_due_date: task.due_date,
     });
+    ep.increase(1);
   }
   const compare = (a: null | string, b: null | string) => {
     if (a === b) {
