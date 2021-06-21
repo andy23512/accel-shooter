@@ -1,13 +1,12 @@
-import clipboardy from "clipboardy";
 import open from "open";
 import readline from "readline";
+import { endAction } from "./actions/end.action";
 import { ClickUp } from "./classes/clickup.class";
 import { CustomEmojiProgress } from "./classes/emoji-progress.class";
 import { GitLab } from "./classes/gitlab.class";
 import { NormalizedChecklist } from "./models/models";
 import {
   getClickUpTaskIdFromGitLabIssue,
-  getGitLabProjectConfigById,
   normalizeClickUpChecklist,
   normalizeGitLabIssueChecklist,
 } from "./utils";
@@ -145,10 +144,7 @@ export function setUpSyncHotkey(
     } else if (!key.ctrl && !key.meta && !key.shift && key.name === "e") {
       console.log(`You pressed the end key`);
       await syncChecklist(gitLabProjectId, issueNumber, ep);
-      const projectName = getGitLabProjectConfigById(gitLabProjectId)?.name;
-      const syncCommand = `acst end ${projectName} ${issueNumber}`;
-      clipboardy.writeSync(syncCommand);
-      console.log(`Sync command: "${syncCommand}" Copied!`);
+      await endAction();
       process.exit();
     }
   });

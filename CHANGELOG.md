@@ -15,6 +15,10 @@
 
 - Add progress bar to my task command
 
+### Changed
+
+- Directly execute end action when e is pressed in sync
+
 ## [1.35.0] - 2021-06-21
 
 ### Added
