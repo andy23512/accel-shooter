@@ -9,7 +9,7 @@
 ### Fixed
 ```
 
-## [Unrealeased] - yyyy-mm-dd
+## [1.36.0] - 2021-06-21
 
 ### Added
 
