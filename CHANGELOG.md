@@ -6,6 +6,12 @@
 ### Changed
 ### Fixed
 
+## [1.35.0] - 2021-06-21
+
+### Added
+
+- Add task url in my task output
+
 ## [1.34.1] - 2021-06-20
 
 ### Fixed
