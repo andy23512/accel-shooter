@@ -49,6 +49,7 @@ export async function myTasksAction() {
     summarizedTasks.push({
       name: reducedTask.name,
       id: task.id,
+      url: task.url,
       priority: reducedTask.priority,
       due_date: reducedTask.due_date,
       original_priority: task.priority,
@@ -89,7 +90,7 @@ export async function myTasksAction() {
   console.log(
     table(
       topDueDateTasks.map((t) => [
-        t.name,
+        t.name + "\n" + t.url,
         colorPriority(t.priority?.priority),
         moment(+t.due_date).format("YYYY-MM-DD"),
       ])
@@ -107,7 +108,7 @@ export async function myTasksAction() {
   console.log(
     table(
       topPriorityTasks.map((t) => [
-        t.name,
+        t.name + "\n" + t.url,
         colorPriority(t.priority?.priority),
         t.due_date ? moment(+t.due_date).format("YYYY-MM-DD") : "",
       ])
