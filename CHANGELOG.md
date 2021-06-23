@@ -9,6 +9,12 @@
 ### Fixed
 ```
 
+## [1.37.0] - 2021-06-24
+
+### Added
+
+- Open frame url when start sync
+
 ## [1.36.1] - 2021-06-24
 
 ### Fixed
