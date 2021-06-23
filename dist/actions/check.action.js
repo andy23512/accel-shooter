@@ -14,8 +14,10 @@ const checker_class_1 = require("../classes/checker.class");
 const utils_1 = require("../utils");
 function checkAction() {
     return __awaiter(this, void 0, void 0, function* () {
+        const selectMode = process.argv.includes("-s") || process.argv.includes("--select");
+        process.argv = process.argv.filter((a) => a !== "-s" && a !== "--select");
         const { gitLabProject, issueNumber } = utils_1.getGitLabFromArgv();
-        const checker = new checker_class_1.Checker(gitLabProject, issueNumber);
+        const checker = new checker_class_1.Checker(gitLabProject, issueNumber, selectMode);
         yield checker.start();
     });
 }

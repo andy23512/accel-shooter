@@ -243,15 +243,14 @@ export class Checker {
 
   constructor(
     private gitLabProject: GitLabProject,
-    private issueNumber: string
+    private issueNumber: string,
+    private selectMode: boolean
   ) {
     this.gitLabProjectId = this.gitLabProject.id;
     this.gitLab = new GitLab(this.gitLabProjectId);
   }
 
   public async start() {
-    const selectMode =
-      process.argv.includes("-s") || process.argv.includes("--select");
     const mergeRequests =
       await this.gitLab.listMergeRequestsWillCloseIssueOnMerge(
         this.issueNumber
@@ -285,7 +284,7 @@ export class Checker {
         (item) => !ignoredCheck.includes(`${item.group}/${item.name}`)
       );
     }
-    if (selectMode) {
+    if (this.selectMode) {
       const answers = await inquirer.prompt([
         {
           name: "selectedCheckItems",

@@ -153,15 +153,15 @@ const items = [
     })),
 ];
 class Checker {
-    constructor(gitLabProject, issueNumber) {
+    constructor(gitLabProject, issueNumber, selectMode) {
         this.gitLabProject = gitLabProject;
         this.issueNumber = issueNumber;
+        this.selectMode = selectMode;
         this.gitLabProjectId = this.gitLabProject.id;
         this.gitLab = new gitlab_class_1.GitLab(this.gitLabProjectId);
     }
     start() {
         return __awaiter(this, void 0, void 0, function* () {
-            const selectMode = process.argv.includes("-s") || process.argv.includes("--select");
             const mergeRequests = yield this.gitLab.listMergeRequestsWillCloseIssueOnMerge(this.issueNumber);
             const mergeRequest = mergeRequests[mergeRequests.length - 1];
             const mergeRequestChanges = yield this.gitLab.getMergeRequestChanges(mergeRequest.iid);
@@ -182,7 +182,7 @@ class Checker {
                 const ignoredCheck = this.gitLabProject.ignoredCheck;
                 runningItems = runningItems.filter((item) => !ignoredCheck.includes(`${item.group}/${item.name}`));
             }
-            if (selectMode) {
+            if (this.selectMode) {
                 const answers = yield inquirer_1.default.prompt([
                     {
                         name: "selectedCheckItems",

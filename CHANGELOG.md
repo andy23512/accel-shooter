@@ -9,6 +9,12 @@
 ### Fixed
 ```
 
+## [1.36.1] - 2021-06-24
+
+### Fixed
+
+- Fix select mode in check command bug
+
 ## [1.36.0] - 2021-06-21
 
 ### Added
