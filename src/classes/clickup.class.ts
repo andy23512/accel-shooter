@@ -3,6 +3,7 @@ import { ChecklistResponse, Task } from "../models/clickup.models";
 import { List } from "../models/clickup/list.models";
 import { Team } from "../models/clickup/team.models";
 import { User } from "../models/clickup/user.models";
+import { Comment } from "./../models/clickup/comment.models";
 const callApi = callApiFactory("ClickUp");
 
 export class ClickUp {
@@ -38,6 +39,13 @@ export class ClickUp {
 
   public getTask() {
     return callApi<Task>("get", `/task/${this.taskId}`);
+  }
+
+  public getTaskComments() {
+    return callApi<{ comments: Comment[] }>(
+      "get",
+      `/task/${this.taskId}/comment/`
+    ).then((r) => r.comments);
   }
 
   public setTaskStatus(status: string) {
@@ -95,5 +103,26 @@ export class ClickUp {
       "delete",
       `/checklist/${checklistId}/checklist_item/${checklistItemId}`
     );
+  }
+
+  public async getFrameUrls() {
+    let currentTaskId = this.taskId;
+    const frameUrls: string[] = [];
+    while (currentTaskId) {
+      const clickUp = new ClickUp(currentTaskId);
+      const task = await clickUp.getTask();
+      const comments = await clickUp.getTaskComments();
+      comments.forEach((co) => {
+        co.comment
+          .filter((c) => c.type === "frame")
+          .forEach((c) => {
+            if (c?.frame?.url) {
+              frameUrls.push(c.frame.url);
+            }
+          });
+      });
+      currentTaskId = task.parent;
+    }
+    return frameUrls;
   }
 }

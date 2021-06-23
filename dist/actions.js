@@ -48,13 +48,6 @@ function syncChecklist(gitLabProjectId, issueNumber, ep, openPage) {
     return __awaiter(this, void 0, void 0, function* () {
         const gitLab = new gitlab_class_1.GitLab(gitLabProjectId);
         const issue = yield gitLab.getIssue(issueNumber);
-        if (openPage) {
-            open_1.default(issue.web_url);
-            const result = issue.description.match(/https:\/\/app.clickup.com\/t\/\w+/);
-            if (result) {
-                open_1.default(result[0]);
-            }
-        }
         const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
         if (clickUpTaskId) {
             const gitLabChecklistText = issue.description
@@ -63,6 +56,14 @@ function syncChecklist(gitLabProjectId, issueNumber, ep, openPage) {
             const gitLabNormalizedChecklist = utils_1.normalizeGitLabIssueChecklist(gitLabChecklistText);
             const clickUp = new clickup_class_1.ClickUp(clickUpTaskId);
             const clickUpTask = yield clickUp.getTask();
+            if (openPage) {
+                const frameUrls = yield clickUp.getFrameUrls();
+                open_1.default(issue.web_url);
+                open_1.default(clickUpTask.url);
+                if (frameUrls.length) {
+                    open_1.default(frameUrls[0]);
+                }
+            }
             const clickUpChecklistTitle = `GitLab synced checklist [${gitLabProjectId.replace("%2F", "/")}]`;
             let clickUpChecklist = clickUpTask.checklists.find((c) => c.name === clickUpChecklistTitle);
             if (!clickUpChecklist) {

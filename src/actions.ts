@@ -53,13 +53,6 @@ export async function syncChecklist(
 ) {
   const gitLab = new GitLab(gitLabProjectId);
   const issue = await gitLab.getIssue(issueNumber);
-  if (openPage) {
-    open(issue.web_url);
-    const result = issue.description.match(/https:\/\/app.clickup.com\/t\/\w+/);
-    if (result) {
-      open(result[0]);
-    }
-  }
   const clickUpTaskId = getClickUpTaskIdFromGitLabIssue(issue);
   if (clickUpTaskId) {
     const gitLabChecklistText = issue.description
@@ -69,6 +62,14 @@ export async function syncChecklist(
       normalizeGitLabIssueChecklist(gitLabChecklistText);
     const clickUp = new ClickUp(clickUpTaskId);
     const clickUpTask = await clickUp.getTask();
+    if (openPage) {
+      const frameUrls = await clickUp.getFrameUrls();
+      open(issue.web_url);
+      open(clickUpTask.url);
+      if (frameUrls.length) {
+        open(frameUrls[0]);
+      }
+    }
     const clickUpChecklistTitle = `GitLab synced checklist [${gitLabProjectId.replace(
       "%2F",
       "/"
