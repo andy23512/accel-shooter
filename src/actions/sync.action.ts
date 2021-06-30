@@ -24,6 +24,7 @@ export async function syncAction() {
     ["checkout", lastMergeRequest.source_branch],
     "pipe"
   );
+  console.log(`${gitLabProject.name} ${issueNumber}`);
   const ep = new CustomEmojiProgress(0, 100);
   setUpSyncHotkey(gitLabProjectId, issueNumber, ep);
   await syncChecklist(gitLabProjectId, issueNumber, ep, true);
