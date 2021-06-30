@@ -16,17 +16,18 @@ exports.syncAction = void 0;
 const os_1 = __importDefault(require("os"));
 const dynamic_1 = require("set-interval-async/dynamic");
 const actions_1 = require("../actions");
-const config_1 = require("../config");
 const emoji_progress_class_1 = require("../classes/emoji-progress.class");
+const config_1 = require("../config");
 const utils_1 = require("../utils");
 function syncAction() {
     return __awaiter(this, void 0, void 0, function* () {
         actions_1.configReadline();
         const { gitLab, gitLabProject, issueNumber } = utils_1.getGitLabFromArgv();
+        process.chdir(gitLabProject.path.replace("~", os_1.default.homedir()));
+        yield utils_1.checkWorkingTreeClean();
         const gitLabProjectId = gitLabProject.id;
         const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
         const lastMergeRequest = mergeRequests[mergeRequests.length - 1];
-        process.chdir(gitLabProject.path.replace("~", os_1.default.homedir()));
         yield utils_1.promiseSpawn("git", ["checkout", lastMergeRequest.source_branch], "pipe");
         const ep = new emoji_progress_class_1.CustomEmojiProgress(0, 100);
         actions_1.setUpSyncHotkey(gitLabProjectId, issueNumber, ep);

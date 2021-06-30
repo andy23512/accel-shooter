@@ -17,9 +17,9 @@ const fs_1 = require("fs");
 const inquirer_1 = __importDefault(require("inquirer"));
 const os_1 = __importDefault(require("os"));
 const rxjs_1 = require("rxjs");
-const operators_1 = require("rxjs/operators");
 const untildify_1 = __importDefault(require("untildify"));
 const utils_1 = require("../utils");
+const check_items_const_1 = require("./../consts/check-items.const");
 const gitlab_class_1 = require("./gitlab.class");
 const SPINNER = [
     "🕛",
@@ -34,123 +34,6 @@ const SPINNER = [
     "🕘",
     "🕙",
     "🕚",
-];
-class CheckItem {
-    constructor(group, name, defaultChecked, run, stdoutReducer) {
-        this.group = group;
-        this.name = name;
-        this.defaultChecked = defaultChecked;
-        this.run = run;
-        this.stdoutReducer = stdoutReducer;
-        this.displayName = `[${this.group}] ${this.name}`;
-    }
-    getObs(context) {
-        return rxjs_1.concat(rxjs_1.of({
-            group: this.group,
-            name: this.name,
-            code: -1,
-            stdout: "",
-            stderr: "",
-        }), rxjs_1.defer(() => this.run(context)).pipe(operators_1.map((d) => {
-            const result = d;
-            result.group = this.group;
-            result.name = this.name;
-            if (this.stdoutReducer && result.stdout) {
-                result.stdout = this.stdoutReducer(result.stdout);
-            }
-            return result;
-        })));
-    }
-}
-const items = [
-    new CheckItem("Global", "Check Non-Pushed Changes", true, () => __awaiter(void 0, void 0, void 0, function* () {
-        const result = yield utils_1.promiseSpawn("git", ["status"], "pipe");
-        result.code =
-            result.stdout.includes("Your branch is up to date with") &&
-                result.stdout.includes("nothing to commit, working tree clean")
-                ? 0
-                : 1;
-        return result;
-    })),
-    new CheckItem("Global", "Check Conflict", true, ({ mergeRequest, gitLab }) => __awaiter(void 0, void 0, void 0, function* () {
-        const fullMergeRequest = yield gitLab.getMergeRequest(mergeRequest.iid);
-        const isConflict = fullMergeRequest.has_conflicts;
-        return { code: isConflict ? 1 : 0 };
-    })),
-    new CheckItem("Frontend", "Check Lint", false, () => __awaiter(void 0, void 0, void 0, function* () {
-        return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "frontend", "yarn", "lint"], "pipe");
-    })),
-    new CheckItem("Frontend", "Check Test", false, () => __awaiter(void 0, void 0, void 0, function* () {
-        return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "frontend", "yarn", "jest", "--coverage=false"], "pipe");
-    }), (stdout) => stdout
-        .split("\n")
-        .filter((line) => !line.startsWith("PASS"))
-        .join("\n")),
-    new CheckItem("Frontend", "Check Prod", false, () => __awaiter(void 0, void 0, void 0, function* () {
-        return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "frontend", "yarn", "prod"], "pipe");
-    })),
-    new CheckItem("Frontend", "Check console.log", true, ({ frontendChanges }) => __awaiter(void 0, void 0, void 0, function* () {
-        return {
-            code: frontendChanges.some((c) => c.new_path.endsWith(".ts") &&
-                c.diff
-                    .split("\n")
-                    .some((line) => !line.startsWith("-") && line.includes("console.log")))
-                ? 1
-                : 0,
-        };
-    })),
-    new CheckItem("Frontend", "Check long import", true, ({ frontendChanges }) => __awaiter(void 0, void 0, void 0, function* () {
-        return {
-            code: frontendChanges.some((c) => c.new_path.endsWith(".ts") &&
-                c.diff
-                    .split("\n")
-                    .some((line) => !line.startsWith("-") && line.includes("../../lib/")))
-                ? 1
-                : 0,
-        };
-    })),
-    new CheckItem("Backend", "Check Test (unittest)", false, () => __awaiter(void 0, void 0, void 0, function* () {
-        return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "backend", "./manage.py", "test"], "pipe");
-    })),
-    new CheckItem("Backend", "Check Test (pytest)", false, () => __awaiter(void 0, void 0, void 0, function* () {
-        return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "backend", "pytest", "."], "pipe");
-    })),
-    new CheckItem("Backend", "Check Print", true, ({ backendChanges }) => __awaiter(void 0, void 0, void 0, function* () {
-        return {
-            code: backendChanges.some((c) => c.new_path.endsWith(".py") &&
-                c.diff
-                    .split("\n")
-                    .some((line) => !line.startsWith("-") && line.includes("print(")))
-                ? 1
-                : 0,
-        };
-    })),
-    new CheckItem("Backend", "Check Migration Conflict", true, ({ mergeRequest, backendChanges, gitLab }) => __awaiter(void 0, void 0, void 0, function* () {
-        if (!backendChanges.some((c) => c.new_path.includes("migrations"))) {
-            return { code: 0 };
-        }
-        const branchName = mergeRequest.source_branch;
-        const defaultBranch = yield gitLab.getDefaultBranchName();
-        const compare = yield gitLab.getCompare(defaultBranch, branchName);
-        const migrationDiffs = compare.diffs.filter((d) => (d.new_file || d.deleted_file) && d.new_path.includes("migration"));
-        const plusFiles = new Set(migrationDiffs
-            .filter((d) => d.new_file)
-            .map((d) => {
-            const match = d.new_path.match(/backend\/(\w+)\/migrations\/(\d+)/);
-            return match ? match[1] + "_" + match[2] : null;
-        })
-            .filter(Boolean));
-        const minusFiles = new Set(migrationDiffs
-            .filter((d) => d.deleted_file)
-            .map((d) => {
-            const match = d.new_path.match(/backend\/(\w+)\/migrations\/(\d+)/);
-            return match ? match[1] + "_" + match[2] : null;
-        })
-            .filter(Boolean));
-        return {
-            code: [...plusFiles].filter((f) => minusFiles.has(f)).length > 0 ? 1 : 0,
-        };
-    })),
 ];
 class Checker {
     constructor(gitLabProject, issueNumber, selectMode) {
@@ -168,11 +51,21 @@ class Checker {
             process.chdir(this.gitLabProject.path.replace("~", os_1.default.homedir()));
             yield utils_1.promiseSpawn("git", ["checkout", mergeRequest.source_branch], "pipe");
             const changes = mergeRequestChanges.changes;
-            const frontendChanges = changes.filter((c) => c.new_path.startsWith("frontend"));
-            const backendChanges = changes.filter((c) => c.new_path.startsWith("backend"));
-            let runningItems = items;
+            let frontendChanges = [];
+            let backendChanges = [];
+            switch (this.gitLabProject.projectType) {
+                case "full":
+                    frontendChanges = changes.filter((c) => c.new_path.startsWith("frontend"));
+                    backendChanges = changes.filter((c) => c.new_path.startsWith("backend"));
+                    break;
+                case "frontend":
+                    frontendChanges = changes;
+                    break;
+            }
+            const checkItems = check_items_const_1.checkItemsMap[this.gitLabProject.projectType];
+            let runningItems = checkItems;
             if (frontendChanges.length === 0) {
-                runningItems = items.filter((item) => item.group !== "Frontend");
+                runningItems = checkItems.filter((item) => item.group !== "Frontend");
             }
             if (backendChanges.length === 0) {
                 runningItems = runningItems.filter((item) => item.group !== "Backend");
@@ -237,6 +130,7 @@ class Checker {
                             .map((s) => `###### [${s.group}] ${s.name} ${s.code}\n${s.stdout}\n${s.stderr}`)
                             .join("\n\n"), () => { });
                     }
+                    console.log("");
                 }
             });
         });

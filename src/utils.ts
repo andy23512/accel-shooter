@@ -154,3 +154,15 @@ export function getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(
 ) {
   return `${issueNumber}_CU-${clickUpTaskId}`;
 }
+
+export async function checkWorkingTreeClean() {
+  const result = await promiseSpawn("git", ["status"], "pipe");
+  if (
+    !result.stdout.includes("Your branch is up to date with") ||
+    !result.stdout.includes("nothing to commit, working tree clean")
+  ) {
+    throw Error(
+      "Working tree is not clean or something is not pushed. Aborted."
+    );
+  }
+}

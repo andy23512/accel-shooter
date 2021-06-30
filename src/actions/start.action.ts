@@ -12,6 +12,7 @@ import { Tracker } from "../classes/tracker.class";
 import { CONFIG } from "../config";
 import { sleep } from "../sleep.utils";
 import {
+  checkWorkingTreeClean,
   getGitLabBranchNameFromIssueNumberAndTitleAndTaskId,
   promiseSpawn,
 } from "../utils";
@@ -67,6 +68,8 @@ export async function startAction() {
     "Add Tracker Item",
     "Do Git Fetch and Checkout",
   ]);
+  process.chdir(answers.gitLabProject.path.replace("~", os.homedir()));
+  await checkWorkingTreeClean();
   const gitLab = new GitLab(answers.gitLabProject.id);
   const clickUp = new ClickUp(answers.clickUpTaskId);
   p.start();

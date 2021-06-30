@@ -28,7 +28,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId = exports.getGitLabFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabIssue = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = exports.normalizeClickUpChecklist = exports.normalizeGitLabIssueChecklist = void 0;
+exports.checkWorkingTreeClean = exports.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId = exports.getGitLabFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabIssue = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = exports.normalizeClickUpChecklist = exports.normalizeGitLabIssueChecklist = void 0;
 const child_process_1 = __importStar(require("child_process"));
 const case_utils_1 = require("./case-utils");
 const clickup_class_1 = require("./classes/clickup.class");
@@ -157,3 +157,13 @@ function getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(issueNumber, clickU
     return `${issueNumber}_CU-${clickUpTaskId}`;
 }
 exports.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId = getGitLabBranchNameFromIssueNumberAndTitleAndTaskId;
+function checkWorkingTreeClean() {
+    return __awaiter(this, void 0, void 0, function* () {
+        const result = yield promiseSpawn("git", ["status"], "pipe");
+        if (!result.stdout.includes("Your branch is up to date with") ||
+            !result.stdout.includes("nothing to commit, working tree clean")) {
+            throw Error("Working tree is not clean or something is not pushed. Aborted.");
+        }
+    });
+}
+exports.checkWorkingTreeClean = checkWorkingTreeClean;

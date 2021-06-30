@@ -79,6 +79,8 @@ function startAction() {
             "Add Tracker Item",
             "Do Git Fetch and Checkout",
         ]);
+        process.chdir(answers.gitLabProject.path.replace("~", os_1.default.homedir()));
+        yield utils_1.checkWorkingTreeClean();
         const gitLab = new gitlab_class_1.GitLab(answers.gitLabProject.id);
         const clickUp = new clickup_class_1.ClickUp(answers.clickUpTaskId);
         p.start();
