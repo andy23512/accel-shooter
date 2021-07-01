@@ -9,7 +9,7 @@
 ### Fixed
 ```
 
-## [Unrealased] - yyyy-mm-dd
+## [1.39.1] - 2021-07-01
 
 ### Fixed
 
