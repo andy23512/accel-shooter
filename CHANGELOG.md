@@ -9,6 +9,12 @@
 ### Fixed
 ```
 
+## [Unrealased] - yyyy-mm-dd
+
+### Changed
+
+- Check branch not equal then checkout
+
 ## [1.38.0] - 2021-06-30
 
 ### Changed

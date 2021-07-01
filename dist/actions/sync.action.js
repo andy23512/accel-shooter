@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.syncAction = void 0;
+const child_process_1 = require("child_process");
 const os_1 = __importDefault(require("os"));
 const dynamic_1 = require("set-interval-async/dynamic");
 const actions_1 = require("../actions");
@@ -23,12 +24,17 @@ function syncAction() {
     return __awaiter(this, void 0, void 0, function* () {
         actions_1.configReadline();
         const { gitLab, gitLabProject, issueNumber } = utils_1.getGitLabFromArgv();
-        process.chdir(gitLabProject.path.replace("~", os_1.default.homedir()));
-        yield utils_1.checkWorkingTreeClean();
         const gitLabProjectId = gitLabProject.id;
         const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
         const lastMergeRequest = mergeRequests[mergeRequests.length - 1];
-        yield utils_1.promiseSpawn("git", ["checkout", lastMergeRequest.source_branch], "pipe");
+        process.chdir(gitLabProject.path.replace("~", os_1.default.homedir()));
+        const branchName = child_process_1.execSync("git branch --show-current", {
+            encoding: "utf-8",
+        });
+        if (branchName !== lastMergeRequest.source_branch) {
+            yield utils_1.checkWorkingTreeClean();
+            yield utils_1.promiseSpawn("git", ["checkout", lastMergeRequest.source_branch], "pipe");
+        }
         console.log(`${gitLabProject.name} ${issueNumber}`);
         const ep = new emoji_progress_class_1.CustomEmojiProgress(0, 100);
         actions_1.setUpSyncHotkey(gitLabProjectId, issueNumber, ep);
