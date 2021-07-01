@@ -9,6 +9,14 @@
 ### Fixed
 ```
 
+## [1.38.0] - 2021-06-30
+
+### Changed
+
+- Show project name and issue number when sync
+- Use different check item set when in different type of project
+- Check working space in start and sync
+
 ## [1.37.0] - 2021-06-24
 
 ### Added

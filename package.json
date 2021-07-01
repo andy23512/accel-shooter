@@ -1,6 +1,6 @@
 {
   "name": "accel-shooter",
-  "version": "1.37.0",
+  "version": "1.38.0",
   "main": "index.js",
   "license": "MIT",
   "bin": {
@@ -18,7 +18,8 @@
     "main.js",
     "dist/*.js",
     "dist/classes/*.js",
-    "dist/actions/*.js"
+    "dist/actions/*.js",
+    "dist/consts/*.js"
   ],
   "pre-commit": [
     "precommit-build"
