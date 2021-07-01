@@ -31,7 +31,7 @@ export async function syncAction() {
     );
   }
   console.log(`${gitLabProject.name} ${issueNumber}`);
-  const ep = new CustomEmojiProgress(0, 100);
+  const ep = new CustomEmojiProgress(100, 100);
   setUpSyncHotkey(gitLabProjectId, issueNumber, ep);
   await syncChecklist(gitLabProjectId, issueNumber, ep, true);
   setIntervalAsync(async () => {

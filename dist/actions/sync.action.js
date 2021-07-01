@@ -36,7 +36,7 @@ function syncAction() {
             yield utils_1.promiseSpawn("git", ["checkout", lastMergeRequest.source_branch], "pipe");
         }
         console.log(`${gitLabProject.name} ${issueNumber}`);
-        const ep = new emoji_progress_class_1.CustomEmojiProgress(0, 100);
+        const ep = new emoji_progress_class_1.CustomEmojiProgress(100, 100);
         actions_1.setUpSyncHotkey(gitLabProjectId, issueNumber, ep);
         yield actions_1.syncChecklist(gitLabProjectId, issueNumber, ep, true);
         dynamic_1.setIntervalAsync(() => __awaiter(this, void 0, void 0, function* () {
