@@ -22,7 +22,7 @@ export async function syncAction() {
   const branchName = execSync("git branch --show-current", {
     encoding: "utf-8",
   });
-  if (branchName !== lastMergeRequest.source_branch) {
+  if (branchName.trim() !== lastMergeRequest.source_branch) {
     await checkWorkingTreeClean();
     await promiseSpawn(
       "git",

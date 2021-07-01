@@ -9,6 +9,12 @@
 ### Fixed
 ```
 
+## [Unrealased] - yyyy-mm-dd
+
+### Fixed
+
+- Fix branch equality bug
+
 ## [1.39.0] - 2021-07-01
 
 ### Changed

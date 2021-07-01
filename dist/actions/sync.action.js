@@ -31,7 +31,7 @@ function syncAction() {
         const branchName = child_process_1.execSync("git branch --show-current", {
             encoding: "utf-8",
         });
-        if (branchName !== lastMergeRequest.source_branch) {
+        if (branchName.trim() !== lastMergeRequest.source_branch) {
             yield utils_1.checkWorkingTreeClean();
             yield utils_1.promiseSpawn("git", ["checkout", lastMergeRequest.source_branch], "pipe");
         }
