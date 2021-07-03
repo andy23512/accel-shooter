@@ -18,6 +18,10 @@ export async function syncAction() {
     issueNumber
   );
   const lastMergeRequest = mergeRequests[mergeRequests.length - 1];
+  if (lastMergeRequest.state === "merged") {
+    console.log("This task is completed.");
+    return;
+  }
   process.chdir(gitLabProject.path.replace("~", os.homedir()));
   const branchName = execSync("git branch --show-current", {
     encoding: "utf-8",

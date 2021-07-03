@@ -9,6 +9,12 @@
 ### Fixed
 ```
 
+## [1.40.0] - 2021-07-03
+
+### Added
+
+- Check MR is merged or not before sync
+
 ## [1.39.2] - 2021-07-01
 
 ### Fixed

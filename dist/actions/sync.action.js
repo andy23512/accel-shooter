@@ -27,6 +27,10 @@ function syncAction() {
         const gitLabProjectId = gitLabProject.id;
         const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
         const lastMergeRequest = mergeRequests[mergeRequests.length - 1];
+        if (lastMergeRequest.state === "merged") {
+            console.log("This task is completed.");
+            return;
+        }
         process.chdir(gitLabProject.path.replace("~", os_1.default.homedir()));
         const branchName = child_process_1.execSync("git branch --show-current", {
             encoding: "utf-8",
