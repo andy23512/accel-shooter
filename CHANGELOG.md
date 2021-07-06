@@ -15,6 +15,9 @@
 - Support project-dependent todo item
 
 ### Changed
+
+- Set max worker number of jest checker command to 4
+
 ### Fixed
 
 - Stop process of end action when task is uncompleted

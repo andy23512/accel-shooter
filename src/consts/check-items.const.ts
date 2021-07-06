@@ -45,7 +45,15 @@ const checkFrontendTestInDocker = new CheckItem(
   async () => {
     return promiseSpawn(
       "docker-compose",
-      ["exec", "-T", "frontend", "yarn", "jest", "--coverage=false"],
+      [
+        "exec",
+        "-T",
+        "frontend",
+        "yarn",
+        "jest",
+        "--coverage=false",
+        "--maxWorkers=4",
+      ],
       "pipe"
     );
   },

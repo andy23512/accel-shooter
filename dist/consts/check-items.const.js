@@ -30,7 +30,15 @@ const checkFrontendLintInDocker = new check_item_class_1.CheckItem("Frontend", "
     return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "frontend", "yarn", "lint"], "pipe");
 }));
 const checkFrontendTestInDocker = new check_item_class_1.CheckItem("Frontend", "Check Test (in docker)", false, () => __awaiter(void 0, void 0, void 0, function* () {
-    return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "frontend", "yarn", "jest", "--coverage=false"], "pipe");
+    return utils_1.promiseSpawn("docker-compose", [
+        "exec",
+        "-T",
+        "frontend",
+        "yarn",
+        "jest",
+        "--coverage=false",
+        "--maxWorkers=4",
+    ], "pipe");
 }), (stdout) => stdout
     .split("\n")
     .filter((line) => !line.startsWith("PASS"))
