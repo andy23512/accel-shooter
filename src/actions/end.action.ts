@@ -24,7 +24,7 @@ export async function endAction() {
   const fullCompleted = gitLabNormalizedChecklist.every((item) => item.checked);
   if (!fullCompleted) {
     console.log("This task has uncompleted todo(s).");
-    return;
+    process.exit();
   }
   p.next();
   const mergeRequests = await gitLab.listMergeRequestsWillCloseIssueOnMerge(

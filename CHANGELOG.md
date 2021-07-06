@@ -17,6 +17,8 @@
 ### Changed
 ### Fixed
 
+- Stop process of end action when task is uncompleted
+
 ## [1.40.0] - 2021-07-03
 
 ### Added
