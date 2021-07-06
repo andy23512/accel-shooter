@@ -8,6 +8,14 @@
 ### Changed
 ### Fixed
 ```
+## [Unrealased] - yyyy-mm-dd
+
+### Added
+
+- Support project-dependent todo item
+
+### Changed
+### Fixed
 
 ## [1.40.0] - 2021-07-03
 

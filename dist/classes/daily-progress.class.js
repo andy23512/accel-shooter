@@ -5,24 +5,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DailyProgress = void 0;
 const untildify_1 = __importDefault(require("untildify"));
-const base_file_ref_class_1 = require("./base-file-ref.class");
 const config_1 = require("../config");
+const base_file_ref_class_1 = require("./base-file-ref.class");
 class DailyProgress extends base_file_ref_class_1.BaseFileRef {
     get path() {
         return untildify_1.default(config_1.CONFIG.DailyProgressFile);
     }
     addProgressToBuffer(dailyProgressString) {
         const content = this.readFile();
-        const updatedDpContent = content.replace('## Buffer', `## Buffer\n    ${dailyProgressString}`);
+        const updatedDpContent = content.replace("## Buffer", `## Buffer\n    ${dailyProgressString}`);
         this.writeFile(updatedDpContent);
     }
     getRecordByDay(day) {
         const content = this.readFile();
-        const matchResult = content.match(new RegExp(`(### ${day}.*?)\n###`, 's'));
+        const matchResult = content.match(new RegExp(`(### ${day}.*?)\n###`, "s"));
         if (matchResult) {
             const record = matchResult[1];
             if (/2\. Today\n3\./.test(record)) {
-                console.log('Today content is empty.');
+                console.log("Today content is empty.");
                 return null;
             }
             else {
@@ -30,7 +30,7 @@ class DailyProgress extends base_file_ref_class_1.BaseFileRef {
             }
         }
         else {
-            console.log('DP record does not exist.');
+            console.log("DP record does not exist.");
             return null;
         }
     }
