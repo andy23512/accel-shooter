@@ -11,6 +11,7 @@ import { revertEndAction } from "./actions/revert-end.action";
 import { RTVTasksAction } from "./actions/rtv-tasks.action";
 import { startAction } from "./actions/start.action";
 import { syncAction } from "./actions/sync.action";
+import { toDoAction } from "./actions/to-do.action";
 import { trackAction } from "./actions/track.action";
 import { CONFIG } from "./config";
 
@@ -39,6 +40,7 @@ const actions: { [key: string]: () => Promise<any> } = {
   comment: commentAction,
   myTasks: myTasksAction,
   list: listAction,
+  toDo: toDoAction,
 };
 
 (async () => {

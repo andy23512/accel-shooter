@@ -25,6 +25,7 @@ const revert_end_action_1 = require("./actions/revert-end.action");
 const rtv_tasks_action_1 = require("./actions/rtv-tasks.action");
 const start_action_1 = require("./actions/start.action");
 const sync_action_1 = require("./actions/sync.action");
+const to_do_action_1 = require("./actions/to-do.action");
 const track_action_1 = require("./actions/track.action");
 const config_1 = require("./config");
 const actionAlias = {
@@ -51,6 +52,7 @@ const actions = {
     comment: comment_action_1.commentAction,
     myTasks: my_tasks_action_1.myTasksAction,
     list: list_action_1.listAction,
+    toDo: to_do_action_1.toDoAction,
 };
 (() => __awaiter(void 0, void 0, void 0, function* () {
     const action = actionAlias[process.argv[2]] || process.argv[2];

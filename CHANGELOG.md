@@ -8,6 +8,12 @@
 ### Changed
 ### Fixed
 ```
+## [1.42.0] - 2021-07-12
+
+### Added
+
+- Add toDo command
+
 ## [1.41.0] - 2021-07-07
 
 ### Added
