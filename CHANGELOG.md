@@ -8,6 +8,12 @@
 ### Changed
 ### Fixed
 ```
+## [1.42.1] - 2021-07-15
+
+### Fixed
+
+- open is not defined
+
 ## [1.42.0] - 2021-07-12
 
 ### Added

@@ -14,6 +14,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.openAction = void 0;
 const inquirer_1 = __importDefault(require("inquirer"));
+const open_1 = __importDefault(require("open"));
 const utils_1 = require("../utils");
 function openAction() {
     return __awaiter(this, void 0, void 0, function* () {
@@ -34,17 +35,17 @@ function openAction() {
         for (const type of answers.types) {
             switch (type) {
                 case "issue":
-                    open(issue.web_url);
+                    open_1.default(issue.web_url);
                     break;
                 case "merge-request":
                     const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
-                    open(mergeRequests[mergeRequests.length - 1].web_url);
+                    open_1.default(mergeRequests[mergeRequests.length - 1].web_url);
                     break;
                 case "task":
                     const description = issue.description;
                     const result = description.match(/https:\/\/app.clickup.com\/t\/\w+/);
                     if (result) {
-                        open(result[0]);
+                        open_1.default(result[0]);
                     }
                     break;
             }

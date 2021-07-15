@@ -1,4 +1,5 @@
 import inquirer from "inquirer";
+import open from "open";
 import { getGitLabFromArgv } from "../utils";
 
 export async function openAction() {
