@@ -8,6 +8,13 @@
 ### Changed
 ### Fixed
 ```
+
+## [1.43.0] - 2021-07-19
+
+### Added
+
+- Clean closed and verified items
+
 ## [1.42.1] - 2021-07-15
 
 ### Fixed

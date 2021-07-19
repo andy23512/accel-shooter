@@ -18,11 +18,11 @@ const date_fns_1 = require("date-fns");
 const fs_1 = require("fs");
 const node_notifier_1 = __importDefault(require("node-notifier"));
 const untildify_1 = __importDefault(require("untildify"));
+const config_1 = require("../config");
+const utils_1 = require("../utils");
 const base_file_ref_class_1 = require("./base-file-ref.class");
 const clickup_class_1 = require("./clickup.class");
-const config_1 = require("../config");
 const gitlab_class_1 = require("./gitlab.class");
-const utils_1 = require("../utils");
 class Tracker extends base_file_ref_class_1.BaseFileRef {
     constructor() {
         super(...arguments);
@@ -125,6 +125,9 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
                         });
                         console.log(message);
                     }
+                }
+                if (["closed", "verified"].includes(clickUpTask.status.status)) {
+                    this.closeItem(projectName, issueNumber);
                 }
             }
         });
