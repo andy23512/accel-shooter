@@ -88,8 +88,12 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
             const clickUp = new clickup_class_1.ClickUp(clickUpTaskId);
             const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
             const mergeRequest = yield gitLab.getMergeRequest(mergeRequests[mergeRequests.length - 1].iid);
+            const clickUpTask = yield clickUp.getTask();
+            if (["closed", "verified"].includes(clickUpTask.status.status)) {
+                this.closeItem(projectName, issueNumber);
+                return;
+            }
             if (projectConfig.stagingStatus && mergeRequest.state === "merged") {
-                const clickUpTask = yield clickUp.getTask();
                 if (clickUpTask.status.status === "in review") {
                     const list = yield clickup_class_1.ClickUp.getList(clickUpTask.list.id);
                     const stagingStatus = projectConfig.stagingStatus[list.name] ||
@@ -125,9 +129,6 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
                         });
                         console.log(message);
                     }
-                }
-                if (["closed", "verified"].includes(clickUpTask.status.status)) {
-                    this.closeItem(projectName, issueNumber);
                 }
             }
         });

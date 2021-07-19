@@ -87,8 +87,12 @@ export class Tracker extends BaseFileRef {
     const mergeRequest = await gitLab.getMergeRequest(
       mergeRequests[mergeRequests.length - 1].iid
     );
+    const clickUpTask = await clickUp.getTask();
+    if (["closed", "verified"].includes(clickUpTask.status.status)) {
+      this.closeItem(projectName, issueNumber);
+      return;
+    }
     if (projectConfig.stagingStatus && mergeRequest.state === "merged") {
-      const clickUpTask = await clickUp.getTask();
       if (clickUpTask.status.status === "in review") {
         const list = await ClickUp.getList(clickUpTask.list.id);
         const stagingStatus =
@@ -132,9 +136,6 @@ export class Tracker extends BaseFileRef {
           });
           console.log(message);
         }
-      }
-      if (["closed", "verified"].includes(clickUpTask.status.status)) {
-        this.closeItem(projectName, issueNumber);
       }
     }
   }
