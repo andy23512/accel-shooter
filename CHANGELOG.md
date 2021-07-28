@@ -8,6 +8,12 @@
 ### Changed
 ### Fixed
 ```
+## [1.43.2] - 2021-07-28
+
+### Fixed
+
+- Fix project todo not show bug
+
 ## [1.43.1] - 2021-07-19
 
 ### Fixed

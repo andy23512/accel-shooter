@@ -94,7 +94,7 @@ function startAction() {
         answers.todoConfig.forEach((c) => {
             todoConfigMap[c] = true;
         });
-        todoConfigMap[answers.gitLabProject.id] = true;
+        todoConfigMap[answers.gitLabProject.name] = true;
         const template = fs_1.readFileSync(untildify_1.default(config_1.CONFIG.ToDoTemplate), {
             encoding: "utf-8",
         });

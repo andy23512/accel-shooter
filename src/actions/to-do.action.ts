@@ -26,7 +26,7 @@ export async function toDoAction() {
   answers.todoConfig.forEach((c: string) => {
     todoConfigMap[c] = true;
   });
-  todoConfigMap[answers.gitLabProject.id] = true;
+  todoConfigMap[answers.gitLabProject.name] = true;
   const template = readFileSync(untildify(CONFIG.ToDoTemplate), {
     encoding: "utf-8",
   });
