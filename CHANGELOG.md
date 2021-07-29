@@ -8,6 +8,12 @@
 ### Changed
 ### Fixed
 ```
+## [1.43.3] - 2021-07-29
+
+### Fixed
+
+- Update deploy job name
+
 ## [1.43.2] - 2021-07-28
 
 ### Fixed

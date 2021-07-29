@@ -54,7 +54,7 @@ export class Tracker extends BaseFileRef {
       // get last commit with success pipeline with deploy job
       for (const pipeline of successPipelines) {
         const jobs = await gitLab.listPipelineJobs(pipeline.id);
-        const job = jobs.find((j) => j.name === "deploy-latest");
+        const job = jobs.find((j) => j.name === "deploy-staging");
         if (!job) {
           continue;
         }
