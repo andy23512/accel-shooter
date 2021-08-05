@@ -1,7 +1,6 @@
 import open from "open";
 import { checkAction } from "./actions/check.action";
 import { commentAction } from "./actions/comment.action";
-import { copyAction } from "./actions/copy.action";
 import { crossChecklistAction } from "./actions/cross-checklist.action";
 import { endAction } from "./actions/end.action";
 import { listAction } from "./actions/list.action";
@@ -11,26 +10,17 @@ import { revertEndAction } from "./actions/revert-end.action";
 import { RTVTasksAction } from "./actions/rtv-tasks.action";
 import { startAction } from "./actions/start.action";
 import { syncAction } from "./actions/sync.action";
+import { timeAction } from "./actions/time.action";
 import { toDoAction } from "./actions/to-do.action";
 import { trackAction } from "./actions/track.action";
+import { updateAction } from "./actions/update.action";
 import { CONFIG } from "./config";
-
-const actionAlias: { [key: string]: string } = {
-  st: "start",
-  o: "open",
-  sy: "sync",
-  c: "copy",
-  t: "track",
-  e: "end",
-  re: "revertEnd",
-  ls: "list",
-};
 
 const actions: { [key: string]: () => Promise<any> } = {
   start: startAction,
   open: openAction,
   sync: syncAction,
-  copy: copyAction,
+  update: updateAction,
   track: trackAction,
   end: endAction,
   revertEnd: revertEndAction,
@@ -41,10 +31,11 @@ const actions: { [key: string]: () => Promise<any> } = {
   myTasks: myTasksAction,
   list: listAction,
   toDo: toDoAction,
+  time: timeAction,
 };
 
 (async () => {
-  const action = actionAlias[process.argv[2]] || process.argv[2];
+  const action = process.argv[2];
   if (actions[action]) {
     await actions[action]();
   } else if (CONFIG.WebPageAlias[action]) {

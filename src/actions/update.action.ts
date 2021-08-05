@@ -1,9 +1,8 @@
-import clipboardy from "clipboardy";
 import { format } from "date-fns";
 import { DailyProgress } from "../classes/daily-progress.class";
 import { updateTaskStatusInDp } from "../utils";
 
-export async function copyAction() {
+export async function updateAction() {
   const day =
     process.argv.length >= 4
       ? process.argv[3]
@@ -13,8 +12,7 @@ export async function copyAction() {
   if (record) {
     const newDpRecord = await updateTaskStatusInDp(record);
     dp.writeRecordByDay(day, newDpRecord);
-    clipboardy.writeSync(newDpRecord);
     console.log(newDpRecord);
-    console.log("Copied!");
+    console.log("Updated!");
   }
 }

@@ -15,7 +15,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const open_1 = __importDefault(require("open"));
 const check_action_1 = require("./actions/check.action");
 const comment_action_1 = require("./actions/comment.action");
-const copy_action_1 = require("./actions/copy.action");
 const cross_checklist_action_1 = require("./actions/cross-checklist.action");
 const end_action_1 = require("./actions/end.action");
 const list_action_1 = require("./actions/list.action");
@@ -25,24 +24,16 @@ const revert_end_action_1 = require("./actions/revert-end.action");
 const rtv_tasks_action_1 = require("./actions/rtv-tasks.action");
 const start_action_1 = require("./actions/start.action");
 const sync_action_1 = require("./actions/sync.action");
+const time_action_1 = require("./actions/time.action");
 const to_do_action_1 = require("./actions/to-do.action");
 const track_action_1 = require("./actions/track.action");
+const update_action_1 = require("./actions/update.action");
 const config_1 = require("./config");
-const actionAlias = {
-    st: "start",
-    o: "open",
-    sy: "sync",
-    c: "copy",
-    t: "track",
-    e: "end",
-    re: "revertEnd",
-    ls: "list",
-};
 const actions = {
     start: start_action_1.startAction,
     open: open_action_1.openAction,
     sync: sync_action_1.syncAction,
-    copy: copy_action_1.copyAction,
+    update: update_action_1.updateAction,
     track: track_action_1.trackAction,
     end: end_action_1.endAction,
     revertEnd: revert_end_action_1.revertEndAction,
@@ -53,9 +44,10 @@ const actions = {
     myTasks: my_tasks_action_1.myTasksAction,
     list: list_action_1.listAction,
     toDo: to_do_action_1.toDoAction,
+    time: time_action_1.timeAction,
 };
 (() => __awaiter(void 0, void 0, void 0, function* () {
-    const action = actionAlias[process.argv[2]] || process.argv[2];
+    const action = process.argv[2];
     if (actions[action]) {
         yield actions[action]();
     }
