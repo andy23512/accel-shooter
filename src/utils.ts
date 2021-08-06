@@ -95,7 +95,7 @@ export function getClickUpTaskIdFromGitLabIssue(issue: Issue) {
 }
 
 const dpItemRegex =
-  /\* \([A-Za-z ]+\) .*? \((#[0-9]+|#\?|\w+ \d+), https:\/\/app.clickup.com\/t\/(\w+)\)/g;
+  /\* \([A-Za-z ]+\) \[.*?\]\(https:\/\/app.clickup.com\/t\/(\w+)\)/g;
 
 export async function updateTaskStatusInDp(dp: string) {
   let match: RegExpExecArray | null = null;
@@ -103,7 +103,7 @@ export async function updateTaskStatusInDp(dp: string) {
 
   while ((match = dpItemRegex.exec(dp))) {
     const full = match[0];
-    const clickUpTaskId = match[2];
+    const clickUpTaskId = match[1];
     const clickUp = new ClickUp(clickUpTaskId);
     const task = await clickUp.getTask();
     const updatedFull = full.replace(

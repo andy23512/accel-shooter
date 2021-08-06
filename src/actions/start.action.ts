@@ -108,7 +108,7 @@ export async function startAction() {
     gitLabBranch.name
   );
   p.next();
-  const dailyProgressString = `* (In Progress) ${gitLabIssue.title} (${answers.gitLabProject.name} ${gitLabIssueNumber}, ${clickUpTaskUrl})`;
+  const dailyProgressString = `* (In Progress) [${gitLabIssue.title}](${clickUpTaskUrl}) [${answers.gitLabProject.name} ${gitLabIssueNumber}](${gitLabIssue.web_url})`;
   new DailyProgress().addProgressToBuffer(dailyProgressString);
   p.next();
   const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabIssueNumber}`;

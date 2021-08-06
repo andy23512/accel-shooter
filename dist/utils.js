@@ -105,14 +105,14 @@ function getClickUpTaskIdFromGitLabIssue(issue) {
     return result ? result[1] : null;
 }
 exports.getClickUpTaskIdFromGitLabIssue = getClickUpTaskIdFromGitLabIssue;
-const dpItemRegex = /\* \([A-Za-z ]+\) .*? \((#[0-9]+|#\?|\w+ \d+), https:\/\/app.clickup.com\/t\/(\w+)\)/g;
+const dpItemRegex = /\* \([A-Za-z ]+\) \[.*?\]\(https:\/\/app.clickup.com\/t\/(\w+)\)/g;
 function updateTaskStatusInDp(dp) {
     return __awaiter(this, void 0, void 0, function* () {
         let match = null;
         let resultDp = dp;
         while ((match = dpItemRegex.exec(dp))) {
             const full = match[0];
-            const clickUpTaskId = match[2];
+            const clickUpTaskId = match[1];
             const clickUp = new clickup_class_1.ClickUp(clickUpTaskId);
             const task = yield clickUp.getTask();
             const updatedFull = full.replace(/\* \([A-Za-z ]+\)/, `* (${case_utils_1.titleCase(task.status.status)})`);
