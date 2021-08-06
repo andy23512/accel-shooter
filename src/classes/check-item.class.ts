@@ -1,6 +1,8 @@
 import { concat, defer, of } from "rxjs";
 import { map } from "rxjs/operators";
+import { promiseSpawn } from "../utils";
 import { CheckContext } from "./../models/check.models";
+import { ProjectCheckItem } from "./../models/models";
 
 export class CheckItem {
   public displayName: string;
@@ -17,6 +19,17 @@ export class CheckItem {
     public stdoutReducer?: (output: string) => string
   ) {
     this.displayName = `[${this.group}] ${this.name}`;
+  }
+
+  public static fromProjectCheckItem({
+    group,
+    name,
+    command,
+    args,
+  }: ProjectCheckItem) {
+    return new CheckItem(group, name, false, async () => {
+      return promiseSpawn(command, args, "pipe");
+    });
   }
 
   public getObs(context: CheckContext) {

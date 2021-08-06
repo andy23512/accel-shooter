@@ -1,6 +1,7 @@
 # Change Log
 
 ## Template
+
 ```
 ## [Unrealased] - yyyy-mm-dd
 
@@ -8,6 +9,13 @@
 ### Changed
 ### Fixed
 ```
+
+## [Unrealased] - yyyy-mm-dd
+
+### Changed
+
+- Remove action alias
+- Set project check command at config
 
 ## [1.44.0] - 2021-08-06
 
@@ -17,7 +25,6 @@
 
 ### Changed
 
-- Remove action alias
 - Change copy action to update
 
 ## [1.43.3] - 2021-07-29

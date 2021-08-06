@@ -26,26 +26,6 @@ const checkConflict = new check_item_class_1.CheckItem("Global", "Check Conflict
     const isConflict = fullMergeRequest.has_conflicts;
     return { code: isConflict ? 1 : 0 };
 }));
-const checkFrontendLintInDocker = new check_item_class_1.CheckItem("Frontend", "Check Lint (in docker)", false, () => __awaiter(void 0, void 0, void 0, function* () {
-    return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "frontend", "yarn", "lint"], "pipe");
-}));
-const checkFrontendTestInDocker = new check_item_class_1.CheckItem("Frontend", "Check Test (in docker)", false, () => __awaiter(void 0, void 0, void 0, function* () {
-    return utils_1.promiseSpawn("docker-compose", [
-        "exec",
-        "-T",
-        "frontend",
-        "yarn",
-        "jest",
-        "--coverage=false",
-        "--maxWorkers=4",
-    ], "pipe");
-}), (stdout) => stdout
-    .split("\n")
-    .filter((line) => !line.startsWith("PASS"))
-    .join("\n"));
-const checkFrontendProdInDocker = new check_item_class_1.CheckItem("Frontend", "Check Prod (in docker)", false, () => __awaiter(void 0, void 0, void 0, function* () {
-    return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "frontend", "yarn", "prod"], "pipe");
-}));
 const checkFrontendConsoleLog = new check_item_class_1.CheckItem("Frontend", "Check console.log", true, ({ frontendChanges }) => __awaiter(void 0, void 0, void 0, function* () {
     return {
         code: frontendChanges.some((c) => c.new_path.endsWith(".ts") &&
@@ -65,12 +45,6 @@ const checkFrontendLongImport = new check_item_class_1.CheckItem("Frontend", "Ch
             ? 1
             : 0,
     };
-}));
-const checkBackendUnittest = new check_item_class_1.CheckItem("Backend", "Check Test (unittest)", false, () => __awaiter(void 0, void 0, void 0, function* () {
-    return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "backend", "./manage.py", "test"], "pipe");
-}));
-const checkBackendPytest = new check_item_class_1.CheckItem("Backend", "Check Test (pytest)", false, () => __awaiter(void 0, void 0, void 0, function* () {
-    return utils_1.promiseSpawn("docker-compose", ["exec", "-T", "backend", "pytest", "."], "pipe");
 }));
 const checkBackendPrint = new check_item_class_1.CheckItem("Backend", "Check Print", true, ({ backendChanges }) => __awaiter(void 0, void 0, void 0, function* () {
     return {
@@ -111,31 +85,14 @@ const checkBackendMigrationConflict = new check_item_class_1.CheckItem("Backend"
 const fullProjectCheckItems = [
     checkNonPushedChanges,
     checkConflict,
-    checkFrontendLintInDocker,
-    checkFrontendTestInDocker,
-    checkFrontendProdInDocker,
     checkFrontendConsoleLog,
     checkFrontendLongImport,
-    checkBackendUnittest,
-    checkBackendPytest,
     checkBackendPrint,
     checkBackendMigrationConflict,
 ];
-const checkFrontendLint = new check_item_class_1.CheckItem("Frontend", "Check Lint", false, () => __awaiter(void 0, void 0, void 0, function* () {
-    return utils_1.promiseSpawn("yarn", ["lint"], "pipe");
-}));
-const checkFrontendTest = new check_item_class_1.CheckItem("Frontend", "Check Test", false, () => __awaiter(void 0, void 0, void 0, function* () {
-    return utils_1.promiseSpawn("yarn", ["test"], "pipe");
-}));
-const checkFrontendBuild = new check_item_class_1.CheckItem("Frontend", "Check Build", false, () => __awaiter(void 0, void 0, void 0, function* () {
-    return utils_1.promiseSpawn("yarn", ["build"], "pipe");
-}));
 const frontendProjectCheckItems = [
     checkNonPushedChanges,
     checkConflict,
-    checkFrontendLint,
-    checkFrontendTest,
-    checkFrontendBuild,
     checkFrontendConsoleLog,
     checkFrontendLongImport,
 ];

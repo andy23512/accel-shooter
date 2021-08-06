@@ -20,6 +20,7 @@ const rxjs_1 = require("rxjs");
 const untildify_1 = __importDefault(require("untildify"));
 const utils_1 = require("../utils");
 const check_items_const_1 = require("./../consts/check-items.const");
+const check_item_class_1 = require("./check-item.class");
 const gitlab_class_1 = require("./gitlab.class");
 const SPINNER = [
     "🕛",
@@ -63,17 +64,13 @@ class Checker {
                     break;
             }
             const checkItems = check_items_const_1.checkItemsMap[this.gitLabProject.projectType];
-            let runningItems = checkItems;
+            const projectCheckItems = (this.gitLabProject.checkItems || []).map(check_item_class_1.CheckItem.fromProjectCheckItem);
+            let runningItems = [...checkItems, ...projectCheckItems];
             if (frontendChanges.length === 0) {
                 runningItems = checkItems.filter((item) => item.group !== "Frontend");
             }
             if (backendChanges.length === 0) {
                 runningItems = runningItems.filter((item) => item.group !== "Backend");
-            }
-            if (this.gitLabProject.ignoredCheck &&
-                this.gitLabProject.ignoredCheck.length > 0) {
-                const ignoredCheck = this.gitLabProject.ignoredCheck;
-                runningItems = runningItems.filter((item) => !ignoredCheck.includes(`${item.group}/${item.name}`));
             }
             if (this.selectMode) {
                 const answers = yield inquirer_1.default.prompt([

@@ -26,55 +26,6 @@ const checkConflict = new CheckItem(
     return { code: isConflict ? 1 : 0 };
   }
 );
-const checkFrontendLintInDocker = new CheckItem(
-  "Frontend",
-  "Check Lint (in docker)",
-  false,
-  async () => {
-    return promiseSpawn(
-      "docker-compose",
-      ["exec", "-T", "frontend", "yarn", "lint"],
-      "pipe"
-    );
-  }
-);
-const checkFrontendTestInDocker = new CheckItem(
-  "Frontend",
-  "Check Test (in docker)",
-  false,
-  async () => {
-    return promiseSpawn(
-      "docker-compose",
-      [
-        "exec",
-        "-T",
-        "frontend",
-        "yarn",
-        "jest",
-        "--coverage=false",
-        "--maxWorkers=4",
-      ],
-      "pipe"
-    );
-  },
-  (stdout) =>
-    stdout
-      .split("\n")
-      .filter((line) => !line.startsWith("PASS"))
-      .join("\n")
-);
-const checkFrontendProdInDocker = new CheckItem(
-  "Frontend",
-  "Check Prod (in docker)",
-  false,
-  async () => {
-    return promiseSpawn(
-      "docker-compose",
-      ["exec", "-T", "frontend", "yarn", "prod"],
-      "pipe"
-    );
-  }
-);
 const checkFrontendConsoleLog = new CheckItem(
   "Frontend",
   "Check console.log",
@@ -113,30 +64,6 @@ const checkFrontendLongImport = new CheckItem(
         ? 1
         : 0,
     };
-  }
-);
-const checkBackendUnittest = new CheckItem(
-  "Backend",
-  "Check Test (unittest)",
-  false,
-  async () => {
-    return promiseSpawn(
-      "docker-compose",
-      ["exec", "-T", "backend", "./manage.py", "test"],
-      "pipe"
-    );
-  }
-);
-const checkBackendPytest = new CheckItem(
-  "Backend",
-  "Check Test (pytest)",
-  false,
-  async () => {
-    return promiseSpawn(
-      "docker-compose",
-      ["exec", "-T", "backend", "pytest", "."],
-      "pipe"
-    );
   }
 );
 const checkBackendPrint = new CheckItem(
@@ -198,48 +125,15 @@ const checkBackendMigrationConflict = new CheckItem(
 const fullProjectCheckItems: CheckItem[] = [
   checkNonPushedChanges,
   checkConflict,
-  checkFrontendLintInDocker,
-  checkFrontendTestInDocker,
-  checkFrontendProdInDocker,
   checkFrontendConsoleLog,
   checkFrontendLongImport,
-  checkBackendUnittest,
-  checkBackendPytest,
   checkBackendPrint,
   checkBackendMigrationConflict,
 ];
 
-const checkFrontendLint = new CheckItem(
-  "Frontend",
-  "Check Lint",
-  false,
-  async () => {
-    return promiseSpawn("yarn", ["lint"], "pipe");
-  }
-);
-const checkFrontendTest = new CheckItem(
-  "Frontend",
-  "Check Test",
-  false,
-  async () => {
-    return promiseSpawn("yarn", ["test"], "pipe");
-  }
-);
-const checkFrontendBuild = new CheckItem(
-  "Frontend",
-  "Check Build",
-  false,
-  async () => {
-    return promiseSpawn("yarn", ["build"], "pipe");
-  }
-);
-
 const frontendProjectCheckItems: CheckItem[] = [
   checkNonPushedChanges,
   checkConflict,
-  checkFrontendLint,
-  checkFrontendTest,
-  checkFrontendBuild,
   checkFrontendConsoleLog,
   checkFrontendLongImport,
 ];

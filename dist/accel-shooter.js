@@ -8,11 +8,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-const open_1 = __importDefault(require("open"));
 const check_action_1 = require("./actions/check.action");
 const comment_action_1 = require("./actions/comment.action");
 const cross_checklist_action_1 = require("./actions/cross-checklist.action");
@@ -28,7 +24,6 @@ const time_action_1 = require("./actions/time.action");
 const to_do_action_1 = require("./actions/to-do.action");
 const track_action_1 = require("./actions/track.action");
 const update_action_1 = require("./actions/update.action");
-const config_1 = require("./config");
 const actions = {
     start: start_action_1.startAction,
     open: open_action_1.openAction,
@@ -50,9 +45,6 @@ const actions = {
     const action = process.argv[2];
     if (actions[action]) {
         yield actions[action]();
-    }
-    else if (config_1.CONFIG.WebPageAlias[action]) {
-        open_1.default(config_1.CONFIG.WebPageAlias[action]);
     }
     else {
         throw Error(`Action ${action} is not supported.`);

@@ -1,5 +1,11 @@
 export type Site = "ClickUp" | "GitLab";
 export type HttpMethod = "get" | "post" | "put" | "delete";
+export interface ProjectCheckItem {
+  group: string;
+  name: string;
+  command: string;
+  args: string[];
+}
 export interface GitLabProject {
   name: string;
   path: string;
@@ -7,7 +13,7 @@ export interface GitLabProject {
   id: string;
   stagingStatus?: Record<string, string>;
   deployedStatus?: Record<string, string>;
-  ignoredCheck?: string[];
+  checkItems?: ProjectCheckItem[];
   projectType: "full" | "frontend" | "other";
 }
 export interface Config {
@@ -23,7 +29,6 @@ export interface Config {
   TrackIntervalInMinutes: number;
   CrossChecklistDefaultSecondLevel: string[];
   ClickUpTeam: string;
-  WebPageAlias: Record<string, string>;
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];
 export interface NormalizedChecklistItem {

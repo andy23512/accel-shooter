@@ -7,6 +7,7 @@ import { GitLabProject } from "../models/models";
 import { promiseSpawn } from "../utils";
 import { checkItemsMap } from "./../consts/check-items.const";
 import { Change } from "./../models/gitlab/merge-request.models";
+import { CheckItem } from "./check-item.class";
 import { GitLab } from "./gitlab.class";
 
 const SPINNER = [
@@ -65,21 +66,15 @@ export class Checker {
         break;
     }
     const checkItems = checkItemsMap[this.gitLabProject.projectType];
-    let runningItems = checkItems;
+    const projectCheckItems = (this.gitLabProject.checkItems || []).map(
+      CheckItem.fromProjectCheckItem
+    );
+    let runningItems = [...checkItems, ...projectCheckItems];
     if (frontendChanges.length === 0) {
       runningItems = checkItems.filter((item) => item.group !== "Frontend");
     }
     if (backendChanges.length === 0) {
       runningItems = runningItems.filter((item) => item.group !== "Backend");
-    }
-    if (
-      this.gitLabProject.ignoredCheck &&
-      this.gitLabProject.ignoredCheck.length > 0
-    ) {
-      const ignoredCheck = this.gitLabProject.ignoredCheck;
-      runningItems = runningItems.filter(
-        (item) => !ignoredCheck.includes(`${item.group}/${item.name}`)
-      );
     }
     if (this.selectMode) {
       const answers = await inquirer.prompt([

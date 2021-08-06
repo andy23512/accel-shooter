@@ -1,4 +1,3 @@
-import open from "open";
 import { checkAction } from "./actions/check.action";
 import { commentAction } from "./actions/comment.action";
 import { crossChecklistAction } from "./actions/cross-checklist.action";
@@ -14,7 +13,6 @@ import { timeAction } from "./actions/time.action";
 import { toDoAction } from "./actions/to-do.action";
 import { trackAction } from "./actions/track.action";
 import { updateAction } from "./actions/update.action";
-import { CONFIG } from "./config";
 
 const actions: { [key: string]: () => Promise<any> } = {
   start: startAction,
@@ -38,8 +36,6 @@ const actions: { [key: string]: () => Promise<any> } = {
   const action = process.argv[2];
   if (actions[action]) {
     await actions[action]();
-  } else if (CONFIG.WebPageAlias[action]) {
-    open(CONFIG.WebPageAlias[action]);
   } else {
     throw Error(`Action ${action} is not supported.`);
   }
