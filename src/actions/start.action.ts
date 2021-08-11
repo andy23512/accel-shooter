@@ -28,6 +28,17 @@ export async function startAction() {
         name: `${p.name} (${p.repo})`,
         value: p,
       })),
+      async filter(input: any) {
+        process.chdir(input.path.replace("~", os.homedir()));
+        const isClean = await checkWorkingTreeClean();
+        if (!isClean) {
+          console.log(
+            "\nWorking tree is not clean or something is not pushed. Aborted."
+          );
+          process.exit();
+        }
+        return input;
+      },
     },
     {
       name: "clickUpTaskId",

@@ -16,6 +16,10 @@
 
 - Ensure single instance for tracker
 
+### Changed
+
+- Check folder clean after selecting project
+
 ## [1.46.0] - 2021-08-06
 
 ### Changed

@@ -36,7 +36,11 @@ function syncAction() {
             encoding: "utf-8",
         });
         if (branchName.trim() !== lastMergeRequest.source_branch) {
-            yield utils_1.checkWorkingTreeClean();
+            const isClean = yield utils_1.checkWorkingTreeClean();
+            if (!isClean) {
+                console.log("\nWorking tree is not clean or something is not pushed. Aborted.");
+                process.exit();
+            }
             yield utils_1.promiseSpawn("git", ["checkout", lastMergeRequest.source_branch], "pipe");
         }
         console.log(`${gitLabProject.name} ${issueNumber}`);

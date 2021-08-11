@@ -39,6 +39,17 @@ function startAction() {
                     name: `${p.name} (${p.repo})`,
                     value: p,
                 })),
+                filter(input) {
+                    return __awaiter(this, void 0, void 0, function* () {
+                        process.chdir(input.path.replace("~", os_1.default.homedir()));
+                        const isClean = yield utils_1.checkWorkingTreeClean();
+                        if (!isClean) {
+                            console.log("\nWorking tree is not clean or something is not pushed. Aborted.");
+                            process.exit();
+                        }
+                        return input;
+                    });
+                },
             },
             {
                 name: "clickUpTaskId",

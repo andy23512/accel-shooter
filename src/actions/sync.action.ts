@@ -27,7 +27,13 @@ export async function syncAction() {
     encoding: "utf-8",
   });
   if (branchName.trim() !== lastMergeRequest.source_branch) {
-    await checkWorkingTreeClean();
+    const isClean = await checkWorkingTreeClean();
+    if (!isClean) {
+      console.log(
+        "\nWorking tree is not clean or something is not pushed. Aborted."
+      );
+      process.exit();
+    }
     await promiseSpawn(
       "git",
       ["checkout", lastMergeRequest.source_branch],
