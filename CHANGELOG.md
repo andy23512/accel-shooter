@@ -10,6 +10,12 @@
 ### Fixed
 ```
 
+## [Unrealased] - yyyy-mm-dd
+
+### Added
+
+- Ensure single instance for tracker
+
 ## [1.46.0] - 2021-08-06
 
 ### Changed

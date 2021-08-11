@@ -648,6 +648,11 @@ inquirer@^8.1.0:
     strip-ansi "^6.0.0"
     through "^2.3.6"
 
+instance-locker@^1.1.5:
+  version "1.1.5"
+  resolved "https://registry.yarnpkg.com/instance-locker/-/instance-locker-1.1.5.tgz#961c5af7e1bab5370256a7d1c48466b44df57de3"
+  integrity sha512-mhi0r9Q1SoDiyLOS12WrixazXK2U9n8FZ36UIY0duj0nDAndWqkmGnxIZTxmnrDln8hJzQQ+wP/EtA6qfVecsQ==
+
 is-core-module@^2.2.0:
   version "2.4.0"
   resolved "https://registry.yarnpkg.com/is-core-module/-/is-core-module-2.4.0.tgz#8e9fc8e15027b011418026e98f0e6f4d86305cc1"
