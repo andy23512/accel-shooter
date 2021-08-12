@@ -67,7 +67,7 @@ class Checker {
             const projectCheckItems = (this.gitLabProject.checkItems || []).map(check_item_class_1.CheckItem.fromProjectCheckItem);
             let runningItems = [...checkItems, ...projectCheckItems];
             if (frontendChanges.length === 0) {
-                runningItems = checkItems.filter((item) => item.group !== "Frontend");
+                runningItems = runningItems.filter((item) => item.group !== "Frontend");
             }
             if (backendChanges.length === 0) {
                 runningItems = runningItems.filter((item) => item.group !== "Backend");

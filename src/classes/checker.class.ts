@@ -71,7 +71,7 @@ export class Checker {
     );
     let runningItems = [...checkItems, ...projectCheckItems];
     if (frontendChanges.length === 0) {
-      runningItems = checkItems.filter((item) => item.group !== "Frontend");
+      runningItems = runningItems.filter((item) => item.group !== "Frontend");
     }
     if (backendChanges.length === 0) {
       runningItems = runningItems.filter((item) => item.group !== "Backend");
