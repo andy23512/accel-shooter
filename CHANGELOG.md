@@ -9,6 +9,11 @@
 ### Changed
 ### Fixed
 ```
+## [1.48.0] - 2021-08-14
+
+### Changed
+
+- open merge request page when start sync
 
 ## [1.47.1] - 2021-08-12
 

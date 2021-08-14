@@ -56,9 +56,11 @@ function syncChecklist(gitLabProjectId, issueNumber, ep, openPage) {
             const gitLabNormalizedChecklist = utils_1.normalizeGitLabIssueChecklist(gitLabChecklistText);
             const clickUp = new clickup_class_1.ClickUp(clickUpTaskId);
             const clickUpTask = yield clickUp.getTask();
+            const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
             if (openPage) {
                 const frameUrls = yield clickUp.getFrameUrls();
                 open_1.default(issue.web_url);
+                open_1.default(mergeRequests[mergeRequests.length - 1].web_url);
                 open_1.default(clickUpTask.url);
                 if (frameUrls.length) {
                     open_1.default(frameUrls[0]);

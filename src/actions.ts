@@ -62,9 +62,13 @@ export async function syncChecklist(
       normalizeGitLabIssueChecklist(gitLabChecklistText);
     const clickUp = new ClickUp(clickUpTaskId);
     const clickUpTask = await clickUp.getTask();
+    const mergeRequests = await gitLab.listMergeRequestsWillCloseIssueOnMerge(
+      issueNumber
+    );
     if (openPage) {
       const frameUrls = await clickUp.getFrameUrls();
       open(issue.web_url);
+      open(mergeRequests[mergeRequests.length - 1].web_url);
       open(clickUpTask.url);
       if (frameUrls.length) {
         open(frameUrls[0]);
