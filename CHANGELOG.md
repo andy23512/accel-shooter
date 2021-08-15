@@ -9,6 +9,12 @@
 ### Changed
 ### Fixed
 ```
+## [2.0.0] - 2021-08-15
+
+### Changed
+
+- use nx structure
+
 ## [1.48.0] - 2021-08-14
 
 ### Changed
