@@ -1,6 +1,6 @@
 {
   "name": "accel-shooter",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "main": "index.js",
   "license": "MIT",
   "bin": {
@@ -9,7 +9,7 @@
   },
   "scripts": {
     "ng": "nx",
-    "postinstall": "bash -c '[ -f ./decorate-angular-cli.js ] && node ./decorate-angular-cli.js && ngcc --properties es2015 browser module main'",
+    "postinstall": "if '[ -e ./decorate-angular-cli.js ]; then node ./decorate-angular-cli.js && ngcc --properties es2015 browser module main; fi'",
     "start": "nx serve cli",
     "build": "nx build cli",
     "precommit-build": "nx build cli && git add dist/",

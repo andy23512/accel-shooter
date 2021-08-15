@@ -9,6 +9,13 @@
 ### Changed
 ### Fixed
 ```
+## [2.0.2] - 2021-08-15
+
+### Fixed
+
+- fix postinstall command
+
+
 ## [2.0.1] - 2021-08-15
 
 ### Changed
