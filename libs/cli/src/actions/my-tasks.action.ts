@@ -1,9 +1,9 @@
-import chalk from "chalk";
-import moment from "moment";
-import { table } from "table";
-import { ClickUp } from "../classes/clickup.class";
-import { CustomEmojiProgress } from "../classes/emoji-progress.class";
-import { CONFIG } from "../config";
+import { CONFIG } from '@accel-shooter/node-shared';
+import chalk from 'chalk';
+import moment from 'moment';
+import { table } from 'table';
+import { ClickUp } from '../classes/clickup.class';
+import { CustomEmojiProgress } from '../classes/emoji-progress.class';
 
 export async function myTasksAction() {
   const user = (await ClickUp.getCurrentUser()).user;
@@ -11,7 +11,7 @@ export async function myTasksAction() {
     (t) => t.name === CONFIG.ClickUpTeam
   );
   if (!team) {
-    console.log("Team does not exist.");
+    console.log('Team does not exist.');
     return;
   }
   const tasks = (await ClickUp.getMyTasks(team.id, user.id)).tasks;
@@ -62,20 +62,20 @@ export async function myTasksAction() {
   const compare = (a: null | string, b: null | string) => {
     if (a === b) {
       return 0;
-    } else if (a === null || typeof a === "undefined") {
+    } else if (a === null || typeof a === 'undefined') {
       return 1;
-    } else if (b === null || typeof b === "undefined") {
+    } else if (b === null || typeof b === 'undefined') {
       return -1;
     }
     return parseInt(a) - parseInt(b);
   };
   const colorPriority = (priority: string | undefined) => {
     switch (priority) {
-      case "urgent":
+      case 'urgent':
         return chalk.redBright(priority);
-      case "high":
+      case 'high':
         return chalk.yellowBright(priority);
-      case "normal":
+      case 'normal':
         return chalk.cyanBright(priority);
       default:
         return chalk.white(priority);
@@ -89,13 +89,13 @@ export async function myTasksAction() {
         compare(a.priority?.orderindex, b.priority?.orderindex)
       );
     });
-  console.log("Sort by Due Date:");
+  console.log('Sort by Due Date:');
   console.log(
     table(
       topDueDateTasks.map((t) => [
-        t.name + "\n" + t.url,
+        t.name + '\n' + t.url,
         colorPriority(t.priority?.priority),
-        moment(+t.due_date).format("YYYY-MM-DD"),
+        moment(+t.due_date).format('YYYY-MM-DD'),
       ])
     )
   );
@@ -107,13 +107,13 @@ export async function myTasksAction() {
         compare(a.due_date, b.due_date)
       );
     });
-  console.log("Sort by Priority:");
+  console.log('Sort by Priority:');
   console.log(
     table(
       topPriorityTasks.map((t) => [
-        t.name + "\n" + t.url,
+        t.name + '\n' + t.url,
         colorPriority(t.priority?.priority),
-        t.due_date ? moment(+t.due_date).format("YYYY-MM-DD") : "",
+        t.due_date ? moment(+t.due_date).format('YYYY-MM-DD') : '',
       ])
     )
   );

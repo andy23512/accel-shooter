@@ -16,7 +16,8 @@
     "baseUrl": ".",
     "paths": {
       "@accel-shooter/api-interfaces": ["libs/api-interfaces/src/index.ts"],
-      "@accel-shooter/cli": ["libs/cli/src/index.ts"]
+      "@accel-shooter/cli": ["libs/cli/src/index.ts"],
+      "@accel-shooter/node-shared": ["libs/node-shared/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

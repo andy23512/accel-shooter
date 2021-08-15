@@ -1,24 +1,24 @@
-import clipboardy from "clipboardy";
-import { readFileSync } from "fs";
-import inquirer from "inquirer";
-import { render } from "mustache";
-import untildify from "untildify";
-import { CONFIG } from "../config";
+import { CONFIG } from '@accel-shooter/node-shared';
+import clipboardy from 'clipboardy';
+import { readFileSync } from 'fs';
+import inquirer from 'inquirer';
+import { render } from 'mustache';
+import untildify from 'untildify';
 export async function toDoAction() {
   const answers = await inquirer.prompt([
     {
-      name: "gitLabProject",
-      message: "Choose GitLab Project",
-      type: "list",
+      name: 'gitLabProject',
+      message: 'Choose GitLab Project',
+      type: 'list',
       choices: CONFIG.GitLabProjects.map((p) => ({
         name: `${p.name} (${p.repo})`,
         value: p,
       })),
     },
     {
-      name: "todoConfig",
-      message: "Choose Preset To-do Config",
-      type: "checkbox",
+      name: 'todoConfig',
+      message: 'Choose Preset To-do Config',
+      type: 'checkbox',
       choices: CONFIG.ToDoConfigChoices,
     },
   ]);
@@ -28,10 +28,10 @@ export async function toDoAction() {
   });
   todoConfigMap[answers.gitLabProject.name] = true;
   const template = readFileSync(untildify(CONFIG.ToDoTemplate), {
-    encoding: "utf-8",
+    encoding: 'utf-8',
   });
   const endingTodo = render(template, todoConfigMap);
   clipboardy.writeSync(endingTodo);
   console.log(endingTodo);
-  console.log("Copied!");
+  console.log('Copied!');
 }

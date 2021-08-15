@@ -1,20 +1,20 @@
-import childProcess from "child_process";
-import { compareAsc, parseISO } from "date-fns";
-import { appendFileSync } from "fs";
-import nodeNotifier from "node-notifier";
-import untildify from "untildify";
-import { CONFIG } from "../config";
-import { Job } from "../models/gitlab/job.models";
+import { CONFIG } from '@accel-shooter/node-shared';
+import childProcess from 'child_process';
+import { compareAsc, parseISO } from 'date-fns';
+import { appendFileSync } from 'fs';
+import nodeNotifier from 'node-notifier';
+import untildify from 'untildify';
+import { Job } from '../models/gitlab/job.models';
 import {
   getClickUpTaskIdFromGitLabIssue,
   getGitLabProjectConfigByName,
-} from "../utils";
-import { BaseFileRef } from "./base-file-ref.class";
-import { ClickUp } from "./clickup.class";
-import { GitLab } from "./gitlab.class";
+} from '../utils';
+import { BaseFileRef } from './base-file-ref.class';
+import { ClickUp } from './clickup.class';
+import { GitLab } from './gitlab.class';
 
 export class Tracker extends BaseFileRef {
-  public lastDeployedCommitMap: Record<string, Job["commit"]> = {};
+  public lastDeployedCommitMap: Record<string, Job['commit']> = {};
   protected get path() {
     return untildify(CONFIG.TrackListFile);
   }
@@ -33,10 +33,10 @@ export class Tracker extends BaseFileRef {
   public getItems() {
     const content = this.readFile();
     const lines = content
-      .split("\n")
+      .split('\n')
       .filter(Boolean)
-      .filter((line) => !line.startsWith("#"));
-    const items = lines.map((line) => line.split(" "));
+      .filter((line) => !line.startsWith('#'));
+    const items = lines.map((line) => line.split(' '));
     return items;
   }
 
@@ -48,13 +48,13 @@ export class Tracker extends BaseFileRef {
     for (const project of checkDeployProjects) {
       const gitLab = new GitLab(project.id);
       const successPipelines = await gitLab.listPipelines({
-        status: "success",
+        status: 'success',
         per_page: 100,
       });
       // get last commit with success pipeline with deploy job
       for (const pipeline of successPipelines) {
         const jobs = await gitLab.listPipelineJobs(pipeline.id);
-        const job = jobs.find((j) => j.name === "deploy-staging");
+        const job = jobs.find((j) => j.name === 'deploy-staging');
         if (!job) {
           continue;
         }
@@ -88,18 +88,18 @@ export class Tracker extends BaseFileRef {
       mergeRequests[mergeRequests.length - 1].iid
     );
     const clickUpTask = await clickUp.getTask();
-    if (["closed", "verified"].includes(clickUpTask.status.status)) {
+    if (['closed', 'verified'].includes(clickUpTask.status.status)) {
       this.closeItem(projectName, issueNumber);
       return;
     }
-    if (projectConfig.stagingStatus && mergeRequest.state === "merged") {
-      if (clickUpTask.status.status === "in review") {
+    if (projectConfig.stagingStatus && mergeRequest.state === 'merged') {
+      if (clickUpTask.status.status === 'in review') {
         const list = await ClickUp.getList(clickUpTask.list.id);
         const stagingStatus =
           projectConfig.stagingStatus[list.name] ||
-          projectConfig.stagingStatus["*"];
+          projectConfig.stagingStatus['*'];
         await clickUp.setTaskStatus(stagingStatus);
-        if (stagingStatus === "verified") {
+        if (stagingStatus === 'verified') {
           this.closeItem(projectName, issueNumber);
         }
         const message = `${projectName} #${issueNumber}: In Review -> ${stagingStatus}`;
@@ -113,7 +113,7 @@ export class Tracker extends BaseFileRef {
       }
       if (
         projectConfig.deployedStatus &&
-        clickUpTask.status.status === "staging" &&
+        clickUpTask.status.status === 'staging' &&
         this.lastDeployedCommitMap[projectName]
       ) {
         const commit = await gitLab.getCommit(mergeRequest.merge_commit_sha);
@@ -126,12 +126,12 @@ export class Tracker extends BaseFileRef {
           const list = await ClickUp.getList(clickUpTask.list.id);
           const deployedStatus =
             projectConfig.deployedStatus[list.name] ||
-            projectConfig.deployedStatus["*"];
+            projectConfig.deployedStatus['*'];
           await clickUp.setTaskStatus(deployedStatus);
           this.closeItem(projectName, issueNumber);
           const message = `${projectName} #${issueNumber} (Under List ${list.name}): Staging -> ${deployedStatus}`;
           nodeNotifier.notify({
-            title: "Accel Shooter",
+            title: 'Accel Shooter',
             message,
           });
           console.log(message);
@@ -143,9 +143,9 @@ export class Tracker extends BaseFileRef {
   public closeItem(projectName: string, issueNumber: string) {
     const content = this.readFile();
     const lines = content
-      .split("\n")
+      .split('\n')
       .filter(Boolean)
       .filter((line) => line !== `${projectName} ${issueNumber}`);
-    this.writeFile(lines.join("\n"));
+    this.writeFile(lines.join('\n'));
   }
 }

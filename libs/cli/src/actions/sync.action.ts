@@ -1,14 +1,14 @@
-import { execSync } from "child_process";
-import os from "os";
-import { setIntervalAsync } from "set-interval-async/dynamic";
-import { configReadline, setUpSyncHotkey, syncChecklist } from "../actions";
-import { CustomEmojiProgress } from "../classes/emoji-progress.class";
-import { CONFIG } from "../config";
+import { CONFIG } from '@accel-shooter/node-shared';
+import { execSync } from 'child_process';
+import os from 'os';
+import { setIntervalAsync } from 'set-interval-async/dynamic';
+import { configReadline, setUpSyncHotkey, syncChecklist } from '../actions';
+import { CustomEmojiProgress } from '../classes/emoji-progress.class';
 import {
   checkWorkingTreeClean,
   getGitLabFromArgv,
   promiseSpawn,
-} from "../utils";
+} from '../utils';
 
 export async function syncAction() {
   configReadline();
@@ -18,26 +18,26 @@ export async function syncAction() {
     issueNumber
   );
   const lastMergeRequest = mergeRequests[mergeRequests.length - 1];
-  if (lastMergeRequest.state === "merged") {
-    console.log("This task is completed.");
+  if (lastMergeRequest.state === 'merged') {
+    console.log('This task is completed.');
     return;
   }
-  process.chdir(gitLabProject.path.replace("~", os.homedir()));
-  const branchName = execSync("git branch --show-current", {
-    encoding: "utf-8",
+  process.chdir(gitLabProject.path.replace('~', os.homedir()));
+  const branchName = execSync('git branch --show-current', {
+    encoding: 'utf-8',
   });
   if (branchName.trim() !== lastMergeRequest.source_branch) {
     const isClean = await checkWorkingTreeClean();
     if (!isClean) {
       console.log(
-        "\nWorking tree is not clean or something is not pushed. Aborted."
+        '\nWorking tree is not clean or something is not pushed. Aborted.'
       );
       process.exit();
     }
     await promiseSpawn(
-      "git",
-      ["checkout", lastMergeRequest.source_branch],
-      "pipe"
+      'git',
+      ['checkout', lastMergeRequest.source_branch],
+      'pipe'
     );
   }
   console.log(`${gitLabProject.name} ${issueNumber}`);

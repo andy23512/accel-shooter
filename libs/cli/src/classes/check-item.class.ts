@@ -1,8 +1,8 @@
-import { concat, defer, of } from "rxjs";
-import { map } from "rxjs/operators";
-import { promiseSpawn } from "../utils";
-import { CheckContext } from "./../models/check.models";
-import { ProjectCheckItem } from "./../models/models";
+import { ProjectCheckItem } from '@accel-shooter/node-shared';
+import { concat, defer, of } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { promiseSpawn } from '../utils';
+import { CheckContext } from './../models/check.models';
 
 export class CheckItem {
   public displayName: string;
@@ -28,7 +28,7 @@ export class CheckItem {
     args,
   }: ProjectCheckItem) {
     return new CheckItem(group, name, false, async () => {
-      return promiseSpawn(command, args, "pipe");
+      return promiseSpawn(command, args, 'pipe');
     });
   }
 
@@ -38,8 +38,8 @@ export class CheckItem {
         group: this.group,
         name: this.name,
         code: -1,
-        stdout: "",
-        stderr: "",
+        stdout: '',
+        stderr: '',
       }),
       defer(() => this.run(context)).pipe(
         map((d: any) => {
