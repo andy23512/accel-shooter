@@ -9,6 +9,12 @@
 ### Changed
 ### Fixed
 ```
+## [2.0.4] - 2021-08-15
+
+### Fixed
+
+- Fix command cannot execute bug
+
 ## [2.0.3] - 2021-08-15
 
 ### Fixed

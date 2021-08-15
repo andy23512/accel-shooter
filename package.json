@@ -1,11 +1,11 @@
 {
   "name": "accel-shooter",
-  "version": "2.0.3",
+  "version": "2.0.4",
   "main": "index.js",
   "license": "MIT",
   "bin": {
-    "accel-shooter": "./dist/apps/cli/main.js",
-    "acst": "./dist/apps/cli/main.js"
+    "accel-shooter": "./main.js",
+    "acst": "./main.js"
   },
   "scripts": {
     "ng": "nx",
@@ -34,6 +34,7 @@
     "validate": "npm ls"
   },
   "files": [
+    "main.js",
     "dist/apps/cli/main.js"
   ],
   "pre-commit": [
