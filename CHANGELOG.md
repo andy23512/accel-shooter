@@ -9,6 +9,13 @@
 ### Changed
 ### Fixed
 ```
+## [2.0.1] - 2021-08-15
+
+### Changed
+
+- clean unneed files
+
+
 ## [2.0.0] - 2021-08-15
 
 ### Changed
