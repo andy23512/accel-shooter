@@ -10,6 +10,12 @@
 ### Fixed
 
 ```
+## [3.0.1] - 2021-08-28
+
+### Fixed
+
+- Fix extension not work bug
+
 ## [3.0.0] - 2021-08-28
 
 ### Added

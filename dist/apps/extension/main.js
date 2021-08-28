@@ -65,26 +65,24 @@ function getAllUrlParams(url) {
     }
     return obj;
 }
-chrome.runtime.onInstalled.addListener(() => {
-    chrome.tabs.onCreated.addListener((tab) => __awaiter(this, void 0, void 0, function* () {
-        const isAccelShooterLink = tab.pendingUrl &&
-            tab.pendingUrl.startsWith('http://localhost:8315/accel-shooter/');
-        console.log(isAccelShooterLink);
-        if (isAccelShooterLink) {
-            const query = getAllUrlParams(tab.pendingUrl);
-            const { urls, group } = query;
-            console.log(urls);
-            console.log(group);
-            const tabIds = [];
-            for (const url of JSON.parse(decodeURIComponent(urls))) {
-                const t = yield chrome.tabs.create({ url });
-                tabIds.push(t.id);
-            }
-            const groupId = yield chrome.tabs.group({ tabIds: tabIds });
-            chrome.tabGroups.move(groupId, { index: 0 });
-            chrome.tabGroups.update(groupId, { color: 'cyan', title: group });
-            chrome.tabs.remove(tab.id);
+chrome.tabs.onCreated.addListener((tab) => __awaiter(this, void 0, void 0, function* () {
+    const isAccelShooterLink = tab.pendingUrl &&
+        tab.pendingUrl.startsWith('http://localhost:8315/accel-shooter/');
+    console.log(isAccelShooterLink);
+    if (isAccelShooterLink) {
+        const query = getAllUrlParams(tab.pendingUrl);
+        const { urls, group } = query;
+        console.log(urls);
+        console.log(group);
+        const tabIds = [];
+        for (const url of JSON.parse(decodeURIComponent(urls))) {
+            const t = yield chrome.tabs.create({ url });
+            tabIds.push(t.id);
         }
-    }));
-});
+        const groupId = yield chrome.tabs.group({ tabIds: tabIds });
+        chrome.tabGroups.move(groupId, { index: 0 });
+        chrome.tabGroups.update(groupId, { color: 'cyan', title: group });
+        chrome.tabs.remove(tab.id);
+    }
+}));
 //# sourceMappingURL=main.js.map
