@@ -65,15 +65,18 @@ chrome.runtime.onInstalled.addListener(() => {
     const isAccelShooterLink =
       tab.pendingUrl &&
       tab.pendingUrl.startsWith('http://localhost:8315/accel-shooter/');
+    console.log(isAccelShooterLink);
     if (isAccelShooterLink) {
       const query = getAllUrlParams<{ urls: string; group: string }>(
-        decodeURI(tab.pendingUrl)
+        tab.pendingUrl
       );
       const { urls, group } = query;
+      console.log(urls);
+      console.log(group);
       const tabIds = [];
-      for (const url of JSON.parse(urls)) {
-        const tab = await chrome.tabs.create({ url });
-        tabIds.push(tab.id);
+      for (const url of JSON.parse(decodeURIComponent(urls))) {
+        const t = await chrome.tabs.create({ url });
+        tabIds.push(t.id);
       }
       const groupId = await chrome.tabs.group({ tabIds: tabIds });
       chrome.tabGroups.move(groupId, { index: 0 });

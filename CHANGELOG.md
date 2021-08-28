@@ -15,6 +15,7 @@
 ### Added
 
 - Add extension
+- Open link in same group
 
 ## [2.0.5] - 2021-08-28
 

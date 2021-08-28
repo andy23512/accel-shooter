@@ -98,7 +98,6 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setUpSyncHotkey = exports.configReadline = exports.syncChecklist = exports.getSyncChecklistActions = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const open_1 = tslib_1.__importDefault(__webpack_require__(/*! open */ "open"));
 const readline_1 = tslib_1.__importDefault(__webpack_require__(/*! readline */ "readline"));
 const end_action_1 = __webpack_require__(/*! ./actions/end.action */ "./apps/cli/src/actions/end.action.ts");
 const clickup_class_1 = __webpack_require__(/*! ./classes/clickup.class */ "./apps/cli/src/classes/clickup.class.ts");
@@ -136,7 +135,7 @@ function syncChecklist(gitLabProjectId, issueNumber, ep, openPage) {
         const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
         if (clickUpTaskId) {
             const gitLabChecklistText = issue.description
-                .replace(/https:\/\/app.clickup.com\/t\/\w+/g, "")
+                .replace(/https:\/\/app.clickup.com\/t\/\w+/g, '')
                 .trim();
             const gitLabNormalizedChecklist = utils_1.normalizeGitLabIssueChecklist(gitLabChecklistText);
             const clickUp = new clickup_class_1.ClickUp(clickUpTaskId);
@@ -144,14 +143,17 @@ function syncChecklist(gitLabProjectId, issueNumber, ep, openPage) {
             const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
             if (openPage) {
                 const frameUrls = yield clickUp.getFrameUrls();
-                open_1.default(issue.web_url);
-                open_1.default(mergeRequests[mergeRequests.length - 1].web_url);
-                open_1.default(clickUpTask.url);
+                const urls = [
+                    issue.web_url,
+                    mergeRequests[mergeRequests.length - 1].web_url,
+                    clickUpTask.url,
+                ];
                 if (frameUrls.length) {
-                    open_1.default(frameUrls[0]);
+                    urls.push(frameUrls[0]);
                 }
+                utils_1.openUrlsInTabGroup(urls, issueNumber);
             }
-            const clickUpChecklistTitle = `GitLab synced checklist [${gitLabProjectId.replace("%2F", "/")}]`;
+            const clickUpChecklistTitle = `GitLab synced checklist [${gitLabProjectId.replace('%2F', '/')}]`;
             let clickUpChecklist = clickUpTask.checklists.find((c) => c.name === clickUpChecklistTitle);
             if (!clickUpChecklist) {
                 clickUpChecklist = (yield clickUp.createChecklist(clickUpChecklistTitle))
@@ -186,15 +188,15 @@ exports.configReadline = configReadline;
 function setUpSyncHotkey(gitLabProjectId, issueNumber, ep) {
     process.stdin.setRawMode(true);
     process.stdin.resume();
-    process.stdin.on("keypress", (_, key) => tslib_1.__awaiter(this, void 0, void 0, function* () {
-        if (key.ctrl && key.name === "c") {
+    process.stdin.on('keypress', (_, key) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+        if (key.ctrl && key.name === 'c') {
             process.exit();
         }
-        else if (!key.ctrl && !key.meta && !key.shift && key.name === "s") {
+        else if (!key.ctrl && !key.meta && !key.shift && key.name === 's') {
             console.log(`You pressed the sync key`);
             syncChecklist(gitLabProjectId, issueNumber, ep);
         }
-        else if (!key.ctrl && !key.meta && !key.shift && key.name === "e") {
+        else if (!key.ctrl && !key.meta && !key.shift && key.name === 'e') {
             console.log(`You pressed the end key`);
             yield syncChecklist(gitLabProjectId, issueNumber, ep);
             yield end_action_1.endAction();
@@ -555,42 +557,43 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.openAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const inquirer_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer */ "inquirer"));
-const open_1 = tslib_1.__importDefault(__webpack_require__(/*! open */ "open"));
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 function openAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const { gitLab, issueNumber } = utils_1.getGitLabFromArgv();
         const answers = yield inquirer_1.default.prompt([
             {
-                name: "types",
-                message: "Choose Link Type to open",
-                type: "checkbox",
+                name: 'types',
+                message: 'Choose Link Type to open',
+                type: 'checkbox',
                 choices: [
-                    { name: "Issue", value: "issue" },
-                    { name: "Merge Request", value: "merge-request" },
-                    { name: "Task", value: "task" },
+                    { name: 'Issue', value: 'issue' },
+                    { name: 'Merge Request', value: 'merge-request' },
+                    { name: 'Task', value: 'task' },
                 ],
             },
         ]);
         const issue = yield gitLab.getIssue(issueNumber);
+        const urls = [];
         for (const type of answers.types) {
             switch (type) {
-                case "issue":
-                    open_1.default(issue.web_url);
+                case 'issue':
+                    urls.push(issue.web_url);
                     break;
-                case "merge-request":
+                case 'merge-request':
                     const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
-                    open_1.default(mergeRequests[mergeRequests.length - 1].web_url);
+                    urls.push(mergeRequests[mergeRequests.length - 1].web_url);
                     break;
-                case "task":
+                case 'task':
                     const description = issue.description;
                     const result = description.match(/https:\/\/app.clickup.com\/t\/\w+/);
                     if (result) {
-                        open_1.default(result[0]);
+                        urls.push(result[0]);
                     }
                     break;
             }
         }
+        utils_1.openUrlsInTabGroup(urls, issueNumber);
     });
 }
 exports.openAction = openAction;
@@ -2216,21 +2219,23 @@ exports.sleep = sleep;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkWorkingTreeClean = exports.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId = exports.getGitLabFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabIssue = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = exports.normalizeClickUpChecklist = exports.normalizeGitLabIssueChecklist = void 0;
+exports.openUrlsInTabGroup = exports.checkWorkingTreeClean = exports.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId = exports.getGitLabFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabIssue = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = exports.normalizeClickUpChecklist = exports.normalizeGitLabIssueChecklist = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const child_process_1 = tslib_1.__importStar(__webpack_require__(/*! child_process */ "child_process"));
+const open_1 = tslib_1.__importDefault(__webpack_require__(/*! open */ "open"));
+const qs_1 = tslib_1.__importDefault(__webpack_require__(/*! qs */ "qs"));
 const case_utils_1 = __webpack_require__(/*! ./case-utils */ "./apps/cli/src/case-utils.ts");
 const clickup_class_1 = __webpack_require__(/*! ./classes/clickup.class */ "./apps/cli/src/classes/clickup.class.ts");
 const gitlab_class_1 = __webpack_require__(/*! ./classes/gitlab.class */ "./apps/cli/src/classes/gitlab.class.ts");
 const config_1 = __webpack_require__(/*! ./config */ "./apps/cli/src/config.ts");
 function normalizeGitLabIssueChecklist(checklistText) {
     return checklistText
-        .split("\n")
-        .filter((line) => line && (line.includes("- [ ]") || line.includes("- [x]")))
+        .split('\n')
+        .filter((line) => line && (line.includes('- [ ]') || line.includes('- [x]')))
         .map((line, index) => ({
         name: line
-            .replace(/- \[[x ]\] /g, "")
-            .replace(/^ +/, (space) => space.replace(/ /g, "-")),
+            .replace(/- \[[x ]\] /g, '')
+            .replace(/^ +/, (space) => space.replace(/ /g, '-')),
         checked: /- \[x\]/.test(line),
         order: index,
     }));
@@ -2247,7 +2252,7 @@ function normalizeClickUpChecklist(checklist) {
     }));
 }
 exports.normalizeClickUpChecklist = normalizeClickUpChecklist;
-function promiseSpawn(command, args, stdio = "inherit") {
+function promiseSpawn(command, args, stdio = 'inherit') {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
             var _a, _b;
@@ -2255,25 +2260,25 @@ function promiseSpawn(command, args, stdio = "inherit") {
                 shell: true,
                 stdio,
             });
-            if (stdio === "pipe") {
-                let stdout = "";
-                let stderr = "";
-                (_a = child.stdout) === null || _a === void 0 ? void 0 : _a.on("data", (d) => {
+            if (stdio === 'pipe') {
+                let stdout = '';
+                let stderr = '';
+                (_a = child.stdout) === null || _a === void 0 ? void 0 : _a.on('data', (d) => {
                     const output = d.toString();
                     stdout += output;
                 });
-                (_b = child.stderr) === null || _b === void 0 ? void 0 : _b.on("data", (d) => {
+                (_b = child.stderr) === null || _b === void 0 ? void 0 : _b.on('data', (d) => {
                     const output = d.toString();
                     stderr += output;
                 });
-                child.on("close", (code) => {
+                child.on('close', (code) => {
                     resolve({ stdout, stderr, code });
                 });
             }
             else {
-                child.on("close", (code) => (code === 0 ? resolve(1) : reject()));
+                child.on('close', (code) => (code === 0 ? resolve(1) : reject()));
             }
-            child.on("error", (err) => {
+            child.on('error', (err) => {
                 console.log(err);
             });
         });
@@ -2313,17 +2318,17 @@ function updateTaskStatusInDp(dp) {
 exports.updateTaskStatusInDp = updateTaskStatusInDp;
 function getGitLabFromArgv() {
     if (process.argv.length === 3) {
-        const directory = child_process_1.execSync("pwd", { encoding: "utf-8" });
+        const directory = child_process_1.execSync('pwd', { encoding: 'utf-8' });
         const gitLabProject = config_1.CONFIG.GitLabProjects.find((p) => directory.startsWith(p.path));
         if (!gitLabProject) {
-            throw Error("No such project");
+            throw Error('No such project');
         }
-        const branchName = child_process_1.execSync("git branch --show-current", {
-            encoding: "utf-8",
+        const branchName = child_process_1.execSync('git branch --show-current', {
+            encoding: 'utf-8',
         });
         const match = branchName.match(/^[0-9]+/);
         if (!match) {
-            throw Error("Cannot get issue number from branch");
+            throw Error('Cannot get issue number from branch');
         }
         const issueNumber = match[0];
         const gitLab = new gitlab_class_1.GitLab(gitLabProject.id);
@@ -2332,7 +2337,7 @@ function getGitLabFromArgv() {
     else {
         const gitLabProject = getGitLabProjectFromArgv();
         if (!gitLabProject) {
-            throw Error("No such project");
+            throw Error('No such project');
         }
         const gitLab = new gitlab_class_1.GitLab(gitLabProject.id);
         return { gitLab, gitLabProject, issueNumber: process.argv[4] };
@@ -2348,12 +2353,20 @@ function getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(issueNumber, clickU
 exports.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId = getGitLabBranchNameFromIssueNumberAndTitleAndTaskId;
 function checkWorkingTreeClean() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const result = yield promiseSpawn("git", ["status"], "pipe");
-        return (result.stdout.includes("Your branch is up to date with") &&
-            result.stdout.includes("nothing to commit, working tree clean"));
+        const result = yield promiseSpawn('git', ['status'], 'pipe');
+        return (result.stdout.includes('Your branch is up to date with') &&
+            result.stdout.includes('nothing to commit, working tree clean'));
     });
 }
 exports.checkWorkingTreeClean = checkWorkingTreeClean;
+function openUrlsInTabGroup(urls, group) {
+    open_1.default('http://localhost:8315/accel-shooter/?' +
+        qs_1.default.stringify({
+            urls: JSON.stringify(urls),
+            group,
+        }));
+}
+exports.openUrlsInTabGroup = openUrlsInTabGroup;
 
 
 /***/ }),
