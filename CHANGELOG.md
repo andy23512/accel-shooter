@@ -8,7 +8,14 @@
 ### Added
 ### Changed
 ### Fixed
+
 ```
+## [Unrealased] - yyyy-mm-dd
+
+### Changed
+
+- Start command is limited to tasks assigned to current user
+
 ## [2.0.4] - 2021-08-15
 
 ### Fixed

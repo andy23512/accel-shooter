@@ -705,19 +705,19 @@ function startAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const answers = yield inquirer_1.default.prompt([
             {
-                name: "gitLabProject",
-                message: "Choose GitLab Project",
-                type: "list",
+                name: 'gitLabProject',
+                message: 'Choose GitLab Project',
+                type: 'list',
                 choices: config_1.CONFIG.GitLabProjects.map((p) => ({
                     name: `${p.name} (${p.repo})`,
                     value: p,
                 })),
                 filter(input) {
                     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-                        process.chdir(input.path.replace("~", os_1.default.homedir()));
+                        process.chdir(input.path.replace('~', os_1.default.homedir()));
                         const isClean = yield utils_1.checkWorkingTreeClean();
                         if (!isClean) {
-                            console.log("\nWorking tree is not clean or something is not pushed. Aborted.");
+                            console.log('\nWorking tree is not clean or something is not pushed. Aborted.');
                             process.exit();
                         }
                         return input;
@@ -725,17 +725,22 @@ function startAction() {
                 },
             },
             {
-                name: "clickUpTaskId",
-                message: "Enter ClickUp Task ID",
-                type: "input",
-                filter: (input) => input.replace("#", ""),
+                name: 'clickUpTaskId',
+                message: 'Enter ClickUp Task ID',
+                type: 'input',
+                filter: (input) => input.replace('#', ''),
             },
             {
-                name: "issueTitle",
-                message: "Enter Issue Title",
-                type: "input",
+                name: 'issueTitle',
+                message: 'Enter Issue Title',
+                type: 'input',
                 default: (answers) => tslib_1.__awaiter(this, void 0, void 0, function* () {
                     let task = yield new clickup_class_1.ClickUp(answers.clickUpTaskId).getTask();
+                    const user = (yield clickup_class_1.ClickUp.getCurrentUser()).user;
+                    if (!task.assignees.find((a) => a.id === user.id)) {
+                        console.log('\nTask is not assigned to you. Aborted.');
+                        process.exit();
+                    }
                     let result = task.name;
                     while (task.parent) {
                         task = yield new clickup_class_1.ClickUp(task.parent).getTask();
@@ -745,34 +750,35 @@ function startAction() {
                 }),
             },
             {
-                name: "todoConfig",
-                message: "Choose Preset To-do Config",
-                type: "checkbox",
+                name: 'todoConfig',
+                message: 'Choose Preset To-do Config',
+                type: 'checkbox',
                 choices: config_1.CONFIG.ToDoConfigChoices,
             },
         ]);
-        const p = new progress_log_class_1.CustomProgressLog("Start", [
-            "Get ClickUp Task",
-            "Set ClickUp Task Status",
-            "Render Todo List",
-            "Create GitLab Issue",
-            "Create GitLab Branch",
-            "Create GitLab Merge Request",
-            "Add Daily Progress Entry",
-            "Copy Sync Command",
-            "Add Tracker Item",
-            "Do Git Fetch and Checkout",
+        const p = new progress_log_class_1.CustomProgressLog('Start', [
+            'Get ClickUp Task',
+            'Set ClickUp Task Status',
+            'Render Todo List',
+            'Create GitLab Issue',
+            'Create GitLab Branch',
+            'Create GitLab Merge Request',
+            'Add Daily Progress Entry',
+            'Copy Sync Command',
+            'Add Tracker Item',
+            'Do Git Fetch and Checkout',
         ]);
-        process.chdir(answers.gitLabProject.path.replace("~", os_1.default.homedir()));
+        process.chdir(answers.gitLabProject.path.replace('~', os_1.default.homedir()));
         yield utils_1.checkWorkingTreeClean();
         const gitLab = new gitlab_class_1.GitLab(answers.gitLabProject.id);
         const clickUp = new clickup_class_1.ClickUp(answers.clickUpTaskId);
         p.start();
         const clickUpTask = yield clickUp.getTask();
-        const clickUpTaskUrl = clickUpTask["url"];
+        process.exit();
+        const clickUpTaskUrl = clickUpTask['url'];
         const gitLabIssueTitle = answers.issueTitle;
         p.next();
-        yield clickUp.setTaskStatus("in progress");
+        yield clickUp.setTaskStatus('in progress');
         p.next();
         const todoConfigMap = {};
         answers.todoConfig.forEach((c) => {
@@ -780,7 +786,7 @@ function startAction() {
         });
         todoConfigMap[answers.gitLabProject.name] = true;
         const template = fs_1.readFileSync(untildify_1.default(config_1.CONFIG.ToDoTemplate), {
-            encoding: "utf-8",
+            encoding: 'utf-8',
         });
         const endingTodo = mustache_1.render(template, todoConfigMap);
         p.next();
@@ -799,11 +805,11 @@ function startAction() {
         p.next();
         new tracker_class_1.Tracker().addItem(answers.gitLabProject.name, gitLabIssueNumber);
         p.next();
-        process.chdir(answers.gitLabProject.path.replace("~", os_1.default.homedir()));
-        yield utils_1.promiseSpawn("git", ["fetch"], "pipe");
+        process.chdir(answers.gitLabProject.path.replace('~', os_1.default.homedir()));
+        yield utils_1.promiseSpawn('git', ['fetch'], 'pipe');
         yield sleep_utils_1.sleep(1000);
-        yield utils_1.promiseSpawn("git", ["checkout", gitLabBranch.name], "pipe");
-        yield utils_1.promiseSpawn("git", ["submodule", "update", "--init", "--recursive"], "pipe");
+        yield utils_1.promiseSpawn('git', ['checkout', gitLabBranch.name], 'pipe');
+        yield utils_1.promiseSpawn('git', ['submodule', 'update', '--init', '--recursive'], 'pipe');
         p.end(0);
         yield sync_action_1.syncAction();
     });
@@ -1595,13 +1601,13 @@ exports.GitLab = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const api_utils_1 = __webpack_require__(/*! ../api.utils */ "./apps/cli/src/api.utils.ts");
 const config_1 = __webpack_require__(/*! ../config */ "./apps/cli/src/config.ts");
-const callApi = api_utils_1.callApiFactory("GitLab");
+const callApi = api_utils_1.callApiFactory('GitLab');
 class GitLab {
     constructor(projectId) {
         this.projectId = projectId;
     }
     getProject() {
-        return callApi("get", `/projects/${this.projectId}`);
+        return callApi('get', `/projects/${this.projectId}`);
     }
     getDefaultBranchName() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -1610,38 +1616,41 @@ class GitLab {
         });
     }
     getIssue(issueNumber) {
-        return callApi("get", `/projects/${this.projectId}/issues/${issueNumber}`);
+        return callApi('get', `/projects/${this.projectId}/issues/${issueNumber}`);
+    }
+    getOpenedMergeRequests() {
+        return callApi('get', `/projects/${this.projectId}/merge_requests`, { state: 'opened', per_page: '100' });
     }
     getMergeRequest(mergeRequestNumber) {
-        return callApi("get", `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}`);
+        return callApi('get', `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}`);
     }
     getMergeRequestChanges(mergeRequestNumber) {
-        return callApi("get", `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}/changes`);
+        return callApi('get', `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}/changes`);
     }
     getCommit(sha) {
-        return callApi("get", `/projects/${this.projectId}/repository/commits/${sha}`);
+        return callApi('get', `/projects/${this.projectId}/repository/commits/${sha}`);
     }
     getEndingAssignee() {
         if (!config_1.CONFIG.EndingAssignee) {
-            throw Error("No ending assignee was set");
+            throw Error('No ending assignee was set');
         }
-        return callApi("get", `/users`, {
+        return callApi('get', `/users`, {
             username: config_1.CONFIG.EndingAssignee,
         }).then((users) => users[0]);
     }
     listProjectLabels() {
-        return callApi("get", `/projects/${this.projectId}/labels`, {
+        return callApi('get', `/projects/${this.projectId}/labels`, {
             per_page: 100,
         });
     }
     listMergeRequestsWillCloseIssueOnMerge(issueNumber) {
-        return callApi("get", `/projects/${this.projectId}/issues/${issueNumber}/closed_by`);
+        return callApi('get', `/projects/${this.projectId}/issues/${issueNumber}/closed_by`);
     }
     listPipelineJobs(pipelineId) {
-        return callApi("get", `/projects/${this.projectId}/pipelines/${pipelineId}/jobs`);
+        return callApi('get', `/projects/${this.projectId}/pipelines/${pipelineId}/jobs`);
     }
     getCompare(from, to) {
-        return callApi("get", `/projects/${this.projectId}/repository/compare`, {
+        return callApi('get', `/projects/${this.projectId}/repository/compare`, {
             from,
             to,
             straight: true,
@@ -1650,12 +1659,12 @@ class GitLab {
     listPipelines(query) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             query.ref = query.ref || (yield this.getDefaultBranchName());
-            return callApi("get", `/projects/${this.projectId}/pipelines/`, query);
+            return callApi('get', `/projects/${this.projectId}/pipelines/`, query);
         });
     }
     createIssue(title, description) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            return callApi("post", `/projects/${this.projectId}/issues`, null, {
+            return callApi('post', `/projects/${this.projectId}/issues`, null, {
                 title: title,
                 description: description,
                 assignee_ids: yield this.getUserId(),
@@ -1664,7 +1673,7 @@ class GitLab {
     }
     createBranch(branch) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            return callApi("post", `/projects/${this.projectId}/repository/branches`, null, {
+            return callApi('post', `/projects/${this.projectId}/repository/branches`, null, {
                 branch,
                 ref: yield this.getDefaultBranchName(),
             });
@@ -1672,7 +1681,7 @@ class GitLab {
     }
     createMergeRequest(issueNumber, issueTitle, branch) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            return callApi("post", `/projects/${this.projectId}/merge_requests`, null, {
+            return callApi('post', `/projects/${this.projectId}/merge_requests`, null, {
                 source_branch: branch,
                 target_branch: yield this.getDefaultBranchName(),
                 title: `Draft: Resolve "${issueTitle}"`,
@@ -1682,30 +1691,30 @@ class GitLab {
     }
     createMergeRequestNote(merge_request, content) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            yield callApi("post", `/projects/${this.projectId}/merge_requests/${merge_request.iid}/notes`, { body: content });
+            yield callApi('post', `/projects/${this.projectId}/merge_requests/${merge_request.iid}/notes`, { body: content });
         });
     }
     markMergeRequestAsReadyAndAddAssignee(merge_request) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const assignee = yield this.getEndingAssignee();
-            yield callApi("put", `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
-                title: merge_request.title.replace("WIP: ", "").replace("Draft: ", ""),
+            yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
+                title: merge_request.title.replace('WIP: ', '').replace('Draft: ', ''),
                 assignee_id: assignee.id,
             });
         });
     }
     markMergeRequestAsUnreadyAndSetAssigneeToSelf(merge_request) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            yield callApi("put", `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
-                title: "Draft: " +
-                    merge_request.title.replace("WIP: ", "").replace("Draft: ", ""),
+            yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
+                title: 'Draft: ' +
+                    merge_request.title.replace('WIP: ', '').replace('Draft: ', ''),
                 assignee_id: yield this.getUserId(),
             });
         });
     }
     getUserId() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const user = yield callApi("get", "/user");
+            const user = yield callApi('get', '/user');
             return user.id;
         });
     }
@@ -2081,6 +2090,7 @@ const time_action_1 = __webpack_require__(/*! ./actions/time.action */ "./apps/c
 const to_do_action_1 = __webpack_require__(/*! ./actions/to-do.action */ "./apps/cli/src/actions/to-do.action.ts");
 const track_action_1 = __webpack_require__(/*! ./actions/track.action */ "./apps/cli/src/actions/track.action.ts");
 const update_action_1 = __webpack_require__(/*! ./actions/update.action */ "./apps/cli/src/actions/update.action.ts");
+const gitlab_class_1 = __webpack_require__(/*! ./classes/gitlab.class */ "./apps/cli/src/classes/gitlab.class.ts");
 const actions = {
     start: start_action_1.startAction,
     open: open_action_1.openAction,
@@ -2097,6 +2107,72 @@ const actions = {
     list: list_action_1.listAction,
     toDo: to_do_action_1.toDoAction,
     time: time_action_1.timeAction,
+    test: () => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
+        const targets = [
+            ['phe-button', 'pheButton'],
+            ['btnType', 'pheButtonType'],
+            ['btnSize', 'pheButtonSize'],
+            ['iconName', 'pheButtonIconName'],
+            ['iconSize', 'pheButtonIconSize'],
+            ['highlight', 'pheButtonHighlight'],
+            ['responsive', 'pheButtonResponsive'],
+            ['phe-dialog-close', 'pheDialogClose'],
+            ['phe-dialog-content', 'pheDialogContent'],
+            ['phe-dialog-title', 'pheDialogTitle'],
+            ['pheType', 'type'],
+            ['pheSize', 'size'],
+            ['pheColor', 'color'],
+            ['pheIconSize', 'iconSize'],
+            ['pheIconName', 'iconName'],
+            ['phePosition', 'position'],
+            ['phe-popover', 'phePopover'],
+            ['PheCdkOverlayMenuModule', 'PheCdkOverlayModule'],
+            ['@aether/pheno/cdk-overlay-menu', '@aether/pheno/cdk-overlay'],
+            ['PheCdkOverlayCascadeMenuService', 'PheCdkOverlayCascadeHelperService'],
+            ['PheCdkMenuTriggerForDirective', 'PheCdkOverlayTriggerForDirective'],
+            ['PheCdkOverlayMenuComponent', 'PheCdkOverlayComponent'],
+            ['pheCdkMenuTriggerFor', 'pheCdkOverlayTriggerFor'],
+            ['cdkMenuConfig', 'pheCdkOverlayTriggerForConfig'],
+            ['CdkMenuConfig', 'CdkOverlayConfig'],
+            ['isOpen', 'pheCdkOverlayTriggerForIsOpen'],
+            ['IsOpenChange', 'pheCdkOverlayTriggerForIsOpenChange'],
+            ['PositionType', 'PheCdkOverlayPositionType'],
+            ['PositionMap', 'PheCdkOverlayPositionMap'],
+            ['positionPair', 'pheCdkOverlayPositionPair'],
+        ];
+        const projectIds = [
+            'DYSK_Labs%2Fwebsite',
+            'DYSK_Labs%2Fspace',
+            'DYSK_Labs%2Faether-mono',
+            // 'DYSK_Labs%2Fpath-gateway',
+            // 'DYSK_Labs%2Fhema-emulator',
+        ];
+        for (const projectId of projectIds) {
+            const gitLab = new gitlab_class_1.GitLab(projectId);
+            // get open merge requests
+            const openedMergedRequests = yield gitLab.getOpenedMergeRequests();
+            for (const mergeRequest of openedMergedRequests) {
+                console.log(projectId);
+                console.log(mergeRequest.iid);
+                const mergeRequestChanges = yield gitLab.getMergeRequestChanges(mergeRequest.iid);
+                const changes = mergeRequestChanges.changes;
+                for (const change of changes) {
+                    const addDiff = change.diff
+                        .split('\n')
+                        .filter((line) => line.startsWith('+'));
+                    addDiff.forEach((line) => {
+                        for (const t of targets) {
+                            if (line.toLowerCase().includes(t[0].toLowerCase())) {
+                                console.log(change.new_path);
+                                console.log(line);
+                            }
+                        }
+                    });
+                }
+            }
+        }
+        console.log('end');
+    }),
 };
 (() => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     const action = process.argv[2];
