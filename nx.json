@@ -36,6 +36,13 @@
     "cli": {
       "tags": []
     },
+    "extension": {
+      "tags": []
+    },
+    "extension-e2e": {
+      "tags": [],
+      "implicitDependencies": ["extension"]
+    },
     "frontend": {
       "tags": []
     },

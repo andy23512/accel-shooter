@@ -10,6 +10,12 @@
 ### Fixed
 
 ```
+## [Unrealased] - yyyy-mm-dd
+
+### Added
+
+- Add extension
+
 ## [2.0.5] - 2021-08-28
 
 ### Changed
