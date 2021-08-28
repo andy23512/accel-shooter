@@ -10,7 +10,7 @@
 ### Fixed
 
 ```
-## [Unrealased] - yyyy-mm-dd
+## [2.0.5] - 2021-08-28
 
 ### Changed
 
