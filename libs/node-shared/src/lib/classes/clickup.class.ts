@@ -1,9 +1,9 @@
-import { callApiFactory } from "../api.utils";
+import { callApiFactory } from "../utils/api.utils";
 import { ChecklistResponse, Task } from "../models/clickup.models";
 import { List } from "../models/clickup/list.models";
 import { Team } from "../models/clickup/team.models";
 import { User } from "../models/clickup/user.models";
-import { Comment } from "./../models/clickup/comment.models";
+import { Comment } from "../models/clickup/comment.models";
 const callApi = callApiFactory("ClickUp");
 
 export class ClickUp {

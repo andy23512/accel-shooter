@@ -1,9 +1,9 @@
+import { CONFIG } from "@accel-shooter/node-shared";
 import clipboardy from "clipboardy";
 import { readFileSync } from "fs";
 import inquirer from "inquirer";
 import { render } from "mustache";
 import untildify from "untildify";
-import { CONFIG } from "../config";
 export async function toDoAction() {
   const answers = await inquirer.prompt([
     {

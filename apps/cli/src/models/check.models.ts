@@ -1,6 +1,6 @@
-import { GitLab } from "../classes/gitlab.class";
-import { MergeRequest } from "./gitlab.models";
-import { Change } from "./gitlab/merge-request.models";
+import { GitLab } from "../../../../libs/node-shared/src/lib/classes/gitlab.class";
+import { MergeRequest } from "../../../../libs/node-shared/src/lib/models/gitlab.models";
+import { Change } from "../../../../libs/node-shared/src/lib/models/gitlab/merge-request.models";
 
 export interface CheckContext {
   mergeRequest: MergeRequest;

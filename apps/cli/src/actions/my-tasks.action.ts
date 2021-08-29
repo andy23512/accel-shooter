@@ -1,9 +1,8 @@
+import { ClickUp, CONFIG } from "@accel-shooter/node-shared";
 import chalk from "chalk";
 import moment from "moment";
 import { table } from "table";
-import { ClickUp } from "../classes/clickup.class";
 import { CustomEmojiProgress } from "../classes/emoji-progress.class";
-import { CONFIG } from "../config";
 
 export async function myTasksAction() {
   const user = (await ClickUp.getCurrentUser()).user;

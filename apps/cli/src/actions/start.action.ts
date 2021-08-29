@@ -1,39 +1,36 @@
-import clipboardy from 'clipboardy';
-import { readFileSync } from 'fs';
-import inquirer from 'inquirer';
-import { render } from 'mustache';
-import os from 'os';
-import untildify from 'untildify';
-import { ClickUp } from '../classes/clickup.class';
-import { DailyProgress } from '../classes/daily-progress.class';
-import { GitLab } from '../classes/gitlab.class';
-import { CustomProgressLog } from '../classes/progress-log.class';
-import { Tracker } from '../classes/tracker.class';
-import { CONFIG } from '../config';
-import { sleep } from '../sleep.utils';
+import { ClickUp, CONFIG, GitLab, sleep } from "@accel-shooter/node-shared";
+import clipboardy from "clipboardy";
+import { readFileSync } from "fs";
+import inquirer from "inquirer";
+import { render } from "mustache";
+import os from "os";
+import untildify from "untildify";
+import { DailyProgress } from "../classes/daily-progress.class";
+import { CustomProgressLog } from "../classes/progress-log.class";
+import { Tracker } from "../classes/tracker.class";
 import {
   checkWorkingTreeClean,
   getGitLabBranchNameFromIssueNumberAndTitleAndTaskId,
   promiseSpawn,
-} from '../utils';
-import { syncAction } from './sync.action';
+} from "../utils";
+import { syncAction } from "./sync.action";
 
 export async function startAction() {
   const answers = await inquirer.prompt([
     {
-      name: 'gitLabProject',
-      message: 'Choose GitLab Project',
-      type: 'list',
+      name: "gitLabProject",
+      message: "Choose GitLab Project",
+      type: "list",
       choices: CONFIG.GitLabProjects.map((p) => ({
         name: `${p.name} (${p.repo})`,
         value: p,
       })),
       async filter(input: any) {
-        process.chdir(input.path.replace('~', os.homedir()));
+        process.chdir(input.path.replace("~", os.homedir()));
         const isClean = await checkWorkingTreeClean();
         if (!isClean) {
           console.log(
-            '\nWorking tree is not clean or something is not pushed. Aborted.'
+            "\nWorking tree is not clean or something is not pushed. Aborted."
           );
           process.exit();
         }
@@ -41,20 +38,20 @@ export async function startAction() {
       },
     },
     {
-      name: 'clickUpTaskId',
-      message: 'Enter ClickUp Task ID',
-      type: 'input',
-      filter: (input) => input.replace('#', ''),
+      name: "clickUpTaskId",
+      message: "Enter ClickUp Task ID",
+      type: "input",
+      filter: (input) => input.replace("#", ""),
     },
     {
-      name: 'issueTitle',
-      message: 'Enter Issue Title',
-      type: 'input',
+      name: "issueTitle",
+      message: "Enter Issue Title",
+      type: "input",
       default: async (answers: { clickUpTaskId: string }) => {
         let task = await new ClickUp(answers.clickUpTaskId).getTask();
         const user = (await ClickUp.getCurrentUser()).user;
         if (!task.assignees.find((a) => a.id === user.id)) {
-          console.log('\nTask is not assigned to you. Aborted.');
+          console.log("\nTask is not assigned to you. Aborted.");
           process.exit();
         }
         let result = task.name;
@@ -66,35 +63,35 @@ export async function startAction() {
       },
     },
     {
-      name: 'todoConfig',
-      message: 'Choose Preset To-do Config',
-      type: 'checkbox',
+      name: "todoConfig",
+      message: "Choose Preset To-do Config",
+      type: "checkbox",
       choices: CONFIG.ToDoConfigChoices,
     },
   ]);
-  const p = new CustomProgressLog('Start', [
-    'Get ClickUp Task',
-    'Set ClickUp Task Status',
-    'Render Todo List',
-    'Create GitLab Issue',
-    'Create GitLab Branch',
-    'Create GitLab Merge Request',
-    'Add Daily Progress Entry',
-    'Copy Sync Command',
-    'Add Tracker Item',
-    'Do Git Fetch and Checkout',
+  const p = new CustomProgressLog("Start", [
+    "Get ClickUp Task",
+    "Set ClickUp Task Status",
+    "Render Todo List",
+    "Create GitLab Issue",
+    "Create GitLab Branch",
+    "Create GitLab Merge Request",
+    "Add Daily Progress Entry",
+    "Copy Sync Command",
+    "Add Tracker Item",
+    "Do Git Fetch and Checkout",
   ]);
-  process.chdir(answers.gitLabProject.path.replace('~', os.homedir()));
+  process.chdir(answers.gitLabProject.path.replace("~", os.homedir()));
   await checkWorkingTreeClean();
   const gitLab = new GitLab(answers.gitLabProject.id);
   const clickUp = new ClickUp(answers.clickUpTaskId);
   p.start();
   const clickUpTask = await clickUp.getTask();
   process.exit();
-  const clickUpTaskUrl = clickUpTask['url'];
+  const clickUpTaskUrl = clickUpTask["url"];
   const gitLabIssueTitle = answers.issueTitle;
   p.next();
-  await clickUp.setTaskStatus('in progress');
+  await clickUp.setTaskStatus("in progress");
   p.next();
   const todoConfigMap: Record<string, boolean> = {};
   answers.todoConfig.forEach((c: string) => {
@@ -102,7 +99,7 @@ export async function startAction() {
   });
   todoConfigMap[answers.gitLabProject.name] = true;
   const template = readFileSync(untildify(CONFIG.ToDoTemplate), {
-    encoding: 'utf-8',
+    encoding: "utf-8",
   });
   const endingTodo = render(template, todoConfigMap);
   p.next();
@@ -133,14 +130,14 @@ export async function startAction() {
   p.next();
   new Tracker().addItem(answers.gitLabProject.name, gitLabIssueNumber);
   p.next();
-  process.chdir(answers.gitLabProject.path.replace('~', os.homedir()));
-  await promiseSpawn('git', ['fetch'], 'pipe');
+  process.chdir(answers.gitLabProject.path.replace("~", os.homedir()));
+  await promiseSpawn("git", ["fetch"], "pipe");
   await sleep(1000);
-  await promiseSpawn('git', ['checkout', gitLabBranch.name], 'pipe');
+  await promiseSpawn("git", ["checkout", gitLabBranch.name], "pipe");
   await promiseSpawn(
-    'git',
-    ['submodule', 'update', '--init', '--recursive'],
-    'pipe'
+    "git",
+    ["submodule", "update", "--init", "--recursive"],
+    "pipe"
   );
   p.end(0);
   await syncAction();

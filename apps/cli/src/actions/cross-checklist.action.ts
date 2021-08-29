@@ -1,6 +1,6 @@
+import { CONFIG } from "@accel-shooter/node-shared";
 import clipboardy from "clipboardy";
 import inquirer from "inquirer";
-import { CONFIG } from "../config";
 
 export async function crossChecklistAction() {
   const answers = await inquirer.prompt([

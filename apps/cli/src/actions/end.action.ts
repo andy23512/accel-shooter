@@ -1,4 +1,4 @@
-import { ClickUp } from "../classes/clickup.class";
+import { ClickUp } from "@accel-shooter/node-shared";
 import { CustomProgressLog } from "../classes/progress-log.class";
 import {
   getClickUpTaskIdFromGitLabIssue,

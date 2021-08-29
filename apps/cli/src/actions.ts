@@ -1,15 +1,17 @@
-import readline from 'readline';
-import { endAction } from './actions/end.action';
-import { ClickUp } from './classes/clickup.class';
-import { CustomEmojiProgress } from './classes/emoji-progress.class';
-import { GitLab } from './classes/gitlab.class';
-import { NormalizedChecklist } from './models/models';
+import {
+  ClickUp,
+  GitLab,
+  NormalizedChecklist,
+} from "@accel-shooter/node-shared";
+import readline from "readline";
+import { endAction } from "./actions/end.action";
+import { CustomEmojiProgress } from "./classes/emoji-progress.class";
 import {
   getClickUpTaskIdFromGitLabIssue,
   normalizeClickUpChecklist,
   normalizeGitLabIssueChecklist,
   openUrlsInTabGroup,
-} from './utils';
+} from "./utils";
 
 export function getSyncChecklistActions(
   oldClickUpChecklist: NormalizedChecklist,
@@ -56,7 +58,7 @@ export async function syncChecklist(
   const clickUpTaskId = getClickUpTaskIdFromGitLabIssue(issue);
   if (clickUpTaskId) {
     const gitLabChecklistText = issue.description
-      .replace(/https:\/\/app.clickup.com\/t\/\w+/g, '')
+      .replace(/https:\/\/app.clickup.com\/t\/\w+/g, "")
       .trim();
     const gitLabNormalizedChecklist =
       normalizeGitLabIssueChecklist(gitLabChecklistText);
@@ -78,8 +80,8 @@ export async function syncChecklist(
       openUrlsInTabGroup(urls, issueNumber);
     }
     const clickUpChecklistTitle = `GitLab synced checklist [${gitLabProjectId.replace(
-      '%2F',
-      '/'
+      "%2F",
+      "/"
     )}]`;
     let clickUpChecklist = clickUpTask.checklists.find(
       (c: any) => c.name === clickUpChecklistTitle
@@ -143,13 +145,13 @@ export function setUpSyncHotkey(
 ) {
   process.stdin.setRawMode(true);
   process.stdin.resume();
-  process.stdin.on('keypress', async (_, key) => {
-    if (key.ctrl && key.name === 'c') {
+  process.stdin.on("keypress", async (_, key) => {
+    if (key.ctrl && key.name === "c") {
       process.exit();
-    } else if (!key.ctrl && !key.meta && !key.shift && key.name === 's') {
+    } else if (!key.ctrl && !key.meta && !key.shift && key.name === "s") {
       console.log(`You pressed the sync key`);
       syncChecklist(gitLabProjectId, issueNumber, ep);
-    } else if (!key.ctrl && !key.meta && !key.shift && key.name === 'e') {
+    } else if (!key.ctrl && !key.meta && !key.shift && key.name === "e") {
       console.log(`You pressed the end key`);
       await syncChecklist(gitLabProjectId, issueNumber, ep);
       await endAction();

@@ -1,8 +1,8 @@
+import { ProjectCheckItem } from "@accel-shooter/node-shared";
 import { concat, defer, of } from "rxjs";
 import { map } from "rxjs/operators";
 import { promiseSpawn } from "../utils";
 import { CheckContext } from "./../models/check.models";
-import { ProjectCheckItem } from "./../models/models";
 
 export class CheckItem {
   public displayName: string;

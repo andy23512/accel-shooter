@@ -98,10 +98,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.setUpSyncHotkey = exports.configReadline = exports.syncChecklist = exports.getSyncChecklistActions = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const readline_1 = tslib_1.__importDefault(__webpack_require__(/*! readline */ "readline"));
 const end_action_1 = __webpack_require__(/*! ./actions/end.action */ "./apps/cli/src/actions/end.action.ts");
-const clickup_class_1 = __webpack_require__(/*! ./classes/clickup.class */ "./apps/cli/src/classes/clickup.class.ts");
-const gitlab_class_1 = __webpack_require__(/*! ./classes/gitlab.class */ "./apps/cli/src/classes/gitlab.class.ts");
 const utils_1 = __webpack_require__(/*! ./utils */ "./apps/cli/src/utils.ts");
 function getSyncChecklistActions(oldClickUpChecklist, newGitLabChecklist) {
     const actions = {
@@ -130,15 +129,15 @@ function getSyncChecklistActions(oldClickUpChecklist, newGitLabChecklist) {
 exports.getSyncChecklistActions = getSyncChecklistActions;
 function syncChecklist(gitLabProjectId, issueNumber, ep, openPage) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const gitLab = new gitlab_class_1.GitLab(gitLabProjectId);
+        const gitLab = new node_shared_1.GitLab(gitLabProjectId);
         const issue = yield gitLab.getIssue(issueNumber);
         const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
         if (clickUpTaskId) {
             const gitLabChecklistText = issue.description
-                .replace(/https:\/\/app.clickup.com\/t\/\w+/g, '')
+                .replace(/https:\/\/app.clickup.com\/t\/\w+/g, "")
                 .trim();
             const gitLabNormalizedChecklist = utils_1.normalizeGitLabIssueChecklist(gitLabChecklistText);
-            const clickUp = new clickup_class_1.ClickUp(clickUpTaskId);
+            const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
             const clickUpTask = yield clickUp.getTask();
             const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
             if (openPage) {
@@ -153,7 +152,7 @@ function syncChecklist(gitLabProjectId, issueNumber, ep, openPage) {
                 }
                 utils_1.openUrlsInTabGroup(urls, issueNumber);
             }
-            const clickUpChecklistTitle = `GitLab synced checklist [${gitLabProjectId.replace('%2F', '/')}]`;
+            const clickUpChecklistTitle = `GitLab synced checklist [${gitLabProjectId.replace("%2F", "/")}]`;
             let clickUpChecklist = clickUpTask.checklists.find((c) => c.name === clickUpChecklistTitle);
             if (!clickUpChecklist) {
                 clickUpChecklist = (yield clickUp.createChecklist(clickUpChecklistTitle))
@@ -188,15 +187,15 @@ exports.configReadline = configReadline;
 function setUpSyncHotkey(gitLabProjectId, issueNumber, ep) {
     process.stdin.setRawMode(true);
     process.stdin.resume();
-    process.stdin.on('keypress', (_, key) => tslib_1.__awaiter(this, void 0, void 0, function* () {
-        if (key.ctrl && key.name === 'c') {
+    process.stdin.on("keypress", (_, key) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+        if (key.ctrl && key.name === "c") {
             process.exit();
         }
-        else if (!key.ctrl && !key.meta && !key.shift && key.name === 's') {
+        else if (!key.ctrl && !key.meta && !key.shift && key.name === "s") {
             console.log(`You pressed the sync key`);
             syncChecklist(gitLabProjectId, issueNumber, ep);
         }
-        else if (!key.ctrl && !key.meta && !key.shift && key.name === 'e') {
+        else if (!key.ctrl && !key.meta && !key.shift && key.name === "e") {
             console.log(`You pressed the end key`);
             yield syncChecklist(gitLabProjectId, issueNumber, ep);
             yield end_action_1.endAction();
@@ -283,9 +282,9 @@ exports.commentAction = commentAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.crossChecklistAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const clipboardy_1 = tslib_1.__importDefault(__webpack_require__(/*! clipboardy */ "clipboardy"));
 const inquirer_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer */ "inquirer"));
-const config_1 = __webpack_require__(/*! ../config */ "./apps/cli/src/config.ts");
 function crossChecklistAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const answers = yield inquirer_1.default.prompt([
@@ -303,7 +302,7 @@ function crossChecklistAction() {
                 name: "secondLevel",
                 message: "Enter second level items",
                 type: "editor",
-                default: config_1.CONFIG.CrossChecklistDefaultSecondLevel.join("\n"),
+                default: node_shared_1.CONFIG.CrossChecklistDefaultSecondLevel.join("\n"),
             },
         ]);
         const firstLevelItems = answers.firstLevel
@@ -343,7 +342,7 @@ exports.crossChecklistAction = crossChecklistAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.endAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const clickup_class_1 = __webpack_require__(/*! ../classes/clickup.class */ "./apps/cli/src/classes/clickup.class.ts");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const progress_log_class_1 = __webpack_require__(/*! ../classes/progress-log.class */ "./apps/cli/src/classes/progress-log.class.ts");
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 function endAction() {
@@ -374,7 +373,7 @@ function endAction() {
         p.next();
         const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
         if (clickUpTaskId) {
-            const clickUp = new clickup_class_1.ClickUp(clickUpTaskId);
+            const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
             yield clickUp.setTaskStatus("in review");
         }
         p.end(0);
@@ -397,7 +396,7 @@ exports.endAction = endAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.listAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const gitlab_class_1 = __webpack_require__(/*! ../classes/gitlab.class */ "./apps/cli/src/classes/gitlab.class.ts");
+const gitlab_class_1 = __webpack_require__(/*! ../../../../libs/node-shared/src/lib/classes/gitlab.class */ "./libs/node-shared/src/lib/classes/gitlab.class.ts");
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 function listAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -424,28 +423,27 @@ exports.listAction = listAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.myTasksAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const chalk_1 = tslib_1.__importDefault(__webpack_require__(/*! chalk */ "chalk"));
 const moment_1 = tslib_1.__importDefault(__webpack_require__(/*! moment */ "moment"));
 const table_1 = __webpack_require__(/*! table */ "table");
-const clickup_class_1 = __webpack_require__(/*! ../classes/clickup.class */ "./apps/cli/src/classes/clickup.class.ts");
 const emoji_progress_class_1 = __webpack_require__(/*! ../classes/emoji-progress.class */ "./apps/cli/src/classes/emoji-progress.class.ts");
-const config_1 = __webpack_require__(/*! ../config */ "./apps/cli/src/config.ts");
 function myTasksAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const user = (yield clickup_class_1.ClickUp.getCurrentUser()).user;
-        const team = (yield clickup_class_1.ClickUp.getTeams()).teams.find((t) => t.name === config_1.CONFIG.ClickUpTeam);
+        const user = (yield node_shared_1.ClickUp.getCurrentUser()).user;
+        const team = (yield node_shared_1.ClickUp.getTeams()).teams.find((t) => t.name === node_shared_1.CONFIG.ClickUpTeam);
         if (!team) {
             console.log("Team does not exist.");
             return;
         }
-        const tasks = (yield clickup_class_1.ClickUp.getMyTasks(team.id, user.id)).tasks;
+        const tasks = (yield node_shared_1.ClickUp.getMyTasks(team.id, user.id)).tasks;
         const summarizedTasks = [];
         const ep = new emoji_progress_class_1.CustomEmojiProgress(0, tasks.length);
         for (const task of tasks) {
             const taskPath = [task];
             let t = task;
             while (t.parent) {
-                t = yield new clickup_class_1.ClickUp(t.parent).getTask();
+                t = yield new node_shared_1.ClickUp(t.parent).getTask();
                 taskPath.push(t);
             }
             const simpleTaskPath = taskPath.map((t) => ({
@@ -613,7 +611,7 @@ exports.openAction = openAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.revertEndAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const clickup_class_1 = __webpack_require__(/*! ../classes/clickup.class */ "./apps/cli/src/classes/clickup.class.ts");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const progress_log_class_1 = __webpack_require__(/*! ../classes/progress-log.class */ "./apps/cli/src/classes/progress-log.class.ts");
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 function revertEndAction() {
@@ -635,7 +633,7 @@ function revertEndAction() {
         p.next();
         const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
         if (clickUpTaskId) {
-            const clickUp = new clickup_class_1.ClickUp(clickUpTaskId);
+            const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
             yield clickUp.setTaskStatus("in progress");
         }
         p.end(0);
@@ -658,17 +656,16 @@ exports.revertEndAction = revertEndAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.RTVTasksAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const clickup_class_1 = __webpack_require__(/*! ../classes/clickup.class */ "./apps/cli/src/classes/clickup.class.ts");
-const config_1 = __webpack_require__(/*! ../config */ "./apps/cli/src/config.ts");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 function RTVTasksAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const user = (yield clickup_class_1.ClickUp.getCurrentUser()).user;
-        const team = (yield clickup_class_1.ClickUp.getTeams()).teams.find((t) => t.name === config_1.CONFIG.ClickUpTeam);
+        const user = (yield node_shared_1.ClickUp.getCurrentUser()).user;
+        const team = (yield node_shared_1.ClickUp.getTeams()).teams.find((t) => t.name === node_shared_1.CONFIG.ClickUpTeam);
         if (!team) {
             console.log("Team does not exist.");
             return;
         }
-        const tasks = (yield clickup_class_1.ClickUp.getRTVTasks(team.id, user.id)).tasks;
+        const tasks = (yield node_shared_1.ClickUp.getRTVTasks(team.id, user.id)).tasks;
         console.log(tasks.map((t) => `- ${t.name} (${t.url})`).join("\n"));
     });
 }
@@ -689,38 +686,35 @@ exports.RTVTasksAction = RTVTasksAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.startAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const clipboardy_1 = tslib_1.__importDefault(__webpack_require__(/*! clipboardy */ "clipboardy"));
 const fs_1 = __webpack_require__(/*! fs */ "fs");
 const inquirer_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer */ "inquirer"));
 const mustache_1 = __webpack_require__(/*! mustache */ "mustache");
 const os_1 = tslib_1.__importDefault(__webpack_require__(/*! os */ "os"));
 const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
-const clickup_class_1 = __webpack_require__(/*! ../classes/clickup.class */ "./apps/cli/src/classes/clickup.class.ts");
 const daily_progress_class_1 = __webpack_require__(/*! ../classes/daily-progress.class */ "./apps/cli/src/classes/daily-progress.class.ts");
-const gitlab_class_1 = __webpack_require__(/*! ../classes/gitlab.class */ "./apps/cli/src/classes/gitlab.class.ts");
 const progress_log_class_1 = __webpack_require__(/*! ../classes/progress-log.class */ "./apps/cli/src/classes/progress-log.class.ts");
 const tracker_class_1 = __webpack_require__(/*! ../classes/tracker.class */ "./apps/cli/src/classes/tracker.class.ts");
-const config_1 = __webpack_require__(/*! ../config */ "./apps/cli/src/config.ts");
-const sleep_utils_1 = __webpack_require__(/*! ../sleep.utils */ "./apps/cli/src/sleep.utils.ts");
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 const sync_action_1 = __webpack_require__(/*! ./sync.action */ "./apps/cli/src/actions/sync.action.ts");
 function startAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const answers = yield inquirer_1.default.prompt([
             {
-                name: 'gitLabProject',
-                message: 'Choose GitLab Project',
-                type: 'list',
-                choices: config_1.CONFIG.GitLabProjects.map((p) => ({
+                name: "gitLabProject",
+                message: "Choose GitLab Project",
+                type: "list",
+                choices: node_shared_1.CONFIG.GitLabProjects.map((p) => ({
                     name: `${p.name} (${p.repo})`,
                     value: p,
                 })),
                 filter(input) {
                     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-                        process.chdir(input.path.replace('~', os_1.default.homedir()));
+                        process.chdir(input.path.replace("~", os_1.default.homedir()));
                         const isClean = yield utils_1.checkWorkingTreeClean();
                         if (!isClean) {
-                            console.log('\nWorking tree is not clean or something is not pushed. Aborted.');
+                            console.log("\nWorking tree is not clean or something is not pushed. Aborted.");
                             process.exit();
                         }
                         return input;
@@ -728,68 +722,68 @@ function startAction() {
                 },
             },
             {
-                name: 'clickUpTaskId',
-                message: 'Enter ClickUp Task ID',
-                type: 'input',
-                filter: (input) => input.replace('#', ''),
+                name: "clickUpTaskId",
+                message: "Enter ClickUp Task ID",
+                type: "input",
+                filter: (input) => input.replace("#", ""),
             },
             {
-                name: 'issueTitle',
-                message: 'Enter Issue Title',
-                type: 'input',
+                name: "issueTitle",
+                message: "Enter Issue Title",
+                type: "input",
                 default: (answers) => tslib_1.__awaiter(this, void 0, void 0, function* () {
-                    let task = yield new clickup_class_1.ClickUp(answers.clickUpTaskId).getTask();
-                    const user = (yield clickup_class_1.ClickUp.getCurrentUser()).user;
+                    let task = yield new node_shared_1.ClickUp(answers.clickUpTaskId).getTask();
+                    const user = (yield node_shared_1.ClickUp.getCurrentUser()).user;
                     if (!task.assignees.find((a) => a.id === user.id)) {
-                        console.log('\nTask is not assigned to you. Aborted.');
+                        console.log("\nTask is not assigned to you. Aborted.");
                         process.exit();
                     }
                     let result = task.name;
                     while (task.parent) {
-                        task = yield new clickup_class_1.ClickUp(task.parent).getTask();
+                        task = yield new node_shared_1.ClickUp(task.parent).getTask();
                         result = `${task.name} - ${result}`;
                     }
                     return result;
                 }),
             },
             {
-                name: 'todoConfig',
-                message: 'Choose Preset To-do Config',
-                type: 'checkbox',
-                choices: config_1.CONFIG.ToDoConfigChoices,
+                name: "todoConfig",
+                message: "Choose Preset To-do Config",
+                type: "checkbox",
+                choices: node_shared_1.CONFIG.ToDoConfigChoices,
             },
         ]);
-        const p = new progress_log_class_1.CustomProgressLog('Start', [
-            'Get ClickUp Task',
-            'Set ClickUp Task Status',
-            'Render Todo List',
-            'Create GitLab Issue',
-            'Create GitLab Branch',
-            'Create GitLab Merge Request',
-            'Add Daily Progress Entry',
-            'Copy Sync Command',
-            'Add Tracker Item',
-            'Do Git Fetch and Checkout',
+        const p = new progress_log_class_1.CustomProgressLog("Start", [
+            "Get ClickUp Task",
+            "Set ClickUp Task Status",
+            "Render Todo List",
+            "Create GitLab Issue",
+            "Create GitLab Branch",
+            "Create GitLab Merge Request",
+            "Add Daily Progress Entry",
+            "Copy Sync Command",
+            "Add Tracker Item",
+            "Do Git Fetch and Checkout",
         ]);
-        process.chdir(answers.gitLabProject.path.replace('~', os_1.default.homedir()));
+        process.chdir(answers.gitLabProject.path.replace("~", os_1.default.homedir()));
         yield utils_1.checkWorkingTreeClean();
-        const gitLab = new gitlab_class_1.GitLab(answers.gitLabProject.id);
-        const clickUp = new clickup_class_1.ClickUp(answers.clickUpTaskId);
+        const gitLab = new node_shared_1.GitLab(answers.gitLabProject.id);
+        const clickUp = new node_shared_1.ClickUp(answers.clickUpTaskId);
         p.start();
         const clickUpTask = yield clickUp.getTask();
         process.exit();
-        const clickUpTaskUrl = clickUpTask['url'];
+        const clickUpTaskUrl = clickUpTask["url"];
         const gitLabIssueTitle = answers.issueTitle;
         p.next();
-        yield clickUp.setTaskStatus('in progress');
+        yield clickUp.setTaskStatus("in progress");
         p.next();
         const todoConfigMap = {};
         answers.todoConfig.forEach((c) => {
             todoConfigMap[c] = true;
         });
         todoConfigMap[answers.gitLabProject.name] = true;
-        const template = fs_1.readFileSync(untildify_1.default(config_1.CONFIG.ToDoTemplate), {
-            encoding: 'utf-8',
+        const template = fs_1.readFileSync(untildify_1.default(node_shared_1.CONFIG.ToDoTemplate), {
+            encoding: "utf-8",
         });
         const endingTodo = mustache_1.render(template, todoConfigMap);
         p.next();
@@ -808,11 +802,11 @@ function startAction() {
         p.next();
         new tracker_class_1.Tracker().addItem(answers.gitLabProject.name, gitLabIssueNumber);
         p.next();
-        process.chdir(answers.gitLabProject.path.replace('~', os_1.default.homedir()));
-        yield utils_1.promiseSpawn('git', ['fetch'], 'pipe');
-        yield sleep_utils_1.sleep(1000);
-        yield utils_1.promiseSpawn('git', ['checkout', gitLabBranch.name], 'pipe');
-        yield utils_1.promiseSpawn('git', ['submodule', 'update', '--init', '--recursive'], 'pipe');
+        process.chdir(answers.gitLabProject.path.replace("~", os_1.default.homedir()));
+        yield utils_1.promiseSpawn("git", ["fetch"], "pipe");
+        yield node_shared_1.sleep(1000);
+        yield utils_1.promiseSpawn("git", ["checkout", gitLabBranch.name], "pipe");
+        yield utils_1.promiseSpawn("git", ["submodule", "update", "--init", "--recursive"], "pipe");
         p.end(0);
         yield sync_action_1.syncAction();
     });
@@ -834,12 +828,12 @@ exports.startAction = startAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.syncAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const child_process_1 = __webpack_require__(/*! child_process */ "child_process");
 const os_1 = tslib_1.__importDefault(__webpack_require__(/*! os */ "os"));
 const dynamic_1 = __webpack_require__(/*! set-interval-async/dynamic */ "set-interval-async/dynamic");
 const actions_1 = __webpack_require__(/*! ../actions */ "./apps/cli/src/actions.ts");
 const emoji_progress_class_1 = __webpack_require__(/*! ../classes/emoji-progress.class */ "./apps/cli/src/classes/emoji-progress.class.ts");
-const config_1 = __webpack_require__(/*! ../config */ "./apps/cli/src/config.ts");
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 function syncAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -870,7 +864,7 @@ function syncAction() {
         yield actions_1.syncChecklist(gitLabProjectId, issueNumber, ep, true);
         dynamic_1.setIntervalAsync(() => tslib_1.__awaiter(this, void 0, void 0, function* () {
             yield actions_1.syncChecklist(gitLabProjectId, issueNumber, ep, false);
-        }), config_1.CONFIG.SyncIntervalInMinutes * 60 * 1000);
+        }), node_shared_1.CONFIG.SyncIntervalInMinutes * 60 * 1000);
     });
 }
 exports.syncAction = syncAction;
@@ -915,12 +909,12 @@ exports.timeAction = timeAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.toDoAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const clipboardy_1 = tslib_1.__importDefault(__webpack_require__(/*! clipboardy */ "clipboardy"));
 const fs_1 = __webpack_require__(/*! fs */ "fs");
 const inquirer_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer */ "inquirer"));
 const mustache_1 = __webpack_require__(/*! mustache */ "mustache");
 const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
-const config_1 = __webpack_require__(/*! ../config */ "./apps/cli/src/config.ts");
 function toDoAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const answers = yield inquirer_1.default.prompt([
@@ -928,7 +922,7 @@ function toDoAction() {
                 name: "gitLabProject",
                 message: "Choose GitLab Project",
                 type: "list",
-                choices: config_1.CONFIG.GitLabProjects.map((p) => ({
+                choices: node_shared_1.CONFIG.GitLabProjects.map((p) => ({
                     name: `${p.name} (${p.repo})`,
                     value: p,
                 })),
@@ -937,7 +931,7 @@ function toDoAction() {
                 name: "todoConfig",
                 message: "Choose Preset To-do Config",
                 type: "checkbox",
-                choices: config_1.CONFIG.ToDoConfigChoices,
+                choices: node_shared_1.CONFIG.ToDoConfigChoices,
             },
         ]);
         const todoConfigMap = {};
@@ -945,7 +939,7 @@ function toDoAction() {
             todoConfigMap[c] = true;
         });
         todoConfigMap[answers.gitLabProject.name] = true;
-        const template = fs_1.readFileSync(untildify_1.default(config_1.CONFIG.ToDoTemplate), {
+        const template = fs_1.readFileSync(untildify_1.default(node_shared_1.CONFIG.ToDoTemplate), {
             encoding: "utf-8",
         });
         const endingTodo = mustache_1.render(template, todoConfigMap);
@@ -1022,105 +1016,6 @@ function updateAction() {
     });
 }
 exports.updateAction = updateAction;
-
-
-/***/ }),
-
-/***/ "./apps/cli/src/api.utils.ts":
-/*!***********************************!*\
-  !*** ./apps/cli/src/api.utils.ts ***!
-  \***********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.callApiFactory = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_fetch_1 = tslib_1.__importDefault(__webpack_require__(/*! node-fetch */ "node-fetch"));
-const qs_1 = tslib_1.__importDefault(__webpack_require__(/*! qs */ "qs"));
-const config_1 = __webpack_require__(/*! ./config */ "./apps/cli/src/config.ts");
-const sleep_utils_1 = __webpack_require__(/*! ./sleep.utils */ "./apps/cli/src/sleep.utils.ts");
-const RETRY_SETTING = {
-    retry: 5,
-    pause: 12 * 1000,
-};
-function fetchRetry(url, opts) {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        let retry = (opts && opts.retry) || 3;
-        while (retry > 0) {
-            try {
-                return yield node_fetch_1.default(url, opts).then(checkStatus);
-            }
-            catch (e) {
-                if (opts === null || opts === void 0 ? void 0 : opts.callback) {
-                    opts.callback(retry);
-                }
-                retry = retry - 1;
-                if (retry == 0) {
-                    throw e;
-                }
-                if (opts === null || opts === void 0 ? void 0 : opts.pause) {
-                    yield sleep_utils_1.sleep(opts.pause);
-                }
-            }
-        }
-    });
-}
-function checkStatus(res) {
-    if (res) {
-        if (res.ok) {
-            return res;
-        }
-        else {
-            throw Error(res.statusText);
-        }
-    }
-    else {
-        throw Error("Response is undefined.");
-    }
-}
-function callApiFactory(site) {
-    let apiUrl = "";
-    let headers = {};
-    switch (site) {
-        case "GitLab":
-            apiUrl = "https://gitlab.com/api/v4";
-            headers = { "Private-Token": config_1.CONFIG.GitLabToken };
-            break;
-        case "ClickUp":
-            apiUrl = "https://api.clickup.com/api/v2";
-            headers = { Authorization: config_1.CONFIG.ClickUpToken };
-            break;
-        default:
-            throw Error(`Site {site} is not supported.`);
-    }
-    return (method, url, queryParams, body) => tslib_1.__awaiter(this, void 0, void 0, function* () {
-        let params;
-        if (typeof body === "object") {
-            params = new URLSearchParams();
-            Object.entries(body).forEach(([key, value]) => {
-                params.set(key, value);
-            });
-        }
-        if (typeof body === "string") {
-            params = body;
-        }
-        if (queryParams) {
-            url += "?" + qs_1.default.stringify(queryParams, { arrayFormat: "brackets" });
-        }
-        return fetchRetry(apiUrl + url, method === "get"
-            ? Object.assign({ method,
-                headers }, RETRY_SETTING) : Object.assign({ method, headers, body: params }, RETRY_SETTING))
-            .then((res) => res === null || res === void 0 ? void 0 : res.json())
-            .catch((error) => {
-            console.log(apiUrl + url);
-            throw error;
-        });
-    });
-}
-exports.callApiFactory = callApiFactory;
 
 
 /***/ }),
@@ -1271,6 +1166,7 @@ exports.CheckItem = CheckItem;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Checker = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const fs_1 = __webpack_require__(/*! fs */ "fs");
 const inquirer_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer */ "inquirer"));
 const os_1 = tslib_1.__importDefault(__webpack_require__(/*! os */ "os"));
@@ -1279,7 +1175,6 @@ const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 const check_items_const_1 = __webpack_require__(/*! ./../consts/check-items.const */ "./apps/cli/src/consts/check-items.const.ts");
 const check_item_class_1 = __webpack_require__(/*! ./check-item.class */ "./apps/cli/src/classes/check-item.class.ts");
-const gitlab_class_1 = __webpack_require__(/*! ./gitlab.class */ "./apps/cli/src/classes/gitlab.class.ts");
 const SPINNER = [
     "🕛",
     "🕐",
@@ -1300,7 +1195,7 @@ class Checker {
         this.issueNumber = issueNumber;
         this.selectMode = selectMode;
         this.gitLabProjectId = this.gitLabProject.id;
-        this.gitLab = new gitlab_class_1.GitLab(this.gitLabProjectId);
+        this.gitLab = new node_shared_1.GitLab(this.gitLabProjectId);
     }
     start() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -1396,105 +1291,6 @@ exports.Checker = Checker;
 
 /***/ }),
 
-/***/ "./apps/cli/src/classes/clickup.class.ts":
-/*!***********************************************!*\
-  !*** ./apps/cli/src/classes/clickup.class.ts ***!
-  \***********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.ClickUp = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const api_utils_1 = __webpack_require__(/*! ../api.utils */ "./apps/cli/src/api.utils.ts");
-const callApi = api_utils_1.callApiFactory("ClickUp");
-class ClickUp {
-    constructor(taskId) {
-        this.taskId = taskId;
-    }
-    static getCurrentUser() {
-        return callApi("get", `/user/`);
-    }
-    static getList(listId) {
-        return callApi("get", `/list/${listId}`);
-    }
-    static getTeams() {
-        return callApi("get", `/team/`);
-    }
-    static getRTVTasks(teamId, userID) {
-        return callApi("get", `/team/${teamId}/task/`, {
-            statuses: ["ready to verify"],
-            include_closed: true,
-            assignees: [userID],
-        });
-    }
-    static getMyTasks(teamId, userID) {
-        return callApi("get", `/team/${teamId}/task/`, {
-            statuses: ["Open", "pending", "ready to do", "in progress"],
-            assignees: [userID],
-            subtasks: true,
-        });
-    }
-    getTask() {
-        return callApi("get", `/task/${this.taskId}`);
-    }
-    getTaskComments() {
-        return callApi("get", `/task/${this.taskId}/comment/`).then((r) => r.comments);
-    }
-    setTaskStatus(status) {
-        return callApi("put", `/task/${this.taskId}`, null, { status });
-    }
-    createChecklist(name) {
-        return callApi("post", `/task/${this.taskId}/checklist`, null, { name });
-    }
-    createChecklistItem(checklistId, name, resolved, orderindex) {
-        return callApi("post", `/checklist/${checklistId}/checklist_item`, null, {
-            name,
-            resolved,
-            orderindex,
-        });
-    }
-    updateChecklistItem(checklistId, checklistItemId, name, resolved, orderindex) {
-        return callApi("put", `/checklist/${checklistId}/checklist_item/${checklistItemId}`, null, {
-            name,
-            resolved,
-            orderindex,
-        });
-    }
-    deleteChecklistItem(checklistId, checklistItemId) {
-        return callApi("delete", `/checklist/${checklistId}/checklist_item/${checklistItemId}`);
-    }
-    getFrameUrls() {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            let currentTaskId = this.taskId;
-            const frameUrls = [];
-            while (currentTaskId) {
-                const clickUp = new ClickUp(currentTaskId);
-                const task = yield clickUp.getTask();
-                const comments = yield clickUp.getTaskComments();
-                comments.forEach((co) => {
-                    co.comment
-                        .filter((c) => c.type === "frame")
-                        .forEach((c) => {
-                        var _a;
-                        if ((_a = c === null || c === void 0 ? void 0 : c.frame) === null || _a === void 0 ? void 0 : _a.url) {
-                            frameUrls.push(c.frame.url);
-                        }
-                    });
-                });
-                currentTaskId = task.parent;
-            }
-            return frameUrls;
-        });
-    }
-}
-exports.ClickUp = ClickUp;
-
-
-/***/ }),
-
 /***/ "./apps/cli/src/classes/daily-progress.class.ts":
 /*!******************************************************!*\
   !*** ./apps/cli/src/classes/daily-progress.class.ts ***!
@@ -1507,12 +1303,12 @@ exports.ClickUp = ClickUp;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.DailyProgress = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
-const config_1 = __webpack_require__(/*! ../config */ "./apps/cli/src/config.ts");
 const base_file_ref_class_1 = __webpack_require__(/*! ./base-file-ref.class */ "./apps/cli/src/classes/base-file-ref.class.ts");
 class DailyProgress extends base_file_ref_class_1.BaseFileRef {
     get path() {
-        return untildify_1.default(config_1.CONFIG.DailyProgressFile);
+        return untildify_1.default(node_shared_1.CONFIG.DailyProgressFile);
     }
     addProgressToBuffer(dailyProgressString) {
         const content = this.readFile();
@@ -1590,143 +1386,6 @@ exports.CustomEmojiProgress = CustomEmojiProgress;
 
 /***/ }),
 
-/***/ "./apps/cli/src/classes/gitlab.class.ts":
-/*!**********************************************!*\
-  !*** ./apps/cli/src/classes/gitlab.class.ts ***!
-  \**********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.GitLab = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const api_utils_1 = __webpack_require__(/*! ../api.utils */ "./apps/cli/src/api.utils.ts");
-const config_1 = __webpack_require__(/*! ../config */ "./apps/cli/src/config.ts");
-const callApi = api_utils_1.callApiFactory('GitLab');
-class GitLab {
-    constructor(projectId) {
-        this.projectId = projectId;
-    }
-    getProject() {
-        return callApi('get', `/projects/${this.projectId}`);
-    }
-    getDefaultBranchName() {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const project = yield this.getProject();
-            return project.default_branch;
-        });
-    }
-    getIssue(issueNumber) {
-        return callApi('get', `/projects/${this.projectId}/issues/${issueNumber}`);
-    }
-    getOpenedMergeRequests() {
-        return callApi('get', `/projects/${this.projectId}/merge_requests`, { state: 'opened', per_page: '100' });
-    }
-    getMergeRequest(mergeRequestNumber) {
-        return callApi('get', `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}`);
-    }
-    getMergeRequestChanges(mergeRequestNumber) {
-        return callApi('get', `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}/changes`);
-    }
-    getCommit(sha) {
-        return callApi('get', `/projects/${this.projectId}/repository/commits/${sha}`);
-    }
-    getEndingAssignee() {
-        if (!config_1.CONFIG.EndingAssignee) {
-            throw Error('No ending assignee was set');
-        }
-        return callApi('get', `/users`, {
-            username: config_1.CONFIG.EndingAssignee,
-        }).then((users) => users[0]);
-    }
-    listProjectLabels() {
-        return callApi('get', `/projects/${this.projectId}/labels`, {
-            per_page: 100,
-        });
-    }
-    listMergeRequestsWillCloseIssueOnMerge(issueNumber) {
-        return callApi('get', `/projects/${this.projectId}/issues/${issueNumber}/closed_by`);
-    }
-    listPipelineJobs(pipelineId) {
-        return callApi('get', `/projects/${this.projectId}/pipelines/${pipelineId}/jobs`);
-    }
-    getCompare(from, to) {
-        return callApi('get', `/projects/${this.projectId}/repository/compare`, {
-            from,
-            to,
-            straight: true,
-        });
-    }
-    listPipelines(query) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            query.ref = query.ref || (yield this.getDefaultBranchName());
-            return callApi('get', `/projects/${this.projectId}/pipelines/`, query);
-        });
-    }
-    createIssue(title, description) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            return callApi('post', `/projects/${this.projectId}/issues`, null, {
-                title: title,
-                description: description,
-                assignee_ids: yield this.getUserId(),
-            });
-        });
-    }
-    createBranch(branch) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            return callApi('post', `/projects/${this.projectId}/repository/branches`, null, {
-                branch,
-                ref: yield this.getDefaultBranchName(),
-            });
-        });
-    }
-    createMergeRequest(issueNumber, issueTitle, branch) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            return callApi('post', `/projects/${this.projectId}/merge_requests`, null, {
-                source_branch: branch,
-                target_branch: yield this.getDefaultBranchName(),
-                title: `Draft: Resolve "${issueTitle}"`,
-                description: `Close #${issueNumber}`,
-            });
-        });
-    }
-    createMergeRequestNote(merge_request, content) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            yield callApi('post', `/projects/${this.projectId}/merge_requests/${merge_request.iid}/notes`, { body: content });
-        });
-    }
-    markMergeRequestAsReadyAndAddAssignee(merge_request) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const assignee = yield this.getEndingAssignee();
-            yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
-                title: merge_request.title.replace('WIP: ', '').replace('Draft: ', ''),
-                assignee_id: assignee.id,
-            });
-        });
-    }
-    markMergeRequestAsUnreadyAndSetAssigneeToSelf(merge_request) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
-                title: 'Draft: ' +
-                    merge_request.title.replace('WIP: ', '').replace('Draft: ', ''),
-                assignee_id: yield this.getUserId(),
-            });
-        });
-    }
-    getUserId() {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const user = yield callApi('get', '/user');
-            return user.id;
-        });
-    }
-}
-exports.GitLab = GitLab;
-
-
-/***/ }),
-
 /***/ "./apps/cli/src/classes/progress-log.class.ts":
 /*!****************************************************!*\
   !*** ./apps/cli/src/classes/progress-log.class.ts ***!
@@ -1784,29 +1443,27 @@ exports.CustomProgressLog = CustomProgressLog;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Tracker = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const child_process_1 = tslib_1.__importDefault(__webpack_require__(/*! child_process */ "child_process"));
 const date_fns_1 = __webpack_require__(/*! date-fns */ "date-fns");
 const fs_1 = __webpack_require__(/*! fs */ "fs");
 const node_notifier_1 = tslib_1.__importDefault(__webpack_require__(/*! node-notifier */ "node-notifier"));
 const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
-const config_1 = __webpack_require__(/*! ../config */ "./apps/cli/src/config.ts");
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 const base_file_ref_class_1 = __webpack_require__(/*! ./base-file-ref.class */ "./apps/cli/src/classes/base-file-ref.class.ts");
-const clickup_class_1 = __webpack_require__(/*! ./clickup.class */ "./apps/cli/src/classes/clickup.class.ts");
-const gitlab_class_1 = __webpack_require__(/*! ./gitlab.class */ "./apps/cli/src/classes/gitlab.class.ts");
 class Tracker extends base_file_ref_class_1.BaseFileRef {
     constructor() {
         super(...arguments);
         this.lastDeployedCommitMap = {};
     }
     get path() {
-        return untildify_1.default(config_1.CONFIG.TrackListFile);
+        return untildify_1.default(node_shared_1.CONFIG.TrackListFile);
     }
     startSync() {
         this.trackTask();
         setInterval(() => {
             this.trackTask();
-        }, config_1.CONFIG.TrackIntervalInMinutes * 60 * 1000);
+        }, node_shared_1.CONFIG.TrackIntervalInMinutes * 60 * 1000);
     }
     addItem(projectName, issueNumber) {
         fs_1.appendFileSync(this.path, `\n${projectName} ${issueNumber}`);
@@ -1823,9 +1480,9 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
     trackTask() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             console.log(`[TrackNew] ${new Date().toLocaleString()}`);
-            const checkDeployProjects = config_1.CONFIG.GitLabProjects.filter((p) => !!p.deployedStatus);
+            const checkDeployProjects = node_shared_1.CONFIG.GitLabProjects.filter((p) => !!p.deployedStatus);
             for (const project of checkDeployProjects) {
-                const gitLab = new gitlab_class_1.GitLab(project.id);
+                const gitLab = new node_shared_1.GitLab(project.id);
                 const successPipelines = yield gitLab.listPipelines({
                     status: "success",
                     per_page: 100,
@@ -1850,13 +1507,13 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
             if (!(projectConfig === null || projectConfig === void 0 ? void 0 : projectConfig.deployedStatus) && !(projectConfig === null || projectConfig === void 0 ? void 0 : projectConfig.stagingStatus)) {
                 return;
             }
-            const gitLab = new gitlab_class_1.GitLab(projectConfig.id);
+            const gitLab = new node_shared_1.GitLab(projectConfig.id);
             const issue = yield gitLab.getIssue(issueNumber);
             const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
             if (!clickUpTaskId) {
                 return;
             }
-            const clickUp = new clickup_class_1.ClickUp(clickUpTaskId);
+            const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
             const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
             const mergeRequest = yield gitLab.getMergeRequest(mergeRequests[mergeRequests.length - 1].iid);
             const clickUpTask = yield clickUp.getTask();
@@ -1866,7 +1523,7 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
             }
             if (projectConfig.stagingStatus && mergeRequest.state === "merged") {
                 if (clickUpTask.status.status === "in review") {
-                    const list = yield clickup_class_1.ClickUp.getList(clickUpTask.list.id);
+                    const list = yield node_shared_1.ClickUp.getList(clickUpTask.list.id);
                     const stagingStatus = projectConfig.stagingStatus[list.name] ||
                         projectConfig.stagingStatus["*"];
                     yield clickUp.setTaskStatus(stagingStatus);
@@ -1888,7 +1545,7 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
                     const mergeCommitDate = date_fns_1.parseISO(commit.created_at);
                     const compareTime = date_fns_1.compareAsc(deployedCommitDate, mergeCommitDate);
                     if (compareTime === 1 || compareTime === 0) {
-                        const list = yield clickup_class_1.ClickUp.getList(clickUpTask.list.id);
+                        const list = yield node_shared_1.ClickUp.getList(clickUpTask.list.id);
                         const deployedStatus = projectConfig.deployedStatus[list.name] ||
                             projectConfig.deployedStatus["*"];
                         yield clickUp.setTaskStatus(deployedStatus);
@@ -1914,44 +1571,6 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
     }
 }
 exports.Tracker = Tracker;
-
-
-/***/ }),
-
-/***/ "./apps/cli/src/config.ts":
-/*!********************************!*\
-  !*** ./apps/cli/src/config.ts ***!
-  \********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CONFIG = exports.getConfig = exports.getConfigPath = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const fs_1 = __webpack_require__(/*! fs */ "fs");
-const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
-function getConfigPath() {
-    if (process.env.ACCEL_SHOOTER_CONFIG_FILE) {
-        return untildify_1.default(process.env.ACCEL_SHOOTER_CONFIG_FILE);
-    }
-    else {
-        throw Error("environment variable ACCEL_SHOOTER_CONFIG_FILE not found");
-    }
-}
-exports.getConfigPath = getConfigPath;
-function getConfig() {
-    const configPath = getConfigPath();
-    if (!fs_1.existsSync) {
-        throw Error("config file does not exist");
-    }
-    const config = JSON.parse(fs_1.readFileSync(configPath, { encoding: "utf-8" }));
-    config.GitLabProjects = config.GitLabProjects.map((p) => (Object.assign(Object.assign({}, p), { path: untildify_1.default(p.path) })));
-    return config;
-}
-exports.getConfig = getConfig;
-exports.CONFIG = getConfig();
 
 
 /***/ }),
@@ -2093,7 +1712,7 @@ const time_action_1 = __webpack_require__(/*! ./actions/time.action */ "./apps/c
 const to_do_action_1 = __webpack_require__(/*! ./actions/to-do.action */ "./apps/cli/src/actions/to-do.action.ts");
 const track_action_1 = __webpack_require__(/*! ./actions/track.action */ "./apps/cli/src/actions/track.action.ts");
 const update_action_1 = __webpack_require__(/*! ./actions/update.action */ "./apps/cli/src/actions/update.action.ts");
-const gitlab_class_1 = __webpack_require__(/*! ./classes/gitlab.class */ "./apps/cli/src/classes/gitlab.class.ts");
+const gitlab_class_1 = __webpack_require__(/*! ../../../libs/node-shared/src/lib/classes/gitlab.class */ "./libs/node-shared/src/lib/classes/gitlab.class.ts");
 const actions = {
     start: start_action_1.startAction,
     open: open_action_1.openAction,
@@ -2190,25 +1809,6 @@ const actions = {
 
 /***/ }),
 
-/***/ "./apps/cli/src/sleep.utils.ts":
-/*!*************************************!*\
-  !*** ./apps/cli/src/sleep.utils.ts ***!
-  \*************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.sleep = void 0;
-function sleep(ms) {
-    return new Promise((resolve) => setTimeout(resolve, ms));
-}
-exports.sleep = sleep;
-
-
-/***/ }),
-
 /***/ "./apps/cli/src/utils.ts":
 /*!*******************************!*\
   !*** ./apps/cli/src/utils.ts ***!
@@ -2221,21 +1821,19 @@ exports.sleep = sleep;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.openUrlsInTabGroup = exports.checkWorkingTreeClean = exports.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId = exports.getGitLabFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabIssue = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = exports.normalizeClickUpChecklist = exports.normalizeGitLabIssueChecklist = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const child_process_1 = tslib_1.__importStar(__webpack_require__(/*! child_process */ "child_process"));
 const open_1 = tslib_1.__importDefault(__webpack_require__(/*! open */ "open"));
 const qs_1 = tslib_1.__importDefault(__webpack_require__(/*! qs */ "qs"));
 const case_utils_1 = __webpack_require__(/*! ./case-utils */ "./apps/cli/src/case-utils.ts");
-const clickup_class_1 = __webpack_require__(/*! ./classes/clickup.class */ "./apps/cli/src/classes/clickup.class.ts");
-const gitlab_class_1 = __webpack_require__(/*! ./classes/gitlab.class */ "./apps/cli/src/classes/gitlab.class.ts");
-const config_1 = __webpack_require__(/*! ./config */ "./apps/cli/src/config.ts");
 function normalizeGitLabIssueChecklist(checklistText) {
     return checklistText
-        .split('\n')
-        .filter((line) => line && (line.includes('- [ ]') || line.includes('- [x]')))
+        .split("\n")
+        .filter((line) => line && (line.includes("- [ ]") || line.includes("- [x]")))
         .map((line, index) => ({
         name: line
-            .replace(/- \[[x ]\] /g, '')
-            .replace(/^ +/, (space) => space.replace(/ /g, '-')),
+            .replace(/- \[[x ]\] /g, "")
+            .replace(/^ +/, (space) => space.replace(/ /g, "-")),
         checked: /- \[x\]/.test(line),
         order: index,
     }));
@@ -2252,7 +1850,7 @@ function normalizeClickUpChecklist(checklist) {
     }));
 }
 exports.normalizeClickUpChecklist = normalizeClickUpChecklist;
-function promiseSpawn(command, args, stdio = 'inherit') {
+function promiseSpawn(command, args, stdio = "inherit") {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
             var _a, _b;
@@ -2260,25 +1858,25 @@ function promiseSpawn(command, args, stdio = 'inherit') {
                 shell: true,
                 stdio,
             });
-            if (stdio === 'pipe') {
-                let stdout = '';
-                let stderr = '';
-                (_a = child.stdout) === null || _a === void 0 ? void 0 : _a.on('data', (d) => {
+            if (stdio === "pipe") {
+                let stdout = "";
+                let stderr = "";
+                (_a = child.stdout) === null || _a === void 0 ? void 0 : _a.on("data", (d) => {
                     const output = d.toString();
                     stdout += output;
                 });
-                (_b = child.stderr) === null || _b === void 0 ? void 0 : _b.on('data', (d) => {
+                (_b = child.stderr) === null || _b === void 0 ? void 0 : _b.on("data", (d) => {
                     const output = d.toString();
                     stderr += output;
                 });
-                child.on('close', (code) => {
+                child.on("close", (code) => {
                     resolve({ stdout, stderr, code });
                 });
             }
             else {
-                child.on('close', (code) => (code === 0 ? resolve(1) : reject()));
+                child.on("close", (code) => (code === 0 ? resolve(1) : reject()));
             }
-            child.on('error', (err) => {
+            child.on("error", (err) => {
                 console.log(err);
             });
         });
@@ -2286,11 +1884,11 @@ function promiseSpawn(command, args, stdio = 'inherit') {
 }
 exports.promiseSpawn = promiseSpawn;
 function getGitLabProjectConfigByName(n) {
-    return config_1.CONFIG.GitLabProjects.find(({ name }) => name === n);
+    return node_shared_1.CONFIG.GitLabProjects.find(({ name }) => name === n);
 }
 exports.getGitLabProjectConfigByName = getGitLabProjectConfigByName;
 function getGitLabProjectConfigById(inputId) {
-    return config_1.CONFIG.GitLabProjects.find(({ id }) => id === inputId);
+    return node_shared_1.CONFIG.GitLabProjects.find(({ id }) => id === inputId);
 }
 exports.getGitLabProjectConfigById = getGitLabProjectConfigById;
 function getClickUpTaskIdFromGitLabIssue(issue) {
@@ -2307,7 +1905,7 @@ function updateTaskStatusInDp(dp) {
         while ((match = dpItemRegex.exec(dp))) {
             const full = match[0];
             const clickUpTaskId = match[1];
-            const clickUp = new clickup_class_1.ClickUp(clickUpTaskId);
+            const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
             const task = yield clickUp.getTask();
             const updatedFull = full.replace(/\* \([A-Za-z ]+\)/, `* (${case_utils_1.titleCase(task.status.status)})`);
             resultDp = resultDp.replace(full, updatedFull);
@@ -2318,28 +1916,28 @@ function updateTaskStatusInDp(dp) {
 exports.updateTaskStatusInDp = updateTaskStatusInDp;
 function getGitLabFromArgv() {
     if (process.argv.length === 3) {
-        const directory = child_process_1.execSync('pwd', { encoding: 'utf-8' });
-        const gitLabProject = config_1.CONFIG.GitLabProjects.find((p) => directory.startsWith(p.path));
+        const directory = child_process_1.execSync("pwd", { encoding: "utf-8" });
+        const gitLabProject = node_shared_1.CONFIG.GitLabProjects.find((p) => directory.startsWith(p.path));
         if (!gitLabProject) {
-            throw Error('No such project');
+            throw Error("No such project");
         }
-        const branchName = child_process_1.execSync('git branch --show-current', {
-            encoding: 'utf-8',
+        const branchName = child_process_1.execSync("git branch --show-current", {
+            encoding: "utf-8",
         });
         const match = branchName.match(/^[0-9]+/);
         if (!match) {
-            throw Error('Cannot get issue number from branch');
+            throw Error("Cannot get issue number from branch");
         }
         const issueNumber = match[0];
-        const gitLab = new gitlab_class_1.GitLab(gitLabProject.id);
+        const gitLab = new node_shared_1.GitLab(gitLabProject.id);
         return { gitLab, gitLabProject, issueNumber };
     }
     else {
         const gitLabProject = getGitLabProjectFromArgv();
         if (!gitLabProject) {
-            throw Error('No such project');
+            throw Error("No such project");
         }
-        const gitLab = new gitlab_class_1.GitLab(gitLabProject.id);
+        const gitLab = new node_shared_1.GitLab(gitLabProject.id);
         return { gitLab, gitLabProject, issueNumber: process.argv[4] };
     }
 }
@@ -2353,20 +1951,533 @@ function getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(issueNumber, clickU
 exports.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId = getGitLabBranchNameFromIssueNumberAndTitleAndTaskId;
 function checkWorkingTreeClean() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const result = yield promiseSpawn('git', ['status'], 'pipe');
-        return (result.stdout.includes('Your branch is up to date with') &&
-            result.stdout.includes('nothing to commit, working tree clean'));
+        const result = yield promiseSpawn("git", ["status"], "pipe");
+        return (result.stdout.includes("Your branch is up to date with") &&
+            result.stdout.includes("nothing to commit, working tree clean"));
     });
 }
 exports.checkWorkingTreeClean = checkWorkingTreeClean;
 function openUrlsInTabGroup(urls, group) {
-    open_1.default('http://localhost:8315/accel-shooter/?' +
+    open_1.default("http://localhost:8315/accel-shooter/?" +
         qs_1.default.stringify({
             urls: JSON.stringify(urls),
             group,
         }));
 }
 exports.openUrlsInTabGroup = openUrlsInTabGroup;
+
+
+/***/ }),
+
+/***/ "./libs/node-shared/src/index.ts":
+/*!***************************************!*\
+  !*** ./libs/node-shared/src/index.ts ***!
+  \***************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+tslib_1.__exportStar(__webpack_require__(/*! ./lib/node-shared */ "./libs/node-shared/src/lib/node-shared.ts"), exports);
+
+
+/***/ }),
+
+/***/ "./libs/node-shared/src/lib/classes/clickup.class.ts":
+/*!***********************************************************!*\
+  !*** ./libs/node-shared/src/lib/classes/clickup.class.ts ***!
+  \***********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ClickUp = void 0;
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const api_utils_1 = __webpack_require__(/*! ../utils/api.utils */ "./libs/node-shared/src/lib/utils/api.utils.ts");
+const callApi = api_utils_1.callApiFactory("ClickUp");
+class ClickUp {
+    constructor(taskId) {
+        this.taskId = taskId;
+    }
+    static getCurrentUser() {
+        return callApi("get", `/user/`);
+    }
+    static getList(listId) {
+        return callApi("get", `/list/${listId}`);
+    }
+    static getTeams() {
+        return callApi("get", `/team/`);
+    }
+    static getRTVTasks(teamId, userID) {
+        return callApi("get", `/team/${teamId}/task/`, {
+            statuses: ["ready to verify"],
+            include_closed: true,
+            assignees: [userID],
+        });
+    }
+    static getMyTasks(teamId, userID) {
+        return callApi("get", `/team/${teamId}/task/`, {
+            statuses: ["Open", "pending", "ready to do", "in progress"],
+            assignees: [userID],
+            subtasks: true,
+        });
+    }
+    getTask() {
+        return callApi("get", `/task/${this.taskId}`);
+    }
+    getTaskComments() {
+        return callApi("get", `/task/${this.taskId}/comment/`).then((r) => r.comments);
+    }
+    setTaskStatus(status) {
+        return callApi("put", `/task/${this.taskId}`, null, { status });
+    }
+    createChecklist(name) {
+        return callApi("post", `/task/${this.taskId}/checklist`, null, { name });
+    }
+    createChecklistItem(checklistId, name, resolved, orderindex) {
+        return callApi("post", `/checklist/${checklistId}/checklist_item`, null, {
+            name,
+            resolved,
+            orderindex,
+        });
+    }
+    updateChecklistItem(checklistId, checklistItemId, name, resolved, orderindex) {
+        return callApi("put", `/checklist/${checklistId}/checklist_item/${checklistItemId}`, null, {
+            name,
+            resolved,
+            orderindex,
+        });
+    }
+    deleteChecklistItem(checklistId, checklistItemId) {
+        return callApi("delete", `/checklist/${checklistId}/checklist_item/${checklistItemId}`);
+    }
+    getFrameUrls() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            let currentTaskId = this.taskId;
+            const frameUrls = [];
+            while (currentTaskId) {
+                const clickUp = new ClickUp(currentTaskId);
+                const task = yield clickUp.getTask();
+                const comments = yield clickUp.getTaskComments();
+                comments.forEach((co) => {
+                    co.comment
+                        .filter((c) => c.type === "frame")
+                        .forEach((c) => {
+                        var _a;
+                        if ((_a = c === null || c === void 0 ? void 0 : c.frame) === null || _a === void 0 ? void 0 : _a.url) {
+                            frameUrls.push(c.frame.url);
+                        }
+                    });
+                });
+                currentTaskId = task.parent;
+            }
+            return frameUrls;
+        });
+    }
+}
+exports.ClickUp = ClickUp;
+
+
+/***/ }),
+
+/***/ "./libs/node-shared/src/lib/classes/gitlab.class.ts":
+/*!**********************************************************!*\
+  !*** ./libs/node-shared/src/lib/classes/gitlab.class.ts ***!
+  \**********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.GitLab = void 0;
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const api_utils_1 = __webpack_require__(/*! ../utils/api.utils */ "./libs/node-shared/src/lib/utils/api.utils.ts");
+const config_1 = __webpack_require__(/*! ../config */ "./libs/node-shared/src/lib/config.ts");
+const callApi = api_utils_1.callApiFactory('GitLab');
+class GitLab {
+    constructor(projectId) {
+        this.projectId = projectId;
+    }
+    getProject() {
+        return callApi('get', `/projects/${this.projectId}`);
+    }
+    getDefaultBranchName() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const project = yield this.getProject();
+            return project.default_branch;
+        });
+    }
+    getIssue(issueNumber) {
+        return callApi('get', `/projects/${this.projectId}/issues/${issueNumber}`);
+    }
+    getOpenedMergeRequests() {
+        return callApi('get', `/projects/${this.projectId}/merge_requests`, { state: 'opened', per_page: '100' });
+    }
+    getMergeRequest(mergeRequestNumber) {
+        return callApi('get', `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}`);
+    }
+    getMergeRequestChanges(mergeRequestNumber) {
+        return callApi('get', `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}/changes`);
+    }
+    getCommit(sha) {
+        return callApi('get', `/projects/${this.projectId}/repository/commits/${sha}`);
+    }
+    getEndingAssignee() {
+        if (!config_1.CONFIG.EndingAssignee) {
+            throw Error('No ending assignee was set');
+        }
+        return callApi('get', `/users`, {
+            username: config_1.CONFIG.EndingAssignee,
+        }).then((users) => users[0]);
+    }
+    listProjectLabels() {
+        return callApi('get', `/projects/${this.projectId}/labels`, {
+            per_page: 100,
+        });
+    }
+    listMergeRequestsWillCloseIssueOnMerge(issueNumber) {
+        return callApi('get', `/projects/${this.projectId}/issues/${issueNumber}/closed_by`);
+    }
+    listPipelineJobs(pipelineId) {
+        return callApi('get', `/projects/${this.projectId}/pipelines/${pipelineId}/jobs`);
+    }
+    getCompare(from, to) {
+        return callApi('get', `/projects/${this.projectId}/repository/compare`, {
+            from,
+            to,
+            straight: true,
+        });
+    }
+    listPipelines(query) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            query.ref = query.ref || (yield this.getDefaultBranchName());
+            return callApi('get', `/projects/${this.projectId}/pipelines/`, query);
+        });
+    }
+    createIssue(title, description) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return callApi('post', `/projects/${this.projectId}/issues`, null, {
+                title: title,
+                description: description,
+                assignee_ids: yield this.getUserId(),
+            });
+        });
+    }
+    createBranch(branch) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return callApi('post', `/projects/${this.projectId}/repository/branches`, null, {
+                branch,
+                ref: yield this.getDefaultBranchName(),
+            });
+        });
+    }
+    createMergeRequest(issueNumber, issueTitle, branch) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return callApi('post', `/projects/${this.projectId}/merge_requests`, null, {
+                source_branch: branch,
+                target_branch: yield this.getDefaultBranchName(),
+                title: `Draft: Resolve "${issueTitle}"`,
+                description: `Close #${issueNumber}`,
+            });
+        });
+    }
+    createMergeRequestNote(merge_request, content) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            yield callApi('post', `/projects/${this.projectId}/merge_requests/${merge_request.iid}/notes`, { body: content });
+        });
+    }
+    markMergeRequestAsReadyAndAddAssignee(merge_request) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const assignee = yield this.getEndingAssignee();
+            yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
+                title: merge_request.title.replace('WIP: ', '').replace('Draft: ', ''),
+                assignee_id: assignee.id,
+            });
+        });
+    }
+    markMergeRequestAsUnreadyAndSetAssigneeToSelf(merge_request) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
+                title: 'Draft: ' +
+                    merge_request.title.replace('WIP: ', '').replace('Draft: ', ''),
+                assignee_id: yield this.getUserId(),
+            });
+        });
+    }
+    getUserId() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const user = yield callApi('get', '/user');
+            return user.id;
+        });
+    }
+}
+exports.GitLab = GitLab;
+
+
+/***/ }),
+
+/***/ "./libs/node-shared/src/lib/config.ts":
+/*!********************************************!*\
+  !*** ./libs/node-shared/src/lib/config.ts ***!
+  \********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CONFIG = exports.getConfig = exports.getConfigPath = void 0;
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const fs_1 = __webpack_require__(/*! fs */ "fs");
+const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
+function getConfigPath() {
+    if (process.env.ACCEL_SHOOTER_CONFIG_FILE) {
+        return untildify_1.default(process.env.ACCEL_SHOOTER_CONFIG_FILE);
+    }
+    else {
+        throw Error("environment variable ACCEL_SHOOTER_CONFIG_FILE not found");
+    }
+}
+exports.getConfigPath = getConfigPath;
+function getConfig() {
+    const configPath = getConfigPath();
+    if (!fs_1.existsSync) {
+        throw Error("config file does not exist");
+    }
+    const config = JSON.parse(fs_1.readFileSync(configPath, { encoding: "utf-8" }));
+    config.GitLabProjects = config.GitLabProjects.map((p) => (Object.assign(Object.assign({}, p), { path: untildify_1.default(p.path) })));
+    return config;
+}
+exports.getConfig = getConfig;
+exports.CONFIG = getConfig();
+
+
+/***/ }),
+
+/***/ "./libs/node-shared/src/lib/models/clickup/checklist.models.ts":
+/*!*********************************************************************!*\
+  !*** ./libs/node-shared/src/lib/models/clickup/checklist.models.ts ***!
+  \*********************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+
+
+/***/ }),
+
+/***/ "./libs/node-shared/src/lib/models/gitlab/issue.models.ts":
+/*!****************************************************************!*\
+  !*** ./libs/node-shared/src/lib/models/gitlab/issue.models.ts ***!
+  \****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+
+
+/***/ }),
+
+/***/ "./libs/node-shared/src/lib/models/gitlab/job.models.ts":
+/*!**************************************************************!*\
+  !*** ./libs/node-shared/src/lib/models/gitlab/job.models.ts ***!
+  \**************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+
+
+/***/ }),
+
+/***/ "./libs/node-shared/src/lib/models/gitlab/merge-request.models.ts":
+/*!************************************************************************!*\
+  !*** ./libs/node-shared/src/lib/models/gitlab/merge-request.models.ts ***!
+  \************************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+
+
+/***/ }),
+
+/***/ "./libs/node-shared/src/lib/models/models.ts":
+/*!***************************************************!*\
+  !*** ./libs/node-shared/src/lib/models/models.ts ***!
+  \***************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+
+
+/***/ }),
+
+/***/ "./libs/node-shared/src/lib/node-shared.ts":
+/*!*************************************************!*\
+  !*** ./libs/node-shared/src/lib/node-shared.ts ***!
+  \*************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.sleep = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.GitLabProject = exports.Change = exports.Job = exports.Issue = exports.ChecklistItem = exports.CONFIG = exports.GitLab = exports.ClickUp = void 0;
+var clickup_class_1 = __webpack_require__(/*! ./classes/clickup.class */ "./libs/node-shared/src/lib/classes/clickup.class.ts");
+Object.defineProperty(exports, "ClickUp", { enumerable: true, get: function () { return clickup_class_1.ClickUp; } });
+var gitlab_class_1 = __webpack_require__(/*! ./classes/gitlab.class */ "./libs/node-shared/src/lib/classes/gitlab.class.ts");
+Object.defineProperty(exports, "GitLab", { enumerable: true, get: function () { return gitlab_class_1.GitLab; } });
+var config_1 = __webpack_require__(/*! ./config */ "./libs/node-shared/src/lib/config.ts");
+Object.defineProperty(exports, "CONFIG", { enumerable: true, get: function () { return config_1.CONFIG; } });
+var checklist_models_1 = __webpack_require__(/*! ./models/clickup/checklist.models */ "./libs/node-shared/src/lib/models/clickup/checklist.models.ts");
+Object.defineProperty(exports, "ChecklistItem", { enumerable: true, get: function () { return checklist_models_1.ChecklistItem; } });
+var issue_models_1 = __webpack_require__(/*! ./models/gitlab/issue.models */ "./libs/node-shared/src/lib/models/gitlab/issue.models.ts");
+Object.defineProperty(exports, "Issue", { enumerable: true, get: function () { return issue_models_1.Issue; } });
+var job_models_1 = __webpack_require__(/*! ./models/gitlab/job.models */ "./libs/node-shared/src/lib/models/gitlab/job.models.ts");
+Object.defineProperty(exports, "Job", { enumerable: true, get: function () { return job_models_1.Job; } });
+var merge_request_models_1 = __webpack_require__(/*! ./models/gitlab/merge-request.models */ "./libs/node-shared/src/lib/models/gitlab/merge-request.models.ts");
+Object.defineProperty(exports, "Change", { enumerable: true, get: function () { return merge_request_models_1.Change; } });
+var models_1 = __webpack_require__(/*! ./models/models */ "./libs/node-shared/src/lib/models/models.ts");
+Object.defineProperty(exports, "GitLabProject", { enumerable: true, get: function () { return models_1.GitLabProject; } });
+Object.defineProperty(exports, "NormalizedChecklist", { enumerable: true, get: function () { return models_1.NormalizedChecklist; } });
+Object.defineProperty(exports, "ProjectCheckItem", { enumerable: true, get: function () { return models_1.ProjectCheckItem; } });
+var sleep_utils_1 = __webpack_require__(/*! ./utils/sleep.utils */ "./libs/node-shared/src/lib/utils/sleep.utils.ts");
+Object.defineProperty(exports, "sleep", { enumerable: true, get: function () { return sleep_utils_1.sleep; } });
+
+
+/***/ }),
+
+/***/ "./libs/node-shared/src/lib/utils/api.utils.ts":
+/*!*****************************************************!*\
+  !*** ./libs/node-shared/src/lib/utils/api.utils.ts ***!
+  \*****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.callApiFactory = void 0;
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const node_fetch_1 = tslib_1.__importDefault(__webpack_require__(/*! node-fetch */ "node-fetch"));
+const qs_1 = tslib_1.__importDefault(__webpack_require__(/*! qs */ "qs"));
+const config_1 = __webpack_require__(/*! ../config */ "./libs/node-shared/src/lib/config.ts");
+const sleep_utils_1 = __webpack_require__(/*! ./sleep.utils */ "./libs/node-shared/src/lib/utils/sleep.utils.ts");
+const RETRY_SETTING = {
+    retry: 5,
+    pause: 12 * 1000,
+};
+function fetchRetry(url, opts) {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        let retry = (opts && opts.retry) || 3;
+        while (retry > 0) {
+            try {
+                return yield node_fetch_1.default(url, opts).then(checkStatus);
+            }
+            catch (e) {
+                if (opts === null || opts === void 0 ? void 0 : opts.callback) {
+                    opts.callback(retry);
+                }
+                retry = retry - 1;
+                if (retry == 0) {
+                    throw e;
+                }
+                if (opts === null || opts === void 0 ? void 0 : opts.pause) {
+                    yield sleep_utils_1.sleep(opts.pause);
+                }
+            }
+        }
+    });
+}
+function checkStatus(res) {
+    if (res) {
+        if (res.ok) {
+            return res;
+        }
+        else {
+            throw Error(res.statusText);
+        }
+    }
+    else {
+        throw Error("Response is undefined.");
+    }
+}
+function callApiFactory(site) {
+    let apiUrl = "";
+    let headers = {};
+    switch (site) {
+        case "GitLab":
+            apiUrl = "https://gitlab.com/api/v4";
+            headers = { "Private-Token": config_1.CONFIG.GitLabToken };
+            break;
+        case "ClickUp":
+            apiUrl = "https://api.clickup.com/api/v2";
+            headers = { Authorization: config_1.CONFIG.ClickUpToken };
+            break;
+        default:
+            throw Error(`Site {site} is not supported.`);
+    }
+    return (method, url, queryParams, body) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+        let params;
+        if (typeof body === "object") {
+            params = new URLSearchParams();
+            Object.entries(body).forEach(([key, value]) => {
+                params.set(key, value);
+            });
+        }
+        if (typeof body === "string") {
+            params = body;
+        }
+        if (queryParams) {
+            url += "?" + qs_1.default.stringify(queryParams, { arrayFormat: "brackets" });
+        }
+        return fetchRetry(apiUrl + url, method === "get"
+            ? Object.assign({ method,
+                headers }, RETRY_SETTING) : Object.assign({ method, headers, body: params }, RETRY_SETTING))
+            .then((res) => res === null || res === void 0 ? void 0 : res.json())
+            .catch((error) => {
+            console.log(apiUrl + url);
+            throw error;
+        });
+    });
+}
+exports.callApiFactory = callApiFactory;
+
+
+/***/ }),
+
+/***/ "./libs/node-shared/src/lib/utils/sleep.utils.ts":
+/*!*******************************************************!*\
+  !*** ./libs/node-shared/src/lib/utils/sleep.utils.ts ***!
+  \*******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.sleep = void 0;
+function sleep(ms) {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+}
+exports.sleep = sleep;
 
 
 /***/ }),

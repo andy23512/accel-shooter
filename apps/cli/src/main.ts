@@ -13,7 +13,7 @@ import { timeAction } from './actions/time.action';
 import { toDoAction } from './actions/to-do.action';
 import { trackAction } from './actions/track.action';
 import { updateAction } from './actions/update.action';
-import { GitLab } from './classes/gitlab.class';
+import { GitLab } from '../../../libs/node-shared/src/lib/classes/gitlab.class';
 
 const actions: { [key: string]: () => Promise<any> } = {
   start: startAction,

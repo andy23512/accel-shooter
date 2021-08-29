@@ -1,7 +1,7 @@
 import fetch, { RequestInfo, RequestInit, Response } from "node-fetch";
 import qs from "qs";
-import { CONFIG } from "./config";
-import { HttpMethod, Site } from "./models/models";
+import { CONFIG } from "../config";
+import { HttpMethod, Site } from "../models/models";
 import { sleep } from "./sleep.utils";
 
 const RETRY_SETTING = {

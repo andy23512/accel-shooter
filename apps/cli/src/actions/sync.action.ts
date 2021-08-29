@@ -1,9 +1,9 @@
+import { CONFIG } from "@accel-shooter/node-shared";
 import { execSync } from "child_process";
 import os from "os";
 import { setIntervalAsync } from "set-interval-async/dynamic";
 import { configReadline, setUpSyncHotkey, syncChecklist } from "../actions";
 import { CustomEmojiProgress } from "../classes/emoji-progress.class";
-import { CONFIG } from "../config";
 import {
   checkWorkingTreeClean,
   getGitLabFromArgv,

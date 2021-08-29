@@ -1,5 +1,4 @@
-import { ClickUp } from "../classes/clickup.class";
-import { CONFIG } from "../config";
+import { ClickUp, CONFIG } from "@accel-shooter/node-shared";
 
 export async function RTVTasksAction() {
   const user = (await ClickUp.getCurrentUser()).user;

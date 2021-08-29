@@ -1,14 +1,12 @@
+import { Change, GitLab, GitLabProject } from "@accel-shooter/node-shared";
 import { writeFile } from "fs";
 import inquirer from "inquirer";
 import os from "os";
 import { combineLatest, interval } from "rxjs";
 import untildify from "untildify";
-import { GitLabProject } from "../models/models";
 import { promiseSpawn } from "../utils";
 import { checkItemsMap } from "./../consts/check-items.const";
-import { Change } from "./../models/gitlab/merge-request.models";
 import { CheckItem } from "./check-item.class";
-import { GitLab } from "./gitlab.class";
 
 const SPINNER = [
   "🕛",

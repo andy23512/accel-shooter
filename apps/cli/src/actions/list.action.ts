@@ -1,4 +1,4 @@
-import { GitLab } from "../classes/gitlab.class";
+import { GitLab } from "../../../../libs/node-shared/src/lib/classes/gitlab.class";
 import { getGitLabFromArgv } from "../utils";
 
 export async function listAction() {

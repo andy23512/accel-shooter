@@ -1,4 +1,4 @@
-import { callApiFactory } from '../api.utils';
+import { callApiFactory } from '../utils/api.utils';
 import { CONFIG } from '../config';
 import {
   Branch,

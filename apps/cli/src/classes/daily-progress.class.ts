@@ -1,5 +1,5 @@
+import { CONFIG } from "@accel-shooter/node-shared";
 import untildify from "untildify";
-import { CONFIG } from "../config";
 import { BaseFileRef } from "./base-file-ref.class";
 
 export class DailyProgress extends BaseFileRef {

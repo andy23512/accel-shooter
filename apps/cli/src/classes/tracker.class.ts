@@ -1,17 +1,14 @@
+import { ClickUp, CONFIG, GitLab, Job } from "@accel-shooter/node-shared";
 import childProcess from "child_process";
 import { compareAsc, parseISO } from "date-fns";
 import { appendFileSync } from "fs";
 import nodeNotifier from "node-notifier";
 import untildify from "untildify";
-import { CONFIG } from "../config";
-import { Job } from "../models/gitlab/job.models";
 import {
   getClickUpTaskIdFromGitLabIssue,
   getGitLabProjectConfigByName,
 } from "../utils";
 import { BaseFileRef } from "./base-file-ref.class";
-import { ClickUp } from "./clickup.class";
-import { GitLab } from "./gitlab.class";
 
 export class Tracker extends BaseFileRef {
   public lastDeployedCommitMap: Record<string, Job["commit"]> = {};

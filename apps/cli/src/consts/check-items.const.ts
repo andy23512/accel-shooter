@@ -1,6 +1,6 @@
+import { GitLabProject } from "@accel-shooter/node-shared";
 import { CheckItem } from "../classes/check-item.class";
 import { promiseSpawn } from "../utils";
-import { GitLabProject } from "./../models/models";
 
 const checkNonPushedChanges = new CheckItem(
   "Global",

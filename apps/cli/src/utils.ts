@@ -1,26 +1,28 @@
-import childProcess, { execSync, StdioOptions } from 'child_process';
-import open from 'open';
-import qs from 'qs';
-import { titleCase } from './case-utils';
-import { ClickUp } from './classes/clickup.class';
-import { GitLab } from './classes/gitlab.class';
-import { CONFIG } from './config';
-import { ChecklistItem } from './models/clickup.models';
-import { Issue } from './models/gitlab/issue.models';
-import { NormalizedChecklist } from './models/models';
+import {
+  ChecklistItem,
+  ClickUp,
+  CONFIG,
+  GitLab,
+  Issue,
+  NormalizedChecklist,
+} from "@accel-shooter/node-shared";
+import childProcess, { execSync, StdioOptions } from "child_process";
+import open from "open";
+import qs from "qs";
+import { titleCase } from "./case-utils";
 
 export function normalizeGitLabIssueChecklist(
   checklistText: string
 ): NormalizedChecklist {
   return checklistText
-    .split('\n')
+    .split("\n")
     .filter(
-      (line) => line && (line.includes('- [ ]') || line.includes('- [x]'))
+      (line) => line && (line.includes("- [ ]") || line.includes("- [x]"))
     )
     .map((line, index) => ({
       name: line
-        .replace(/- \[[x ]\] /g, '')
-        .replace(/^ +/, (space) => space.replace(/ /g, '-')),
+        .replace(/- \[[x ]\] /g, "")
+        .replace(/^ +/, (space) => space.replace(/ /g, "-")),
       checked: /- \[x\]/.test(line),
       order: index,
     }));
@@ -42,41 +44,41 @@ export function normalizeClickUpChecklist(
 export async function promiseSpawn(
   command: string,
   args: string[],
-  stdio?: 'pipe'
+  stdio?: "pipe"
 ): Promise<{ stdout: string; stderr: string; code: number }>;
 export async function promiseSpawn(
   command: string,
   args: string[],
-  stdio?: 'inherit'
+  stdio?: "inherit"
 ): Promise<number>;
 export async function promiseSpawn(
   command: string,
   args: string[],
-  stdio: StdioOptions = 'inherit'
+  stdio: StdioOptions = "inherit"
 ) {
   return new Promise((resolve, reject) => {
     const child = childProcess.spawn(command, args, {
       shell: true,
       stdio,
     });
-    if (stdio === 'pipe') {
-      let stdout = '';
-      let stderr = '';
-      child.stdout?.on('data', (d) => {
+    if (stdio === "pipe") {
+      let stdout = "";
+      let stderr = "";
+      child.stdout?.on("data", (d) => {
         const output = d.toString();
         stdout += output;
       });
-      child.stderr?.on('data', (d) => {
+      child.stderr?.on("data", (d) => {
         const output = d.toString();
         stderr += output;
       });
-      child.on('close', (code) => {
+      child.on("close", (code) => {
         resolve({ stdout, stderr, code });
       });
     } else {
-      child.on('close', (code) => (code === 0 ? resolve(1) : reject()));
+      child.on("close", (code) => (code === 0 ? resolve(1) : reject()));
     }
-    child.on('error', (err) => {
+    child.on("error", (err) => {
       console.log(err);
     });
   });
@@ -119,19 +121,19 @@ export async function updateTaskStatusInDp(dp: string) {
 
 export function getGitLabFromArgv() {
   if (process.argv.length === 3) {
-    const directory = execSync('pwd', { encoding: 'utf-8' });
+    const directory = execSync("pwd", { encoding: "utf-8" });
     const gitLabProject = CONFIG.GitLabProjects.find((p) =>
       directory.startsWith(p.path)
     );
     if (!gitLabProject) {
-      throw Error('No such project');
+      throw Error("No such project");
     }
-    const branchName = execSync('git branch --show-current', {
-      encoding: 'utf-8',
+    const branchName = execSync("git branch --show-current", {
+      encoding: "utf-8",
     });
     const match = branchName.match(/^[0-9]+/);
     if (!match) {
-      throw Error('Cannot get issue number from branch');
+      throw Error("Cannot get issue number from branch");
     }
     const issueNumber = match[0];
     const gitLab = new GitLab(gitLabProject.id);
@@ -139,7 +141,7 @@ export function getGitLabFromArgv() {
   } else {
     const gitLabProject = getGitLabProjectFromArgv();
     if (!gitLabProject) {
-      throw Error('No such project');
+      throw Error("No such project");
     }
     const gitLab = new GitLab(gitLabProject.id);
     return { gitLab, gitLabProject, issueNumber: process.argv[4] };
@@ -158,16 +160,16 @@ export function getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(
 }
 
 export async function checkWorkingTreeClean() {
-  const result = await promiseSpawn('git', ['status'], 'pipe');
+  const result = await promiseSpawn("git", ["status"], "pipe");
   return (
-    result.stdout.includes('Your branch is up to date with') &&
-    result.stdout.includes('nothing to commit, working tree clean')
+    result.stdout.includes("Your branch is up to date with") &&
+    result.stdout.includes("nothing to commit, working tree clean")
   );
 }
 
 export function openUrlsInTabGroup(urls: string[], group: string) {
   open(
-    'http://localhost:8315/accel-shooter/?' +
+    "http://localhost:8315/accel-shooter/?" +
       qs.stringify({
         urls: JSON.stringify(urls),
         group,
