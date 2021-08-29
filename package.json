@@ -32,7 +32,9 @@
     "workspace-generator": "nx workspace-generator",
     "dep-graph": "nx dep-graph",
     "help": "nx help",
-    "validate": "npm ls"
+    "validate": "npm ls",
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s",
+    "release": "np && yarn changelog && git commit CHANGELOG.md -m 'chore: update changelog'"
   },
   "files": [
     "main.js",
@@ -111,11 +113,13 @@
     "@typescript-eslint/parser": "~4.28.3",
     "conventional-changelog-cli": "^2.1.1",
     "cypress": "^7.3.0",
+    "cz-conventional-changelog": "3.3.0",
     "eslint": "7.22.0",
     "eslint-config-prettier": "8.1.0",
     "eslint-plugin-cypress": "^2.10.3",
     "jest": "27.0.3",
     "jest-preset-angular": "9.0.4",
+    "np": "^7.5.0",
     "precommit-hook": "^3.0.0",
     "prettier": "^2.3.1",
     "reflect-metadata": "^0.1.13",
@@ -124,5 +128,10 @@
     "tslib": "^2.0.0",
     "typescript": "~4.3.5",
     "zone.js": "~0.11.4"
+  },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
   }
 }
