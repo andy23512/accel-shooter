@@ -13,9 +13,12 @@
     "lib": ["es2017", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
+    "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
-      "@accel-shooter/api-interfaces": ["libs/api-interfaces/src/index.ts"]
+      "@accel-shooter/api-interfaces": ["libs/api-interfaces/src/index.ts"],
+      "@accel-shooter/node-shared": ["libs/node-shared/src/index.ts"],
+      "*": ["./src/@types/*"]
     }
   },
   "exclude": ["node_modules", "tmp"]
