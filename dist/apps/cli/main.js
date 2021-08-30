@@ -771,7 +771,6 @@ function startAction() {
         const clickUp = new node_shared_1.ClickUp(answers.clickUpTaskId);
         p.start();
         const clickUpTask = yield clickUp.getTask();
-        process.exit();
         const clickUpTaskUrl = clickUpTask["url"];
         const gitLabIssueTitle = answers.issueTitle;
         p.next();

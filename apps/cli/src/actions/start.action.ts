@@ -87,7 +87,6 @@ export async function startAction() {
   const clickUp = new ClickUp(answers.clickUpTaskId);
   p.start();
   const clickUpTask = await clickUp.getTask();
-  process.exit();
   const clickUpTaskUrl = clickUpTask["url"];
   const gitLabIssueTitle = answers.issueTitle;
   p.next();
