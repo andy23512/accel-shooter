@@ -270,6 +270,40 @@ exports.commentAction = commentAction;
 
 /***/ }),
 
+/***/ "./apps/cli/src/actions/copy.action.ts":
+/*!*********************************************!*\
+  !*** ./apps/cli/src/actions/copy.action.ts ***!
+  \*********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.copyAction = void 0;
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
+const clipboardy_1 = tslib_1.__importDefault(__webpack_require__(/*! clipboardy */ "clipboardy"));
+const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+function copyAction() {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const { gitLab, issueNumber, gitLabProject } = utils_1.getGitLabFromArgv();
+        const issue = yield gitLab.getIssue(issueNumber);
+        const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
+        if (clickUpTaskId) {
+            const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
+            const task = yield clickUp.getTask();
+            const string = `[${issue.title}](${task.url}) [${gitLabProject.name} ${issueNumber}](${issue.web_url})`;
+            clipboardy_1.default.writeSync(string);
+            console.log("Copied!");
+        }
+    });
+}
+exports.copyAction = copyAction;
+
+
+/***/ }),
+
 /***/ "./apps/cli/src/actions/cross-checklist.action.ts":
 /*!********************************************************!*\
   !*** ./apps/cli/src/actions/cross-checklist.action.ts ***!
@@ -1696,8 +1730,10 @@ exports.checkItemsMap = {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const gitlab_class_1 = __webpack_require__(/*! ../../../libs/node-shared/src/lib/classes/gitlab.class */ "./libs/node-shared/src/lib/classes/gitlab.class.ts");
 const check_action_1 = __webpack_require__(/*! ./actions/check.action */ "./apps/cli/src/actions/check.action.ts");
 const comment_action_1 = __webpack_require__(/*! ./actions/comment.action */ "./apps/cli/src/actions/comment.action.ts");
+const copy_action_1 = __webpack_require__(/*! ./actions/copy.action */ "./apps/cli/src/actions/copy.action.ts");
 const cross_checklist_action_1 = __webpack_require__(/*! ./actions/cross-checklist.action */ "./apps/cli/src/actions/cross-checklist.action.ts");
 const end_action_1 = __webpack_require__(/*! ./actions/end.action */ "./apps/cli/src/actions/end.action.ts");
 const list_action_1 = __webpack_require__(/*! ./actions/list.action */ "./apps/cli/src/actions/list.action.ts");
@@ -1711,7 +1747,6 @@ const time_action_1 = __webpack_require__(/*! ./actions/time.action */ "./apps/c
 const to_do_action_1 = __webpack_require__(/*! ./actions/to-do.action */ "./apps/cli/src/actions/to-do.action.ts");
 const track_action_1 = __webpack_require__(/*! ./actions/track.action */ "./apps/cli/src/actions/track.action.ts");
 const update_action_1 = __webpack_require__(/*! ./actions/update.action */ "./apps/cli/src/actions/update.action.ts");
-const gitlab_class_1 = __webpack_require__(/*! ../../../libs/node-shared/src/lib/classes/gitlab.class */ "./libs/node-shared/src/lib/classes/gitlab.class.ts");
 const actions = {
     start: start_action_1.startAction,
     open: open_action_1.openAction,
@@ -1728,43 +1763,44 @@ const actions = {
     list: list_action_1.listAction,
     toDo: to_do_action_1.toDoAction,
     time: time_action_1.timeAction,
+    copy: copy_action_1.copyAction,
     test: () => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
         const targets = [
-            ['phe-button', 'pheButton'],
-            ['btnType', 'pheButtonType'],
-            ['btnSize', 'pheButtonSize'],
-            ['iconName', 'pheButtonIconName'],
-            ['iconSize', 'pheButtonIconSize'],
-            ['highlight', 'pheButtonHighlight'],
-            ['responsive', 'pheButtonResponsive'],
-            ['phe-dialog-close', 'pheDialogClose'],
-            ['phe-dialog-content', 'pheDialogContent'],
-            ['phe-dialog-title', 'pheDialogTitle'],
-            ['pheType', 'type'],
-            ['pheSize', 'size'],
-            ['pheColor', 'color'],
-            ['pheIconSize', 'iconSize'],
-            ['pheIconName', 'iconName'],
-            ['phePosition', 'position'],
-            ['phe-popover', 'phePopover'],
-            ['PheCdkOverlayMenuModule', 'PheCdkOverlayModule'],
-            ['@aether/pheno/cdk-overlay-menu', '@aether/pheno/cdk-overlay'],
-            ['PheCdkOverlayCascadeMenuService', 'PheCdkOverlayCascadeHelperService'],
-            ['PheCdkMenuTriggerForDirective', 'PheCdkOverlayTriggerForDirective'],
-            ['PheCdkOverlayMenuComponent', 'PheCdkOverlayComponent'],
-            ['pheCdkMenuTriggerFor', 'pheCdkOverlayTriggerFor'],
-            ['cdkMenuConfig', 'pheCdkOverlayTriggerForConfig'],
-            ['CdkMenuConfig', 'CdkOverlayConfig'],
-            ['isOpen', 'pheCdkOverlayTriggerForIsOpen'],
-            ['IsOpenChange', 'pheCdkOverlayTriggerForIsOpenChange'],
-            ['PositionType', 'PheCdkOverlayPositionType'],
-            ['PositionMap', 'PheCdkOverlayPositionMap'],
-            ['positionPair', 'pheCdkOverlayPositionPair'],
+            ["phe-button", "pheButton"],
+            ["btnType", "pheButtonType"],
+            ["btnSize", "pheButtonSize"],
+            ["iconName", "pheButtonIconName"],
+            ["iconSize", "pheButtonIconSize"],
+            ["highlight", "pheButtonHighlight"],
+            ["responsive", "pheButtonResponsive"],
+            ["phe-dialog-close", "pheDialogClose"],
+            ["phe-dialog-content", "pheDialogContent"],
+            ["phe-dialog-title", "pheDialogTitle"],
+            ["pheType", "type"],
+            ["pheSize", "size"],
+            ["pheColor", "color"],
+            ["pheIconSize", "iconSize"],
+            ["pheIconName", "iconName"],
+            ["phePosition", "position"],
+            ["phe-popover", "phePopover"],
+            ["PheCdkOverlayMenuModule", "PheCdkOverlayModule"],
+            ["@aether/pheno/cdk-overlay-menu", "@aether/pheno/cdk-overlay"],
+            ["PheCdkOverlayCascadeMenuService", "PheCdkOverlayCascadeHelperService"],
+            ["PheCdkMenuTriggerForDirective", "PheCdkOverlayTriggerForDirective"],
+            ["PheCdkOverlayMenuComponent", "PheCdkOverlayComponent"],
+            ["pheCdkMenuTriggerFor", "pheCdkOverlayTriggerFor"],
+            ["cdkMenuConfig", "pheCdkOverlayTriggerForConfig"],
+            ["CdkMenuConfig", "CdkOverlayConfig"],
+            ["isOpen", "pheCdkOverlayTriggerForIsOpen"],
+            ["IsOpenChange", "pheCdkOverlayTriggerForIsOpenChange"],
+            ["PositionType", "PheCdkOverlayPositionType"],
+            ["PositionMap", "PheCdkOverlayPositionMap"],
+            ["positionPair", "pheCdkOverlayPositionPair"],
         ];
         const projectIds = [
-            'DYSK_Labs%2Fwebsite',
-            'DYSK_Labs%2Fspace',
-            'DYSK_Labs%2Faether-mono',
+            "DYSK_Labs%2Fwebsite",
+            "DYSK_Labs%2Fspace",
+            "DYSK_Labs%2Faether-mono",
             // 'DYSK_Labs%2Fpath-gateway',
             // 'DYSK_Labs%2Fhema-emulator',
         ];
@@ -1779,8 +1815,8 @@ const actions = {
                 const changes = mergeRequestChanges.changes;
                 for (const change of changes) {
                     const addDiff = change.diff
-                        .split('\n')
-                        .filter((line) => line.startsWith('+'));
+                        .split("\n")
+                        .filter((line) => line.startsWith("+"));
                     addDiff.forEach((line) => {
                         for (const t of targets) {
                             if (line.toLowerCase().includes(t[0].toLowerCase())) {
@@ -1792,7 +1828,7 @@ const actions = {
                 }
             }
         }
-        console.log('end');
+        console.log("end");
     }),
 };
 (() => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
