@@ -588,42 +588,19 @@ exports.myTasksAction = myTasksAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.openAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const inquirer_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer */ "inquirer"));
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 function openAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const { gitLab, issueNumber } = utils_1.getGitLabFromArgv();
-        const answers = yield inquirer_1.default.prompt([
-            {
-                name: 'types',
-                message: 'Choose Link Type to open',
-                type: 'checkbox',
-                choices: [
-                    { name: 'Issue', value: 'issue' },
-                    { name: 'Merge Request', value: 'merge-request' },
-                    { name: 'Task', value: 'task' },
-                ],
-            },
-        ]);
         const issue = yield gitLab.getIssue(issueNumber);
         const urls = [];
-        for (const type of answers.types) {
-            switch (type) {
-                case 'issue':
-                    urls.push(issue.web_url);
-                    break;
-                case 'merge-request':
-                    const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
-                    urls.push(mergeRequests[mergeRequests.length - 1].web_url);
-                    break;
-                case 'task':
-                    const description = issue.description;
-                    const result = description.match(/https:\/\/app.clickup.com\/t\/\w+/);
-                    if (result) {
-                        urls.push(result[0]);
-                    }
-                    break;
-            }
+        urls.push(issue.web_url);
+        const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
+        urls.push(mergeRequests[mergeRequests.length - 1].web_url);
+        const description = issue.description;
+        const result = description.match(/https:\/\/app.clickup.com\/t\/\w+/);
+        if (result) {
+            urls.push(result[0]);
         }
         utils_1.openUrlsInTabGroup(urls, issueNumber);
     });
