@@ -84,6 +84,24 @@ const checkBackendPrint = new CheckItem(
     };
   }
 );
+const checkBackendDoubleQuotes = new CheckItem(
+  "Backend",
+  "Check Double Quotes",
+  true,
+  async ({ backendChanges }) => {
+    return {
+      code: backendChanges.some(
+        (c) =>
+          c.new_path.endsWith(".py") &&
+          c.diff
+            .split("\n")
+            .some((line) => !line.startsWith("-") && line.includes('"'))
+      )
+        ? 1
+        : 0,
+    };
+  }
+);
 const checkBackendMigrationConflict = new CheckItem(
   "Backend",
   "Check Migration Conflict",
@@ -128,6 +146,7 @@ const fullProjectCheckItems: CheckItem[] = [
   checkFrontendConsoleLog,
   checkFrontendLongImport,
   checkBackendPrint,
+  checkBackendDoubleQuotes,
   checkBackendMigrationConflict,
 ];
 

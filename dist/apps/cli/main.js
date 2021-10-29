@@ -1666,6 +1666,16 @@ const checkBackendPrint = new check_item_class_1.CheckItem("Backend", "Check Pri
             : 0,
     };
 }));
+const checkBackendDoubleQuotes = new check_item_class_1.CheckItem("Backend", "Check Double Quotes", true, ({ backendChanges }) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
+    return {
+        code: backendChanges.some((c) => c.new_path.endsWith(".py") &&
+            c.diff
+                .split("\n")
+                .some((line) => !line.startsWith("-") && line.includes('"')))
+            ? 1
+            : 0,
+    };
+}));
 const checkBackendMigrationConflict = new check_item_class_1.CheckItem("Backend", "Check Migration Conflict", true, ({ mergeRequest, backendChanges, gitLab }) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     if (!backendChanges.some((c) => c.new_path.includes("migrations"))) {
         return { code: 0 };
@@ -1698,6 +1708,7 @@ const fullProjectCheckItems = [
     checkFrontendConsoleLog,
     checkFrontendLongImport,
     checkBackendPrint,
+    checkBackendDoubleQuotes,
     checkBackendMigrationConflict,
 ];
 const frontendProjectCheckItems = [
