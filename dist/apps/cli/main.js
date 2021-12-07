@@ -1718,7 +1718,6 @@ exports.checkItemsMap = {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const gitlab_class_1 = __webpack_require__(/*! ../../../libs/node-shared/src/lib/classes/gitlab.class */ "./libs/node-shared/src/lib/classes/gitlab.class.ts");
 const check_action_1 = __webpack_require__(/*! ./actions/check.action */ "./apps/cli/src/actions/check.action.ts");
 const comment_action_1 = __webpack_require__(/*! ./actions/comment.action */ "./apps/cli/src/actions/comment.action.ts");
 const copy_action_1 = __webpack_require__(/*! ./actions/copy.action */ "./apps/cli/src/actions/copy.action.ts");
@@ -1752,72 +1751,6 @@ const actions = {
     toDo: to_do_action_1.toDoAction,
     time: time_action_1.timeAction,
     copy: copy_action_1.copyAction,
-    test: () => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
-        const targets = [
-            ["phe-button", "pheButton"],
-            ["btnType", "pheButtonType"],
-            ["btnSize", "pheButtonSize"],
-            ["iconName", "pheButtonIconName"],
-            ["iconSize", "pheButtonIconSize"],
-            ["highlight", "pheButtonHighlight"],
-            ["responsive", "pheButtonResponsive"],
-            ["phe-dialog-close", "pheDialogClose"],
-            ["phe-dialog-content", "pheDialogContent"],
-            ["phe-dialog-title", "pheDialogTitle"],
-            ["pheType", "type"],
-            ["pheSize", "size"],
-            ["pheColor", "color"],
-            ["pheIconSize", "iconSize"],
-            ["pheIconName", "iconName"],
-            ["phePosition", "position"],
-            ["phe-popover", "phePopover"],
-            ["PheCdkOverlayMenuModule", "PheCdkOverlayModule"],
-            ["@aether/pheno/cdk-overlay-menu", "@aether/pheno/cdk-overlay"],
-            ["PheCdkOverlayCascadeMenuService", "PheCdkOverlayCascadeHelperService"],
-            ["PheCdkMenuTriggerForDirective", "PheCdkOverlayTriggerForDirective"],
-            ["PheCdkOverlayMenuComponent", "PheCdkOverlayComponent"],
-            ["pheCdkMenuTriggerFor", "pheCdkOverlayTriggerFor"],
-            ["cdkMenuConfig", "pheCdkOverlayTriggerForConfig"],
-            ["CdkMenuConfig", "CdkOverlayConfig"],
-            ["isOpen", "pheCdkOverlayTriggerForIsOpen"],
-            ["IsOpenChange", "pheCdkOverlayTriggerForIsOpenChange"],
-            ["PositionType", "PheCdkOverlayPositionType"],
-            ["PositionMap", "PheCdkOverlayPositionMap"],
-            ["positionPair", "pheCdkOverlayPositionPair"],
-        ];
-        const projectIds = [
-            "DYSK_Labs%2Fwebsite",
-            "DYSK_Labs%2Fspace",
-            "DYSK_Labs%2Faether-mono",
-            // 'DYSK_Labs%2Fpath-gateway',
-            // 'DYSK_Labs%2Fhema-emulator',
-        ];
-        for (const projectId of projectIds) {
-            const gitLab = new gitlab_class_1.GitLab(projectId);
-            // get open merge requests
-            const openedMergedRequests = yield gitLab.getOpenedMergeRequests();
-            for (const mergeRequest of openedMergedRequests) {
-                console.log(projectId);
-                console.log(mergeRequest.iid);
-                const mergeRequestChanges = yield gitLab.getMergeRequestChanges(mergeRequest.iid);
-                const changes = mergeRequestChanges.changes;
-                for (const change of changes) {
-                    const addDiff = change.diff
-                        .split("\n")
-                        .filter((line) => line.startsWith("+"));
-                    addDiff.forEach((line) => {
-                        for (const t of targets) {
-                            if (line.toLowerCase().includes(t[0].toLowerCase())) {
-                                console.log(change.new_path);
-                                console.log(line);
-                            }
-                        }
-                    });
-                }
-            }
-        }
-        console.log("end");
-    }),
 };
 (() => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     const action = process.argv[2];
@@ -1842,7 +1775,7 @@ const actions = {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.openUrlsInTabGroup = exports.checkWorkingTreeClean = exports.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId = exports.getGitLabFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabIssue = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = exports.normalizeClickUpChecklist = exports.normalizeGitLabIssueChecklist = void 0;
+exports.getTaskProgress = exports.openUrlsInTabGroup = exports.checkWorkingTreeClean = exports.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId = exports.getGitLabFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabIssue = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = exports.normalizeClickUpChecklist = exports.normalizeGitLabIssueChecklist = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const child_process_1 = tslib_1.__importStar(__webpack_require__(/*! child_process */ "child_process"));
@@ -1920,7 +1853,7 @@ function getClickUpTaskIdFromGitLabIssue(issue) {
     return result ? result[1] : null;
 }
 exports.getClickUpTaskIdFromGitLabIssue = getClickUpTaskIdFromGitLabIssue;
-const dpItemRegex = /\* \([A-Za-z ]+\) \[.*?\]\(https:\/\/app.clickup.com\/t\/(\w+)\)/g;
+const dpItemRegex = /\* \([A-Za-z0-9 %]+\) \[.*?\]\(https:\/\/app.clickup.com\/t\/(\w+)\)/g;
 function updateTaskStatusInDp(dp) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         let match = null;
@@ -1930,7 +1863,10 @@ function updateTaskStatusInDp(dp) {
             const clickUpTaskId = match[1];
             const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
             const task = yield clickUp.getTask();
-            const updatedFull = full.replace(/\* \([A-Za-z ]+\)/, `* (${case_utils_1.titleCase(task.status.status)})`);
+            const progress = getTaskProgress(task);
+            const updatedFull = full.replace(/\* \([A-Za-z0-9 %]+\)/, progress
+                ? `* (${case_utils_1.titleCase(task.status.status)} ${progress})`
+                : `* (${case_utils_1.titleCase(task.status.status)})`);
             resultDp = resultDp.replace(full, updatedFull);
         }
         return resultDp;
@@ -1988,6 +1924,16 @@ function openUrlsInTabGroup(urls, group) {
         }));
 }
 exports.openUrlsInTabGroup = openUrlsInTabGroup;
+function getTaskProgress(task) {
+    const progressField = task.custom_fields.find((f) => f.type === "automatic_progress");
+    if (progressField &&
+        progressField.value &&
+        progressField.value.percent_complete) {
+        return `${Math.round(progressField.value.percent_complete)}%`;
+    }
+    return "";
+}
+exports.getTaskProgress = getTaskProgress;
 
 
 /***/ }),
@@ -2296,6 +2242,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 /***/ }),
 
+/***/ "./libs/node-shared/src/lib/models/clickup/task.models.ts":
+/*!****************************************************************!*\
+  !*** ./libs/node-shared/src/lib/models/clickup/task.models.ts ***!
+  \****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+
+
+/***/ }),
+
 /***/ "./libs/node-shared/src/lib/models/gitlab/issue.models.ts":
 /*!****************************************************************!*\
   !*** ./libs/node-shared/src/lib/models/gitlab/issue.models.ts ***!
@@ -2362,7 +2322,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sleep = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.GitLabProject = exports.Change = exports.Job = exports.Issue = exports.ChecklistItem = exports.CONFIG = exports.GitLab = exports.ClickUp = void 0;
+exports.sleep = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.GitLabProject = exports.Change = exports.Job = exports.Issue = exports.Task = exports.ChecklistItem = exports.CONFIG = exports.GitLab = exports.ClickUp = void 0;
 var clickup_class_1 = __webpack_require__(/*! ./classes/clickup.class */ "./libs/node-shared/src/lib/classes/clickup.class.ts");
 Object.defineProperty(exports, "ClickUp", { enumerable: true, get: function () { return clickup_class_1.ClickUp; } });
 var gitlab_class_1 = __webpack_require__(/*! ./classes/gitlab.class */ "./libs/node-shared/src/lib/classes/gitlab.class.ts");
@@ -2371,6 +2331,8 @@ var config_1 = __webpack_require__(/*! ./config */ "./libs/node-shared/src/lib/c
 Object.defineProperty(exports, "CONFIG", { enumerable: true, get: function () { return config_1.CONFIG; } });
 var checklist_models_1 = __webpack_require__(/*! ./models/clickup/checklist.models */ "./libs/node-shared/src/lib/models/clickup/checklist.models.ts");
 Object.defineProperty(exports, "ChecklistItem", { enumerable: true, get: function () { return checklist_models_1.ChecklistItem; } });
+var task_models_1 = __webpack_require__(/*! ./models/clickup/task.models */ "./libs/node-shared/src/lib/models/clickup/task.models.ts");
+Object.defineProperty(exports, "Task", { enumerable: true, get: function () { return task_models_1.Task; } });
 var issue_models_1 = __webpack_require__(/*! ./models/gitlab/issue.models */ "./libs/node-shared/src/lib/models/gitlab/issue.models.ts");
 Object.defineProperty(exports, "Issue", { enumerable: true, get: function () { return issue_models_1.Issue; } });
 var job_models_1 = __webpack_require__(/*! ./models/gitlab/job.models */ "./libs/node-shared/src/lib/models/gitlab/job.models.ts");

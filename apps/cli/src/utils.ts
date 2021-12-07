@@ -5,6 +5,7 @@ import {
   GitLab,
   Issue,
   NormalizedChecklist,
+  Task,
 } from "@accel-shooter/node-shared";
 import childProcess, { execSync, StdioOptions } from "child_process";
 import open from "open";
@@ -99,7 +100,7 @@ export function getClickUpTaskIdFromGitLabIssue(issue: Issue) {
 }
 
 const dpItemRegex =
-  /\* \([A-Za-z ]+\) \[.*?\]\(https:\/\/app.clickup.com\/t\/(\w+)\)/g;
+  /\* \([A-Za-z0-9 %]+\) \[.*?\]\(https:\/\/app.clickup.com\/t\/(\w+)\)/g;
 
 export async function updateTaskStatusInDp(dp: string) {
   let match: RegExpExecArray | null = null;
@@ -110,9 +111,12 @@ export async function updateTaskStatusInDp(dp: string) {
     const clickUpTaskId = match[1];
     const clickUp = new ClickUp(clickUpTaskId);
     const task = await clickUp.getTask();
+    const progress = getTaskProgress(task);
     const updatedFull = full.replace(
-      /\* \([A-Za-z ]+\)/,
-      `* (${titleCase(task.status.status)})`
+      /\* \([A-Za-z0-9 %]+\)/,
+      progress
+        ? `* (${titleCase(task.status.status)} ${progress})`
+        : `* (${titleCase(task.status.status)})`
     );
     resultDp = resultDp.replace(full, updatedFull);
   }
@@ -175,4 +179,18 @@ export function openUrlsInTabGroup(urls: string[], group: string) {
         group,
       })
   );
+}
+
+export function getTaskProgress(task: Task) {
+  const progressField = task.custom_fields.find(
+    (f) => f.type === "automatic_progress"
+  );
+  if (
+    progressField &&
+    progressField.value &&
+    progressField.value.percent_complete
+  ) {
+    return `${Math.round(progressField.value.percent_complete)}%`;
+  }
+  return "";
 }

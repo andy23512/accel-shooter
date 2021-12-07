@@ -28,6 +28,16 @@ export interface Task {
   folder: List;
   space: List;
   url: string;
+  custom_fields?: {
+    id: string;
+    name: string;
+    type: string;
+    type_config: any;
+    date_created: string;
+    hide_from_guests: boolean;
+    value: Record<string, any>;
+    required: boolean;
+  }[];
 }
 
 interface List {
