@@ -1864,7 +1864,7 @@ function updateTaskStatusInDp(dp) {
             const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
             const task = yield clickUp.getTask();
             const progress = getTaskProgress(task);
-            const updatedFull = full.replace(/\* \([A-Za-z0-9 %]+\)/, progress
+            const updatedFull = full.replace(/\* \([A-Za-z0-9 %]+\)/, task.status.status === "in progress" && progress
                 ? `* (${case_utils_1.titleCase(task.status.status)} ${progress})`
                 : `* (${case_utils_1.titleCase(task.status.status)})`);
             resultDp = resultDp.replace(full, updatedFull);

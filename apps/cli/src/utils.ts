@@ -114,7 +114,7 @@ export async function updateTaskStatusInDp(dp: string) {
     const progress = getTaskProgress(task);
     const updatedFull = full.replace(
       /\* \([A-Za-z0-9 %]+\)/,
-      progress
+      task.status.status === "in progress" && progress
         ? `* (${titleCase(task.status.status)} ${progress})`
         : `* (${titleCase(task.status.status)})`
     );
