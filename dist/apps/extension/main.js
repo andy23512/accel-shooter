@@ -71,6 +71,11 @@ chrome.tabs.onCreated.addListener((tab) => __awaiter(this, void 0, void 0, funct
         console.log(urls);
         console.log(group);
         const tabIds = [];
+        const existingGroups = yield chrome.tabGroups.query({ title: group });
+        for (const g of existingGroups) {
+            const tabs = yield chrome.tabs.query({ groupId: g.id });
+            chrome.tabs.remove(tabs.map((t) => t.id));
+        }
         for (const url of JSON.parse(decodeURIComponent(urls))) {
             const t = yield chrome.tabs.create({ url });
             tabIds.push(t.id);
