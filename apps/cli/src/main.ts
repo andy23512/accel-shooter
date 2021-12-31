@@ -15,7 +15,7 @@ import { toDoAction } from "./actions/to-do.action";
 import { trackAction } from "./actions/track.action";
 import { updateAction } from "./actions/update.action";
 
-const actions: { [key: string]: () => Promise<any> } = {
+const actions: { [key: string]: () => Promise<void> } = {
   start: startAction,
   open: openAction,
   sync: syncAction,

@@ -40,6 +40,10 @@ export interface Task {
   }[];
 }
 
+export interface TaskIncludeSubTasks extends Task {
+  subtasks: Task[];
+}
+
 interface List {
   id: string;
 }

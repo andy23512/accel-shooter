@@ -1998,6 +1998,11 @@ class ClickUp {
     getTask() {
         return callApi("get", `/task/${this.taskId}`);
     }
+    getTaskIncludeSubTasks() {
+        return callApi("get", `/task/${this.taskId}`, {
+            include_subtasks: true,
+        });
+    }
     getTaskComments() {
         return callApi("get", `/task/${this.taskId}/comment/`).then((r) => r.comments);
     }
@@ -2027,10 +2032,20 @@ class ClickUp {
     getFrameUrls() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             let currentTaskId = this.taskId;
+            let rootTaskId = null;
             const frameUrls = [];
             while (currentTaskId) {
                 const clickUp = new ClickUp(currentTaskId);
                 const task = yield clickUp.getTask();
+                if (!task.parent) {
+                    rootTaskId = task.id;
+                }
+                currentTaskId = task.parent;
+            }
+            const taskQueue = [rootTaskId];
+            while (taskQueue.length > 0) {
+                const taskId = taskQueue.shift();
+                const clickUp = new ClickUp(taskId);
                 const comments = yield clickUp.getTaskComments();
                 comments.forEach((co) => {
                     co.comment
@@ -2042,7 +2057,12 @@ class ClickUp {
                         }
                     });
                 });
-                currentTaskId = task.parent;
+                const task = yield clickUp.getTaskIncludeSubTasks();
+                if (task.subtasks) {
+                    task.subtasks.forEach((t) => {
+                        taskQueue.push(t.id);
+                    });
+                }
             }
             return frameUrls;
         });

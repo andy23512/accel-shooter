@@ -1,9 +1,10 @@
-import { callApiFactory } from "../utils/api.utils";
 import { ChecklistResponse, Task } from "../models/clickup.models";
+import { Comment } from "../models/clickup/comment.models";
 import { List } from "../models/clickup/list.models";
+import { TaskIncludeSubTasks } from "../models/clickup/task.models";
 import { Team } from "../models/clickup/team.models";
 import { User } from "../models/clickup/user.models";
-import { Comment } from "../models/clickup/comment.models";
+import { callApiFactory } from "../utils/api.utils";
 const callApi = callApiFactory("ClickUp");
 
 export class ClickUp {
@@ -39,6 +40,12 @@ export class ClickUp {
 
   public getTask() {
     return callApi<Task>("get", `/task/${this.taskId}`);
+  }
+
+  public getTaskIncludeSubTasks() {
+    return callApi<TaskIncludeSubTasks>("get", `/task/${this.taskId}`, {
+      include_subtasks: true,
+    });
   }
 
   public getTaskComments() {
@@ -107,10 +114,20 @@ export class ClickUp {
 
   public async getFrameUrls() {
     let currentTaskId = this.taskId;
+    let rootTaskId = null;
     const frameUrls: string[] = [];
     while (currentTaskId) {
       const clickUp = new ClickUp(currentTaskId);
       const task = await clickUp.getTask();
+      if (!task.parent) {
+        rootTaskId = task.id;
+      }
+      currentTaskId = task.parent;
+    }
+    const taskQueue: string[] = [rootTaskId];
+    while (taskQueue.length > 0) {
+      const taskId = taskQueue.shift();
+      const clickUp = new ClickUp(taskId);
       const comments = await clickUp.getTaskComments();
       comments.forEach((co) => {
         co.comment
@@ -121,7 +138,12 @@ export class ClickUp {
             }
           });
       });
-      currentTaskId = task.parent;
+      const task = await clickUp.getTaskIncludeSubTasks();
+      if (task.subtasks) {
+        task.subtasks.forEach((t) => {
+          taskQueue.push(t.id);
+        });
+      }
     }
     return frameUrls;
   }
