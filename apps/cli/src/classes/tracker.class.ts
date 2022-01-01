@@ -85,7 +85,11 @@ export class Tracker extends BaseFileRef {
       mergeRequests[mergeRequests.length - 1].iid
     );
     const clickUpTask = await clickUp.getTask();
-    if (["closed", "verified"].includes(clickUpTask.status.status)) {
+    if (
+      ["closed", "verified", "ready to verify"].includes(
+        clickUpTask.status.status
+      )
+    ) {
       this.closeItem(projectName, issueNumber);
       return;
     }
