@@ -1527,7 +1527,7 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
             const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
             const mergeRequest = yield gitLab.getMergeRequest(mergeRequests[mergeRequests.length - 1].iid);
             const clickUpTask = yield clickUp.getTask();
-            if (["closed", "verified", "ready to verify"].includes(clickUpTask.status.status)) {
+            if (["closed", "verified", "ready to verify", "done"].includes(clickUpTask.status.status.toLowerCase())) {
                 this.closeItem(projectName, issueNumber);
                 return;
             }

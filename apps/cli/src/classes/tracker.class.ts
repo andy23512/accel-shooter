@@ -86,8 +86,8 @@ export class Tracker extends BaseFileRef {
     );
     const clickUpTask = await clickUp.getTask();
     if (
-      ["closed", "verified", "ready to verify"].includes(
-        clickUpTask.status.status
+      ["closed", "verified", "ready to verify", "done"].includes(
+        clickUpTask.status.status.toLowerCase()
       )
     ) {
       this.closeItem(projectName, issueNumber);
