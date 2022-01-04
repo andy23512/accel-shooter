@@ -387,6 +387,7 @@ function endAction() {
             "Get GitLab Merge Request",
             "Update GitLab Merge Request Ready Status and Assignee",
             "Update ClickUp Task Status",
+            "Close Tab Group",
         ]);
         p.start();
         const issue = yield gitLab.getIssue(issueNumber);
@@ -410,6 +411,8 @@ function endAction() {
             const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
             yield clickUp.setTaskStatus("in review");
         }
+        p.next();
+        utils_1.openUrlsInTabGroup([], issueNumber);
         p.end(0);
     });
 }

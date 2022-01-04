@@ -4,6 +4,7 @@ import {
   getClickUpTaskIdFromGitLabIssue,
   getGitLabFromArgv,
   normalizeGitLabIssueChecklist,
+  openUrlsInTabGroup,
 } from "../utils";
 
 export async function endAction() {
@@ -13,6 +14,7 @@ export async function endAction() {
     "Get GitLab Merge Request",
     "Update GitLab Merge Request Ready Status and Assignee",
     "Update ClickUp Task Status",
+    "Close Tab Group",
   ]);
   p.start();
   const issue = await gitLab.getIssue(issueNumber);
@@ -39,5 +41,7 @@ export async function endAction() {
     const clickUp = new ClickUp(clickUpTaskId);
     await clickUp.setTaskStatus("in review");
   }
+  p.next();
+  openUrlsInTabGroup([], issueNumber);
   p.end(0);
 }
