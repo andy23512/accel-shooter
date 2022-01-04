@@ -96,10 +96,17 @@ export class Tracker extends BaseFileRef {
     if (projectConfig.stagingStatus && mergeRequest.state === "merged") {
       if (clickUpTask.status.status === "in review") {
         const list = await ClickUp.getList(clickUpTask.list.id);
-        const stagingStatus =
+        let stagingStatus =
           projectConfig.stagingStatus[list.name] ||
           projectConfig.stagingStatus["*"];
-        await clickUp.setTaskStatus(stagingStatus);
+        if (
+          list.statuses.find((s) => s.status.toLowerCase() === stagingStatus)
+        ) {
+          await clickUp.setTaskStatus(stagingStatus);
+        } else {
+          stagingStatus = "done";
+          await clickUp.setTaskStatus(stagingStatus);
+        }
         if (stagingStatus === "verified") {
           this.closeItem(projectName, issueNumber);
         }

@@ -1541,9 +1541,15 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
             if (projectConfig.stagingStatus && mergeRequest.state === "merged") {
                 if (clickUpTask.status.status === "in review") {
                     const list = yield node_shared_1.ClickUp.getList(clickUpTask.list.id);
-                    const stagingStatus = projectConfig.stagingStatus[list.name] ||
+                    let stagingStatus = projectConfig.stagingStatus[list.name] ||
                         projectConfig.stagingStatus["*"];
-                    yield clickUp.setTaskStatus(stagingStatus);
+                    if (list.statuses.find((s) => s.status.toLowerCase() === stagingStatus)) {
+                        yield clickUp.setTaskStatus(stagingStatus);
+                    }
+                    else {
+                        stagingStatus = "done";
+                        yield clickUp.setTaskStatus(stagingStatus);
+                    }
                     if (stagingStatus === "verified") {
                         this.closeItem(projectName, issueNumber);
                     }
