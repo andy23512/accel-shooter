@@ -1,18 +1,29 @@
-import { getGitLabFromArgv, openUrlsInTabGroup } from "../utils";
+import { ClickUp } from "@accel-shooter/node-shared";
+import {
+  getClickUpTaskIdFromGitLabIssue,
+  getGitLabFromArgv,
+  openUrlsInTabGroup,
+} from "../utils";
 
 export async function openAction() {
   const { gitLab, issueNumber } = getGitLabFromArgv();
   const issue = await gitLab.getIssue(issueNumber);
-  const urls = [];
-  urls.push(issue.web_url);
   const mergeRequests = await gitLab.listMergeRequestsWillCloseIssueOnMerge(
     issueNumber
   );
-  urls.push(mergeRequests[mergeRequests.length - 1].web_url);
-  const description = issue.description;
-  const result = description.match(/https:\/\/app.clickup.com\/t\/\w+/);
-  if (result) {
-    urls.push(result[0]);
+  const clickUpTaskId = getClickUpTaskIdFromGitLabIssue(issue);
+  if (clickUpTaskId) {
+    const clickUp = new ClickUp(clickUpTaskId);
+    const clickUpTask = await clickUp.getTask();
+    const frameUrls = await clickUp.getFrameUrls();
+    const urls = [
+      issue.web_url,
+      mergeRequests[mergeRequests.length - 1].web_url,
+      clickUpTask.url,
+    ];
+    if (frameUrls.length) {
+      urls.push(frameUrls[0]);
+    }
+    openUrlsInTabGroup(urls, issueNumber);
   }
-  openUrlsInTabGroup(urls, issueNumber);
 }

@@ -588,21 +588,28 @@ exports.myTasksAction = myTasksAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.openAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 function openAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const { gitLab, issueNumber } = utils_1.getGitLabFromArgv();
         const issue = yield gitLab.getIssue(issueNumber);
-        const urls = [];
-        urls.push(issue.web_url);
         const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
-        urls.push(mergeRequests[mergeRequests.length - 1].web_url);
-        const description = issue.description;
-        const result = description.match(/https:\/\/app.clickup.com\/t\/\w+/);
-        if (result) {
-            urls.push(result[0]);
+        const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
+        if (clickUpTaskId) {
+            const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
+            const clickUpTask = yield clickUp.getTask();
+            const frameUrls = yield clickUp.getFrameUrls();
+            const urls = [
+                issue.web_url,
+                mergeRequests[mergeRequests.length - 1].web_url,
+                clickUpTask.url,
+            ];
+            if (frameUrls.length) {
+                urls.push(frameUrls[0]);
+            }
+            utils_1.openUrlsInTabGroup(urls, issueNumber);
         }
-        utils_1.openUrlsInTabGroup(urls, issueNumber);
     });
 }
 exports.openAction = openAction;
