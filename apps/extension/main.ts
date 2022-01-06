@@ -74,6 +74,7 @@ chrome.tabs.onCreated.addListener(async (tab) => {
       const tabs = await chrome.tabs.query({ groupId: g.id });
       chrome.tabs.remove(tabs.map((t) => t.id));
     }
+    chrome.tabs.remove(tab.id);
     for (const url of JSON.parse(decodeURIComponent(urls))) {
       const t = await chrome.tabs.create({ url });
       tabIds.push(t.id);
@@ -81,6 +82,5 @@ chrome.tabs.onCreated.addListener(async (tab) => {
     const groupId = await chrome.tabs.group({ tabIds: tabIds });
     chrome.tabGroups.move(groupId, { index: 0 });
     chrome.tabGroups.update(groupId, { color: "cyan", title: group });
-    chrome.tabs.remove(tab.id);
   }
 });
