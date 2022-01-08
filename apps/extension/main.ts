@@ -74,13 +74,16 @@ chrome.tabs.onCreated.addListener(async (tab) => {
       const tabs = await chrome.tabs.query({ groupId: g.id });
       chrome.tabs.remove(tabs.map((t) => t.id));
     }
-    chrome.tabs.remove(tab.id);
-    for (const url of JSON.parse(decodeURIComponent(urls))) {
-      const t = await chrome.tabs.create({ url });
-      tabIds.push(t.id);
+    const urlList = JSON.parse(decodeURIComponent(urls));
+    if (urlList.length > 0) {
+      for (const url of JSON.parse(decodeURIComponent(urls))) {
+        const t = await chrome.tabs.create({ url });
+        tabIds.push(t.id);
+      }
+      const groupId = await chrome.tabs.group({ tabIds: tabIds });
+      chrome.tabGroups.move(groupId, { index: 0 });
+      chrome.tabGroups.update(groupId, { color: "cyan", title: group });
     }
-    const groupId = await chrome.tabs.group({ tabIds: tabIds });
-    chrome.tabGroups.move(groupId, { index: 0 });
-    chrome.tabGroups.update(groupId, { color: "cyan", title: group });
+    chrome.tabs.remove(tab.id);
   }
 });
