@@ -99,8 +99,8 @@ export class Checker {
     };
     const obss = runningItems.map((r) => r.getObs(context));
     const checkStream = combineLatest(obss);
-    process.stdout.write(runningItems.map((r) => "").join("\n"));
-    const s = combineLatest([interval(60), checkStream]).subscribe(
+    process.stdout.write(runningItems.map(() => "").join("\n"));
+    const stream = combineLatest([interval(60), checkStream]).subscribe(
       ([count, statusList]) => {
         process.stdout.moveCursor(0, -statusList.length + 1);
         process.stdout.cursorTo(0);
@@ -127,7 +127,7 @@ export class Checker {
             .join("\n")
         );
         if (statusList.every((s) => s.code !== -1)) {
-          s.unsubscribe();
+          stream.unsubscribe();
           const nonSuccessStatusList = statusList.filter((s) => s.code !== 0);
           if (nonSuccessStatusList.length > 0) {
             writeFile(

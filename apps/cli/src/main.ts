@@ -8,6 +8,7 @@ import { myTasksAction } from "./actions/my-tasks.action";
 import { openAction } from "./actions/open.action";
 import { revertEndAction } from "./actions/revert-end.action";
 import { RTVTasksAction } from "./actions/rtv-tasks.action";
+import { showDiffAction } from "./actions/show-diff.action";
 import { startAction } from "./actions/start.action";
 import { syncAction } from "./actions/sync.action";
 import { timeAction } from "./actions/time.action";
@@ -32,6 +33,7 @@ const actions: { [key: string]: () => Promise<void> } = {
   toDo: toDoAction,
   time: timeAction,
   copy: copyAction,
+  showDiff: showDiffAction,
 };
 
 (async () => {

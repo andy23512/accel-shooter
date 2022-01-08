@@ -695,6 +695,40 @@ exports.RTVTasksAction = RTVTasksAction;
 
 /***/ }),
 
+/***/ "./apps/cli/src/actions/show-diff.action.ts":
+/*!**************************************************!*\
+  !*** ./apps/cli/src/actions/show-diff.action.ts ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.showDiffAction = void 0;
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
+const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+function showDiffAction() {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const { gitLabProject, issueNumber } = utils_1.getGitLabFromArgv();
+        const gitLab = new node_shared_1.GitLab(gitLabProject.id);
+        const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
+        const mergeRequest = mergeRequests[mergeRequests.length - 1];
+        const mergeRequestChanges = yield gitLab.getMergeRequestChanges(mergeRequest.iid);
+        const changes = mergeRequestChanges.changes;
+        const templateChanges = changes.filter((c) => c.new_path.endsWith(".html"));
+        for (const change of templateChanges) {
+            console.log(`### ${change.new_path}`);
+            console.log(change.diff);
+        }
+    });
+}
+exports.showDiffAction = showDiffAction;
+
+
+/***/ }),
+
 /***/ "./apps/cli/src/actions/start.action.ts":
 /*!**********************************************!*\
   !*** ./apps/cli/src/actions/start.action.ts ***!
@@ -1268,8 +1302,8 @@ class Checker {
             };
             const obss = runningItems.map((r) => r.getObs(context));
             const checkStream = rxjs_1.combineLatest(obss);
-            process.stdout.write(runningItems.map((r) => "").join("\n"));
-            const s = rxjs_1.combineLatest([rxjs_1.interval(60), checkStream]).subscribe(([count, statusList]) => {
+            process.stdout.write(runningItems.map(() => "").join("\n"));
+            const stream = rxjs_1.combineLatest([rxjs_1.interval(60), checkStream]).subscribe(([count, statusList]) => {
                 process.stdout.moveCursor(0, -statusList.length + 1);
                 process.stdout.cursorTo(0);
                 process.stdout.clearScreenDown();
@@ -1293,7 +1327,7 @@ class Checker {
                 })
                     .join("\n"));
                 if (statusList.every((s) => s.code !== -1)) {
-                    s.unsubscribe();
+                    stream.unsubscribe();
                     const nonSuccessStatusList = statusList.filter((s) => s.code !== 0);
                     if (nonSuccessStatusList.length > 0) {
                         fs_1.writeFile(untildify_1.default("~/ac-checker-log"), nonSuccessStatusList
@@ -1744,6 +1778,7 @@ const my_tasks_action_1 = __webpack_require__(/*! ./actions/my-tasks.action */ "
 const open_action_1 = __webpack_require__(/*! ./actions/open.action */ "./apps/cli/src/actions/open.action.ts");
 const revert_end_action_1 = __webpack_require__(/*! ./actions/revert-end.action */ "./apps/cli/src/actions/revert-end.action.ts");
 const rtv_tasks_action_1 = __webpack_require__(/*! ./actions/rtv-tasks.action */ "./apps/cli/src/actions/rtv-tasks.action.ts");
+const show_diff_action_1 = __webpack_require__(/*! ./actions/show-diff.action */ "./apps/cli/src/actions/show-diff.action.ts");
 const start_action_1 = __webpack_require__(/*! ./actions/start.action */ "./apps/cli/src/actions/start.action.ts");
 const sync_action_1 = __webpack_require__(/*! ./actions/sync.action */ "./apps/cli/src/actions/sync.action.ts");
 const time_action_1 = __webpack_require__(/*! ./actions/time.action */ "./apps/cli/src/actions/time.action.ts");
@@ -1767,6 +1802,7 @@ const actions = {
     toDo: to_do_action_1.toDoAction,
     time: time_action_1.timeAction,
     copy: copy_action_1.copyAction,
+    showDiff: show_diff_action_1.showDiffAction,
 };
 (() => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     const action = process.argv[2];
