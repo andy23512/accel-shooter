@@ -1,1 +1,10 @@
-<div>{{ task$ | async | json }}</div>
+<ngx-codemirror
+  [(ngModel)]="checklistMarkDown"
+  [options]="{
+    lineNumbers: true,
+    theme: 'one-dark',
+    mode: 'gfm',
+    tabSize: 2,
+    indentWithTabs: false
+  }"
+></ngx-codemirror>
