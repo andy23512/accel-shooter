@@ -1,15 +1,11 @@
-import { Controller, Get } from '@nestjs/common';
-
-import { Message } from '@accel-shooter/api-interfaces';
-
-import { AppService } from './app.service';
+import { ClickUp, Task } from "@accel-shooter/node-shared";
+import { Controller, Get, Param } from "@nestjs/common";
 
 @Controller()
 export class AppController {
-  constructor(private readonly appService: AppService) {}
-
-  @Get('hello')
-  getData(): Message {
-    return this.appService.getData();
+  @Get("task/:id")
+  async getData(@Param("id") taskId: string): Promise<Task> {
+    const clickUp = new ClickUp(taskId);
+    return clickUp.getTask();
   }
 }
