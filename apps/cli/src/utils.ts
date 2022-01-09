@@ -1,5 +1,4 @@
 import {
-  ChecklistItem,
   ClickUp,
   CONFIG,
   GitLab,
@@ -26,19 +25,6 @@ export function normalizeGitLabIssueChecklist(
         .replace(/^ +/, (space) => space.replace(/ /g, "-")),
       checked: /- \[x\]/.test(line),
       order: index,
-    }));
-}
-
-export function normalizeClickUpChecklist(
-  checklist: ChecklistItem[]
-): NormalizedChecklist {
-  return checklist
-    .sort((a, b) => a.orderindex - b.orderindex)
-    .map((item, index) => ({
-      name: item.name,
-      checked: item.resolved,
-      order: index,
-      id: item.id,
     }));
 }
 

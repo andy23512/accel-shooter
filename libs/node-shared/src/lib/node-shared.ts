@@ -11,4 +11,5 @@ export {
   NormalizedChecklist,
   ProjectCheckItem,
 } from "./models/models";
+export { normalizeClickUpChecklist } from "./utils/clickup.utils";
 export { sleep } from "./utils/sleep.utils";

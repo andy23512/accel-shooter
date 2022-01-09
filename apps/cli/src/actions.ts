@@ -1,6 +1,7 @@
 import {
   ClickUp,
   GitLab,
+  normalizeClickUpChecklist,
   NormalizedChecklist,
 } from "@accel-shooter/node-shared";
 import readline from "readline";
@@ -8,7 +9,6 @@ import { endAction } from "./actions/end.action";
 import { CustomEmojiProgress } from "./classes/emoji-progress.class";
 import {
   getClickUpTaskIdFromGitLabIssue,
-  normalizeClickUpChecklist,
   normalizeGitLabIssueChecklist,
   openUrlsInTabGroup,
 } from "./utils";
