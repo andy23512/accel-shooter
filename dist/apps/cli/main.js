@@ -2461,6 +2461,7 @@ function fetchRetry(url, opts) {
                 }
             }
         }
+        return Promise.reject();
     });
 }
 function checkStatus(res) {

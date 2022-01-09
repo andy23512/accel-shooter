@@ -35,6 +35,7 @@ async function fetchRetry(
       }
     }
   }
+  return Promise.reject();
 }
 
 function checkStatus(res: Response | undefined) {

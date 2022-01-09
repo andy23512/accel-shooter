@@ -124,9 +124,9 @@ export class ClickUp {
       }
       currentTaskId = task.parent;
     }
-    const taskQueue: string[] = [rootTaskId];
+    const taskQueue: string[] = [rootTaskId as string];
     while (taskQueue.length > 0) {
-      const taskId = taskQueue.shift();
+      const taskId = taskQueue.shift() as string;
       const clickUp = new ClickUp(taskId);
       const comments = await clickUp.getTaskComments();
       comments.forEach((co) => {
