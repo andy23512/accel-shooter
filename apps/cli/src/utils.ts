@@ -1,32 +1,14 @@
 import {
   ClickUp,
   CONFIG,
+  FullMergeRequest,
   GitLab,
-  Issue,
-  NormalizedChecklist,
   Task,
 } from "@accel-shooter/node-shared";
 import childProcess, { execSync, StdioOptions } from "child_process";
 import open from "open";
 import qs from "qs";
 import { titleCase } from "./case-utils";
-
-export function normalizeGitLabIssueChecklist(
-  checklistText: string
-): NormalizedChecklist {
-  return checklistText
-    .split("\n")
-    .filter(
-      (line) => line && (line.includes("- [ ]") || line.includes("- [x]"))
-    )
-    .map((line, index) => ({
-      name: line
-        .replace(/- \[[x ]\] /g, "")
-        .replace(/^ +/, (space) => space.replace(/ /g, "-")),
-      checked: /- \[x\]/.test(line),
-      order: index,
-    }));
-}
 
 export async function promiseSpawn(
   command: string,
@@ -79,9 +61,11 @@ export function getGitLabProjectConfigById(inputId: string) {
   return CONFIG.GitLabProjects.find(({ id }) => id === inputId);
 }
 
-export function getClickUpTaskIdFromGitLabIssue(issue: Issue) {
-  const description = issue.description;
-  const result = description.match(/https:\/\/app.clickup.com\/t\/(\w+)/);
+export function getClickUpTaskIdFromGitLabMergeRequest(
+  mergeRequest: FullMergeRequest
+) {
+  const branchName = mergeRequest.source_branch;
+  const result = branchName.match(/CU-([\S]+)/);
   return result ? result[1] : null;
 }
 
@@ -109,7 +93,7 @@ export async function updateTaskStatusInDp(dp: string) {
   return resultDp;
 }
 
-export function getGitLabFromArgv() {
+export async function getInfoFromArgv() {
   if (process.argv.length === 3) {
     const directory = execSync("pwd", { encoding: "utf-8" });
     const gitLabProject = CONFIG.GitLabProjects.find((p) =>
@@ -121,32 +105,55 @@ export function getGitLabFromArgv() {
     const branchName = execSync("git branch --show-current", {
       encoding: "utf-8",
     });
-    const match = branchName.match(/^[0-9]+/);
+    const match = branchName.match(/CU-(\S+)/);
     if (!match) {
-      throw Error("Cannot get issue number from branch");
+      throw Error("Cannot get task number from branch");
     }
-    const issueNumber = match[0];
+    const clickUpTaskId = match[1];
+    const clickUp = new ClickUp(clickUpTaskId);
+    const clickUpTask = await clickUp.getTask();
+    const mergeRequestIId = await clickUp.getGitLabMergeRequestIId();
     const gitLab = new GitLab(gitLabProject.id);
-    return { gitLab, gitLabProject, issueNumber };
+    const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
+    return {
+      gitLab,
+      gitLabProject,
+      mergeRequestIId,
+      mergeRequest,
+      clickUp,
+      clickUpTaskId,
+      clickUpTask,
+    };
   } else {
     const gitLabProject = getGitLabProjectFromArgv();
     if (!gitLabProject) {
       throw Error("No such project");
     }
     const gitLab = new GitLab(gitLabProject.id);
-    return { gitLab, gitLabProject, issueNumber: process.argv[4] };
+    const mergeRequestIId = process.argv[4];
+    const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
+    const branchName = mergeRequest.source_branch;
+    const match = branchName.match(/CU-(\S+)/);
+    if (!match) {
+      throw Error("Cannot get task number from branch");
+    }
+    const clickUpTaskId = match[1];
+    const clickUp = new ClickUp(clickUpTaskId);
+    const clickUpTask = await clickUp.getTask();
+    return {
+      gitLab,
+      gitLabProject,
+      mergeRequestIId,
+      mergeRequest,
+      clickUp,
+      clickUpTaskId,
+      clickUpTask,
+    };
   }
 }
 
 function getGitLabProjectFromArgv() {
   return getGitLabProjectConfigByName(process.argv[3]);
-}
-
-export function getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(
-  issueNumber: number,
-  clickUpTaskId: string
-) {
-  return `${issueNumber}_CU-${clickUpTaskId}`;
 }
 
 export async function checkWorkingTreeClean() {

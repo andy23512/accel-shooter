@@ -96,89 +96,13 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setUpSyncHotkey = exports.configReadline = exports.syncChecklist = void 0;
+exports.configReadline = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const readline_1 = tslib_1.__importDefault(__webpack_require__(/*! readline */ "readline"));
-const end_action_1 = __webpack_require__(/*! ./actions/end.action */ "./apps/cli/src/actions/end.action.ts");
-const utils_1 = __webpack_require__(/*! ./utils */ "./apps/cli/src/utils.ts");
-function syncChecklist(gitLabProjectId, issueNumber, ep, openPage) {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const gitLab = new node_shared_1.GitLab(gitLabProjectId);
-        const issue = yield gitLab.getIssue(issueNumber);
-        const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
-        if (clickUpTaskId) {
-            const gitLabChecklistText = issue.description
-                .replace(/https:\/\/app.clickup.com\/t\/\w+/g, "")
-                .trim();
-            const gitLabNormalizedChecklist = utils_1.normalizeGitLabIssueChecklist(gitLabChecklistText);
-            const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
-            const clickUpTask = yield clickUp.getTask();
-            const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
-            if (openPage) {
-                const frameUrls = yield clickUp.getFrameUrls();
-                const urls = [
-                    issue.web_url,
-                    mergeRequests[mergeRequests.length - 1].web_url,
-                    clickUpTask.url,
-                ];
-                if (frameUrls.length) {
-                    urls.push(frameUrls[0]);
-                }
-                utils_1.openUrlsInTabGroup(urls, issueNumber);
-            }
-            const clickUpChecklistTitle = `GitLab synced checklist [${gitLabProjectId.replace("%2F", "/")}]`;
-            let clickUpChecklist = clickUpTask.checklists.find((c) => c.name === clickUpChecklistTitle);
-            if (!clickUpChecklist) {
-                clickUpChecklist = (yield clickUp.createChecklist(clickUpChecklistTitle))
-                    .checklist;
-            }
-            const clickUpNormalizedChecklist = node_shared_1.normalizeClickUpChecklist(clickUpChecklist.items);
-            const actions = node_shared_1.getSyncChecklistActions(clickUpNormalizedChecklist, gitLabNormalizedChecklist);
-            const checkedCount = gitLabNormalizedChecklist.filter((item) => item.checked).length;
-            const totalCount = gitLabNormalizedChecklist.length;
-            ep.setValueAndEndValue(checkedCount, totalCount);
-            if (actions.update.length + actions.create.length + actions.delete.length ===
-                0) {
-                return;
-            }
-            for (const checklistItem of actions.update) {
-                yield clickUp.updateChecklistItem(clickUpChecklist.id, checklistItem.id, checklistItem.name, checklistItem.checked, checklistItem.order);
-            }
-            for (const checklistItem of actions.create) {
-                yield clickUp.createChecklistItem(clickUpChecklist.id, checklistItem.name, checklistItem.checked, checklistItem.order);
-            }
-            for (const checklistItem of actions.delete) {
-                yield clickUp.deleteChecklistItem(clickUpChecklist.id, checklistItem.id);
-            }
-        }
-    });
-}
-exports.syncChecklist = syncChecklist;
 function configReadline() {
     readline_1.default.emitKeypressEvents(process.stdin);
 }
 exports.configReadline = configReadline;
-function setUpSyncHotkey(gitLabProjectId, issueNumber, ep) {
-    process.stdin.setRawMode(true);
-    process.stdin.resume();
-    process.stdin.on("keypress", (_, key) => tslib_1.__awaiter(this, void 0, void 0, function* () {
-        if (key.ctrl && key.name === "c") {
-            process.exit();
-        }
-        else if (!key.ctrl && !key.meta && !key.shift && key.name === "s") {
-            console.log(`You pressed the sync key`);
-            syncChecklist(gitLabProjectId, issueNumber, ep);
-        }
-        else if (!key.ctrl && !key.meta && !key.shift && key.name === "e") {
-            console.log(`You pressed the end key`);
-            yield syncChecklist(gitLabProjectId, issueNumber, ep);
-            yield end_action_1.endAction();
-            process.exit();
-        }
-    }));
-}
-exports.setUpSyncHotkey = setUpSyncHotkey;
 
 
 /***/ }),
@@ -201,8 +125,8 @@ function checkAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const selectMode = process.argv.includes("-s") || process.argv.includes("--select");
         process.argv = process.argv.filter((a) => a !== "-s" && a !== "--select");
-        const { gitLabProject, issueNumber } = utils_1.getGitLabFromArgv();
-        const checker = new checker_class_1.Checker(gitLabProject, issueNumber, selectMode);
+        const { gitLabProject, mergeRequestIId } = yield utils_1.getInfoFromArgv();
+        const checker = new checker_class_1.Checker(gitLabProject, mergeRequestIId, selectMode);
         yield checker.start();
     });
 }
@@ -234,9 +158,7 @@ function commentAction() {
                 type: "editor",
             },
         ]);
-        const { gitLab, issueNumber } = utils_1.getGitLabFromArgv();
-        const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
-        const mergeRequest = mergeRequests[mergeRequests.length - 1];
+        const { gitLab, mergeRequest } = yield utils_1.getInfoFromArgv();
         yield gitLab.createMergeRequestNote(mergeRequest, answers.content);
     });
 }
@@ -257,21 +179,16 @@ exports.commentAction = commentAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.copyAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const clipboardy_1 = tslib_1.__importDefault(__webpack_require__(/*! clipboardy */ "clipboardy"));
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 function copyAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { gitLab, issueNumber, gitLabProject } = utils_1.getGitLabFromArgv();
-        const issue = yield gitLab.getIssue(issueNumber);
-        const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
-        if (clickUpTaskId) {
-            const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
-            const task = yield clickUp.getTask();
-            const string = `[${issue.title}](${task.url}) [${gitLabProject.name} ${issueNumber}](${issue.web_url})`;
-            clipboardy_1.default.writeSync(string);
-            console.log("Copied!");
-        }
+        const { mergeRequestIId, gitLabProject, mergeRequest, clickUp } = yield utils_1.getInfoFromArgv();
+        const task = yield clickUp.getTask();
+        const name = yield clickUp.getFullTaskName();
+        const string = `[${name}](${task.url}) [${gitLabProject.name} ${mergeRequestIId}](${mergeRequest.web_url})`;
+        clipboardy_1.default.writeSync(string);
+        console.log("Copied!");
     });
 }
 exports.copyAction = copyAction;
@@ -356,38 +273,27 @@ const progress_log_class_1 = __webpack_require__(/*! ../classes/progress-log.cla
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 function endAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { gitLab, issueNumber } = utils_1.getGitLabFromArgv();
+        const { gitLab, mergeRequest, clickUp, clickUpTask, clickUpTaskId } = yield utils_1.getInfoFromArgv();
         const p = new progress_log_class_1.CustomProgressLog("End", [
-            "Get GitLab Issue",
-            "Get GitLab Merge Request",
+            "Check Task is Completed or not",
             "Update GitLab Merge Request Ready Status and Assignee",
             "Update ClickUp Task Status",
             "Close Tab Group",
         ]);
-        p.start();
-        const issue = yield gitLab.getIssue(issueNumber);
-        const gitLabChecklistText = issue.description
-            .replace(/https:\/\/app.clickup.com\/t\/\w+/g, "")
-            .trim();
-        const gitLabNormalizedChecklist = utils_1.normalizeGitLabIssueChecklist(gitLabChecklistText);
-        const fullCompleted = gitLabNormalizedChecklist.every((item) => item.checked);
+        p.next(); // Check Task is Completed or not
+        const targetChecklist = clickUpTask.checklists.find((c) => c.name.toLowerCase().includes("synced checklist"));
+        const clickUpNormalizedChecklist = node_shared_1.normalizeClickUpChecklist(targetChecklist.items);
+        const fullCompleted = clickUpNormalizedChecklist.every((item) => item.checked);
         if (!fullCompleted) {
             console.log("This task has uncompleted todo(s).");
             process.exit();
         }
-        p.next();
-        const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
-        const mergeRequest = mergeRequests[mergeRequests.length - 1];
-        p.next();
+        p.next(); // Update GitLab Merge Request Ready Status and Assignee
         yield gitLab.markMergeRequestAsReadyAndAddAssignee(mergeRequest);
-        p.next();
-        const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
-        if (clickUpTaskId) {
-            const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
-            yield clickUp.setTaskStatus("in review");
-        }
-        p.next();
-        utils_1.openUrlsInTabGroup([], issueNumber);
+        p.next(); // Update ClickUp Task Status
+        yield clickUp.setTaskStatus("in review");
+        p.next(); // Close Tab Group
+        utils_1.openUrlsInTabGroup([], clickUpTaskId);
         p.end(0);
     });
 }
@@ -408,14 +314,11 @@ exports.endAction = endAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.listAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const gitlab_class_1 = __webpack_require__(/*! ../../../../libs/node-shared/src/lib/classes/gitlab.class */ "./libs/node-shared/src/lib/classes/gitlab.class.ts");
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 function listAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { gitLabProject, issueNumber } = utils_1.getGitLabFromArgv();
-        const gitLab = new gitlab_class_1.GitLab(gitLabProject.id);
-        const issue = yield gitLab.getIssue(issueNumber);
-        console.log(issue.title);
+        const { clickUp } = yield utils_1.getInfoFromArgv();
+        console.log(clickUp.getFullTaskName());
     });
 }
 exports.listAction = listAction;
@@ -566,28 +469,20 @@ exports.myTasksAction = myTasksAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.openAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 function openAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { gitLab, issueNumber } = utils_1.getGitLabFromArgv();
-        const issue = yield gitLab.getIssue(issueNumber);
-        const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
-        const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
-        if (clickUpTaskId) {
-            const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
-            const clickUpTask = yield clickUp.getTask();
-            const frameUrls = yield clickUp.getFrameUrls();
-            const urls = [
-                issue.web_url,
-                mergeRequests[mergeRequests.length - 1].web_url,
-                clickUpTask.url,
-            ];
-            if (frameUrls.length) {
-                urls.push(frameUrls[0]);
-            }
-            utils_1.openUrlsInTabGroup(urls, issueNumber);
+        const { mergeRequest, clickUp, clickUpTask, clickUpTaskId } = yield utils_1.getInfoFromArgv();
+        const frameUrls = yield clickUp.getFrameUrls();
+        const urls = [
+            mergeRequest.web_url,
+            clickUpTask.url,
+            `localhost:8112/task/${clickUpTaskId}`,
+        ];
+        if (frameUrls.length) {
+            urls.push(frameUrls[0]);
         }
+        utils_1.openUrlsInTabGroup(urls, clickUpTaskId);
     });
 }
 exports.openAction = openAction;
@@ -607,31 +502,19 @@ exports.openAction = openAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.revertEndAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const progress_log_class_1 = __webpack_require__(/*! ../classes/progress-log.class */ "./apps/cli/src/classes/progress-log.class.ts");
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 function revertEndAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { gitLab, issueNumber } = utils_1.getGitLabFromArgv();
+        const { gitLab, mergeRequest, clickUp } = yield utils_1.getInfoFromArgv();
         const p = new progress_log_class_1.CustomProgressLog("End", [
-            "Get GitLab Issue",
-            "Get GitLab Merge Request",
             "Update GitLab Merge Request Ready Status and Assignee",
             "Update ClickUp Task Status",
         ]);
         p.start();
-        const issue = yield gitLab.getIssue(issueNumber);
-        p.next();
-        const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
-        const mergeRequest = mergeRequests[mergeRequests.length - 1];
-        p.next();
         yield gitLab.markMergeRequestAsUnreadyAndSetAssigneeToSelf(mergeRequest);
         p.next();
-        const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
-        if (clickUpTaskId) {
-            const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
-            yield clickUp.setTaskStatus("in progress");
-        }
+        yield clickUp.setTaskStatus("in progress");
         p.end(0);
     });
 }
@@ -682,14 +565,10 @@ exports.RTVTasksAction = RTVTasksAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.showDiffAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 function showDiffAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { gitLabProject, issueNumber } = utils_1.getGitLabFromArgv();
-        const gitLab = new node_shared_1.GitLab(gitLabProject.id);
-        const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
-        const mergeRequest = mergeRequests[mergeRequests.length - 1];
+        const { gitLab, mergeRequest } = yield utils_1.getInfoFromArgv();
         const mergeRequestChanges = yield gitLab.getMergeRequestChanges(mergeRequest.iid);
         const changes = mergeRequestChanges.changes;
         const templateChanges = changes.filter((c) => c.new_path.endsWith(".html"));
@@ -727,6 +606,7 @@ const daily_progress_class_1 = __webpack_require__(/*! ../classes/daily-progress
 const progress_log_class_1 = __webpack_require__(/*! ../classes/progress-log.class */ "./apps/cli/src/classes/progress-log.class.ts");
 const tracker_class_1 = __webpack_require__(/*! ../classes/tracker.class */ "./apps/cli/src/classes/tracker.class.ts");
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+const open_action_1 = __webpack_require__(/*! ./open.action */ "./apps/cli/src/actions/open.action.ts");
 function startAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const answers = yield inquirer_1.default.prompt([
@@ -820,7 +700,7 @@ function startAction() {
         const gitLabMergeRequest = yield gitLab.createMergeRequest(gitLabMergeRequestTitle, gitLabBranch.name);
         const gitLabMergeRequestIId = gitLabMergeRequest.iid;
         p.next(); // Create Checklist at ClickUp
-        const clickUpChecklistTitle = `Synced checklist [${answers.gitLabProject.id.replace("%2F", "/")} @${gitLabMergeRequestIId}]`;
+        const clickUpChecklistTitle = `Synced checklist [${answers.gitLabProject.id.replace("%2F", "/")} !${gitLabMergeRequestIId}]`;
         let clickUpChecklist = clickUpTask.checklists.find((c) => c.name === clickUpChecklistTitle);
         if (!clickUpChecklist) {
             clickUpChecklist = (yield clickUp.createChecklist(clickUpChecklistTitle))
@@ -856,6 +736,7 @@ function startAction() {
         yield node_shared_1.sleep(1000);
         yield utils_1.promiseSpawn("git", ["checkout", gitLabBranch.name], "pipe");
         yield utils_1.promiseSpawn("git", ["submodule", "update", "--init", "--recursive"], "pipe");
+        yield open_action_1.openAction();
         p.end(0);
     });
 }
@@ -864,33 +745,27 @@ exports.startAction = startAction;
 
 /***/ }),
 
-/***/ "./apps/cli/src/actions/sync.action.ts":
-/*!*********************************************!*\
-  !*** ./apps/cli/src/actions/sync.action.ts ***!
-  \*********************************************/
+/***/ "./apps/cli/src/actions/switch.action.ts":
+/*!***********************************************!*\
+  !*** ./apps/cli/src/actions/switch.action.ts ***!
+  \***********************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.syncAction = void 0;
+exports.switchAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const child_process_1 = __webpack_require__(/*! child_process */ "child_process");
 const os_1 = tslib_1.__importDefault(__webpack_require__(/*! os */ "os"));
-const dynamic_1 = __webpack_require__(/*! set-interval-async/dynamic */ "set-interval-async/dynamic");
 const actions_1 = __webpack_require__(/*! ../actions */ "./apps/cli/src/actions.ts");
-const emoji_progress_class_1 = __webpack_require__(/*! ../classes/emoji-progress.class */ "./apps/cli/src/classes/emoji-progress.class.ts");
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
-function syncAction() {
+function switchAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         actions_1.configReadline();
-        const { gitLab, gitLabProject, issueNumber } = utils_1.getGitLabFromArgv();
-        const gitLabProjectId = gitLabProject.id;
-        const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
-        const lastMergeRequest = mergeRequests[mergeRequests.length - 1];
-        if (lastMergeRequest.state === "merged") {
+        const { gitLabProject, mergeRequest } = yield utils_1.getInfoFromArgv();
+        if (mergeRequest.state === "merged") {
             console.log("This task is completed.");
             return;
         }
@@ -898,24 +773,17 @@ function syncAction() {
         const branchName = child_process_1.execSync("git branch --show-current", {
             encoding: "utf-8",
         });
-        if (branchName.trim() !== lastMergeRequest.source_branch) {
+        if (branchName.trim() !== mergeRequest.source_branch) {
             const isClean = yield utils_1.checkWorkingTreeClean();
             if (!isClean) {
                 console.log("\nWorking tree is not clean or something is not pushed. Aborted.");
                 process.exit();
             }
-            yield utils_1.promiseSpawn("git", ["checkout", lastMergeRequest.source_branch], "pipe");
+            yield utils_1.promiseSpawn("git", ["checkout", mergeRequest.source_branch], "pipe");
         }
-        console.log(`${gitLabProject.name} ${issueNumber}`);
-        const ep = new emoji_progress_class_1.CustomEmojiProgress(100, 100);
-        actions_1.setUpSyncHotkey(gitLabProjectId, issueNumber, ep);
-        yield actions_1.syncChecklist(gitLabProjectId, issueNumber, ep, true);
-        dynamic_1.setIntervalAsync(() => tslib_1.__awaiter(this, void 0, void 0, function* () {
-            yield actions_1.syncChecklist(gitLabProjectId, issueNumber, ep, false);
-        }), node_shared_1.CONFIG.SyncIntervalInMinutes * 60 * 1000);
     });
 }
-exports.syncAction = syncAction;
+exports.switchAction = switchAction;
 
 
 /***/ }),
@@ -1238,18 +1106,17 @@ const SPINNER = [
     "🕚",
 ];
 class Checker {
-    constructor(gitLabProject, issueNumber, selectMode) {
+    constructor(gitLabProject, mergeRequestIId, selectMode) {
         this.gitLabProject = gitLabProject;
-        this.issueNumber = issueNumber;
+        this.mergeRequestIId = mergeRequestIId;
         this.selectMode = selectMode;
         this.gitLabProjectId = this.gitLabProject.id;
         this.gitLab = new node_shared_1.GitLab(this.gitLabProjectId);
     }
     start() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const mergeRequests = yield this.gitLab.listMergeRequestsWillCloseIssueOnMerge(this.issueNumber);
-            const mergeRequest = mergeRequests[mergeRequests.length - 1];
-            const mergeRequestChanges = yield this.gitLab.getMergeRequestChanges(mergeRequest.iid);
+            const mergeRequest = yield this.gitLab.getMergeRequest(this.mergeRequestIId);
+            const mergeRequestChanges = yield this.gitLab.getMergeRequestChanges(this.mergeRequestIId);
             process.chdir(this.gitLabProject.path.replace("~", os_1.default.homedir()));
             yield utils_1.promiseSpawn("git", ["checkout", mergeRequest.source_branch], "pipe");
             const changes = mergeRequestChanges.changes;
@@ -1513,8 +1380,8 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
             this.trackTask();
         }, node_shared_1.CONFIG.TrackIntervalInMinutes * 60 * 1000);
     }
-    addItem(projectName, issueNumber) {
-        fs_1.appendFileSync(this.path, `\n${projectName} ${issueNumber}`);
+    addItem(projectName, mergeRequestIId) {
+        fs_1.appendFileSync(this.path, `\n${projectName} ${mergeRequestIId}`);
     }
     getItems() {
         const content = this.readFile();
@@ -1546,27 +1413,27 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
                     break;
                 }
             }
-            return Promise.all(this.getItems().map(([projectName, issueNumber]) => this.trackSingle(projectName, issueNumber)));
+            return Promise.all(this.getItems().map(([projectName, mergeRequestIId]) => this.trackSingle(projectName, mergeRequestIId)));
         });
     }
-    trackSingle(projectName, issueNumber) {
+    trackSingle(projectName, mergeRequestIId) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const projectConfig = utils_1.getGitLabProjectConfigByName(projectName);
             if (!(projectConfig === null || projectConfig === void 0 ? void 0 : projectConfig.deployedStatus) && !(projectConfig === null || projectConfig === void 0 ? void 0 : projectConfig.stagingStatus)) {
                 return;
             }
             const gitLab = new node_shared_1.GitLab(projectConfig.id);
-            const issue = yield gitLab.getIssue(issueNumber);
-            const clickUpTaskId = utils_1.getClickUpTaskIdFromGitLabIssue(issue);
-            if (!clickUpTaskId) {
-                return;
+            const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
+            const branchName = mergeRequest.source_branch;
+            const match = branchName.match(/CU-(\S+)/);
+            if (!match) {
+                throw Error("Cannot get task number from branch");
             }
+            const clickUpTaskId = match[1];
             const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
-            const mergeRequests = yield gitLab.listMergeRequestsWillCloseIssueOnMerge(issueNumber);
-            const mergeRequest = yield gitLab.getMergeRequest(mergeRequests[mergeRequests.length - 1].iid);
             const clickUpTask = yield clickUp.getTask();
             if (["closed", "verified", "ready to verify", "done"].includes(clickUpTask.status.status.toLowerCase())) {
-                this.closeItem(projectName, issueNumber);
+                this.closeItem(projectName, mergeRequestIId);
                 return;
             }
             if (projectConfig.stagingStatus && mergeRequest.state === "merged") {
@@ -1582,13 +1449,13 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
                         yield clickUp.setTaskStatus(stagingStatus);
                     }
                     if (stagingStatus === "verified") {
-                        this.closeItem(projectName, issueNumber);
+                        this.closeItem(projectName, mergeRequestIId);
                     }
-                    const message = `${projectName} #${issueNumber}: In Review -> ${stagingStatus}`;
+                    const message = `${projectName} !${mergeRequestIId}: In Review -> ${stagingStatus}`;
                     child_process_1.default.execSync(`osascript -e 'display notification "${message}" with title "Accel Shooter"'`);
                     console.log(message);
                     if (!projectConfig.deployedStatus) {
-                        this.closeItem(projectName, issueNumber);
+                        this.closeItem(projectName, mergeRequestIId);
                     }
                 }
                 if (projectConfig.deployedStatus &&
@@ -1603,8 +1470,8 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
                         const deployedStatus = projectConfig.deployedStatus[list.name] ||
                             projectConfig.deployedStatus["*"];
                         yield clickUp.setTaskStatus(deployedStatus);
-                        this.closeItem(projectName, issueNumber);
-                        const message = `${projectName} #${issueNumber} (Under List ${list.name}): Staging -> ${deployedStatus}`;
+                        this.closeItem(projectName, mergeRequestIId);
+                        const message = `${projectName} !${mergeRequestIId} (Under List ${list.name}): Staging -> ${deployedStatus}`;
                         node_notifier_1.default.notify({
                             title: "Accel Shooter",
                             message,
@@ -1615,12 +1482,12 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
             }
         });
     }
-    closeItem(projectName, issueNumber) {
+    closeItem(projectName, mergeRequestIId) {
         const content = this.readFile();
         const lines = content
             .split("\n")
             .filter(Boolean)
-            .filter((line) => line !== `${projectName} ${issueNumber}`);
+            .filter((line) => line !== `${projectName} ${mergeRequestIId}`);
         this.writeFile(lines.join("\n"));
     }
 }
@@ -1774,7 +1641,7 @@ const revert_end_action_1 = __webpack_require__(/*! ./actions/revert-end.action 
 const rtv_tasks_action_1 = __webpack_require__(/*! ./actions/rtv-tasks.action */ "./apps/cli/src/actions/rtv-tasks.action.ts");
 const show_diff_action_1 = __webpack_require__(/*! ./actions/show-diff.action */ "./apps/cli/src/actions/show-diff.action.ts");
 const start_action_1 = __webpack_require__(/*! ./actions/start.action */ "./apps/cli/src/actions/start.action.ts");
-const sync_action_1 = __webpack_require__(/*! ./actions/sync.action */ "./apps/cli/src/actions/sync.action.ts");
+const switch_action_1 = __webpack_require__(/*! ./actions/switch.action */ "./apps/cli/src/actions/switch.action.ts");
 const time_action_1 = __webpack_require__(/*! ./actions/time.action */ "./apps/cli/src/actions/time.action.ts");
 const to_do_action_1 = __webpack_require__(/*! ./actions/to-do.action */ "./apps/cli/src/actions/to-do.action.ts");
 const track_action_1 = __webpack_require__(/*! ./actions/track.action */ "./apps/cli/src/actions/track.action.ts");
@@ -1782,7 +1649,7 @@ const update_action_1 = __webpack_require__(/*! ./actions/update.action */ "./ap
 const actions = {
     start: start_action_1.startAction,
     open: open_action_1.openAction,
-    sync: sync_action_1.syncAction,
+    switch: switch_action_1.switchAction,
     update: update_action_1.updateAction,
     track: track_action_1.trackAction,
     end: end_action_1.endAction,
@@ -1821,26 +1688,13 @@ const actions = {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTaskProgress = exports.openUrlsInTabGroup = exports.checkWorkingTreeClean = exports.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId = exports.getGitLabFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabIssue = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = exports.normalizeGitLabIssueChecklist = void 0;
+exports.getTaskProgress = exports.openUrlsInTabGroup = exports.checkWorkingTreeClean = exports.getInfoFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabMergeRequest = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const child_process_1 = tslib_1.__importStar(__webpack_require__(/*! child_process */ "child_process"));
 const open_1 = tslib_1.__importDefault(__webpack_require__(/*! open */ "open"));
 const qs_1 = tslib_1.__importDefault(__webpack_require__(/*! qs */ "qs"));
 const case_utils_1 = __webpack_require__(/*! ./case-utils */ "./apps/cli/src/case-utils.ts");
-function normalizeGitLabIssueChecklist(checklistText) {
-    return checklistText
-        .split("\n")
-        .filter((line) => line && (line.includes("- [ ]") || line.includes("- [x]")))
-        .map((line, index) => ({
-        name: line
-            .replace(/- \[[x ]\] /g, "")
-            .replace(/^ +/, (space) => space.replace(/ /g, "-")),
-        checked: /- \[x\]/.test(line),
-        order: index,
-    }));
-}
-exports.normalizeGitLabIssueChecklist = normalizeGitLabIssueChecklist;
 function promiseSpawn(command, args, stdio = "inherit") {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
@@ -1882,12 +1736,12 @@ function getGitLabProjectConfigById(inputId) {
     return node_shared_1.CONFIG.GitLabProjects.find(({ id }) => id === inputId);
 }
 exports.getGitLabProjectConfigById = getGitLabProjectConfigById;
-function getClickUpTaskIdFromGitLabIssue(issue) {
-    const description = issue.description;
-    const result = description.match(/https:\/\/app.clickup.com\/t\/(\w+)/);
+function getClickUpTaskIdFromGitLabMergeRequest(mergeRequest) {
+    const branchName = mergeRequest.source_branch;
+    const result = branchName.match(/CU-([\S]+)/);
     return result ? result[1] : null;
 }
-exports.getClickUpTaskIdFromGitLabIssue = getClickUpTaskIdFromGitLabIssue;
+exports.getClickUpTaskIdFromGitLabMergeRequest = getClickUpTaskIdFromGitLabMergeRequest;
 const dpItemRegex = /\* \([A-Za-z0-9 %]+\) \[.*?\]\(https:\/\/app.clickup.com\/t\/(\w+)\)/g;
 function updateTaskStatusInDp(dp) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -1908,41 +1762,69 @@ function updateTaskStatusInDp(dp) {
     });
 }
 exports.updateTaskStatusInDp = updateTaskStatusInDp;
-function getGitLabFromArgv() {
-    if (process.argv.length === 3) {
-        const directory = child_process_1.execSync("pwd", { encoding: "utf-8" });
-        const gitLabProject = node_shared_1.CONFIG.GitLabProjects.find((p) => directory.startsWith(p.path));
-        if (!gitLabProject) {
-            throw Error("No such project");
+function getInfoFromArgv() {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        if (process.argv.length === 3) {
+            const directory = child_process_1.execSync("pwd", { encoding: "utf-8" });
+            const gitLabProject = node_shared_1.CONFIG.GitLabProjects.find((p) => directory.startsWith(p.path));
+            if (!gitLabProject) {
+                throw Error("No such project");
+            }
+            const branchName = child_process_1.execSync("git branch --show-current", {
+                encoding: "utf-8",
+            });
+            const match = branchName.match(/CU-(\S+)/);
+            if (!match) {
+                throw Error("Cannot get task number from branch");
+            }
+            const clickUpTaskId = match[1];
+            const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
+            const clickUpTask = yield clickUp.getTask();
+            const mergeRequestIId = yield clickUp.getGitLabMergeRequestIId();
+            const gitLab = new node_shared_1.GitLab(gitLabProject.id);
+            const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
+            return {
+                gitLab,
+                gitLabProject,
+                mergeRequestIId,
+                mergeRequest,
+                clickUp,
+                clickUpTaskId,
+                clickUpTask,
+            };
         }
-        const branchName = child_process_1.execSync("git branch --show-current", {
-            encoding: "utf-8",
-        });
-        const match = branchName.match(/^[0-9]+/);
-        if (!match) {
-            throw Error("Cannot get issue number from branch");
+        else {
+            const gitLabProject = getGitLabProjectFromArgv();
+            if (!gitLabProject) {
+                throw Error("No such project");
+            }
+            const gitLab = new node_shared_1.GitLab(gitLabProject.id);
+            const mergeRequestIId = process.argv[4];
+            const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
+            const branchName = mergeRequest.source_branch;
+            const match = branchName.match(/CU-(\S+)/);
+            if (!match) {
+                throw Error("Cannot get task number from branch");
+            }
+            const clickUpTaskId = match[1];
+            const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
+            const clickUpTask = yield clickUp.getTask();
+            return {
+                gitLab,
+                gitLabProject,
+                mergeRequestIId,
+                mergeRequest,
+                clickUp,
+                clickUpTaskId,
+                clickUpTask,
+            };
         }
-        const issueNumber = match[0];
-        const gitLab = new node_shared_1.GitLab(gitLabProject.id);
-        return { gitLab, gitLabProject, issueNumber };
-    }
-    else {
-        const gitLabProject = getGitLabProjectFromArgv();
-        if (!gitLabProject) {
-            throw Error("No such project");
-        }
-        const gitLab = new node_shared_1.GitLab(gitLabProject.id);
-        return { gitLab, gitLabProject, issueNumber: process.argv[4] };
-    }
+    });
 }
-exports.getGitLabFromArgv = getGitLabFromArgv;
+exports.getInfoFromArgv = getInfoFromArgv;
 function getGitLabProjectFromArgv() {
     return getGitLabProjectConfigByName(process.argv[3]);
 }
-function getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(issueNumber, clickUpTaskId) {
-    return `${issueNumber}_CU-${clickUpTaskId}`;
-}
-exports.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId = getGitLabBranchNameFromIssueNumberAndTitleAndTaskId;
 function checkWorkingTreeClean() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const result = yield promiseSpawn("git", ["status"], "pipe");
@@ -2102,6 +1984,28 @@ class ClickUp {
             return frameUrls;
         });
     }
+    getGitLabMergeRequestIId() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const task = yield this.getTask();
+            const clickUpChecklist = task.checklists.find((c) => c.name.toLowerCase().includes("synced checklist"));
+            const match = clickUpChecklist.name.match(/!([\d]+)/);
+            if (match) {
+                return match[1];
+            }
+            return null;
+        });
+    }
+    getFullTaskName() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            let task = yield this.getTask();
+            let result = task.name;
+            while (task.parent) {
+                task = yield new ClickUp(task.parent).getTask();
+                result = `${task.name} - ${result}`;
+            }
+            return result;
+        });
+    }
 }
 exports.ClickUp = ClickUp;
 
@@ -2136,9 +2040,6 @@ class GitLab {
             return project.default_branch;
         });
     }
-    getIssue(issueNumber) {
-        return callApi("get", `/projects/${this.projectId}/issues/${issueNumber}`);
-    }
     getOpenedMergeRequests() {
         return callApi("get", `/projects/${this.projectId}/merge_requests`, { state: "opened", per_page: "100" });
     }
@@ -2159,14 +2060,6 @@ class GitLab {
             username: config_1.CONFIG.EndingAssignee,
         }).then((users) => users[0]);
     }
-    listProjectLabels() {
-        return callApi("get", `/projects/${this.projectId}/labels`, {
-            per_page: 100,
-        });
-    }
-    listMergeRequestsWillCloseIssueOnMerge(issueNumber) {
-        return callApi("get", `/projects/${this.projectId}/issues/${issueNumber}/closed_by`);
-    }
     listPipelineJobs(pipelineId) {
         return callApi("get", `/projects/${this.projectId}/pipelines/${pipelineId}/jobs`);
     }
@@ -2181,15 +2074,6 @@ class GitLab {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             query.ref = query.ref || (yield this.getDefaultBranchName());
             return callApi("get", `/projects/${this.projectId}/pipelines/`, query);
-        });
-    }
-    createIssue(title, description) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            return callApi("post", `/projects/${this.projectId}/issues`, null, {
-                title: title,
-                description: description,
-                assignee_ids: yield this.getUserId(),
-            });
         });
     }
     createBranch(branch) {
@@ -2311,20 +2195,6 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/models/gitlab/issue.models.ts":
-/*!****************************************************************!*\
-  !*** ./libs/node-shared/src/lib/models/gitlab/issue.models.ts ***!
-  \****************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-
-
-/***/ }),
-
 /***/ "./libs/node-shared/src/lib/models/gitlab/job.models.ts":
 /*!**************************************************************!*\
   !*** ./libs/node-shared/src/lib/models/gitlab/job.models.ts ***!
@@ -2377,7 +2247,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sleep = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.GitLabProject = exports.Change = exports.Job = exports.Issue = exports.Task = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.GitLab = exports.ClickUp = void 0;
+exports.sleep = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Task = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.GitLab = exports.ClickUp = void 0;
 var clickup_class_1 = __webpack_require__(/*! ./classes/clickup.class */ "./libs/node-shared/src/lib/classes/clickup.class.ts");
 Object.defineProperty(exports, "ClickUp", { enumerable: true, get: function () { return clickup_class_1.ClickUp; } });
 var gitlab_class_1 = __webpack_require__(/*! ./classes/gitlab.class */ "./libs/node-shared/src/lib/classes/gitlab.class.ts");
@@ -2389,12 +2259,11 @@ var checklist_models_1 = __webpack_require__(/*! ./models/clickup/checklist.mode
 Object.defineProperty(exports, "ChecklistItem", { enumerable: true, get: function () { return checklist_models_1.ChecklistItem; } });
 var task_models_1 = __webpack_require__(/*! ./models/clickup/task.models */ "./libs/node-shared/src/lib/models/clickup/task.models.ts");
 Object.defineProperty(exports, "Task", { enumerable: true, get: function () { return task_models_1.Task; } });
-var issue_models_1 = __webpack_require__(/*! ./models/gitlab/issue.models */ "./libs/node-shared/src/lib/models/gitlab/issue.models.ts");
-Object.defineProperty(exports, "Issue", { enumerable: true, get: function () { return issue_models_1.Issue; } });
 var job_models_1 = __webpack_require__(/*! ./models/gitlab/job.models */ "./libs/node-shared/src/lib/models/gitlab/job.models.ts");
 Object.defineProperty(exports, "Job", { enumerable: true, get: function () { return job_models_1.Job; } });
 var merge_request_models_1 = __webpack_require__(/*! ./models/gitlab/merge-request.models */ "./libs/node-shared/src/lib/models/gitlab/merge-request.models.ts");
 Object.defineProperty(exports, "Change", { enumerable: true, get: function () { return merge_request_models_1.Change; } });
+Object.defineProperty(exports, "FullMergeRequest", { enumerable: true, get: function () { return merge_request_models_1.FullMergeRequest; } });
 var models_1 = __webpack_require__(/*! ./models/models */ "./libs/node-shared/src/lib/models/models.ts");
 Object.defineProperty(exports, "GitLabProject", { enumerable: true, get: function () { return models_1.GitLabProject; } });
 Object.defineProperty(exports, "NormalizedChecklist", { enumerable: true, get: function () { return models_1.NormalizedChecklist; } });
@@ -2810,17 +2679,6 @@ module.exports = require("rxjs");
 /***/ (function(module, exports) {
 
 module.exports = require("rxjs/operators");
-
-/***/ }),
-
-/***/ "set-interval-async/dynamic":
-/*!*********************************************!*\
-  !*** external "set-interval-async/dynamic" ***!
-  \*********************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("set-interval-async/dynamic");
 
 /***/ }),
 

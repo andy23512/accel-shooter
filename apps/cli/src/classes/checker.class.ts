@@ -29,7 +29,7 @@ export class Checker {
 
   constructor(
     private gitLabProject: GitLabProject,
-    private issueNumber: string,
+    private mergeRequestIId: string,
     private selectMode: boolean
   ) {
     this.gitLabProjectId = this.gitLabProject.id;
@@ -37,13 +37,11 @@ export class Checker {
   }
 
   public async start() {
-    const mergeRequests =
-      await this.gitLab.listMergeRequestsWillCloseIssueOnMerge(
-        this.issueNumber
-      );
-    const mergeRequest = mergeRequests[mergeRequests.length - 1];
+    const mergeRequest = await this.gitLab.getMergeRequest(
+      this.mergeRequestIId
+    );
     const mergeRequestChanges = await this.gitLab.getMergeRequestChanges(
-      mergeRequest.iid
+      this.mergeRequestIId
     );
     process.chdir(this.gitLabProject.path.replace("~", os.homedir()));
     await promiseSpawn("git", ["checkout", mergeRequest.source_branch], "pipe");

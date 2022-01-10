@@ -147,4 +147,26 @@ export class ClickUp {
     }
     return frameUrls;
   }
+
+  public async getGitLabMergeRequestIId() {
+    const task = await this.getTask();
+    const clickUpChecklist = task.checklists.find((c) =>
+      c.name.toLowerCase().includes("synced checklist")
+    );
+    const match = clickUpChecklist.name.match(/!([\d]+)/);
+    if (match) {
+      return match[1];
+    }
+    return null;
+  }
+
+  public async getFullTaskName() {
+    let task = await this.getTask();
+    let result = task.name;
+    while (task.parent) {
+      task = await new ClickUp(task.parent).getTask();
+      result = `${task.name} - ${result}`;
+    }
+    return result;
+  }
 }

@@ -1,13 +1,7 @@
-import { GitLab } from "@accel-shooter/node-shared";
-import { getGitLabFromArgv } from "../utils";
+import { getInfoFromArgv } from "../utils";
 
 export async function showDiffAction() {
-  const { gitLabProject, issueNumber } = getGitLabFromArgv();
-  const gitLab = new GitLab(gitLabProject.id);
-  const mergeRequests = await gitLab.listMergeRequestsWillCloseIssueOnMerge(
-    issueNumber
-  );
-  const mergeRequest = mergeRequests[mergeRequests.length - 1];
+  const { gitLab, mergeRequest } = await getInfoFromArgv();
   const mergeRequestChanges = await gitLab.getMergeRequestChanges(
     mergeRequest.iid
   );

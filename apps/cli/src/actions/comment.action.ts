@@ -1,5 +1,5 @@
 import inquirer from "inquirer";
-import { getGitLabFromArgv } from "../utils";
+import { getInfoFromArgv } from "../utils";
 
 export async function commentAction() {
   const answers = await inquirer.prompt([
@@ -9,10 +9,6 @@ export async function commentAction() {
       type: "editor",
     },
   ]);
-  const { gitLab, issueNumber } = getGitLabFromArgv();
-  const mergeRequests = await gitLab.listMergeRequestsWillCloseIssueOnMerge(
-    issueNumber
-  );
-  const mergeRequest = mergeRequests[mergeRequests.length - 1];
+  const { gitLab, mergeRequest } = await getInfoFromArgv();
   await gitLab.createMergeRequestNote(mergeRequest, answers.content);
 }

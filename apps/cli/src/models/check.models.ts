@@ -1,9 +1,7 @@
-import { GitLab } from "../../../../libs/node-shared/src/lib/classes/gitlab.class";
-import { MergeRequest } from "../../../../libs/node-shared/src/lib/models/gitlab.models";
-import { Change } from "../../../../libs/node-shared/src/lib/models/gitlab/merge-request.models";
+import { Change, FullMergeRequest, GitLab } from "@accel-shooter/node-shared";
 
 export interface CheckContext {
-  mergeRequest: MergeRequest;
+  mergeRequest: FullMergeRequest;
   gitLab: GitLab;
   frontendChanges: Change[];
   backendChanges: Change[];

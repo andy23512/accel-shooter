@@ -17,6 +17,7 @@ import { DailyProgress } from "../classes/daily-progress.class";
 import { CustomProgressLog } from "../classes/progress-log.class";
 import { Tracker } from "../classes/tracker.class";
 import { checkWorkingTreeClean, promiseSpawn } from "../utils";
+import { openAction } from "./open.action";
 
 export async function startAction() {
   const answers = await inquirer.prompt([
@@ -116,7 +117,7 @@ export async function startAction() {
   const clickUpChecklistTitle = `Synced checklist [${answers.gitLabProject.id.replace(
     "%2F",
     "/"
-  )} @${gitLabMergeRequestIId}]`;
+  )} !${gitLabMergeRequestIId}]`;
   let clickUpChecklist = clickUpTask.checklists.find(
     (c) => c.name === clickUpChecklistTitle
   );
@@ -179,5 +180,6 @@ export async function startAction() {
     ["submodule", "update", "--init", "--recursive"],
     "pipe"
   );
+  await openAction();
   p.end(0);
 }

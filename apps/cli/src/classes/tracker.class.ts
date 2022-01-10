@@ -4,10 +4,7 @@ import { compareAsc, parseISO } from "date-fns";
 import { appendFileSync } from "fs";
 import nodeNotifier from "node-notifier";
 import untildify from "untildify";
-import {
-  getClickUpTaskIdFromGitLabIssue,
-  getGitLabProjectConfigByName,
-} from "../utils";
+import { getGitLabProjectConfigByName } from "../utils";
 import { BaseFileRef } from "./base-file-ref.class";
 
 export class Tracker extends BaseFileRef {
@@ -23,8 +20,8 @@ export class Tracker extends BaseFileRef {
     }, CONFIG.TrackIntervalInMinutes * 60 * 1000);
   }
 
-  public addItem(projectName: string, issueNumber: string | number) {
-    appendFileSync(this.path, `\n${projectName} ${issueNumber}`);
+  public addItem(projectName: string, mergeRequestIId: string | number) {
+    appendFileSync(this.path, `\n${projectName} ${mergeRequestIId}`);
   }
 
   public getItems() {
@@ -60,37 +57,33 @@ export class Tracker extends BaseFileRef {
       }
     }
     return Promise.all(
-      this.getItems().map(([projectName, issueNumber]) =>
-        this.trackSingle(projectName, issueNumber)
+      this.getItems().map(([projectName, mergeRequestIId]) =>
+        this.trackSingle(projectName, mergeRequestIId)
       )
     );
   }
 
-  public async trackSingle(projectName: string, issueNumber: string) {
+  public async trackSingle(projectName: string, mergeRequestIId: string) {
     const projectConfig = getGitLabProjectConfigByName(projectName);
     if (!projectConfig?.deployedStatus && !projectConfig?.stagingStatus) {
       return;
     }
     const gitLab = new GitLab(projectConfig.id);
-    const issue = await gitLab.getIssue(issueNumber);
-    const clickUpTaskId = getClickUpTaskIdFromGitLabIssue(issue);
-    if (!clickUpTaskId) {
-      return;
+    const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
+    const branchName = mergeRequest.source_branch;
+    const match = branchName.match(/CU-(\S+)/);
+    if (!match) {
+      throw Error("Cannot get task number from branch");
     }
+    const clickUpTaskId = match[1];
     const clickUp = new ClickUp(clickUpTaskId);
-    const mergeRequests = await gitLab.listMergeRequestsWillCloseIssueOnMerge(
-      issueNumber
-    );
-    const mergeRequest = await gitLab.getMergeRequest(
-      mergeRequests[mergeRequests.length - 1].iid
-    );
     const clickUpTask = await clickUp.getTask();
     if (
       ["closed", "verified", "ready to verify", "done"].includes(
         clickUpTask.status.status.toLowerCase()
       )
     ) {
-      this.closeItem(projectName, issueNumber);
+      this.closeItem(projectName, mergeRequestIId);
       return;
     }
     if (projectConfig.stagingStatus && mergeRequest.state === "merged") {
@@ -108,15 +101,15 @@ export class Tracker extends BaseFileRef {
           await clickUp.setTaskStatus(stagingStatus);
         }
         if (stagingStatus === "verified") {
-          this.closeItem(projectName, issueNumber);
+          this.closeItem(projectName, mergeRequestIId);
         }
-        const message = `${projectName} #${issueNumber}: In Review -> ${stagingStatus}`;
+        const message = `${projectName} !${mergeRequestIId}: In Review -> ${stagingStatus}`;
         childProcess.execSync(
           `osascript -e 'display notification "${message}" with title "Accel Shooter"'`
         );
         console.log(message);
         if (!projectConfig.deployedStatus) {
-          this.closeItem(projectName, issueNumber);
+          this.closeItem(projectName, mergeRequestIId);
         }
       }
       if (
@@ -136,8 +129,8 @@ export class Tracker extends BaseFileRef {
             projectConfig.deployedStatus[list.name] ||
             projectConfig.deployedStatus["*"];
           await clickUp.setTaskStatus(deployedStatus);
-          this.closeItem(projectName, issueNumber);
-          const message = `${projectName} #${issueNumber} (Under List ${list.name}): Staging -> ${deployedStatus}`;
+          this.closeItem(projectName, mergeRequestIId);
+          const message = `${projectName} !${mergeRequestIId} (Under List ${list.name}): Staging -> ${deployedStatus}`;
           nodeNotifier.notify({
             title: "Accel Shooter",
             message,
@@ -148,12 +141,12 @@ export class Tracker extends BaseFileRef {
     }
   }
 
-  public closeItem(projectName: string, issueNumber: string) {
+  public closeItem(projectName: string, mergeRequestIId: string) {
     const content = this.readFile();
     const lines = content
       .split("\n")
       .filter(Boolean)
-      .filter((line) => line !== `${projectName} ${issueNumber}`);
+      .filter((line) => line !== `${projectName} ${mergeRequestIId}`);
     this.writeFile(lines.join("\n"));
   }
 }

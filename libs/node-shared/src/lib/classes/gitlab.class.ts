@@ -1,12 +1,5 @@
 import { CONFIG } from "../config";
-import {
-  Branch,
-  Issue,
-  Label,
-  MergeRequest,
-  Project,
-  User,
-} from "../models/gitlab.models";
+import { Branch, MergeRequest, Project, User } from "../models/gitlab.models";
 import { Commit } from "../models/gitlab/commit.models";
 import { Compare } from "../models/gitlab/compare.models";
 import { Job } from "../models/gitlab/job.models";
@@ -29,13 +22,6 @@ export class GitLab {
   public async getDefaultBranchName() {
     const project = await this.getProject();
     return project.default_branch;
-  }
-
-  public getIssue(issueNumber: string) {
-    return callApi<Issue>(
-      "get",
-      `/projects/${this.projectId}/issues/${issueNumber}`
-    );
   }
 
   public getOpenedMergeRequests() {
@@ -76,19 +62,6 @@ export class GitLab {
     }).then((users) => users[0]);
   }
 
-  public listProjectLabels() {
-    return callApi<Label[]>("get", `/projects/${this.projectId}/labels`, {
-      per_page: 100,
-    });
-  }
-
-  public listMergeRequestsWillCloseIssueOnMerge(issueNumber: string) {
-    return callApi<MergeRequest[]>(
-      "get",
-      `/projects/${this.projectId}/issues/${issueNumber}/closed_by`
-    );
-  }
-
   public listPipelineJobs(pipelineId: number) {
     return callApi<Job[]>(
       "get",
@@ -122,14 +95,6 @@ export class GitLab {
     );
   }
 
-  public async createIssue(title: string, description: string) {
-    return callApi<Issue>("post", `/projects/${this.projectId}/issues`, null, {
-      title: title,
-      description: description,
-      assignee_ids: await this.getUserId(),
-    });
-  }
-
   public async createBranch(branch: string) {
     return callApi<Branch>(
       "post",
@@ -156,7 +121,7 @@ export class GitLab {
   }
 
   public async createMergeRequestNote(
-    merge_request: MergeRequest,
+    merge_request: FullMergeRequest,
     content: string
   ) {
     await callApi(
@@ -167,7 +132,7 @@ export class GitLab {
   }
 
   public async markMergeRequestAsReadyAndAddAssignee(
-    merge_request: MergeRequest
+    merge_request: FullMergeRequest
   ) {
     const assignee = await this.getEndingAssignee();
     await callApi(
@@ -182,7 +147,7 @@ export class GitLab {
   }
 
   public async markMergeRequestAsUnreadyAndSetAssigneeToSelf(
-    merge_request: MergeRequest
+    merge_request: FullMergeRequest
   ) {
     await callApi(
       "put",

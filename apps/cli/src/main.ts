@@ -10,7 +10,7 @@ import { revertEndAction } from "./actions/revert-end.action";
 import { RTVTasksAction } from "./actions/rtv-tasks.action";
 import { showDiffAction } from "./actions/show-diff.action";
 import { startAction } from "./actions/start.action";
-import { syncAction } from "./actions/sync.action";
+import { switchAction } from "./actions/switch.action";
 import { timeAction } from "./actions/time.action";
 import { toDoAction } from "./actions/to-do.action";
 import { trackAction } from "./actions/track.action";
@@ -19,7 +19,7 @@ import { updateAction } from "./actions/update.action";
 const actions: { [key: string]: () => Promise<void> } = {
   start: startAction,
   open: openAction,
-  sync: syncAction,
+  switch: switchAction,
   update: updateAction,
   track: trackAction,
   end: endAction,
