@@ -11,7 +11,7 @@
     "ng": "nx",
     "postinstall": "if [ -e ./decorate-angular-cli.js ]; then node ./decorate-angular-cli.js && ngcc --properties es2015 browser module main; fi",
     "start-api": "nx serve api",
-    "start-frontend": "nx serve frontend",
+    "start-frontend": "nx serve frontend --port 8112",
     "start": "nx serve cli",
     "build": "nx build cli",
     "build-ext": "tsc --project apps/extension/tsconfig.app.json && cp apps/extension/manifest.json dist/apps/extension",
