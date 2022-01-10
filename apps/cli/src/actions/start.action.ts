@@ -1,4 +1,12 @@
-import { ClickUp, CONFIG, GitLab, sleep } from "@accel-shooter/node-shared";
+import {
+  ClickUp,
+  CONFIG,
+  getSyncChecklistActions,
+  GitLab,
+  normalizeClickUpChecklist,
+  normalizeMarkdownChecklist,
+  sleep,
+} from "@accel-shooter/node-shared";
 import clipboardy from "clipboardy";
 import { readFileSync } from "fs";
 import inquirer from "inquirer";
@@ -8,12 +16,7 @@ import untildify from "untildify";
 import { DailyProgress } from "../classes/daily-progress.class";
 import { CustomProgressLog } from "../classes/progress-log.class";
 import { Tracker } from "../classes/tracker.class";
-import {
-  checkWorkingTreeClean,
-  getGitLabBranchNameFromIssueNumberAndTitleAndTaskId,
-  promiseSpawn,
-} from "../utils";
-import { syncAction } from "./sync.action";
+import { checkWorkingTreeClean, promiseSpawn } from "../utils";
 
 export async function startAction() {
   const answers = await inquirer.prompt([
@@ -44,8 +47,8 @@ export async function startAction() {
       filter: (input) => input.replace("#", ""),
     },
     {
-      name: "issueTitle",
-      message: "Enter Issue Title",
+      name: "mergeRequestTitle",
+      message: "Enter Merge Request Title",
       type: "input",
       default: async (answers: { clickUpTaskId: string }) => {
         let task = await new ClickUp(answers.clickUpTaskId).getTask();
@@ -73,9 +76,9 @@ export async function startAction() {
     "Get ClickUp Task",
     "Set ClickUp Task Status",
     "Render Todo List",
-    "Create GitLab Issue",
     "Create GitLab Branch",
     "Create GitLab Merge Request",
+    "Create Checklist at ClickUp",
     "Add Daily Progress Entry",
     "Copy Sync Command",
     "Add Tracker Item",
@@ -85,13 +88,13 @@ export async function startAction() {
   await checkWorkingTreeClean();
   const gitLab = new GitLab(answers.gitLabProject.id);
   const clickUp = new ClickUp(answers.clickUpTaskId);
-  p.start();
+  p.start(); // Get ClickUp Task
   const clickUpTask = await clickUp.getTask();
   const clickUpTaskUrl = clickUpTask["url"];
-  const gitLabIssueTitle = answers.issueTitle;
-  p.next();
+  const gitLabMergeRequestTitle = answers.mergeRequestTitle;
+  p.next(); // Set ClickUp Task Status
   await clickUp.setTaskStatus("in progress");
-  p.next();
+  p.next(); // Render Todo List
   const todoConfigMap: Record<string, boolean> = {};
   answers.todoConfig.forEach((c: string) => {
     todoConfigMap[c] = true;
@@ -101,34 +104,72 @@ export async function startAction() {
     encoding: "utf-8",
   });
   const endingTodo = render(template, todoConfigMap);
-  p.next();
-  const gitLabIssue = await gitLab.createIssue(
-    gitLabIssueTitle,
-    `${clickUpTaskUrl}\n\n${endingTodo}`
-  );
-  const gitLabIssueNumber = gitLabIssue.iid;
-  p.next();
-  const gitLabBranch = await gitLab.createBranch(
-    getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(
-      gitLabIssueNumber,
-      answers.clickUpTaskId
-    )
-  );
-  p.next();
-  await gitLab.createMergeRequest(
-    gitLabIssueNumber,
-    gitLabIssueTitle,
+  p.next(); // Create GitLab Branch
+  const gitLabBranch = await gitLab.createBranch(`CU-${answers.clickUpTaskId}`);
+  p.next(); // Create GitLab Merge Request
+  const gitLabMergeRequest = await gitLab.createMergeRequest(
+    gitLabMergeRequestTitle,
     gitLabBranch.name
   );
-  p.next();
-  const dailyProgressString = `* (In Progress) [${gitLabIssue.title}](${clickUpTaskUrl}) [${answers.gitLabProject.name} ${gitLabIssueNumber}](${gitLabIssue.web_url})`;
+  const gitLabMergeRequestIId = gitLabMergeRequest.iid;
+  p.next(); // Create Checklist at ClickUp
+  const clickUpChecklistTitle = `Synced checklist [${answers.gitLabProject.id.replace(
+    "%2F",
+    "/"
+  )} @${gitLabMergeRequestIId}]`;
+  let clickUpChecklist = clickUpTask.checklists.find(
+    (c) => c.name === clickUpChecklistTitle
+  );
+  if (!clickUpChecklist) {
+    clickUpChecklist = (await clickUp.createChecklist(clickUpChecklistTitle))
+      .checklist;
+    const markdownNormalizedChecklist = normalizeMarkdownChecklist(endingTodo);
+    const clickUpNormalizedChecklist = normalizeClickUpChecklist(
+      clickUpChecklist.items
+    );
+    const actions = getSyncChecklistActions(
+      clickUpNormalizedChecklist,
+      markdownNormalizedChecklist
+    );
+    if (
+      actions.update.length + actions.create.length + actions.delete.length ===
+      0
+    ) {
+      return;
+    }
+    for (const checklistItem of actions.update) {
+      await clickUp.updateChecklistItem(
+        clickUpChecklist.id,
+        checklistItem.id as string,
+        checklistItem.name,
+        checklistItem.checked,
+        checklistItem.order
+      );
+    }
+    for (const checklistItem of actions.create) {
+      await clickUp.createChecklistItem(
+        clickUpChecklist.id,
+        checklistItem.name,
+        checklistItem.checked,
+        checklistItem.order
+      );
+    }
+    for (const checklistItem of actions.delete) {
+      await clickUp.deleteChecklistItem(
+        clickUpChecklist.id,
+        checklistItem.id as string
+      );
+    }
+  }
+  p.next(); // Add Daily Progress Entry
+  const dailyProgressString = `* (In Progress) [${gitLabMergeRequestTitle}](${clickUpTaskUrl}) [${answers.gitLabProject.name} ${gitLabMergeRequestIId}](${gitLabMergeRequest.web_url})`;
   new DailyProgress().addProgressToBuffer(dailyProgressString);
-  p.next();
-  const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabIssueNumber}`;
+  p.next(); // Copy Sync Command
+  const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabMergeRequestIId}`;
   clipboardy.writeSync(syncCommand);
-  p.next();
-  new Tracker().addItem(answers.gitLabProject.name, gitLabIssueNumber);
-  p.next();
+  p.next(); // Add Tracker Item
+  new Tracker().addItem(answers.gitLabProject.name, gitLabMergeRequestIId);
+  p.next(); // Do Git Fetch and Checkout
   process.chdir(answers.gitLabProject.path.replace("~", os.homedir()));
   await promiseSpawn("git", ["fetch"], "pipe");
   await sleep(1000);
@@ -139,5 +180,4 @@ export async function startAction() {
     "pipe"
   );
   p.end(0);
-  await syncAction();
 }

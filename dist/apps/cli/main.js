@@ -794,11 +794,8 @@ function startAction() {
             "Add Tracker Item",
             "Do Git Fetch and Checkout",
         ]);
-        console.log(answers);
-        console.log(answers.gitLabProject);
         process.chdir(answers.gitLabProject.path.replace("~", os_1.default.homedir()));
         yield utils_1.checkWorkingTreeClean();
-        console.log(answers.gitLabProject.id);
         const gitLab = new node_shared_1.GitLab(answers.gitLabProject.id);
         const clickUp = new node_shared_1.ClickUp(answers.clickUpTaskId);
         p.start(); // Get ClickUp Task
@@ -823,7 +820,7 @@ function startAction() {
         const gitLabMergeRequest = yield gitLab.createMergeRequest(gitLabMergeRequestTitle, gitLabBranch.name);
         const gitLabMergeRequestIId = gitLabMergeRequest.iid;
         p.next(); // Create Checklist at ClickUp
-        const clickUpChecklistTitle = `GitLab synced checklist [${answers.gitLabProject.id.replace("%2F", "/")} @${gitLabMergeRequestIId}]`;
+        const clickUpChecklistTitle = `Synced checklist [${answers.gitLabProject.id.replace("%2F", "/")} @${gitLabMergeRequestIId}]`;
         let clickUpChecklist = clickUpTask.checklists.find((c) => c.name === clickUpChecklistTitle);
         if (!clickUpChecklist) {
             clickUpChecklist = (yield clickUp.createChecklist(clickUpChecklistTitle))
@@ -852,7 +849,7 @@ function startAction() {
         const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabMergeRequestIId}`;
         clipboardy_1.default.writeSync(syncCommand);
         p.next(); // Add Tracker Item
-        new tracker_class_1.Tracker().addItem(answers.gitLabProject.name, "@" + gitLabMergeRequestIId);
+        new tracker_class_1.Tracker().addItem(answers.gitLabProject.name, gitLabMergeRequestIId);
         p.next(); // Do Git Fetch and Checkout
         process.chdir(answers.gitLabProject.path.replace("~", os_1.default.homedir()));
         yield utils_1.promiseSpawn("git", ["fetch"], "pipe");
