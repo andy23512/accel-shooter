@@ -727,7 +727,6 @@ const daily_progress_class_1 = __webpack_require__(/*! ../classes/daily-progress
 const progress_log_class_1 = __webpack_require__(/*! ../classes/progress-log.class */ "./apps/cli/src/classes/progress-log.class.ts");
 const tracker_class_1 = __webpack_require__(/*! ../classes/tracker.class */ "./apps/cli/src/classes/tracker.class.ts");
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
-const sync_action_1 = __webpack_require__(/*! ./sync.action */ "./apps/cli/src/actions/sync.action.ts");
 function startAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const answers = yield inquirer_1.default.prompt([
@@ -758,8 +757,8 @@ function startAction() {
                 filter: (input) => input.replace("#", ""),
             },
             {
-                name: "issueTitle",
-                message: "Enter Issue Title",
+                name: "mergeRequestTitle",
+                message: "Enter Merge Request Title",
                 type: "input",
                 default: (answers) => tslib_1.__awaiter(this, void 0, void 0, function* () {
                     let task = yield new node_shared_1.ClickUp(answers.clickUpTaskId).getTask();
@@ -787,25 +786,28 @@ function startAction() {
             "Get ClickUp Task",
             "Set ClickUp Task Status",
             "Render Todo List",
-            "Create GitLab Issue",
             "Create GitLab Branch",
             "Create GitLab Merge Request",
+            "Create Checklist at ClickUp",
             "Add Daily Progress Entry",
             "Copy Sync Command",
             "Add Tracker Item",
             "Do Git Fetch and Checkout",
         ]);
+        console.log(answers);
+        console.log(answers.gitLabProject);
         process.chdir(answers.gitLabProject.path.replace("~", os_1.default.homedir()));
         yield utils_1.checkWorkingTreeClean();
+        console.log(answers.gitLabProject.id);
         const gitLab = new node_shared_1.GitLab(answers.gitLabProject.id);
         const clickUp = new node_shared_1.ClickUp(answers.clickUpTaskId);
-        p.start();
+        p.start(); // Get ClickUp Task
         const clickUpTask = yield clickUp.getTask();
         const clickUpTaskUrl = clickUpTask["url"];
-        const gitLabIssueTitle = answers.issueTitle;
-        p.next();
+        const gitLabMergeRequestTitle = answers.mergeRequestTitle;
+        p.next(); // Set ClickUp Task Status
         yield clickUp.setTaskStatus("in progress");
-        p.next();
+        p.next(); // Render Todo List
         const todoConfigMap = {};
         answers.todoConfig.forEach((c) => {
             todoConfigMap[c] = true;
@@ -815,29 +817,49 @@ function startAction() {
             encoding: "utf-8",
         });
         const endingTodo = mustache_1.render(template, todoConfigMap);
-        p.next();
-        const gitLabIssue = yield gitLab.createIssue(gitLabIssueTitle, `${clickUpTaskUrl}\n\n${endingTodo}`);
-        const gitLabIssueNumber = gitLabIssue.iid;
-        p.next();
-        const gitLabBranch = yield gitLab.createBranch(utils_1.getGitLabBranchNameFromIssueNumberAndTitleAndTaskId(gitLabIssueNumber, answers.clickUpTaskId));
-        p.next();
-        yield gitLab.createMergeRequest(gitLabIssueNumber, gitLabIssueTitle, gitLabBranch.name);
-        p.next();
-        const dailyProgressString = `* (In Progress) [${gitLabIssue.title}](${clickUpTaskUrl}) [${answers.gitLabProject.name} ${gitLabIssueNumber}](${gitLabIssue.web_url})`;
+        p.next(); // Create GitLab Branch
+        const gitLabBranch = yield gitLab.createBranch(`CU-${answers.clickUpTaskId}`);
+        p.next(); // Create GitLab Merge Request
+        const gitLabMergeRequest = yield gitLab.createMergeRequest(gitLabMergeRequestTitle, gitLabBranch.name);
+        const gitLabMergeRequestIId = gitLabMergeRequest.iid;
+        p.next(); // Create Checklist at ClickUp
+        const clickUpChecklistTitle = `GitLab synced checklist [${answers.gitLabProject.id.replace("%2F", "/")} @${gitLabMergeRequestIId}]`;
+        let clickUpChecklist = clickUpTask.checklists.find((c) => c.name === clickUpChecklistTitle);
+        if (!clickUpChecklist) {
+            clickUpChecklist = (yield clickUp.createChecklist(clickUpChecklistTitle))
+                .checklist;
+            const markdownNormalizedChecklist = node_shared_1.normalizeMarkdownChecklist(endingTodo);
+            const clickUpNormalizedChecklist = node_shared_1.normalizeClickUpChecklist(clickUpChecklist.items);
+            const actions = node_shared_1.getSyncChecklistActions(clickUpNormalizedChecklist, markdownNormalizedChecklist);
+            if (actions.update.length + actions.create.length + actions.delete.length ===
+                0) {
+                return;
+            }
+            for (const checklistItem of actions.update) {
+                yield clickUp.updateChecklistItem(clickUpChecklist.id, checklistItem.id, checklistItem.name, checklistItem.checked, checklistItem.order);
+            }
+            for (const checklistItem of actions.create) {
+                yield clickUp.createChecklistItem(clickUpChecklist.id, checklistItem.name, checklistItem.checked, checklistItem.order);
+            }
+            for (const checklistItem of actions.delete) {
+                yield clickUp.deleteChecklistItem(clickUpChecklist.id, checklistItem.id);
+            }
+        }
+        p.next(); // Add Daily Progress Entry
+        const dailyProgressString = `* (In Progress) [${gitLabMergeRequestTitle}](${clickUpTaskUrl}) [${answers.gitLabProject.name} ${gitLabMergeRequestIId}](${gitLabMergeRequest.web_url})`;
         new daily_progress_class_1.DailyProgress().addProgressToBuffer(dailyProgressString);
-        p.next();
-        const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabIssueNumber}`;
+        p.next(); // Copy Sync Command
+        const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabMergeRequestIId}`;
         clipboardy_1.default.writeSync(syncCommand);
-        p.next();
-        new tracker_class_1.Tracker().addItem(answers.gitLabProject.name, gitLabIssueNumber);
-        p.next();
+        p.next(); // Add Tracker Item
+        new tracker_class_1.Tracker().addItem(answers.gitLabProject.name, "@" + gitLabMergeRequestIId);
+        p.next(); // Do Git Fetch and Checkout
         process.chdir(answers.gitLabProject.path.replace("~", os_1.default.homedir()));
         yield utils_1.promiseSpawn("git", ["fetch"], "pipe");
         yield node_shared_1.sleep(1000);
         yield utils_1.promiseSpawn("git", ["checkout", gitLabBranch.name], "pipe");
         yield utils_1.promiseSpawn("git", ["submodule", "update", "--init", "--recursive"], "pipe");
         p.end(0);
-        yield sync_action_1.syncAction();
     });
 }
 exports.startAction = startAction;
@@ -2101,15 +2123,15 @@ exports.ClickUp = ClickUp;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.GitLab = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const api_utils_1 = __webpack_require__(/*! ../utils/api.utils */ "./libs/node-shared/src/lib/utils/api.utils.ts");
 const config_1 = __webpack_require__(/*! ../config */ "./libs/node-shared/src/lib/config.ts");
-const callApi = api_utils_1.callApiFactory('GitLab');
+const api_utils_1 = __webpack_require__(/*! ../utils/api.utils */ "./libs/node-shared/src/lib/utils/api.utils.ts");
+const callApi = api_utils_1.callApiFactory("GitLab");
 class GitLab {
     constructor(projectId) {
         this.projectId = projectId;
     }
     getProject() {
-        return callApi('get', `/projects/${this.projectId}`);
+        return callApi("get", `/projects/${this.projectId}`);
     }
     getDefaultBranchName() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -2118,41 +2140,41 @@ class GitLab {
         });
     }
     getIssue(issueNumber) {
-        return callApi('get', `/projects/${this.projectId}/issues/${issueNumber}`);
+        return callApi("get", `/projects/${this.projectId}/issues/${issueNumber}`);
     }
     getOpenedMergeRequests() {
-        return callApi('get', `/projects/${this.projectId}/merge_requests`, { state: 'opened', per_page: '100' });
+        return callApi("get", `/projects/${this.projectId}/merge_requests`, { state: "opened", per_page: "100" });
     }
     getMergeRequest(mergeRequestNumber) {
-        return callApi('get', `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}`);
+        return callApi("get", `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}`);
     }
     getMergeRequestChanges(mergeRequestNumber) {
-        return callApi('get', `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}/changes`);
+        return callApi("get", `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}/changes`);
     }
     getCommit(sha) {
-        return callApi('get', `/projects/${this.projectId}/repository/commits/${sha}`);
+        return callApi("get", `/projects/${this.projectId}/repository/commits/${sha}`);
     }
     getEndingAssignee() {
         if (!config_1.CONFIG.EndingAssignee) {
-            throw Error('No ending assignee was set');
+            throw Error("No ending assignee was set");
         }
-        return callApi('get', `/users`, {
+        return callApi("get", `/users`, {
             username: config_1.CONFIG.EndingAssignee,
         }).then((users) => users[0]);
     }
     listProjectLabels() {
-        return callApi('get', `/projects/${this.projectId}/labels`, {
+        return callApi("get", `/projects/${this.projectId}/labels`, {
             per_page: 100,
         });
     }
     listMergeRequestsWillCloseIssueOnMerge(issueNumber) {
-        return callApi('get', `/projects/${this.projectId}/issues/${issueNumber}/closed_by`);
+        return callApi("get", `/projects/${this.projectId}/issues/${issueNumber}/closed_by`);
     }
     listPipelineJobs(pipelineId) {
-        return callApi('get', `/projects/${this.projectId}/pipelines/${pipelineId}/jobs`);
+        return callApi("get", `/projects/${this.projectId}/pipelines/${pipelineId}/jobs`);
     }
     getCompare(from, to) {
-        return callApi('get', `/projects/${this.projectId}/repository/compare`, {
+        return callApi("get", `/projects/${this.projectId}/repository/compare`, {
             from,
             to,
             straight: true,
@@ -2161,12 +2183,12 @@ class GitLab {
     listPipelines(query) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             query.ref = query.ref || (yield this.getDefaultBranchName());
-            return callApi('get', `/projects/${this.projectId}/pipelines/`, query);
+            return callApi("get", `/projects/${this.projectId}/pipelines/`, query);
         });
     }
     createIssue(title, description) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            return callApi('post', `/projects/${this.projectId}/issues`, null, {
+            return callApi("post", `/projects/${this.projectId}/issues`, null, {
                 title: title,
                 description: description,
                 assignee_ids: yield this.getUserId(),
@@ -2175,48 +2197,47 @@ class GitLab {
     }
     createBranch(branch) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            return callApi('post', `/projects/${this.projectId}/repository/branches`, null, {
+            return callApi("post", `/projects/${this.projectId}/repository/branches`, null, {
                 branch,
                 ref: yield this.getDefaultBranchName(),
             });
         });
     }
-    createMergeRequest(issueNumber, issueTitle, branch) {
+    createMergeRequest(title, branch) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            return callApi('post', `/projects/${this.projectId}/merge_requests`, null, {
+            return callApi("post", `/projects/${this.projectId}/merge_requests`, null, {
                 source_branch: branch,
                 target_branch: yield this.getDefaultBranchName(),
-                title: `Draft: Resolve "${issueTitle}"`,
-                description: `Close #${issueNumber}`,
+                title: `Draft: Resolve "${title}"`,
             });
         });
     }
     createMergeRequestNote(merge_request, content) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            yield callApi('post', `/projects/${this.projectId}/merge_requests/${merge_request.iid}/notes`, { body: content });
+            yield callApi("post", `/projects/${this.projectId}/merge_requests/${merge_request.iid}/notes`, { body: content });
         });
     }
     markMergeRequestAsReadyAndAddAssignee(merge_request) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const assignee = yield this.getEndingAssignee();
-            yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
-                title: merge_request.title.replace('WIP: ', '').replace('Draft: ', ''),
+            yield callApi("put", `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
+                title: merge_request.title.replace("WIP: ", "").replace("Draft: ", ""),
                 assignee_id: assignee.id,
             });
         });
     }
     markMergeRequestAsUnreadyAndSetAssigneeToSelf(merge_request) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
-                title: 'Draft: ' +
-                    merge_request.title.replace('WIP: ', '').replace('Draft: ', ''),
+            yield callApi("put", `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
+                title: "Draft: " +
+                    merge_request.title.replace("WIP: ", "").replace("Draft: ", ""),
                 assignee_id: yield this.getUserId(),
             });
         });
     }
     getUserId() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const user = yield callApi('get', '/user');
+            const user = yield callApi("get", "/user");
             return user.id;
         });
     }
