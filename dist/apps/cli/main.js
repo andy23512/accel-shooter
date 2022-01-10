@@ -96,37 +96,12 @@
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.setUpSyncHotkey = exports.configReadline = exports.syncChecklist = exports.getSyncChecklistActions = void 0;
+exports.setUpSyncHotkey = exports.configReadline = exports.syncChecklist = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const readline_1 = tslib_1.__importDefault(__webpack_require__(/*! readline */ "readline"));
 const end_action_1 = __webpack_require__(/*! ./actions/end.action */ "./apps/cli/src/actions/end.action.ts");
 const utils_1 = __webpack_require__(/*! ./utils */ "./apps/cli/src/utils.ts");
-function getSyncChecklistActions(oldClickUpChecklist, newGitLabChecklist) {
-    const actions = {
-        update: [],
-        create: [],
-        delete: [],
-    };
-    const oldLength = oldClickUpChecklist.length;
-    const newLength = newGitLabChecklist.length;
-    if (newLength < oldLength) {
-        actions.delete = oldClickUpChecklist.slice(newLength);
-    }
-    else if (newLength > oldLength) {
-        actions.create = newGitLabChecklist.slice(oldLength);
-    }
-    const minLength = Math.min(oldLength, newLength);
-    for (let i = 0; i < minLength; i++) {
-        const oldItem = oldClickUpChecklist[i];
-        const newItem = newGitLabChecklist[i];
-        if (oldItem.checked !== newItem.checked || oldItem.name !== newItem.name) {
-            actions.update.push(Object.assign({ id: oldItem.id }, newItem));
-        }
-    }
-    return actions;
-}
-exports.getSyncChecklistActions = getSyncChecklistActions;
 function syncChecklist(gitLabProjectId, issueNumber, ep, openPage) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const gitLab = new node_shared_1.GitLab(gitLabProjectId);
@@ -159,7 +134,7 @@ function syncChecklist(gitLabProjectId, issueNumber, ep, openPage) {
                     .checklist;
             }
             const clickUpNormalizedChecklist = node_shared_1.normalizeClickUpChecklist(clickUpChecklist.items);
-            const actions = getSyncChecklistActions(clickUpNormalizedChecklist, gitLabNormalizedChecklist);
+            const actions = node_shared_1.getSyncChecklistActions(clickUpNormalizedChecklist, gitLabNormalizedChecklist);
             const checkedCount = gitLabNormalizedChecklist.filter((item) => item.checked).length;
             const totalCount = gitLabNormalizedChecklist.length;
             ep.setValueAndEndValue(checkedCount, totalCount);
@@ -2281,6 +2256,7 @@ function getConfig() {
     }
     const config = JSON.parse(fs_1.readFileSync(configPath, { encoding: "utf-8" }));
     config.GitLabProjects = config.GitLabProjects.map((p) => (Object.assign(Object.assign({}, p), { path: untildify_1.default(p.path) })));
+    config.TodoBackupFolder = untildify_1.default(config.TodoBackupFolder);
     return config;
 }
 exports.getConfig = getConfig;
@@ -2383,13 +2359,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sleep = exports.normalizeClickUpChecklist = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.GitLabProject = exports.Change = exports.Job = exports.Issue = exports.Task = exports.ChecklistItem = exports.CONFIG = exports.GitLab = exports.ClickUp = void 0;
+exports.sleep = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.GitLabProject = exports.Change = exports.Job = exports.Issue = exports.Task = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.GitLab = exports.ClickUp = void 0;
 var clickup_class_1 = __webpack_require__(/*! ./classes/clickup.class */ "./libs/node-shared/src/lib/classes/clickup.class.ts");
 Object.defineProperty(exports, "ClickUp", { enumerable: true, get: function () { return clickup_class_1.ClickUp; } });
 var gitlab_class_1 = __webpack_require__(/*! ./classes/gitlab.class */ "./libs/node-shared/src/lib/classes/gitlab.class.ts");
 Object.defineProperty(exports, "GitLab", { enumerable: true, get: function () { return gitlab_class_1.GitLab; } });
 var config_1 = __webpack_require__(/*! ./config */ "./libs/node-shared/src/lib/config.ts");
 Object.defineProperty(exports, "CONFIG", { enumerable: true, get: function () { return config_1.CONFIG; } });
+Object.defineProperty(exports, "getConfig", { enumerable: true, get: function () { return config_1.getConfig; } });
 var checklist_models_1 = __webpack_require__(/*! ./models/clickup/checklist.models */ "./libs/node-shared/src/lib/models/clickup/checklist.models.ts");
 Object.defineProperty(exports, "ChecklistItem", { enumerable: true, get: function () { return checklist_models_1.ChecklistItem; } });
 var task_models_1 = __webpack_require__(/*! ./models/clickup/task.models */ "./libs/node-shared/src/lib/models/clickup/task.models.ts");
@@ -2404,8 +2381,10 @@ var models_1 = __webpack_require__(/*! ./models/models */ "./libs/node-shared/sr
 Object.defineProperty(exports, "GitLabProject", { enumerable: true, get: function () { return models_1.GitLabProject; } });
 Object.defineProperty(exports, "NormalizedChecklist", { enumerable: true, get: function () { return models_1.NormalizedChecklist; } });
 Object.defineProperty(exports, "ProjectCheckItem", { enumerable: true, get: function () { return models_1.ProjectCheckItem; } });
-var clickup_utils_1 = __webpack_require__(/*! ./utils/clickup.utils */ "./libs/node-shared/src/lib/utils/clickup.utils.ts");
-Object.defineProperty(exports, "normalizeClickUpChecklist", { enumerable: true, get: function () { return clickup_utils_1.normalizeClickUpChecklist; } });
+var checklist_utils_1 = __webpack_require__(/*! ./utils/checklist.utils */ "./libs/node-shared/src/lib/utils/checklist.utils.ts");
+Object.defineProperty(exports, "getSyncChecklistActions", { enumerable: true, get: function () { return checklist_utils_1.getSyncChecklistActions; } });
+Object.defineProperty(exports, "normalizeClickUpChecklist", { enumerable: true, get: function () { return checklist_utils_1.normalizeClickUpChecklist; } });
+Object.defineProperty(exports, "normalizeMarkdownChecklist", { enumerable: true, get: function () { return checklist_utils_1.normalizeMarkdownChecklist; } });
 var sleep_utils_1 = __webpack_require__(/*! ./utils/sleep.utils */ "./libs/node-shared/src/lib/utils/sleep.utils.ts");
 Object.defineProperty(exports, "sleep", { enumerable: true, get: function () { return sleep_utils_1.sleep; } });
 
@@ -2512,17 +2491,17 @@ exports.callApiFactory = callApiFactory;
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/utils/clickup.utils.ts":
-/*!*********************************************************!*\
-  !*** ./libs/node-shared/src/lib/utils/clickup.utils.ts ***!
-  \*********************************************************/
+/***/ "./libs/node-shared/src/lib/utils/checklist.utils.ts":
+/*!***********************************************************!*\
+  !*** ./libs/node-shared/src/lib/utils/checklist.utils.ts ***!
+  \***********************************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.normalizeClickUpChecklist = void 0;
+exports.getSyncChecklistActions = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = void 0;
 function normalizeClickUpChecklist(checklist) {
     return checklist
         .sort((a, b) => a.orderindex - b.orderindex)
@@ -2534,6 +2513,44 @@ function normalizeClickUpChecklist(checklist) {
     }));
 }
 exports.normalizeClickUpChecklist = normalizeClickUpChecklist;
+function normalizeMarkdownChecklist(markdown) {
+    return markdown
+        .split("\n")
+        .filter((line) => line && (line.includes("- [ ]") || line.includes("- [x]")))
+        .map((line, index) => ({
+        name: line
+            .replace(/- \[[x ]\] /g, "")
+            .replace(/^ +/, (space) => space.replace(/ /g, "-")),
+        checked: /- \[x\]/.test(line),
+        order: index,
+    }));
+}
+exports.normalizeMarkdownChecklist = normalizeMarkdownChecklist;
+function getSyncChecklistActions(oldClickUpChecklist, newGitLabChecklist) {
+    const actions = {
+        update: [],
+        create: [],
+        delete: [],
+    };
+    const oldLength = oldClickUpChecklist.length;
+    const newLength = newGitLabChecklist.length;
+    if (newLength < oldLength) {
+        actions.delete = oldClickUpChecklist.slice(newLength);
+    }
+    else if (newLength > oldLength) {
+        actions.create = newGitLabChecklist.slice(oldLength);
+    }
+    const minLength = Math.min(oldLength, newLength);
+    for (let i = 0; i < minLength; i++) {
+        const oldItem = oldClickUpChecklist[i];
+        const newItem = newGitLabChecklist[i];
+        if (oldItem.checked !== newItem.checked || oldItem.name !== newItem.name) {
+            actions.update.push(Object.assign({ id: oldItem.id }, newItem));
+        }
+    }
+    return actions;
+}
+exports.getSyncChecklistActions = getSyncChecklistActions;
 
 
 /***/ }),

@@ -6,8 +6,8 @@ import {
 import { HttpClient } from "@angular/common/http";
 import { AfterViewInit, Component, OnInit, ViewChild } from "@angular/core";
 import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
-import { interval } from "rxjs";
-import { filter, map, take } from "rxjs/operators";
+import { interval, merge, Subject } from "rxjs";
+import { filter, map, switchMap, take, throttleTime } from "rxjs/operators";
 
 export function normalizeClickUpChecklist(
   checklist: ChecklistItem[]
@@ -31,6 +31,8 @@ export class AppComponent implements OnInit, AfterViewInit {
   public checklistMarkDown = "";
   @ViewChild(CodemirrorComponent)
   public codemirrorComponent?: CodemirrorComponent;
+  public changeSubject = new Subject();
+  public saveSubject = new Subject();
 
   constructor(private http: HttpClient) {}
 
@@ -63,6 +65,7 @@ export class AppComponent implements OnInit, AfterViewInit {
       )
       .subscribe((markdown) => {
         this.checklistMarkDown = markdown;
+        this.startSync();
       });
   }
 
@@ -87,6 +90,24 @@ export class AppComponent implements OnInit, AfterViewInit {
         });
         Vim.mapCommand("c", "action", "checkMdCheckbox");
         Vim.mapCommand("C", "action", "uncheckMdCheckbox");
+        Vim.defineEx("w", null, () => {
+          this.saveSubject.next();
+        });
       });
+  }
+
+  public startSync() {
+    merge(
+      this.changeSubject.asObservable().pipe(throttleTime(30 * 1000)),
+      this.saveSubject.asObservable()
+    )
+      .pipe(
+        switchMap(() =>
+          this.http.put("/api/task/aj55xx/checklist", {
+            checklist: this.checklistMarkDown,
+          })
+        )
+      )
+      .subscribe();
   }
 }

@@ -1,6 +1,6 @@
 export { ClickUp } from "./classes/clickup.class";
 export { GitLab } from "./classes/gitlab.class";
-export { CONFIG } from "./config";
+export { CONFIG, getConfig } from "./config";
 export { ChecklistItem } from "./models/clickup/checklist.models";
 export { Task } from "./models/clickup/task.models";
 export { Issue } from "./models/gitlab/issue.models";
@@ -11,5 +11,9 @@ export {
   NormalizedChecklist,
   ProjectCheckItem,
 } from "./models/models";
-export { normalizeClickUpChecklist } from "./utils/clickup.utils";
+export {
+  getSyncChecklistActions,
+  normalizeClickUpChecklist,
+  normalizeMarkdownChecklist,
+} from "./utils/checklist.utils";
 export { sleep } from "./utils/sleep.utils";

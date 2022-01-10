@@ -22,6 +22,7 @@ export function getConfig(): Config {
     ...p,
     path: untildify(p.path),
   }));
+  config.TodoBackupFolder = untildify(config.TodoBackupFolder);
   return config;
 }
 

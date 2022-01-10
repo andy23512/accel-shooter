@@ -1,8 +1,8 @@
 import {
   ClickUp,
+  getSyncChecklistActions,
   GitLab,
   normalizeClickUpChecklist,
-  NormalizedChecklist,
 } from "@accel-shooter/node-shared";
 import readline from "readline";
 import { endAction } from "./actions/end.action";
@@ -12,40 +12,6 @@ import {
   normalizeGitLabIssueChecklist,
   openUrlsInTabGroup,
 } from "./utils";
-
-export function getSyncChecklistActions(
-  oldClickUpChecklist: NormalizedChecklist,
-  newGitLabChecklist: NormalizedChecklist
-) {
-  const actions: {
-    update: NormalizedChecklist;
-    create: NormalizedChecklist;
-    delete: NormalizedChecklist;
-  } = {
-    update: [],
-    create: [],
-    delete: [],
-  };
-  const oldLength = oldClickUpChecklist.length;
-  const newLength = newGitLabChecklist.length;
-  if (newLength < oldLength) {
-    actions.delete = oldClickUpChecklist.slice(newLength);
-  } else if (newLength > oldLength) {
-    actions.create = newGitLabChecklist.slice(oldLength);
-  }
-  const minLength = Math.min(oldLength, newLength);
-  for (let i = 0; i < minLength; i++) {
-    const oldItem = oldClickUpChecklist[i];
-    const newItem = newGitLabChecklist[i];
-    if (oldItem.checked !== newItem.checked || oldItem.name !== newItem.name) {
-      actions.update.push({
-        id: oldItem.id,
-        ...newItem,
-      });
-    }
-  }
-  return actions;
-}
 
 export async function syncChecklist(
   gitLabProjectId: string,
