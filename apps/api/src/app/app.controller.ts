@@ -41,7 +41,6 @@ export class AppController {
         clickUpNormalizedChecklist,
         markdownNormalizedChecklist
       );
-      console.log(actions);
       if (
         actions.update.length +
           actions.create.length +
