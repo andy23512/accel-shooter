@@ -65,7 +65,7 @@ export function getClickUpTaskIdFromGitLabMergeRequest(
   mergeRequest: FullMergeRequest
 ) {
   const branchName = mergeRequest.source_branch;
-  const result = branchName.match(/CU-([\S]+)/);
+  const result = branchName.match(/CU-([a-z0-9]+)/);
   return result ? result[1] : null;
 }
 
@@ -105,7 +105,7 @@ export async function getInfoFromArgv() {
     const branchName = execSync("git branch --show-current", {
       encoding: "utf-8",
     });
-    const match = branchName.match(/CU-(\S+)/);
+    const match = branchName.match(/CU-([a-z0-9]+)/);
     if (!match) {
       throw Error("Cannot get task number from branch");
     }
@@ -133,7 +133,7 @@ export async function getInfoFromArgv() {
     const mergeRequestIId = process.argv[4];
     const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
     const branchName = mergeRequest.source_branch;
-    const match = branchName.match(/CU-(\S+)/);
+    const match = branchName.match(/CU-([a-z0-9]+)/);
     if (!match) {
       throw Error("Cannot get task number from branch");
     }

@@ -153,9 +153,11 @@ export class ClickUp {
     const clickUpChecklist = task.checklists.find((c) =>
       c.name.toLowerCase().includes("synced checklist")
     );
-    const match = clickUpChecklist.name.match(/!([\d]+)/);
-    if (match) {
-      return match[1];
+    if (clickUpChecklist) {
+      const match = clickUpChecklist.name.match(/!([\d]+)/);
+      if (match) {
+        return match[1];
+      }
     }
     return null;
   }

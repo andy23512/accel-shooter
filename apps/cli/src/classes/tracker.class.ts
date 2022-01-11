@@ -71,7 +71,7 @@ export class Tracker extends BaseFileRef {
     const gitLab = new GitLab(projectConfig.id);
     const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
     const branchName = mergeRequest.source_branch;
-    const match = branchName.match(/CU-(\S+)/);
+    const match = branchName.match(/CU-([a-z0-9]+)/);
     if (!match) {
       throw Error("Cannot get task number from branch");
     }

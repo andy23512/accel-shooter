@@ -1425,7 +1425,7 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
             const gitLab = new node_shared_1.GitLab(projectConfig.id);
             const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
             const branchName = mergeRequest.source_branch;
-            const match = branchName.match(/CU-(\S+)/);
+            const match = branchName.match(/CU-([a-z0-9]+)/);
             if (!match) {
                 throw Error("Cannot get task number from branch");
             }
@@ -1738,7 +1738,7 @@ function getGitLabProjectConfigById(inputId) {
 exports.getGitLabProjectConfigById = getGitLabProjectConfigById;
 function getClickUpTaskIdFromGitLabMergeRequest(mergeRequest) {
     const branchName = mergeRequest.source_branch;
-    const result = branchName.match(/CU-([\S]+)/);
+    const result = branchName.match(/CU-([a-z0-9]+)/);
     return result ? result[1] : null;
 }
 exports.getClickUpTaskIdFromGitLabMergeRequest = getClickUpTaskIdFromGitLabMergeRequest;
@@ -1773,7 +1773,7 @@ function getInfoFromArgv() {
             const branchName = child_process_1.execSync("git branch --show-current", {
                 encoding: "utf-8",
             });
-            const match = branchName.match(/CU-(\S+)/);
+            const match = branchName.match(/CU-([a-z0-9]+)/);
             if (!match) {
                 throw Error("Cannot get task number from branch");
             }
@@ -1802,7 +1802,7 @@ function getInfoFromArgv() {
             const mergeRequestIId = process.argv[4];
             const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
             const branchName = mergeRequest.source_branch;
-            const match = branchName.match(/CU-(\S+)/);
+            const match = branchName.match(/CU-([a-z0-9]+)/);
             if (!match) {
                 throw Error("Cannot get task number from branch");
             }
@@ -1988,9 +1988,11 @@ class ClickUp {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const task = yield this.getTask();
             const clickUpChecklist = task.checklists.find((c) => c.name.toLowerCase().includes("synced checklist"));
-            const match = clickUpChecklist.name.match(/!([\d]+)/);
-            if (match) {
-                return match[1];
+            if (clickUpChecklist) {
+                const match = clickUpChecklist.name.match(/!([\d]+)/);
+                if (match) {
+                    return match[1];
+                }
             }
             return null;
         });
