@@ -318,7 +318,7 @@ const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 function listAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const { clickUp } = yield utils_1.getInfoFromArgv();
-        console.log(clickUp.getFullTaskName());
+        console.log(yield clickUp.getFullTaskName());
     });
 }
 exports.listAction = listAction;
