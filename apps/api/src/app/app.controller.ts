@@ -7,6 +7,7 @@ import {
 } from "@accel-shooter/node-shared";
 import { Body, Controller, Get, Param, Put } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
+import { format } from "date-fns";
 import { writeFileSync } from "fs";
 import { join } from "path";
 
@@ -26,7 +27,6 @@ export class AppController {
     @Body("checklist") checklist: string
   ) {
     const folderPath = this.configService.get<string>("TodoBackupFolder");
-    writeFileSync(join(folderPath, taskId + ".md"), checklist);
     const markdownNormalizedChecklist = normalizeMarkdownChecklist(checklist);
     const clickUp = new ClickUp(taskId);
     const task = await clickUp.getTask();
@@ -49,6 +49,8 @@ export class AppController {
       ) {
         return;
       }
+      const time = format(new Date(), "yyyyMMdd_HHmmss");
+      writeFileSync(join(folderPath, taskId + "_" + time + ".md"), checklist);
       for (const checklistItem of actions.update) {
         await clickUp.updateChecklistItem(
           clickUpChecklist.id,
