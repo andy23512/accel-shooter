@@ -3,10 +3,13 @@ import {
   CONFIG,
   FullMergeRequest,
   GitLab,
+  normalizeMarkdownChecklist,
   Task,
 } from "@accel-shooter/node-shared";
 import childProcess, { execSync, StdioOptions } from "child_process";
+import { readFileSync } from "fs";
 import open from "open";
+import { join } from "path";
 import qs from "qs";
 import { titleCase } from "./case-utils";
 
@@ -175,15 +178,10 @@ export function openUrlsInTabGroup(urls: string[], group: string) {
 }
 
 export function getTaskProgress(task: Task) {
-  const progressField = task.custom_fields.find(
-    (f) => f.type === "automatic_progress"
-  );
-  if (
-    progressField &&
-    progressField.value &&
-    progressField.value.percent_complete
-  ) {
-    return `${Math.round(progressField.value.percent_complete)}%`;
-  }
-  return "";
+  const path = join(CONFIG.TodoBackupFolder, task.id + ".md");
+  const content = readFileSync(path, { encoding: "utf-8" });
+  const checklist = normalizeMarkdownChecklist(content);
+  const total = checklist.length;
+  const done = checklist.filter((c) => c.checked).length;
+  return `${Math.round((done / total) * 100)}%`;
 }

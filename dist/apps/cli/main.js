@@ -1695,7 +1695,9 @@ exports.getTaskProgress = exports.openUrlsInTabGroup = exports.checkWorkingTreeC
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const child_process_1 = tslib_1.__importStar(__webpack_require__(/*! child_process */ "child_process"));
+const fs_1 = __webpack_require__(/*! fs */ "fs");
 const open_1 = tslib_1.__importDefault(__webpack_require__(/*! open */ "open"));
+const path_1 = __webpack_require__(/*! path */ "path");
 const qs_1 = tslib_1.__importDefault(__webpack_require__(/*! qs */ "qs"));
 const case_utils_1 = __webpack_require__(/*! ./case-utils */ "./apps/cli/src/case-utils.ts");
 function promiseSpawn(command, args, stdio = "inherit") {
@@ -1845,13 +1847,12 @@ function openUrlsInTabGroup(urls, group) {
 }
 exports.openUrlsInTabGroup = openUrlsInTabGroup;
 function getTaskProgress(task) {
-    const progressField = task.custom_fields.find((f) => f.type === "automatic_progress");
-    if (progressField &&
-        progressField.value &&
-        progressField.value.percent_complete) {
-        return `${Math.round(progressField.value.percent_complete)}%`;
-    }
-    return "";
+    const path = path_1.join(node_shared_1.CONFIG.TodoBackupFolder, task.id + ".md");
+    const content = fs_1.readFileSync(path, { encoding: "utf-8" });
+    const checklist = node_shared_1.normalizeMarkdownChecklist(content);
+    const total = checklist.length;
+    const done = checklist.filter((c) => c.checked).length;
+    return `${Math.round((done / total) * 100)}%`;
 }
 exports.getTaskProgress = getTaskProgress;
 
