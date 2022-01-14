@@ -1,5 +1,5 @@
 <ngx-codemirror
-  [(ngModel)]="checklistMarkDown"
+  [ngModel]="checklistMarkDown"
   [options]="{
     lineNumbers: true,
     theme: 'one-dark',
@@ -8,4 +8,5 @@
     indentWithTabs: false,
     keyMap: 'vim'
   }"
+  (ngModelChange)="onContentChange($event)"
 ></ngx-codemirror>

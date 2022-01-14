@@ -1,6 +1,7 @@
 import { HttpClientModule } from "@angular/common/http";
 import { NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
+import { MatSnackBarModule } from "@angular/material/snack-bar";
 import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { RouterModule } from "@angular/router";
@@ -22,6 +23,7 @@ import { TaskPageComponent } from "./task-page/task-page.component";
         component: TaskPageComponent,
       },
     ]),
+    MatSnackBarModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

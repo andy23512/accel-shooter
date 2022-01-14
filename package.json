@@ -5,7 +5,9 @@
   "license": "MIT",
   "bin": {
     "accel-shooter": "./main.js",
-    "acst": "./main.js"
+    "acst": "./main-server.js",
+    "accel-shooter-server": "./main.js",
+    "acst-server": "./main-server.js"
   },
   "scripts": {
     "ng": "nx",
@@ -15,7 +17,9 @@
     "start": "nx serve cli",
     "build": "nx build cli",
     "build-ext": "tsc --project apps/extension/tsconfig.app.json && cp apps/extension/manifest.json dist/apps/extension",
-    "precommit-build": "yarn build && yarn build-ext && git add dist/",
+    "build-frontend": "nx build frontend",
+    "build-api": "nx build api",
+    "precommit-build": "yarn build && yarn build-ext && yarn build frontend && yarn build api && git add dist/",
     "test": "ng test",
     "lint": "nx workspace-lint && ng lint",
     "e2e": "ng e2e",
@@ -40,7 +44,10 @@
   },
   "files": [
     "main.js",
-    "dist/apps/cli/main.js"
+    "main-server.js",
+    "dist/apps/cli/main.js",
+    "dist/apps/api/main.js",
+    "dist/apps/frontend"
   ],
   "pre-commit": [
     "precommit-build"
@@ -54,6 +61,7 @@
     "@nestjs/config": "^1.1.6",
     "@nestjs/core": "^7.0.0",
     "@nestjs/platform-express": "^7.0.0",
+    "@nestjs/serve-static": "^2.2.2",
     "clipboardy": "^2.3.0",
     "core-js": "^3.6.5",
     "csv-parser": "^3.0.0",

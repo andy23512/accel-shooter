@@ -3,22 +3,25 @@ import {
   getSyncChecklistActions,
   normalizeClickUpChecklist,
   normalizeMarkdownChecklist,
-  Task,
 } from "@accel-shooter/node-shared";
 import { Body, Controller, Get, Param, Put } from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { format } from "date-fns";
-import { writeFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
 
 @Controller()
 export class AppController {
   constructor(private configService: ConfigService) {}
 
-  @Get("task/:id")
-  async getData(@Param("id") taskId: string): Promise<Task> {
-    const clickUp = new ClickUp(taskId);
-    return clickUp.getTask();
+  @Get("task/:id/checklist")
+  async getData(@Param("id") taskId: string): Promise<{ content: string }> {
+    const folderPath = this.configService.get<string>("TodoBackupFolder");
+    const path = join(folderPath, taskId + ".md");
+    const content = readFileSync(path, { encoding: "utf-8" });
+    return {
+      content,
+    };
   }
 
   @Put("task/:id/checklist")

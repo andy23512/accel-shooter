@@ -1,14 +1,18 @@
-import {
-  ChecklistItem,
-  NormalizedChecklist,
-  Task,
-} from "@accel-shooter/node-shared";
+import { ChecklistItem, NormalizedChecklist } from "@accel-shooter/node-shared";
 import { HttpClient } from "@angular/common/http";
 import { AfterViewInit, Component, OnInit, ViewChild } from "@angular/core";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute } from "@angular/router";
 import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
 import { interval, merge, Subject } from "rxjs";
-import { filter, map, switchMap, take, throttleTime } from "rxjs/operators";
+import {
+  filter,
+  map,
+  switchMap,
+  take,
+  tap,
+  throttleTime,
+} from "rxjs/operators";
 
 export function normalizeClickUpChecklist(
   checklist: ChecklistItem[]
@@ -36,38 +40,19 @@ export class TaskPageComponent implements OnInit, AfterViewInit {
   public changeSubject = new Subject();
   public saveSubject = new Subject();
 
-  constructor(private route: ActivatedRoute, private http: HttpClient) {}
+  constructor(
+    private route: ActivatedRoute,
+    private http: HttpClient,
+    private matSnackBar: MatSnackBar
+  ) {}
 
   public ngOnInit(): void {
     this.taskId = this.route.snapshot.paramMap.get("id") as string;
     this.http
-      .get<Task>(`/api/task/${this.taskId}`)
-      .pipe(
-        take(1),
-        map((task) => {
-          const targetChecklist = task.checklists.find((c) =>
-            c.name.toLowerCase().includes("synced checklist")
-          );
-          if (targetChecklist) {
-            const clickUpNormalizedChecklist = normalizeClickUpChecklist(
-              targetChecklist.items
-            );
-            return clickUpNormalizedChecklist
-              .map((c) =>
-                c.name.replace(
-                  /^-*/,
-                  (dashes) =>
-                    dashes.replace(/-/g, " ") +
-                    (c.checked ? "- [x] " : "- [ ] ")
-                )
-              )
-              .join("\n");
-          }
-          return "";
-        })
-      )
-      .subscribe((markdown) => {
-        this.checklistMarkDown = markdown;
+      .get<{ content: string }>(`/api/task/${this.taskId}/checklist`)
+      .pipe(take(1))
+      .subscribe(({ content }) => {
+        this.checklistMarkDown = content;
         this.startSync();
       });
   }
@@ -81,34 +66,52 @@ export class TaskPageComponent implements OnInit, AfterViewInit {
       )
       .subscribe((codeMirror: any) => {
         const Vim = codeMirror.constructor.Vim;
-        Vim.unmap("c");
-        Vim.unmap("C");
+        Vim.unmap("z");
+        Vim.unmap("Z");
         Vim.defineAction("checkMdCheckbox", (cm: any) => {
           Vim.handleEx(cm, "s/- \\[\\s\\]/- [x]/g");
         });
         Vim.defineAction("uncheckMdCheckbox", (cm: any) => {
-          console.log(cm);
           Vim.handleEx(cm, "s/- \\[x\\]/- [ ]/g");
-          Vim.handleEx(cm, "s/someimpossibleword//g");
         });
-        Vim.mapCommand("c", "action", "checkMdCheckbox");
-        Vim.mapCommand("C", "action", "uncheckMdCheckbox");
+        Vim.defineAction("save", () => {
+          this.saveSubject.next();
+        });
+        Vim.mapCommand("z", "action", "checkMdCheckbox");
+        Vim.mapCommand("Z", "action", "uncheckMdCheckbox");
+        Vim.mapCommand("<C-s>", "action", "save");
         Vim.defineEx("w", null, () => {
           this.saveSubject.next();
         });
       });
   }
 
+  public onContentChange(content: string) {
+    this.checklistMarkDown = content;
+    this.changeSubject.next();
+  }
+
   public startSync() {
     merge(
-      this.changeSubject.asObservable().pipe(throttleTime(30 * 1000)),
+      this.changeSubject.asObservable().pipe(throttleTime(10 * 1000)),
       this.saveSubject.asObservable()
     )
       .pipe(
         switchMap(() =>
-          this.http.put(`/api/task/${this.taskId}/checklist`, {
-            checklist: this.checklistMarkDown,
-          })
+          this.http
+            .put(`/api/task/${this.taskId}/checklist`, {
+              checklist: this.checklistMarkDown,
+            })
+            .pipe(
+              tap({
+                next: () => {
+                  this.matSnackBar.open("Saved!", "", { duration: 5000 });
+                },
+                error: () => {
+                  this.matSnackBar.open("Error!", "", { duration: 5000 });
+                },
+              })
+            )
         )
       )
       .subscribe();
