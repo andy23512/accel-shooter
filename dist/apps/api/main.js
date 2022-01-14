@@ -261,7 +261,7 @@ function bootstrap() {
         const app = yield core_1.NestFactory.create(app_module_1.AppModule);
         const globalPrefix = 'api';
         app.setGlobalPrefix(globalPrefix);
-        const port = process.env.PORT || 3333;
+        const port = process.env.PORT || 8112;
         yield app.listen(port, () => {
             common_1.Logger.log('Listening at http://localhost:' + port + '/' + globalPrefix);
         });
