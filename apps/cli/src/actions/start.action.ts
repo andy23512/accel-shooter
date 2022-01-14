@@ -107,7 +107,7 @@ export async function startAction() {
   });
   const endingTodo = render(template, todoConfigMap);
   const path = join(CONFIG.TodoBackupFolder, answers.clickUpTaskId + ".md");
-  const content = writeFileSync(path, endingTodo);
+  writeFileSync(path, endingTodo);
   p.next(); // Create GitLab Branch
   const gitLabBranch = await gitLab.createBranch(`CU-${answers.clickUpTaskId}`);
   p.next(); // Create GitLab Merge Request

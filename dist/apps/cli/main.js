@@ -696,7 +696,7 @@ function startAction() {
         });
         const endingTodo = mustache_1.render(template, todoConfigMap);
         const path = path_1.join(node_shared_1.CONFIG.TodoBackupFolder, answers.clickUpTaskId + ".md");
-        const content = fs_1.writeFileSync(path, endingTodo);
+        fs_1.writeFileSync(path, endingTodo);
         p.next(); // Create GitLab Branch
         const gitLabBranch = yield gitLab.createBranch(`CU-${answers.clickUpTaskId}`);
         p.next(); // Create GitLab Merge Request
