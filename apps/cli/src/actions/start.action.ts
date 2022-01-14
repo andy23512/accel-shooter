@@ -8,10 +8,11 @@ import {
   sleep,
 } from "@accel-shooter/node-shared";
 import clipboardy from "clipboardy";
-import { readFileSync } from "fs";
+import { readFileSync, writeFileSync } from "fs";
 import inquirer from "inquirer";
 import { render } from "mustache";
 import os from "os";
+import { join } from "path";
 import untildify from "untildify";
 import { DailyProgress } from "../classes/daily-progress.class";
 import { CustomProgressLog } from "../classes/progress-log.class";
@@ -105,6 +106,8 @@ export async function startAction() {
     encoding: "utf-8",
   });
   const endingTodo = render(template, todoConfigMap);
+  const path = join(CONFIG.TodoBackupFolder, answers.clickUpTaskId + ".md");
+  const content = writeFileSync(path, endingTodo);
   p.next(); // Create GitLab Branch
   const gitLabBranch = await gitLab.createBranch(`CU-${answers.clickUpTaskId}`);
   p.next(); // Create GitLab Merge Request

@@ -601,6 +601,7 @@ const fs_1 = __webpack_require__(/*! fs */ "fs");
 const inquirer_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer */ "inquirer"));
 const mustache_1 = __webpack_require__(/*! mustache */ "mustache");
 const os_1 = tslib_1.__importDefault(__webpack_require__(/*! os */ "os"));
+const path_1 = __webpack_require__(/*! path */ "path");
 const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
 const daily_progress_class_1 = __webpack_require__(/*! ../classes/daily-progress.class */ "./apps/cli/src/classes/daily-progress.class.ts");
 const progress_log_class_1 = __webpack_require__(/*! ../classes/progress-log.class */ "./apps/cli/src/classes/progress-log.class.ts");
@@ -694,6 +695,8 @@ function startAction() {
             encoding: "utf-8",
         });
         const endingTodo = mustache_1.render(template, todoConfigMap);
+        const path = path_1.join(node_shared_1.CONFIG.TodoBackupFolder, answers.clickUpTaskId + ".md");
+        const content = fs_1.writeFileSync(path, endingTodo);
         p.next(); // Create GitLab Branch
         const gitLabBranch = yield gitLab.createBranch(`CU-${answers.clickUpTaskId}`);
         p.next(); // Create GitLab Merge Request
@@ -2626,6 +2629,17 @@ module.exports = require("open");
 /***/ (function(module, exports) {
 
 module.exports = require("os");
+
+/***/ }),
+
+/***/ "path":
+/*!***********************!*\
+  !*** external "path" ***!
+  \***********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("path");
 
 /***/ }),
 
