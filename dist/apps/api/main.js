@@ -136,7 +136,7 @@ let AppController = class AppController {
                     return;
                 }
                 const time = date_fns_1.format(new Date(), "yyyyMMdd_HHmmss");
-                fs_1.writeFileSync(path_1.join(folderPath, taskId + "_" + time + ".md"), checklist);
+                fs_1.writeFileSync(path_1.join(folderPath, taskId + ".md"), checklist);
                 for (const checklistItem of actions.update) {
                     yield clickUp.updateChecklistItem(clickUpChecklist.id, checklistItem.id, checklistItem.name, checklistItem.checked, checklistItem.order);
                 }
