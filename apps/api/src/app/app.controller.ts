@@ -53,7 +53,7 @@ export class AppController {
         return;
       }
       const time = format(new Date(), "yyyyMMdd_HHmmss");
-      writeFileSync(join(folderPath, taskId + "_" + time + ".md"), checklist);
+      writeFileSync(join(folderPath, taskId + ".md"), checklist);
       for (const checklistItem of actions.update) {
         await clickUp.updateChecklistItem(
           clickUpChecklist.id,
