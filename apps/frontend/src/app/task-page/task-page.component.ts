@@ -6,12 +6,12 @@ import { ActivatedRoute } from "@angular/router";
 import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
 import { interval, merge, Subject } from "rxjs";
 import {
+  debounceTime,
   filter,
   map,
   switchMap,
   take,
   tap,
-  throttleTime,
 } from "rxjs/operators";
 
 export function normalizeClickUpChecklist(
@@ -93,7 +93,7 @@ export class TaskPageComponent implements OnInit, AfterViewInit {
 
   public startSync() {
     merge(
-      this.changeSubject.asObservable().pipe(throttleTime(10 * 1000)),
+      this.changeSubject.asObservable().pipe(debounceTime(2000)),
       this.saveSubject.asObservable()
     )
       .pipe(
