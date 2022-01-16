@@ -568,11 +568,26 @@ const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 function showDiffAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const htmlOnly = process.argv.includes("-h") || process.argv.includes("--html");
+        const pythonOnly = process.argv.includes("-p") || process.argv.includes("--python");
+        process.argv = process.argv.filter((a) => !a.startsWith("-"));
         const { gitLab, mergeRequest } = yield utils_1.getInfoFromArgv();
         const mergeRequestChanges = yield gitLab.getMergeRequestChanges(mergeRequest.iid);
         const changes = mergeRequestChanges.changes;
-        const templateChanges = changes.filter((c) => c.new_path.endsWith(".html"));
-        for (const change of templateChanges) {
+        let filteredChanges = [];
+        if (htmlOnly) {
+            filteredChanges = [
+                ...filteredChanges,
+                ...changes.filter((c) => c.new_path.endsWith(".html")),
+            ];
+        }
+        if (pythonOnly) {
+            filteredChanges = [
+                ...filteredChanges,
+                ...changes.filter((c) => c.new_path.endsWith(".py")),
+            ];
+        }
+        for (const change of filteredChanges) {
             console.log(`### ${change.new_path}`);
             console.log(change.diff);
         }

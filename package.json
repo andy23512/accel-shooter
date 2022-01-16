@@ -19,7 +19,7 @@
     "build-ext": "tsc --project apps/extension/tsconfig.app.json && cp apps/extension/manifest.json dist/apps/extension",
     "build-frontend": "nx build frontend",
     "build-api": "nx build api",
-    "precommit-build": "yarn build && yarn build-ext && yarn build frontend && yarn build api && git add dist/",
+    "precommit-build": "rm -rf ./node_modules/.cache/nx && yarn build && yarn build-ext && yarn build frontend && yarn build api && git add dist/",
     "test": "ng test",
     "lint": "nx workspace-lint && ng lint",
     "e2e": "ng e2e",
