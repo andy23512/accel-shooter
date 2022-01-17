@@ -35,6 +35,8 @@ export function normalizeClickUpChecklist(
 export class TaskPageComponent implements OnInit, AfterViewInit {
   public taskId = "";
   public checklistMarkDown = "";
+  public taskLink = "";
+  public mergeRequestLink = "";
   @ViewChild(CodemirrorComponent)
   public codemirrorComponent?: CodemirrorComponent;
   public changeSubject = new Subject();
@@ -49,9 +51,13 @@ export class TaskPageComponent implements OnInit, AfterViewInit {
   public ngOnInit(): void {
     this.taskId = this.route.snapshot.paramMap.get("id") as string;
     this.http
-      .get<{ content: string }>(`/api/task/${this.taskId}/checklist`)
+      .get<{ mergeRequestLink: string; taskLink: string; content: string }>(
+        `/api/task/${this.taskId}/checklist`
+      )
       .pipe(take(1))
-      .subscribe(({ content }) => {
+      .subscribe(({ taskLink, mergeRequestLink, content }) => {
+        this.taskLink = taskLink;
+        this.mergeRequestLink = mergeRequestLink;
         this.checklistMarkDown = content;
         this.startSync();
       });

@@ -1,3 +1,4 @@
+import { ClickUp } from "@accel-shooter/node-shared";
 import { checkAction } from "./actions/check.action";
 import { commentAction } from "./actions/comment.action";
 import { copyAction } from "./actions/copy.action";
@@ -34,6 +35,19 @@ const actions: { [key: string]: () => Promise<void> } = {
   time: timeAction,
   copy: copyAction,
   showDiff: showDiffAction,
+  test: async () => {
+    const clickUp = new ClickUp("21v88x5");
+    const task = await clickUp.getTask();
+    const clickUpChecklist = task.checklists.find((c) =>
+      c.name.toLowerCase().includes("synced checklist")
+    );
+    if (clickUpChecklist) {
+      const match = clickUpChecklist.name.match(/\[(.*?) !([\d]+)\]/);
+      if (match) {
+        console.log(match);
+      }
+    }
+  },
 };
 
 (async () => {

@@ -98,13 +98,6 @@ export async function updateTaskStatusInDp(dp: string) {
 
 export async function getInfoFromArgv() {
   if (process.argv.length === 3) {
-    const directory = execSync("pwd", { encoding: "utf-8" });
-    const gitLabProject = CONFIG.GitLabProjects.find((p) =>
-      directory.startsWith(p.path)
-    );
-    if (!gitLabProject) {
-      throw Error("No such project");
-    }
     const branchName = execSync("git branch --show-current", {
       encoding: "utf-8",
     });
@@ -115,7 +108,8 @@ export async function getInfoFromArgv() {
     const clickUpTaskId = match[1];
     const clickUp = new ClickUp(clickUpTaskId);
     const clickUpTask = await clickUp.getTask();
-    const mergeRequestIId = await clickUp.getGitLabMergeRequestIId();
+    const { gitLabProject, mergeRequestIId } =
+      await clickUp.getGitLabProjectAndMergeRequestIId();
     const gitLab = new GitLab(gitLabProject.id);
     const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
     return {

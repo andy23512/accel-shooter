@@ -1,3 +1,4 @@
+import { CONFIG } from "../config";
 import { ChecklistResponse, Task } from "../models/clickup.models";
 import { Comment } from "../models/clickup/comment.models";
 import { List } from "../models/clickup/list.models";
@@ -148,15 +149,18 @@ export class ClickUp {
     return frameUrls;
   }
 
-  public async getGitLabMergeRequestIId() {
+  public async getGitLabProjectAndMergeRequestIId() {
     const task = await this.getTask();
     const clickUpChecklist = task.checklists.find((c) =>
       c.name.toLowerCase().includes("synced checklist")
     );
     if (clickUpChecklist) {
-      const match = clickUpChecklist.name.match(/!([\d]+)/);
+      const match = clickUpChecklist.name.match(/\[(.*?) !([\d]+)\]/);
       if (match) {
-        return match[1];
+        return {
+          gitLabProject: CONFIG.GitLabProjects.find((p) => p.repo === match[1]),
+          mergeRequestIId: match[2],
+        };
       }
     }
     return null;

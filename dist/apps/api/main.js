@@ -102,7 +102,6 @@ const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 const config_1 = __webpack_require__(/*! @nestjs/config */ "@nestjs/config");
-const date_fns_1 = __webpack_require__(/*! date-fns */ "date-fns");
 const fs_1 = __webpack_require__(/*! fs */ "fs");
 const path_1 = __webpack_require__(/*! path */ "path");
 let AppController = class AppController {
@@ -111,10 +110,17 @@ let AppController = class AppController {
     }
     getData(taskId) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const clickUp = new node_shared_1.ClickUp(taskId);
+            const task = yield clickUp.getTask();
+            const { gitLabProject, mergeRequestIId } = yield clickUp.getGitLabProjectAndMergeRequestIId();
+            const gitLab = new node_shared_1.GitLab(gitLabProject.id);
+            const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
             const folderPath = this.configService.get("TodoBackupFolder");
             const path = path_1.join(folderPath, taskId + ".md");
             const content = fs_1.readFileSync(path, { encoding: "utf-8" });
             return {
+                mergeRequestLink: mergeRequest.web_url,
+                taskLink: task.url,
                 content,
             };
         });
@@ -135,7 +141,6 @@ let AppController = class AppController {
                     0) {
                     return;
                 }
-                const time = date_fns_1.format(new Date(), "yyyyMMdd_HHmmss");
                 fs_1.writeFileSync(path_1.join(folderPath, taskId + ".md"), checklist);
                 for (const checklistItem of actions.update) {
                     yield clickUp.updateChecklistItem(clickUpChecklist.id, checklistItem.id, checklistItem.name, checklistItem.checked, checklistItem.order);
@@ -300,6 +305,7 @@ tslib_1.__exportStar(__webpack_require__(/*! ./lib/node-shared */ "./libs/node-s
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClickUp = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const config_1 = __webpack_require__(/*! ../config */ "./libs/node-shared/src/lib/config.ts");
 const api_utils_1 = __webpack_require__(/*! ../utils/api.utils */ "./libs/node-shared/src/lib/utils/api.utils.ts");
 const callApi = api_utils_1.callApiFactory("ClickUp");
 class ClickUp {
@@ -401,14 +407,17 @@ class ClickUp {
             return frameUrls;
         });
     }
-    getGitLabMergeRequestIId() {
+    getGitLabProjectAndMergeRequestIId() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const task = yield this.getTask();
             const clickUpChecklist = task.checklists.find((c) => c.name.toLowerCase().includes("synced checklist"));
             if (clickUpChecklist) {
-                const match = clickUpChecklist.name.match(/!([\d]+)/);
+                const match = clickUpChecklist.name.match(/\[(.*?) !([\d]+)\]/);
                 if (match) {
-                    return match[1];
+                    return {
+                        gitLabProject: config_1.CONFIG.GitLabProjects.find((p) => p.repo === match[1]),
+                        mergeRequestIId: match[2],
+                    };
                 }
             }
             return null;
@@ -933,17 +942,6 @@ module.exports = require("@nestjs/core");
 /***/ (function(module, exports) {
 
 module.exports = require("@nestjs/serve-static");
-
-/***/ }),
-
-/***/ "date-fns":
-/*!***************************!*\
-  !*** external "date-fns" ***!
-  \***************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("date-fns");
 
 /***/ }),
 

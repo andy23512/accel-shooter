@@ -1647,6 +1647,7 @@ exports.checkItemsMap = {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const check_action_1 = __webpack_require__(/*! ./actions/check.action */ "./apps/cli/src/actions/check.action.ts");
 const comment_action_1 = __webpack_require__(/*! ./actions/comment.action */ "./apps/cli/src/actions/comment.action.ts");
 const copy_action_1 = __webpack_require__(/*! ./actions/copy.action */ "./apps/cli/src/actions/copy.action.ts");
@@ -1682,6 +1683,17 @@ const actions = {
     time: time_action_1.timeAction,
     copy: copy_action_1.copyAction,
     showDiff: show_diff_action_1.showDiffAction,
+    test: () => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
+        const clickUp = new node_shared_1.ClickUp("21v88x5");
+        const task = yield clickUp.getTask();
+        const clickUpChecklist = task.checklists.find((c) => c.name.toLowerCase().includes("synced checklist"));
+        if (clickUpChecklist) {
+            const match = clickUpChecklist.name.match(/\[(.*?) !([\d]+)\]/);
+            if (match) {
+                console.log(match);
+            }
+        }
+    }),
 };
 (() => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     const action = process.argv[2];
@@ -1785,11 +1797,6 @@ exports.updateTaskStatusInDp = updateTaskStatusInDp;
 function getInfoFromArgv() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         if (process.argv.length === 3) {
-            const directory = child_process_1.execSync("pwd", { encoding: "utf-8" });
-            const gitLabProject = node_shared_1.CONFIG.GitLabProjects.find((p) => directory.startsWith(p.path));
-            if (!gitLabProject) {
-                throw Error("No such project");
-            }
             const branchName = child_process_1.execSync("git branch --show-current", {
                 encoding: "utf-8",
             });
@@ -1800,7 +1807,7 @@ function getInfoFromArgv() {
             const clickUpTaskId = match[1];
             const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
             const clickUpTask = yield clickUp.getTask();
-            const mergeRequestIId = yield clickUp.getGitLabMergeRequestIId();
+            const { gitLabProject, mergeRequestIId } = yield clickUp.getGitLabProjectAndMergeRequestIId();
             const gitLab = new node_shared_1.GitLab(gitLabProject.id);
             const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
             return {
@@ -1902,6 +1909,7 @@ tslib_1.__exportStar(__webpack_require__(/*! ./lib/node-shared */ "./libs/node-s
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClickUp = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const config_1 = __webpack_require__(/*! ../config */ "./libs/node-shared/src/lib/config.ts");
 const api_utils_1 = __webpack_require__(/*! ../utils/api.utils */ "./libs/node-shared/src/lib/utils/api.utils.ts");
 const callApi = api_utils_1.callApiFactory("ClickUp");
 class ClickUp {
@@ -2003,14 +2011,17 @@ class ClickUp {
             return frameUrls;
         });
     }
-    getGitLabMergeRequestIId() {
+    getGitLabProjectAndMergeRequestIId() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const task = yield this.getTask();
             const clickUpChecklist = task.checklists.find((c) => c.name.toLowerCase().includes("synced checklist"));
             if (clickUpChecklist) {
-                const match = clickUpChecklist.name.match(/!([\d]+)/);
+                const match = clickUpChecklist.name.match(/\[(.*?) !([\d]+)\]/);
                 if (match) {
-                    return match[1];
+                    return {
+                        gitLabProject: config_1.CONFIG.GitLabProjects.find((p) => p.repo === match[1]),
+                        mergeRequestIId: match[2],
+                    };
                 }
             }
             return null;

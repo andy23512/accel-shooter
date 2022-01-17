@@ -1,6 +1,7 @@
 import {
   ClickUp,
   getSyncChecklistActions,
+  GitLab,
   normalizeClickUpChecklist,
   normalizeMarkdownChecklist,
 } from "@accel-shooter/node-shared";
@@ -14,11 +15,21 @@ export class AppController {
   constructor(private configService: ConfigService) {}
 
   @Get("task/:id/checklist")
-  async getData(@Param("id") taskId: string): Promise<{ content: string }> {
+  async getData(
+    @Param("id") taskId: string
+  ): Promise<{ mergeRequestLink: string; taskLink: string; content: string }> {
+    const clickUp = new ClickUp(taskId);
+    const task = await clickUp.getTask();
+    const { gitLabProject, mergeRequestIId } =
+      await clickUp.getGitLabProjectAndMergeRequestIId();
+    const gitLab = new GitLab(gitLabProject.id);
+    const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
     const folderPath = this.configService.get<string>("TodoBackupFolder");
     const path = join(folderPath, taskId + ".md");
     const content = readFileSync(path, { encoding: "utf-8" });
     return {
+      mergeRequestLink: mergeRequest.web_url,
+      taskLink: task.url,
       content,
     };
   }
