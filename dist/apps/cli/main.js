@@ -1245,7 +1245,7 @@ class DailyProgress extends base_file_ref_class_1.BaseFileRef {
     }
     addProgressToBuffer(dailyProgressString) {
         const content = this.readFile();
-        const updatedDpContent = content.replace("## Buffer", `## Buffer\n    ${dailyProgressString}`);
+        const updatedDpContent = content.replace("## Buffer End", `    ${dailyProgressString}\n## Buffer End`);
         this.writeFile(updatedDpContent);
     }
     getRecordByDay(day) {

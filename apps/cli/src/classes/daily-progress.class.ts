@@ -10,8 +10,8 @@ export class DailyProgress extends BaseFileRef {
   public addProgressToBuffer(dailyProgressString: string) {
     const content = this.readFile();
     const updatedDpContent = content.replace(
-      "## Buffer",
-      `## Buffer\n    ${dailyProgressString}`
+      "## Buffer End",
+      `    ${dailyProgressString}\n## Buffer End`
     );
     this.writeFile(updatedDpContent);
   }
