@@ -472,16 +472,8 @@ const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 function openAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { mergeRequest, clickUp, clickUpTask, clickUpTaskId } = yield utils_1.getInfoFromArgv();
-        const frameUrls = yield clickUp.getFrameUrls();
-        const urls = [
-            mergeRequest.web_url,
-            clickUpTask.url,
-            `localhost:8112/task/${clickUpTaskId}`,
-        ];
-        if (frameUrls.length) {
-            urls.push(frameUrls[0]);
-        }
+        const { clickUpTaskId } = yield utils_1.getInfoFromArgv();
+        const urls = [`localhost:8112/task/${clickUpTaskId}`];
         utils_1.openUrlsInTabGroup(urls, clickUpTaskId);
     });
 }
