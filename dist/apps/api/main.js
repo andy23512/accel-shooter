@@ -112,6 +112,7 @@ let AppController = class AppController {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const clickUp = new node_shared_1.ClickUp(taskId);
             const task = yield clickUp.getTask();
+            const frameUrls = yield clickUp.getFrameUrls();
             const { gitLabProject, mergeRequestIId } = yield clickUp.getGitLabProjectAndMergeRequestIId();
             const gitLab = new node_shared_1.GitLab(gitLabProject.id);
             const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
@@ -122,6 +123,7 @@ let AppController = class AppController {
                 mergeRequestLink: mergeRequest.web_url,
                 taskLink: task.url,
                 content,
+                frameUrl: frameUrls.length ? frameUrls[0] : null,
             };
         });
     }

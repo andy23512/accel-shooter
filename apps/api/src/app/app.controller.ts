@@ -17,9 +17,15 @@ export class AppController {
   @Get("task/:id/checklist")
   async getData(
     @Param("id") taskId: string
-  ): Promise<{ mergeRequestLink: string; taskLink: string; content: string }> {
+  ): Promise<{
+    mergeRequestLink: string;
+    taskLink: string;
+    content: string;
+    frameUrl: string;
+  }> {
     const clickUp = new ClickUp(taskId);
     const task = await clickUp.getTask();
+    const frameUrls = await clickUp.getFrameUrls();
     const { gitLabProject, mergeRequestIId } =
       await clickUp.getGitLabProjectAndMergeRequestIId();
     const gitLab = new GitLab(gitLabProject.id);
@@ -31,6 +37,7 @@ export class AppController {
       mergeRequestLink: mergeRequest.web_url,
       taskLink: task.url,
       content,
+      frameUrl: frameUrls.length ? frameUrls[0] : null,
     };
   }
 

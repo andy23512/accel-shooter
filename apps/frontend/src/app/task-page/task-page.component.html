@@ -13,4 +13,5 @@
 <div class="refs">
   <a [href]="mergeRequestLink" target="_blank">Merge Request</a><br />
   <a [href]="taskLink" target="_blank">ClickUp Task</a>
+  <a *ngIf="frameUrl" [href]="frameUrl" target="_blank">Frame</a>
 </div>

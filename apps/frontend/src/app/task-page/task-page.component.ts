@@ -37,6 +37,7 @@ export class TaskPageComponent implements OnInit, AfterViewInit {
   public checklistMarkDown = "";
   public taskLink = "";
   public mergeRequestLink = "";
+  public frameUrl = "";
   @ViewChild(CodemirrorComponent)
   public codemirrorComponent?: CodemirrorComponent;
   public changeSubject = new Subject();
@@ -51,13 +52,17 @@ export class TaskPageComponent implements OnInit, AfterViewInit {
   public ngOnInit(): void {
     this.taskId = this.route.snapshot.paramMap.get("id") as string;
     this.http
-      .get<{ mergeRequestLink: string; taskLink: string; content: string }>(
-        `/api/task/${this.taskId}/checklist`
-      )
+      .get<{
+        mergeRequestLink: string;
+        taskLink: string;
+        content: string;
+        frameUrl: string;
+      }>(`/api/task/${this.taskId}/checklist`)
       .pipe(take(1))
-      .subscribe(({ taskLink, mergeRequestLink, content }) => {
+      .subscribe(({ taskLink, mergeRequestLink, content, frameUrl }) => {
         this.taskLink = taskLink;
         this.mergeRequestLink = mergeRequestLink;
+        this.frameUrl = frameUrl;
         this.checklistMarkDown = content;
         this.startSync();
       });
