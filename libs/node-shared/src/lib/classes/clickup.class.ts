@@ -158,7 +158,9 @@ export class ClickUp {
       const match = clickUpChecklist.name.match(/\[(.*?) !([\d]+)\]/);
       if (match) {
         return {
-          gitLabProject: CONFIG.GitLabProjects.find((p) => p.repo === match[1]),
+          gitLabProject: CONFIG.GitLabProjects.find(
+            (p) => p.repo.toLowerCase() === match[1].toLowerCase()
+          ),
           mergeRequestIId: match[2],
         };
       }
