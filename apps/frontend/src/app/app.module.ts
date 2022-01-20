@@ -6,6 +6,9 @@ import { BrowserModule } from "@angular/platform-browser";
 import { BrowserAnimationsModule } from "@angular/platform-browser/animations";
 import { RouterModule } from "@angular/router";
 import { CodemirrorModule } from "@ctrl/ngx-codemirror";
+import { LoadingBarModule } from "@ngx-loading-bar/core";
+import { LoadingBarHttpClientModule } from "@ngx-loading-bar/http-client";
+import { LoadingBarRouterModule } from "@ngx-loading-bar/router";
 import { AppComponent } from "./app.component";
 import { TaskPageComponent } from "./task-page/task-page.component";
 
@@ -24,6 +27,9 @@ import { TaskPageComponent } from "./task-page/task-page.component";
       },
     ]),
     MatSnackBarModule,
+    LoadingBarHttpClientModule,
+    LoadingBarRouterModule,
+    LoadingBarModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
