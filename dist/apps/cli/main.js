@@ -707,6 +707,7 @@ function startAction() {
         p.next(); // Create GitLab Branch
         const gitLabBranch = yield gitLab.createBranch(`CU-${answers.clickUpTaskId}`);
         p.next(); // Create GitLab Merge Request
+        yield node_shared_1.sleep(2000); // prevent "branch restored" bug
         const gitLabMergeRequest = yield gitLab.createMergeRequest(gitLabMergeRequestTitle, gitLabBranch.name);
         const gitLabMergeRequestIId = gitLabMergeRequest.iid;
         p.next(); // Create Checklist at ClickUp
