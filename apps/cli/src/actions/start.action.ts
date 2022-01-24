@@ -128,7 +128,10 @@ export async function startAction() {
   if (!clickUpChecklist) {
     clickUpChecklist = (await clickUp.createChecklist(clickUpChecklistTitle))
       .checklist;
-    const markdownNormalizedChecklist = normalizeMarkdownChecklist(endingTodo);
+    const markdownNormalizedChecklist = normalizeMarkdownChecklist(
+      endingTodo,
+      true
+    );
     const clickUpNormalizedChecklist = normalizeClickUpChecklist(
       clickUpChecklist.items
     );

@@ -716,7 +716,7 @@ function startAction() {
         if (!clickUpChecklist) {
             clickUpChecklist = (yield clickUp.createChecklist(clickUpChecklistTitle))
                 .checklist;
-            const markdownNormalizedChecklist = node_shared_1.normalizeMarkdownChecklist(endingTodo);
+            const markdownNormalizedChecklist = node_shared_1.normalizeMarkdownChecklist(endingTodo, true);
             const clickUpNormalizedChecklist = node_shared_1.normalizeClickUpChecklist(clickUpChecklist.items);
             const actions = node_shared_1.getSyncChecklistActions(clickUpNormalizedChecklist, markdownNormalizedChecklist);
             if (actions.update.length + actions.create.length + actions.delete.length ===
@@ -2425,7 +2425,7 @@ function normalizeClickUpChecklist(checklist) {
     }));
 }
 exports.normalizeClickUpChecklist = normalizeClickUpChecklist;
-function normalizeMarkdownChecklist(markdown) {
+function normalizeMarkdownChecklist(markdown, rootOnly = false) {
     return markdown
         .split("\n")
         .filter((line) => line && (line.includes("- [ ]") || line.includes("- [x]")))
@@ -2435,7 +2435,8 @@ function normalizeMarkdownChecklist(markdown) {
             .replace(/^ +/, (space) => space.replace(/ /g, "-")),
         checked: /- \[x\]/.test(line),
         order: index,
-    }));
+    }))
+        .filter((item) => !rootOnly || !item.name.startsWith("-"));
 }
 exports.normalizeMarkdownChecklist = normalizeMarkdownChecklist;
 function getSyncChecklistActions(oldClickUpChecklist, newGitLabChecklist) {

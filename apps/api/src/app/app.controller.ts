@@ -15,9 +15,7 @@ export class AppController {
   constructor(private configService: ConfigService) {}
 
   @Get("task/:id/checklist")
-  async getData(
-    @Param("id") taskId: string
-  ): Promise<{
+  async getData(@Param("id") taskId: string): Promise<{
     mergeRequestLink: string;
     taskLink: string;
     content: string;
@@ -47,7 +45,10 @@ export class AppController {
     @Body("checklist") checklist: string
   ) {
     const folderPath = this.configService.get<string>("TodoBackupFolder");
-    const markdownNormalizedChecklist = normalizeMarkdownChecklist(checklist);
+    const markdownNormalizedChecklist = normalizeMarkdownChecklist(
+      checklist,
+      true
+    );
     const clickUp = new ClickUp(taskId);
     const task = await clickUp.getTask();
     const clickUpChecklist = task.checklists.find((c) =>

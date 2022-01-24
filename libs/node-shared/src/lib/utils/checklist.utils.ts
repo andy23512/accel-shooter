@@ -15,7 +15,8 @@ export function normalizeClickUpChecklist(
 }
 
 export function normalizeMarkdownChecklist(
-  markdown: string
+  markdown: string,
+  rootOnly = false
 ): NormalizedChecklist {
   return markdown
     .split("\n")
@@ -28,7 +29,8 @@ export function normalizeMarkdownChecklist(
         .replace(/^ +/, (space) => space.replace(/ /g, "-")),
       checked: /- \[x\]/.test(line),
       order: index,
-    }));
+    }))
+    .filter((item) => !rootOnly || !item.name.startsWith("-"));
 }
 
 export function getSyncChecklistActions(

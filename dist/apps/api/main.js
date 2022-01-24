@@ -130,7 +130,7 @@ let AppController = class AppController {
     putChecklist(taskId, checklist) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const folderPath = this.configService.get("TodoBackupFolder");
-            const markdownNormalizedChecklist = node_shared_1.normalizeMarkdownChecklist(checklist);
+            const markdownNormalizedChecklist = node_shared_1.normalizeMarkdownChecklist(checklist, true);
             const clickUp = new node_shared_1.ClickUp(taskId);
             const task = yield clickUp.getTask();
             const clickUpChecklist = task.checklists.find((c) => c.name.toLowerCase().includes("synced checklist"));
@@ -830,7 +830,7 @@ function normalizeClickUpChecklist(checklist) {
     }));
 }
 exports.normalizeClickUpChecklist = normalizeClickUpChecklist;
-function normalizeMarkdownChecklist(markdown) {
+function normalizeMarkdownChecklist(markdown, rootOnly = false) {
     return markdown
         .split("\n")
         .filter((line) => line && (line.includes("- [ ]") || line.includes("- [x]")))
@@ -840,7 +840,8 @@ function normalizeMarkdownChecklist(markdown) {
             .replace(/^ +/, (space) => space.replace(/ /g, "-")),
         checked: /- \[x\]/.test(line),
         order: index,
-    }));
+    }))
+        .filter((item) => !rootOnly || !item.name.startsWith("-"));
 }
 exports.normalizeMarkdownChecklist = normalizeMarkdownChecklist;
 function getSyncChecklistActions(oldClickUpChecklist, newGitLabChecklist) {
