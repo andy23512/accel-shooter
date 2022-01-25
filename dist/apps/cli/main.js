@@ -368,7 +368,7 @@ function myTasksAction() {
                 due_date: t.due_date,
             }));
             const reducedTask = simpleTaskPath.reduce((a, c) => ({
-                name: a.name,
+                name: c.name + "\n" + a.name,
                 id: a.id,
                 priority: (a.priority === null && c.priority !== null) ||
                     (a.priority !== null &&
