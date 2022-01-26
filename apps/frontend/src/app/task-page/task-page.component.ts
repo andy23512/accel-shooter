@@ -76,14 +76,23 @@ export class TaskPageComponent implements OnInit, AfterViewInit {
         take(1)
       )
       .subscribe((codeMirror: any) => {
+        console.log("nanoha");
         const Vim = codeMirror.constructor.Vim;
         Vim.unmap("z");
         Vim.unmap("Z");
         Vim.defineAction("checkMdCheckbox", (cm: any) => {
-          Vim.handleEx(cm, "s/- \\[\\s\\]/- [x]/g");
+          if (cm.state.vim.visualMode) {
+            Vim.handleEx(cm, "'<,'>s/- \\[\\s\\]/- [x]/g");
+          } else {
+            Vim.handleEx(cm, "s/- \\[\\s\\]/- [x]/g");
+          }
         });
         Vim.defineAction("uncheckMdCheckbox", (cm: any) => {
-          Vim.handleEx(cm, "s/- \\[x\\]/- [ ]/g");
+          if (cm.state.vim.visualMode) {
+            Vim.handleEx(cm, "'<,'>s/- \\[x\\]/- [ ]/g");
+          } else {
+            Vim.handleEx(cm, "s/- \\[x\\]/- [ ]/g");
+          }
         });
         Vim.defineAction("save", () => {
           this.saveSubject.next();
