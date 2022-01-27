@@ -30,6 +30,7 @@ export interface Config {
   CrossChecklistDefaultSecondLevel: string[];
   ClickUpTeam: string;
   TaskTodoFolder: string;
+  TodoFile: string;
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];
 export interface NormalizedChecklistItem {
