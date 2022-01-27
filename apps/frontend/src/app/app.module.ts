@@ -11,9 +11,10 @@ import { LoadingBarHttpClientModule } from "@ngx-loading-bar/http-client";
 import { LoadingBarRouterModule } from "@ngx-loading-bar/router";
 import { AppComponent } from "./app.component";
 import { TaskPageComponent } from "./task-page/task-page.component";
+import { EditorComponent } from './editor/editor.component';
 
 @NgModule({
-  declarations: [AppComponent, TaskPageComponent],
+  declarations: [AppComponent, TaskPageComponent, EditorComponent],
   imports: [
     BrowserModule,
     HttpClientModule,

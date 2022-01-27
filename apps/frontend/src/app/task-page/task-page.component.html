@@ -1,15 +1,8 @@
-<ngx-codemirror
-  [ngModel]="checklistMarkDown"
-  [options]="{
-    lineNumbers: true,
-    theme: 'one-dark',
-    mode: 'gfm',
-    tabSize: 2,
-    indentWithTabs: false,
-    keyMap: 'vim'
-  }"
-  (ngModelChange)="onContentChange($event)"
-></ngx-codemirror>
+<accel-shooter-editor
+  [content]="checklistMarkDown"
+  (contentChange)="onContentChange($event)"
+  (save)="onSave()"
+></accel-shooter-editor>
 <div class="refs">
   <a [href]="mergeRequestLink" target="_blank">Merge Request</a><br />
   <a [href]="taskLink" target="_blank">ClickUp Task</a><br />

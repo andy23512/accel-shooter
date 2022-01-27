@@ -45,6 +45,7 @@ export class AppController {
     @Body("checklist") checklist: string
   ) {
     const folderPath = this.configService.get<string>("TodoBackupFolder");
+    writeFileSync(join(folderPath, taskId + ".md"), checklist);
     const markdownNormalizedChecklist = normalizeMarkdownChecklist(
       checklist,
       true
@@ -70,7 +71,6 @@ export class AppController {
       ) {
         return;
       }
-      writeFileSync(join(folderPath, taskId + ".md"), checklist);
       for (const checklistItem of actions.update) {
         await clickUp.updateChecklistItem(
           clickUpChecklist.id,

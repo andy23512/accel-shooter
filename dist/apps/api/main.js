@@ -130,6 +130,7 @@ let AppController = class AppController {
     putChecklist(taskId, checklist) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const folderPath = this.configService.get("TodoBackupFolder");
+            fs_1.writeFileSync(path_1.join(folderPath, taskId + ".md"), checklist);
             const markdownNormalizedChecklist = node_shared_1.normalizeMarkdownChecklist(checklist, true);
             const clickUp = new node_shared_1.ClickUp(taskId);
             const task = yield clickUp.getTask();
@@ -143,7 +144,6 @@ let AppController = class AppController {
                     0) {
                     return;
                 }
-                fs_1.writeFileSync(path_1.join(folderPath, taskId + ".md"), checklist);
                 for (const checklistItem of actions.update) {
                     yield clickUp.updateChecklistItem(clickUpChecklist.id, checklistItem.id, checklistItem.name, checklistItem.checked, checklistItem.order);
                 }

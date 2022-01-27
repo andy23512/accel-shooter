@@ -1,0 +1,12 @@
+<ngx-codemirror
+  [ngModel]="content"
+  [options]="{
+    lineNumbers: true,
+    theme: 'one-dark',
+    mode: 'gfm',
+    tabSize: 2,
+    indentWithTabs: false,
+    keyMap: 'vim'
+  }"
+  (ngModelChange)="contentChange.emit($event)"
+></ngx-codemirror>
