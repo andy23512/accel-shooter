@@ -172,7 +172,7 @@ export function openUrlsInTabGroup(urls: string[], group: string) {
 }
 
 export function getTaskProgress(task: Task) {
-  const path = join(CONFIG.TodoBackupFolder, task.id + ".md");
+  const path = join(CONFIG.TaskTodoFolder, task.id + ".md");
   const content = readFileSync(path, { encoding: "utf-8" });
   const checklist = normalizeMarkdownChecklist(content);
   const total = checklist.length;

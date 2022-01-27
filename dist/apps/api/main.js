@@ -116,7 +116,7 @@ let AppController = class AppController {
             const { gitLabProject, mergeRequestIId } = yield clickUp.getGitLabProjectAndMergeRequestIId();
             const gitLab = new node_shared_1.GitLab(gitLabProject.id);
             const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
-            const folderPath = this.configService.get("TodoBackupFolder");
+            const folderPath = this.configService.get("TaskTodoFolder");
             const path = path_1.join(folderPath, taskId + ".md");
             const content = fs_1.readFileSync(path, { encoding: "utf-8" });
             return {
@@ -129,7 +129,7 @@ let AppController = class AppController {
     }
     putChecklist(taskId, checklist) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const folderPath = this.configService.get("TodoBackupFolder");
+            const folderPath = this.configService.get("TaskTodoFolder");
             fs_1.writeFileSync(path_1.join(folderPath, taskId + ".md"), checklist);
             const markdownNormalizedChecklist = node_shared_1.normalizeMarkdownChecklist(checklist, true);
             const clickUp = new node_shared_1.ClickUp(taskId);
@@ -588,7 +588,7 @@ function getConfig() {
     }
     const config = JSON.parse(fs_1.readFileSync(configPath, { encoding: "utf-8" }));
     config.GitLabProjects = config.GitLabProjects.map((p) => (Object.assign(Object.assign({}, p), { path: untildify_1.default(p.path) })));
-    config.TodoBackupFolder = untildify_1.default(config.TodoBackupFolder);
+    config.TaskTodoFolder = untildify_1.default(config.TaskTodoFolder);
     return config;
 }
 exports.getConfig = getConfig;

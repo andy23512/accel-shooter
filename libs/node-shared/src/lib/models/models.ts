@@ -29,7 +29,7 @@ export interface Config {
   TrackIntervalInMinutes: number;
   CrossChecklistDefaultSecondLevel: string[];
   ClickUpTeam: string;
-  TodoBackupFolder: string;
+  TaskTodoFolder: string;
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];
 export interface NormalizedChecklistItem {

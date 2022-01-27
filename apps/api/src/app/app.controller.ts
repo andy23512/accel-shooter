@@ -28,7 +28,7 @@ export class AppController {
       await clickUp.getGitLabProjectAndMergeRequestIId();
     const gitLab = new GitLab(gitLabProject.id);
     const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
-    const folderPath = this.configService.get<string>("TodoBackupFolder");
+    const folderPath = this.configService.get<string>("TaskTodoFolder");
     const path = join(folderPath, taskId + ".md");
     const content = readFileSync(path, { encoding: "utf-8" });
     return {
@@ -44,7 +44,7 @@ export class AppController {
     @Param("id") taskId: string,
     @Body("checklist") checklist: string
   ) {
-    const folderPath = this.configService.get<string>("TodoBackupFolder");
+    const folderPath = this.configService.get<string>("TaskTodoFolder");
     writeFileSync(join(folderPath, taskId + ".md"), checklist);
     const markdownNormalizedChecklist = normalizeMarkdownChecklist(
       checklist,

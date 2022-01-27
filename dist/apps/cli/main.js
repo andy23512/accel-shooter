@@ -702,7 +702,7 @@ function startAction() {
             encoding: "utf-8",
         });
         const endingTodo = mustache_1.render(template, todoConfigMap);
-        const path = path_1.join(node_shared_1.CONFIG.TodoBackupFolder, answers.clickUpTaskId + ".md");
+        const path = path_1.join(node_shared_1.CONFIG.TaskTodoFolder, answers.clickUpTaskId + ".md");
         fs_1.writeFileSync(path, endingTodo);
         p.next(); // Create GitLab Branch
         const gitLabBranch = yield gitLab.createBranch(`CU-${answers.clickUpTaskId}`);
@@ -1862,7 +1862,7 @@ function openUrlsInTabGroup(urls, group) {
 }
 exports.openUrlsInTabGroup = openUrlsInTabGroup;
 function getTaskProgress(task) {
-    const path = path_1.join(node_shared_1.CONFIG.TodoBackupFolder, task.id + ".md");
+    const path = path_1.join(node_shared_1.CONFIG.TaskTodoFolder, task.id + ".md");
     const content = fs_1.readFileSync(path, { encoding: "utf-8" });
     const checklist = node_shared_1.normalizeMarkdownChecklist(content);
     const total = checklist.length;
@@ -2183,7 +2183,7 @@ function getConfig() {
     }
     const config = JSON.parse(fs_1.readFileSync(configPath, { encoding: "utf-8" }));
     config.GitLabProjects = config.GitLabProjects.map((p) => (Object.assign(Object.assign({}, p), { path: untildify_1.default(p.path) })));
-    config.TodoBackupFolder = untildify_1.default(config.TodoBackupFolder);
+    config.TaskTodoFolder = untildify_1.default(config.TaskTodoFolder);
     return config;
 }
 exports.getConfig = getConfig;
