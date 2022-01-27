@@ -14,8 +14,15 @@ import { join } from "path";
 export class AppController {
   constructor(private configService: ConfigService) {}
 
+  @Get("todo")
+  async getTodo(): Promise<{ content: string }> {
+    const path = this.configService.get<string>("TodoFile");
+    const content = readFileSync(path, { encoding: "utf-8" });
+    return { content };
+  }
+
   @Get("task/:id/checklist")
-  async getData(@Param("id") taskId: string): Promise<{
+  async getChecklist(@Param("id") taskId: string): Promise<{
     mergeRequestLink: string;
     taskLink: string;
     content: string;
@@ -37,6 +44,12 @@ export class AppController {
       content,
       frameUrl: frameUrls.length ? frameUrls[0] : null,
     };
+  }
+
+  @Put("todo")
+  async putTodo(@Body("content") content: string) {
+    const path = this.configService.get<string>("TodoFile");
+    writeFileSync(path, content);
   }
 
   @Put("task/:id/checklist")

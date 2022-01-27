@@ -95,7 +95,7 @@
 
 "use strict";
 
-var _a, _b;
+var _a, _b, _c;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppController = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
@@ -108,7 +108,14 @@ let AppController = class AppController {
     constructor(configService) {
         this.configService = configService;
     }
-    getData(taskId) {
+    getTodo() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const path = this.configService.get("TodoFile");
+            const content = fs_1.readFileSync(path, { encoding: "utf-8" });
+            return { content };
+        });
+    }
+    getChecklist(taskId) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const clickUp = new node_shared_1.ClickUp(taskId);
             const task = yield clickUp.getTask();
@@ -125,6 +132,12 @@ let AppController = class AppController {
                 content,
                 frameUrl: frameUrls.length ? frameUrls[0] : null,
             };
+        });
+    }
+    putTodo(content) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const path = this.configService.get("TodoFile");
+            fs_1.writeFileSync(path, content);
         });
     }
     putChecklist(taskId, checklist) {
@@ -158,12 +171,25 @@ let AppController = class AppController {
     }
 };
 tslib_1.__decorate([
+    common_1.Get("todo"),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", []),
+    tslib_1.__metadata("design:returntype", typeof (_a = typeof Promise !== "undefined" && Promise) === "function" ? _a : Object)
+], AppController.prototype, "getTodo", null);
+tslib_1.__decorate([
     common_1.Get("task/:id/checklist"),
     tslib_1.__param(0, common_1.Param("id")),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String]),
-    tslib_1.__metadata("design:returntype", typeof (_a = typeof Promise !== "undefined" && Promise) === "function" ? _a : Object)
-], AppController.prototype, "getData", null);
+    tslib_1.__metadata("design:returntype", typeof (_b = typeof Promise !== "undefined" && Promise) === "function" ? _b : Object)
+], AppController.prototype, "getChecklist", null);
+tslib_1.__decorate([
+    common_1.Put("todo"),
+    tslib_1.__param(0, common_1.Body("content")),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [String]),
+    tslib_1.__metadata("design:returntype", Promise)
+], AppController.prototype, "putTodo", null);
 tslib_1.__decorate([
     common_1.Put("task/:id/checklist"),
     tslib_1.__param(0, common_1.Param("id")),
@@ -174,7 +200,7 @@ tslib_1.__decorate([
 ], AppController.prototype, "putChecklist", null);
 AppController = tslib_1.__decorate([
     common_1.Controller(),
-    tslib_1.__metadata("design:paramtypes", [typeof (_b = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _b : Object])
+    tslib_1.__metadata("design:paramtypes", [typeof (_c = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _c : Object])
 ], AppController);
 exports.AppController = AppController;
 
