@@ -5,14 +5,7 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 import { ActivatedRoute } from "@angular/router";
 import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
 import { interval, merge, Subject } from "rxjs";
-import {
-  debounceTime,
-  filter,
-  map,
-  switchMap,
-  take,
-  tap,
-} from "rxjs/operators";
+import { filter, map, switchMap, take, tap } from "rxjs/operators";
 
 export function normalizeClickUpChecklist(
   checklist: ChecklistItem[]
@@ -112,10 +105,7 @@ export class TaskPageComponent implements OnInit, AfterViewInit {
   }
 
   public startSync() {
-    merge(
-      this.changeSubject.asObservable().pipe(debounceTime(2000)),
-      this.saveSubject.asObservable()
-    )
+    merge(this.changeSubject.asObservable(), this.saveSubject.asObservable())
       .pipe(
         switchMap(() =>
           this.http
