@@ -9,12 +9,19 @@ import { CodemirrorModule } from "@ctrl/ngx-codemirror";
 import { LoadingBarModule } from "@ngx-loading-bar/core";
 import { LoadingBarHttpClientModule } from "@ngx-loading-bar/http-client";
 import { LoadingBarRouterModule } from "@ngx-loading-bar/router";
+import { NgxMarkdownItModule } from "ngx-markdown-it";
 import { AppComponent } from "./app.component";
+import { EditorComponent } from "./editor/editor.component";
 import { TaskPageComponent } from "./task-page/task-page.component";
-import { EditorComponent } from './editor/editor.component';
+import { TodoPageComponent } from "./todo-page/todo-page.component";
 
 @NgModule({
-  declarations: [AppComponent, TaskPageComponent, EditorComponent],
+  declarations: [
+    AppComponent,
+    TaskPageComponent,
+    EditorComponent,
+    TodoPageComponent,
+  ],
   imports: [
     BrowserModule,
     HttpClientModule,
@@ -26,11 +33,21 @@ import { EditorComponent } from './editor/editor.component';
         path: "task/:id",
         component: TaskPageComponent,
       },
+      {
+        path: "todo",
+        component: TodoPageComponent,
+      },
+      {
+        path: "",
+        pathMatch: "full",
+        redirectTo: "todo",
+      },
     ]),
     MatSnackBarModule,
     LoadingBarHttpClientModule,
     LoadingBarRouterModule,
     LoadingBarModule,
+    NgxMarkdownItModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

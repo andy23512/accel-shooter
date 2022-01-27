@@ -23,6 +23,7 @@ export function getConfig(): Config {
     path: untildify(p.path),
   }));
   config.TaskTodoFolder = untildify(config.TaskTodoFolder);
+  config.TodoFile = untildify(config.TodoFile);
   return config;
 }
 

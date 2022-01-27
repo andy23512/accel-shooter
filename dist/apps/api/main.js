@@ -615,6 +615,7 @@ function getConfig() {
     const config = JSON.parse(fs_1.readFileSync(configPath, { encoding: "utf-8" }));
     config.GitLabProjects = config.GitLabProjects.map((p) => (Object.assign(Object.assign({}, p), { path: untildify_1.default(p.path) })));
     config.TaskTodoFolder = untildify_1.default(config.TaskTodoFolder);
+    config.TodoFile = untildify_1.default(config.TodoFile);
     return config;
 }
 exports.getConfig = getConfig;

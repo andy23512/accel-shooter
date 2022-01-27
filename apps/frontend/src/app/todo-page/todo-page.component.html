@@ -1,0 +1,9 @@
+<accel-shooter-editor
+  [content]="todo"
+  [lineWrapping]="true"
+  (contentChange)="onContentChange($event)"
+  (save)="onSave()"
+></accel-shooter-editor>
+<div class="rendered">
+  <markdown-it class="markdown-body" [markdown]="todo"></markdown-it>
+</div>

@@ -36,6 +36,7 @@ $frontend-theme: mat.define-light-theme(
 
 @import "~codemirror/lib/codemirror";
 @import "./one-dark";
+@import "./markdown.css";
 
 html,
 body {

@@ -17,6 +17,7 @@ import { filter, map, take } from "rxjs/operators";
 })
 export class EditorComponent implements AfterViewInit {
   @Input() public content = "";
+  @Input() public lineWrapping = false;
   @Output() public contentChange = new EventEmitter<string>();
   @Output() public save = new EventEmitter<void>();
   @ViewChild(CodemirrorComponent)
