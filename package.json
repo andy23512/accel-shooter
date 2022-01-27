@@ -136,8 +136,6 @@
     "eslint-plugin-cypress": "^2.10.3",
     "jest": "27.0.3",
     "jest-preset-angular": "9.0.4",
-    "markdown-it": "^12.3.2",
-    "ngx-markdown-it": "^0.1.2",
     "np": "^7.5.0",
     "precommit-hook": "^3.0.0",
     "prettier": "^2.3.1",

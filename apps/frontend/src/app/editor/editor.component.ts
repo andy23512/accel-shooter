@@ -1,6 +1,7 @@
 import {
   AfterViewInit,
   Component,
+  ElementRef,
   EventEmitter,
   Input,
   Output,
@@ -23,7 +24,27 @@ export class EditorComponent implements AfterViewInit {
   @ViewChild(CodemirrorComponent)
   public codemirrorComponent?: CodemirrorComponent;
 
+  constructor(private elementRef: ElementRef) {}
+
   public ngAfterViewInit(): void {
+    this.elementRef.nativeElement.addEventListener(
+      "auxclick",
+      function (e: MouseEvent) {
+        if (e.button == 1) {
+          const target = e.target as HTMLElement;
+          const classNames = target.className.split(" ");
+          let url: string | undefined = "";
+          if (classNames.includes("cm-url")) {
+            url = target?.textContent?.replace(/[()]+/g, "");
+          } else if (classNames.includes("cm-link")) {
+            url = target.nextSibling?.textContent?.replace(/[()]+/g, "");
+          }
+          if (url) {
+            window.open(url);
+          }
+        }
+      }
+    );
     interval(500)
       .pipe(
         map(() => this.codemirrorComponent?.codeMirror),

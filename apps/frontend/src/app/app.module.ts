@@ -9,7 +9,6 @@ import { CodemirrorModule } from "@ctrl/ngx-codemirror";
 import { LoadingBarModule } from "@ngx-loading-bar/core";
 import { LoadingBarHttpClientModule } from "@ngx-loading-bar/http-client";
 import { LoadingBarRouterModule } from "@ngx-loading-bar/router";
-import { NgxMarkdownItModule } from "ngx-markdown-it";
 import { AppComponent } from "./app.component";
 import { EditorComponent } from "./editor/editor.component";
 import { TaskPageComponent } from "./task-page/task-page.component";
@@ -47,7 +46,6 @@ import { TodoPageComponent } from "./todo-page/todo-page.component";
     LoadingBarHttpClientModule,
     LoadingBarRouterModule,
     LoadingBarModule,
-    NgxMarkdownItModule,
   ],
   providers: [],
   bootstrap: [AppComponent],
