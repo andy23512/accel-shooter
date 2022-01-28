@@ -7,6 +7,7 @@ import {
   Output,
   ViewChild,
 } from "@angular/core";
+import { Router } from "@angular/router";
 import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
 import { interval } from "rxjs";
 import { filter, map, take } from "rxjs/operators";
@@ -24,12 +25,12 @@ export class EditorComponent implements AfterViewInit {
   @ViewChild(CodemirrorComponent)
   public codemirrorComponent?: CodemirrorComponent;
 
-  constructor(private elementRef: ElementRef) {}
+  constructor(private elementRef: ElementRef, private router: Router) {}
 
   public ngAfterViewInit(): void {
     this.elementRef.nativeElement.addEventListener(
       "auxclick",
-      function (e: MouseEvent) {
+      (e: MouseEvent) => {
         if (e.button == 1) {
           const target = e.target as HTMLElement;
           const classNames = target.className.split(" ");
@@ -40,7 +41,15 @@ export class EditorComponent implements AfterViewInit {
             url = target.nextSibling?.textContent?.replace(/[()]+/g, "");
           }
           if (url) {
-            window.open(url);
+            if (e.metaKey || e.ctrlKey) {
+              const match = url.match(/https:\/\/app.clickup.com\/t\/(\w+)/);
+              if (match) {
+                const taskLink = this.getTaskLink(match[1]);
+                window.open(taskLink);
+              }
+            } else {
+              window.open(url);
+            }
           }
         }
       }
@@ -75,5 +84,18 @@ export class EditorComponent implements AfterViewInit {
           this.save.next();
         });
       });
+  }
+
+  public getTaskLink(id: string) {
+    const internalUrl = `/task/${id}`;
+
+    // Resolve the base url as the full absolute url subtract the relative url.
+    const currentAbsoluteUrl = window.location.href;
+    const currentRelativeUrl = this.router.url;
+    const index = currentAbsoluteUrl.indexOf(currentRelativeUrl);
+    const baseUrl = currentAbsoluteUrl.substring(0, index);
+
+    // Concatenate the urls to construct the desired absolute url.
+    return baseUrl + internalUrl;
   }
 }
