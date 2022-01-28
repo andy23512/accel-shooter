@@ -97,6 +97,7 @@ export async function updateTaskStatusInDp(dp: string) {
 }
 
 export async function getInfoFromArgv() {
+  let clickUpTaskId = null;
   if (process.argv.length === 3) {
     const branchName = execSync("git branch --show-current", {
       encoding: "utf-8",
@@ -105,7 +106,11 @@ export async function getInfoFromArgv() {
     if (!match) {
       throw Error("Cannot get task number from branch");
     }
-    const clickUpTaskId = match[1];
+    clickUpTaskId = match[1];
+  } else {
+    clickUpTaskId = process.argv[3];
+  }
+  if (clickUpTaskId) {
     const clickUp = new ClickUp(clickUpTaskId);
     const clickUpTask = await clickUp.getTask();
     const { gitLabProject, mergeRequestIId } =
@@ -122,35 +127,8 @@ export async function getInfoFromArgv() {
       clickUpTask,
     };
   } else {
-    const gitLabProject = getGitLabProjectFromArgv();
-    if (!gitLabProject) {
-      throw Error("No such project");
-    }
-    const gitLab = new GitLab(gitLabProject.id);
-    const mergeRequestIId = process.argv[4];
-    const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
-    const branchName = mergeRequest.source_branch;
-    const match = branchName.match(/CU-([a-z0-9]+)/);
-    if (!match) {
-      throw Error("Cannot get task number from branch");
-    }
-    const clickUpTaskId = match[1];
-    const clickUp = new ClickUp(clickUpTaskId);
-    const clickUpTask = await clickUp.getTask();
-    return {
-      gitLab,
-      gitLabProject,
-      mergeRequestIId,
-      mergeRequest,
-      clickUp,
-      clickUpTaskId,
-      clickUpTask,
-    };
+    throw Error("No task id specified");
   }
-}
-
-function getGitLabProjectFromArgv() {
-  return getGitLabProjectConfigByName(process.argv[3]);
 }
 
 export async function checkWorkingTreeClean() {
