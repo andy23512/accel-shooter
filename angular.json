@@ -228,7 +228,8 @@
             "tsConfig": "apps/frontend/tsconfig.app.json",
             "inlineStyleLanguage": "scss",
             "assets": [
-              "apps/frontend/src/favicon.ico",
+              "apps/frontend/src/favicon-16x16.png",
+              "apps/frontend/src/favicon-32x32.png",
               "apps/frontend/src/assets"
             ],
             "styles": ["apps/frontend/src/styles.scss"],
