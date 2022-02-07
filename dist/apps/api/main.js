@@ -104,15 +104,33 @@ const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 const config_1 = __webpack_require__(/*! @nestjs/config */ "@nestjs/config");
 const fs_1 = __webpack_require__(/*! fs */ "fs");
 const path_1 = __webpack_require__(/*! path */ "path");
+const CONFIG_KEY_MAP = {
+    todo: "TodoFile",
+    work_note: "WorkNoteFile",
+};
 let AppController = class AppController {
     constructor(configService) {
         this.configService = configService;
     }
-    getTodo() {
+    getMarkdown(markdownId) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const path = this.configService.get("TodoFile");
+            const configKey = CONFIG_KEY_MAP[markdownId];
+            if (!configKey) {
+                throw new common_1.NotFoundException();
+            }
+            const path = this.configService.get(configKey);
             const content = fs_1.readFileSync(path, { encoding: "utf-8" });
             return { content };
+        });
+    }
+    putTodo(markdownId, content) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const configKey = CONFIG_KEY_MAP[markdownId];
+            if (!configKey) {
+                throw new common_1.NotFoundException();
+            }
+            const path = this.configService.get(configKey);
+            fs_1.writeFileSync(path, content);
         });
     }
     getChecklist(taskId) {
@@ -134,12 +152,6 @@ let AppController = class AppController {
                 frameUrl: frameUrls.length ? frameUrls[0] : null,
                 fullTaskName,
             };
-        });
-    }
-    putTodo(content) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const path = this.configService.get("TodoFile");
-            fs_1.writeFileSync(path, content);
         });
     }
     putChecklist(taskId, checklist) {
@@ -173,11 +185,20 @@ let AppController = class AppController {
     }
 };
 tslib_1.__decorate([
-    common_1.Get("todo"),
+    common_1.Get("markdown/:id"),
+    tslib_1.__param(0, common_1.Param("id")),
     tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", []),
+    tslib_1.__metadata("design:paramtypes", [String]),
     tslib_1.__metadata("design:returntype", typeof (_a = typeof Promise !== "undefined" && Promise) === "function" ? _a : Object)
-], AppController.prototype, "getTodo", null);
+], AppController.prototype, "getMarkdown", null);
+tslib_1.__decorate([
+    common_1.Put("markdown/:id"),
+    tslib_1.__param(0, common_1.Param("id")),
+    tslib_1.__param(1, common_1.Body("content")),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [String, String]),
+    tslib_1.__metadata("design:returntype", Promise)
+], AppController.prototype, "putTodo", null);
 tslib_1.__decorate([
     common_1.Get("task/:id/checklist"),
     tslib_1.__param(0, common_1.Param("id")),
@@ -185,13 +206,6 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:paramtypes", [String]),
     tslib_1.__metadata("design:returntype", typeof (_b = typeof Promise !== "undefined" && Promise) === "function" ? _b : Object)
 ], AppController.prototype, "getChecklist", null);
-tslib_1.__decorate([
-    common_1.Put("todo"),
-    tslib_1.__param(0, common_1.Body("content")),
-    tslib_1.__metadata("design:type", Function),
-    tslib_1.__metadata("design:paramtypes", [String]),
-    tslib_1.__metadata("design:returntype", Promise)
-], AppController.prototype, "putTodo", null);
 tslib_1.__decorate([
     common_1.Put("task/:id/checklist"),
     tslib_1.__param(0, common_1.Param("id")),
@@ -618,6 +632,7 @@ function getConfig() {
     config.GitLabProjects = config.GitLabProjects.map((p) => (Object.assign(Object.assign({}, p), { path: untildify_1.default(p.path) })));
     config.TaskTodoFolder = untildify_1.default(config.TaskTodoFolder);
     config.TodoFile = untildify_1.default(config.TodoFile);
+    config.WorkNoteFile = untildify_1.default(config.WorkNoteFile);
     return config;
 }
 exports.getConfig = getConfig;

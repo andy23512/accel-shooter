@@ -1,34 +1,41 @@
 import { HttpClient } from "@angular/common/http";
 import { Component, OnInit } from "@angular/core";
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { ActivatedRoute } from "@angular/router";
 import { merge, Subject } from "rxjs";
 import { concatMap, debounceTime, take, tap } from "rxjs/operators";
 
 @Component({
-  selector: "accel-shooter-todo-page",
-  templateUrl: "./todo-page.component.html",
-  styleUrls: ["./todo-page.component.scss"],
+  selector: "accel-shooter-markdown-page",
+  templateUrl: "./markdown-page.component.html",
+  styleUrls: ["./markdown-page.component.scss"],
 })
-export class TodoPageComponent implements OnInit {
-  public todo = "";
+export class MarkdownPageComponent implements OnInit {
+  public markdownId = "";
+  public markdownContent = "";
   public changeSubject = new Subject();
   public saveSubject = new Subject();
-  constructor(private http: HttpClient, private matSnackBar: MatSnackBar) {}
+  constructor(
+    private http: HttpClient,
+    private matSnackBar: MatSnackBar,
+    private route: ActivatedRoute
+  ) {}
 
   public ngOnInit(): void {
+    this.markdownId = this.route.snapshot.paramMap.get("id") as string;
     this.http
       .get<{
         content: string;
-      }>(`/api/todo`)
+      }>(`/api/markdown/${this.markdownId}`)
       .pipe(take(1))
       .subscribe(({ content }) => {
-        this.todo = content;
+        this.markdownContent = content;
       });
     this.startSync();
   }
 
   public onContentChange(content: string) {
-    this.todo = content;
+    this.markdownContent = content;
     this.changeSubject.next();
   }
 
@@ -44,8 +51,8 @@ export class TodoPageComponent implements OnInit {
       .pipe(
         concatMap(() =>
           this.http
-            .put(`/api/todo`, {
-              content: this.todo,
+            .put(`/api/markdown/${this.markdownId}`, {
+              content: this.markdownContent,
             })
             .pipe(
               tap({

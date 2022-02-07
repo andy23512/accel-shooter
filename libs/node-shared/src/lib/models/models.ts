@@ -31,6 +31,7 @@ export interface Config {
   ClickUpTeam: string;
   TaskTodoFolder: string;
   TodoFile: string;
+  WorkNoteFile: string;
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];
 export interface NormalizedChecklistItem {

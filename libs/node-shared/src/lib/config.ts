@@ -24,6 +24,7 @@ export function getConfig(): Config {
   }));
   config.TaskTodoFolder = untildify(config.TaskTodoFolder);
   config.TodoFile = untildify(config.TodoFile);
+  config.WorkNoteFile = untildify(config.WorkNoteFile);
   return config;
 }
 

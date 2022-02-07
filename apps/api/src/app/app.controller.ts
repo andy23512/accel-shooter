@@ -5,20 +5,51 @@ import {
   normalizeClickUpChecklist,
   normalizeMarkdownChecklist,
 } from "@accel-shooter/node-shared";
-import { Body, Controller, Get, Param, Put } from "@nestjs/common";
+import {
+  Body,
+  Controller,
+  Get,
+  NotFoundException,
+  Param,
+  Put,
+} from "@nestjs/common";
 import { ConfigService } from "@nestjs/config";
 import { readFileSync, writeFileSync } from "fs";
 import { join } from "path";
+
+const CONFIG_KEY_MAP = {
+  todo: "TodoFile",
+  work_note: "WorkNoteFile",
+} as const;
 
 @Controller()
 export class AppController {
   constructor(private configService: ConfigService) {}
 
-  @Get("todo")
-  async getTodo(): Promise<{ content: string }> {
-    const path = this.configService.get<string>("TodoFile");
+  @Get("markdown/:id")
+  async getMarkdown(
+    @Param("id") markdownId: "todo" | "work_note"
+  ): Promise<{ content: string }> {
+    const configKey = CONFIG_KEY_MAP[markdownId];
+    if (!configKey) {
+      throw new NotFoundException();
+    }
+    const path = this.configService.get<string>(configKey);
     const content = readFileSync(path, { encoding: "utf-8" });
     return { content };
+  }
+
+  @Put("markdown/:id")
+  async putTodo(
+    @Param("id") markdownId: "todo" | "work_note",
+    @Body("content") content: string
+  ) {
+    const configKey = CONFIG_KEY_MAP[markdownId];
+    if (!configKey) {
+      throw new NotFoundException();
+    }
+    const path = this.configService.get<string>(configKey);
+    writeFileSync(path, content);
   }
 
   @Get("task/:id/checklist")
@@ -47,12 +78,6 @@ export class AppController {
       frameUrl: frameUrls.length ? frameUrls[0] : null,
       fullTaskName,
     };
-  }
-
-  @Put("todo")
-  async putTodo(@Body("content") content: string) {
-    const path = this.configService.get<string>("TodoFile");
-    writeFileSync(path, content);
   }
 
   @Put("task/:id/checklist")

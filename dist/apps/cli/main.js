@@ -2165,6 +2165,7 @@ function getConfig() {
     config.GitLabProjects = config.GitLabProjects.map((p) => (Object.assign(Object.assign({}, p), { path: untildify_1.default(p.path) })));
     config.TaskTodoFolder = untildify_1.default(config.TaskTodoFolder);
     config.TodoFile = untildify_1.default(config.TodoFile);
+    config.WorkNoteFile = untildify_1.default(config.WorkNoteFile);
     return config;
 }
 exports.getConfig = getConfig;

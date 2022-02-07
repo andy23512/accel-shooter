@@ -11,15 +11,15 @@ import { LoadingBarHttpClientModule } from "@ngx-loading-bar/http-client";
 import { LoadingBarRouterModule } from "@ngx-loading-bar/router";
 import { AppComponent } from "./app.component";
 import { EditorComponent } from "./editor/editor.component";
+import { MarkdownPageComponent } from "./markdown-page/markdown-page.component";
 import { TaskPageComponent } from "./task-page/task-page.component";
-import { TodoPageComponent } from "./todo-page/todo-page.component";
 
 @NgModule({
   declarations: [
     AppComponent,
-    TaskPageComponent,
     EditorComponent,
-    TodoPageComponent,
+    MarkdownPageComponent,
+    TaskPageComponent,
   ],
   imports: [
     BrowserModule,
@@ -33,13 +33,13 @@ import { TodoPageComponent } from "./todo-page/todo-page.component";
         component: TaskPageComponent,
       },
       {
-        path: "todo",
-        component: TodoPageComponent,
+        path: "markdown/:id",
+        component: MarkdownPageComponent,
       },
       {
         path: "",
         pathMatch: "full",
-        redirectTo: "todo",
+        redirectTo: "markdown/todo",
       },
     ]),
     MatSnackBarModule,
