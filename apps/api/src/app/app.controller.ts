@@ -27,9 +27,11 @@ export class AppController {
     taskLink: string;
     content: string;
     frameUrl: string;
+    fullTaskName: string;
   }> {
     const clickUp = new ClickUp(taskId);
     const task = await clickUp.getTask();
+    const fullTaskName = await clickUp.getFullTaskName();
     const frameUrls = await clickUp.getFrameUrls();
     const { gitLabProject, mergeRequestIId } =
       await clickUp.getGitLabProjectAndMergeRequestIId();
@@ -43,6 +45,7 @@ export class AppController {
       taskLink: task.url,
       content,
       frameUrl: frameUrls.length ? frameUrls[0] : null,
+      fullTaskName,
     };
   }
 

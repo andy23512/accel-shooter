@@ -30,6 +30,7 @@ export class TaskPageComponent implements OnInit {
   public taskLink = "";
   public mergeRequestLink = "";
   public frameUrl = "";
+  public fullTaskName = "";
   public changeSubject = new Subject();
   public saveSubject = new Subject();
 
@@ -47,15 +48,19 @@ export class TaskPageComponent implements OnInit {
         taskLink: string;
         content: string;
         frameUrl: string;
+        fullTaskName: string;
       }>(`/api/task/${this.taskId}/checklist`)
       .pipe(take(1))
-      .subscribe(({ taskLink, mergeRequestLink, content, frameUrl }) => {
-        this.taskLink = taskLink;
-        this.mergeRequestLink = mergeRequestLink;
-        this.frameUrl = frameUrl;
-        this.checklistMarkDown = content;
-        this.startSync();
-      });
+      .subscribe(
+        ({ taskLink, mergeRequestLink, content, frameUrl, fullTaskName }) => {
+          this.taskLink = taskLink;
+          this.mergeRequestLink = mergeRequestLink;
+          this.frameUrl = frameUrl;
+          this.checklistMarkDown = content;
+          this.fullTaskName = fullTaskName;
+          this.startSync();
+        }
+      );
   }
 
   public onContentChange(content: string) {

@@ -4,6 +4,8 @@
   (save)="onSave()"
 ></accel-shooter-editor>
 <div class="refs">
+  <span>{{ fullTaskName }}</span
+  ><br />
   <a [href]="mergeRequestLink" target="_blank">Merge Request</a><br />
   <a [href]="taskLink" target="_blank">ClickUp Task</a><br />
   <a *ngIf="frameUrl" [href]="frameUrl" target="_blank">Frame</a>
