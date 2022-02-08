@@ -81,8 +81,12 @@ chrome.tabs.onCreated.addListener(async (tab) => {
         tabIds.push(t.id);
       }
       const groupId = await chrome.tabs.group({ tabIds: tabIds });
-      chrome.tabGroups.move(groupId, { index: 0 });
       chrome.tabGroups.update(groupId, { color: "cyan", title: group });
+      const pinnedTabs = await chrome.tabs.query({
+        currentWindow: true,
+        pinned: true,
+      });
+      chrome.tabGroups.move(groupId, { index: pinnedTabs.length });
     }
     chrome.tabs.remove(tab.id);
   }
