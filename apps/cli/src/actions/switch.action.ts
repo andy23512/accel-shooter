@@ -2,6 +2,7 @@ import { execSync } from "child_process";
 import os from "os";
 import { configReadline } from "../actions";
 import { checkWorkingTreeClean, getInfoFromArgv, promiseSpawn } from "../utils";
+import { openAction } from "./open.action";
 
 export async function switchAction() {
   configReadline();
@@ -23,5 +24,6 @@ export async function switchAction() {
       process.exit();
     }
     await promiseSpawn("git", ["checkout", mergeRequest.source_branch], "pipe");
+    await openAction();
   }
 }

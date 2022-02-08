@@ -12,7 +12,5 @@ export async function updateAction() {
   if (record) {
     const newDpRecord = await updateTaskStatusInDp(record);
     dp.writeRecordByDay(day, newDpRecord);
-    console.log(newDpRecord);
-    console.log("Updated!");
   }
 }

@@ -772,6 +772,7 @@ const child_process_1 = __webpack_require__(/*! child_process */ "child_process"
 const os_1 = tslib_1.__importDefault(__webpack_require__(/*! os */ "os"));
 const actions_1 = __webpack_require__(/*! ../actions */ "./apps/cli/src/actions.ts");
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+const open_action_1 = __webpack_require__(/*! ./open.action */ "./apps/cli/src/actions/open.action.ts");
 function switchAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         actions_1.configReadline();
@@ -791,6 +792,7 @@ function switchAction() {
                 process.exit();
             }
             yield utils_1.promiseSpawn("git", ["checkout", mergeRequest.source_branch], "pipe");
+            yield open_action_1.openAction();
         }
     });
 }
@@ -937,8 +939,6 @@ function updateAction() {
         if (record) {
             const newDpRecord = yield utils_1.updateTaskStatusInDp(record);
             dp.writeRecordByDay(day, newDpRecord);
-            console.log(newDpRecord);
-            console.log("Updated!");
         }
     });
 }
