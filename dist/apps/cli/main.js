@@ -1843,11 +1843,16 @@ function openUrlsInTabGroup(urls, group) {
 exports.openUrlsInTabGroup = openUrlsInTabGroup;
 function getTaskProgress(task) {
     const path = path_1.join(node_shared_1.CONFIG.TaskTodoFolder, task.id + ".md");
-    const content = fs_1.readFileSync(path, { encoding: "utf-8" });
-    const checklist = node_shared_1.normalizeMarkdownChecklist(content);
-    const total = checklist.length;
-    const done = checklist.filter((c) => c.checked).length;
-    return `${Math.round((done / total) * 100)}%`;
+    if (fs_1.existsSync(path)) {
+        const content = fs_1.readFileSync(path, { encoding: "utf-8" });
+        const checklist = node_shared_1.normalizeMarkdownChecklist(content);
+        const total = checklist.length;
+        const done = checklist.filter((c) => c.checked).length;
+        return `${Math.round((done / total) * 100)}%`;
+    }
+    else {
+        return null;
+    }
 }
 exports.getTaskProgress = getTaskProgress;
 
