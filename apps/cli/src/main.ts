@@ -2,6 +2,7 @@ import { ClickUp } from "@accel-shooter/node-shared";
 import { checkAction } from "./actions/check.action";
 import { commentAction } from "./actions/comment.action";
 import { copyAction } from "./actions/copy.action";
+import { copyTaskAction } from "./actions/copyTask.actions";
 import { crossChecklistAction } from "./actions/cross-checklist.action";
 import { endAction } from "./actions/end.action";
 import { listAction } from "./actions/list.action";
@@ -34,6 +35,7 @@ const actions: { [key: string]: () => Promise<void> } = {
   toDo: toDoAction,
   time: timeAction,
   copy: copyAction,
+  copyTask: copyTaskAction,
   showDiff: showDiffAction,
   test: async () => {
     const clickUp = new ClickUp("21v88x5");

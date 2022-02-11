@@ -196,6 +196,35 @@ exports.copyAction = copyAction;
 
 /***/ }),
 
+/***/ "./apps/cli/src/actions/copyTask.actions.ts":
+/*!**************************************************!*\
+  !*** ./apps/cli/src/actions/copyTask.actions.ts ***!
+  \**************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.copyTaskAction = void 0;
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const clipboardy_1 = tslib_1.__importDefault(__webpack_require__(/*! clipboardy */ "clipboardy"));
+const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+function copyTaskAction() {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const { clickUp } = yield utils_1.getInfoFromArgv(true);
+        const task = yield clickUp.getTask();
+        const name = yield clickUp.getFullTaskName();
+        const string = `- [ ] [${name}](${task.url})`;
+        clipboardy_1.default.writeSync(string);
+        console.log("Copied!");
+    });
+}
+exports.copyTaskAction = copyTaskAction;
+
+
+/***/ }),
+
 /***/ "./apps/cli/src/actions/cross-checklist.action.ts":
 /*!********************************************************!*\
   !*** ./apps/cli/src/actions/cross-checklist.action.ts ***!
@@ -1644,6 +1673,7 @@ const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./l
 const check_action_1 = __webpack_require__(/*! ./actions/check.action */ "./apps/cli/src/actions/check.action.ts");
 const comment_action_1 = __webpack_require__(/*! ./actions/comment.action */ "./apps/cli/src/actions/comment.action.ts");
 const copy_action_1 = __webpack_require__(/*! ./actions/copy.action */ "./apps/cli/src/actions/copy.action.ts");
+const copyTask_actions_1 = __webpack_require__(/*! ./actions/copyTask.actions */ "./apps/cli/src/actions/copyTask.actions.ts");
 const cross_checklist_action_1 = __webpack_require__(/*! ./actions/cross-checklist.action */ "./apps/cli/src/actions/cross-checklist.action.ts");
 const end_action_1 = __webpack_require__(/*! ./actions/end.action */ "./apps/cli/src/actions/end.action.ts");
 const list_action_1 = __webpack_require__(/*! ./actions/list.action */ "./apps/cli/src/actions/list.action.ts");
@@ -1675,6 +1705,7 @@ const actions = {
     toDo: to_do_action_1.toDoAction,
     time: time_action_1.timeAction,
     copy: copy_action_1.copyAction,
+    copyTask: copyTask_actions_1.copyTaskAction,
     showDiff: show_diff_action_1.showDiffAction,
     test: () => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
         const clickUp = new node_shared_1.ClickUp("21v88x5");
@@ -1787,7 +1818,7 @@ function updateTaskStatusInDp(dp) {
     });
 }
 exports.updateTaskStatusInDp = updateTaskStatusInDp;
-function getInfoFromArgv() {
+function getInfoFromArgv(clickUpOnly) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         let clickUpTaskId = null;
         if (process.argv.length === 3) {
@@ -1806,6 +1837,9 @@ function getInfoFromArgv() {
         if (clickUpTaskId) {
             const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
             const clickUpTask = yield clickUp.getTask();
+            if (clickUpOnly) {
+                return { clickUpTask, clickUp, clickUpTaskId };
+            }
             const { gitLabProject, mergeRequestIId } = yield clickUp.getGitLabProjectAndMergeRequestIId();
             const gitLab = new node_shared_1.GitLab(gitLabProject.id);
             const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);

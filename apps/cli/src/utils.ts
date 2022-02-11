@@ -96,7 +96,7 @@ export async function updateTaskStatusInDp(dp: string) {
   return resultDp;
 }
 
-export async function getInfoFromArgv() {
+export async function getInfoFromArgv(clickUpOnly?: boolean) {
   let clickUpTaskId = null;
   if (process.argv.length === 3) {
     const branchName = execSync("git branch --show-current", {
@@ -113,6 +113,9 @@ export async function getInfoFromArgv() {
   if (clickUpTaskId) {
     const clickUp = new ClickUp(clickUpTaskId);
     const clickUpTask = await clickUp.getTask();
+    if (clickUpOnly) {
+      return { clickUpTask, clickUp, clickUpTaskId };
+    }
     const { gitLabProject, mergeRequestIId } =
       await clickUp.getGitLabProjectAndMergeRequestIId();
     const gitLab = new GitLab(gitLabProject.id);
