@@ -1,3 +1,4 @@
+import { ClipboardModule } from "@angular/cdk/clipboard";
 import { HttpClientModule } from "@angular/common/http";
 import { NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
@@ -46,6 +47,7 @@ import { TaskPageComponent } from "./task-page/task-page.component";
     LoadingBarHttpClientModule,
     LoadingBarRouterModule,
     LoadingBarModule,
+    ClipboardModule,
   ],
   providers: [],
   bootstrap: [AppComponent],

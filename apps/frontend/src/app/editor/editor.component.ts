@@ -1,3 +1,4 @@
+import { Clipboard } from "@angular/cdk/clipboard";
 import {
   AfterViewInit,
   Component,
@@ -7,6 +8,7 @@ import {
   Output,
   ViewChild,
 } from "@angular/core";
+import { MatSnackBar } from "@angular/material/snack-bar";
 import { Router } from "@angular/router";
 import { CodemirrorComponent } from "@ctrl/ngx-codemirror";
 import { interval } from "rxjs";
@@ -25,7 +27,12 @@ export class EditorComponent implements AfterViewInit {
   @ViewChild(CodemirrorComponent)
   public codemirrorComponent?: CodemirrorComponent;
 
-  constructor(private elementRef: ElementRef, private router: Router) {}
+  constructor(
+    private elementRef: ElementRef,
+    private router: Router,
+    private clipboard: Clipboard,
+    private matSnackBar: MatSnackBar
+  ) {}
 
   public ngAfterViewInit(): void {
     this.elementRef.nativeElement.addEventListener(
@@ -41,11 +48,20 @@ export class EditorComponent implements AfterViewInit {
             url = target.nextSibling?.textContent?.replace(/[()]+/g, "");
           }
           if (url) {
-            if (e.metaKey || e.ctrlKey) {
+            if (e.metaKey) {
               const match = url.match(/https:\/\/app.clickup.com\/t\/(\w+)/);
               if (match) {
                 const taskLink = this.getTaskLink(match[1]);
                 window.open(taskLink);
+              }
+            } else if (e.ctrlKey) {
+              const match = url.match(/https:\/\/app.clickup.com\/t\/(\w+)/);
+              if (match) {
+                const taskId = match[1];
+                this.clipboard.copy(taskId);
+                this.matSnackBar.open(`Task ID ${taskId} copied!`, "", {
+                  duration: 5000,
+                });
               }
             } else {
               window.open(url);
