@@ -168,7 +168,7 @@ export async function startAction() {
     }
   }
   p.next(); // Add Daily Progress Entry
-  const dailyProgressString = `* (In Progress) [${gitLabMergeRequestTitle}](${clickUpTaskUrl}) [${answers.gitLabProject.name} ${gitLabMergeRequestIId}](${gitLabMergeRequest.web_url})`;
+  const dailyProgressString = `* (In Progress) [${gitLabMergeRequestTitle}](${clickUpTaskUrl})`;
   new DailyProgress().addProgressToBuffer(dailyProgressString);
   p.next(); // Add Tracker Item
   new Tracker().addItem(answers.clickUpTaskId);

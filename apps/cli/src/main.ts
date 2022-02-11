@@ -1,5 +1,4 @@
 import { checkAction } from "./actions/check.action";
-import { commentAction } from "./actions/comment.action";
 import { copyAction } from "./actions/copy.action";
 import { copyTaskAction } from "./actions/copyTask.actions";
 import { crossChecklistAction } from "./actions/cross-checklist.action";
@@ -28,7 +27,6 @@ const actions: { [key: string]: () => Promise<void> } = {
   crossChecklist: crossChecklistAction,
   RTVTasks: RTVTasksAction,
   check: checkAction,
-  comment: commentAction,
   myTasks: myTasksAction,
   list: listAction,
   toDo: toDoAction,

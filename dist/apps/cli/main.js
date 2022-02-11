@@ -135,38 +135,6 @@ exports.checkAction = checkAction;
 
 /***/ }),
 
-/***/ "./apps/cli/src/actions/comment.action.ts":
-/*!************************************************!*\
-  !*** ./apps/cli/src/actions/comment.action.ts ***!
-  \************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.commentAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const inquirer_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer */ "inquirer"));
-const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
-function commentAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const answers = yield inquirer_1.default.prompt([
-            {
-                name: "content",
-                message: "Enter comment content",
-                type: "editor",
-            },
-        ]);
-        const { gitLab, mergeRequest } = yield utils_1.getInfoFromArgv();
-        yield gitLab.createMergeRequestNote(mergeRequest, answers.content);
-    });
-}
-exports.commentAction = commentAction;
-
-
-/***/ }),
-
 /***/ "./apps/cli/src/actions/copy.action.ts":
 /*!*********************************************!*\
   !*** ./apps/cli/src/actions/copy.action.ts ***!
@@ -183,35 +151,6 @@ const clipboardy_1 = tslib_1.__importDefault(__webpack_require__(/*! clipboardy 
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 function copyAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { mergeRequestIId, gitLabProject, mergeRequest, clickUp } = yield utils_1.getInfoFromArgv();
-        const task = yield clickUp.getTask();
-        const name = yield clickUp.getFullTaskName();
-        const string = `[${name}](${task.url}) [${gitLabProject.name} ${mergeRequestIId}](${mergeRequest.web_url})`;
-        clipboardy_1.default.writeSync(string);
-        console.log("Copied!");
-    });
-}
-exports.copyAction = copyAction;
-
-
-/***/ }),
-
-/***/ "./apps/cli/src/actions/copyTask.actions.ts":
-/*!**************************************************!*\
-  !*** ./apps/cli/src/actions/copyTask.actions.ts ***!
-  \**************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.copyTaskAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const clipboardy_1 = tslib_1.__importDefault(__webpack_require__(/*! clipboardy */ "clipboardy"));
-const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
-function copyTaskAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const { clickUp } = yield utils_1.getInfoFromArgv(true);
         const task = yield clickUp.getTask();
         const name = yield clickUp.getFullTaskName();
@@ -220,7 +159,7 @@ function copyTaskAction() {
         console.log("Copied!");
     });
 }
-exports.copyTaskAction = copyTaskAction;
+exports.copyAction = copyAction;
 
 
 /***/ }),
@@ -761,7 +700,7 @@ function startAction() {
             }
         }
         p.next(); // Add Daily Progress Entry
-        const dailyProgressString = `* (In Progress) [${gitLabMergeRequestTitle}](${clickUpTaskUrl}) [${answers.gitLabProject.name} ${gitLabMergeRequestIId}](${gitLabMergeRequest.web_url})`;
+        const dailyProgressString = `* (In Progress) [${gitLabMergeRequestTitle}](${clickUpTaskUrl})`;
         new daily_progress_class_1.DailyProgress().addProgressToBuffer(dailyProgressString);
         p.next(); // Add Tracker Item
         new tracker_class_1.Tracker().addItem(answers.clickUpTaskId);
@@ -821,31 +760,6 @@ function switchAction() {
     });
 }
 exports.switchAction = switchAction;
-
-
-/***/ }),
-
-/***/ "./apps/cli/src/actions/time.action.ts":
-/*!*********************************************!*\
-  !*** ./apps/cli/src/actions/time.action.ts ***!
-  \*********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.timeAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const clipboardy_1 = tslib_1.__importDefault(__webpack_require__(/*! clipboardy */ "clipboardy"));
-const date_fns_1 = __webpack_require__(/*! date-fns */ "date-fns");
-function timeAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        clipboardy_1.default.writeSync(date_fns_1.format(new Date(), "yyyyMMdd_HHmmss"));
-        console.log("Copied!");
-    });
-}
-exports.timeAction = timeAction;
 
 
 /***/ }),
@@ -1606,9 +1520,7 @@ exports.checkItemsMap = {
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const check_action_1 = __webpack_require__(/*! ./actions/check.action */ "./apps/cli/src/actions/check.action.ts");
-const comment_action_1 = __webpack_require__(/*! ./actions/comment.action */ "./apps/cli/src/actions/comment.action.ts");
 const copy_action_1 = __webpack_require__(/*! ./actions/copy.action */ "./apps/cli/src/actions/copy.action.ts");
-const copyTask_actions_1 = __webpack_require__(/*! ./actions/copyTask.actions */ "./apps/cli/src/actions/copyTask.actions.ts");
 const cross_checklist_action_1 = __webpack_require__(/*! ./actions/cross-checklist.action */ "./apps/cli/src/actions/cross-checklist.action.ts");
 const end_action_1 = __webpack_require__(/*! ./actions/end.action */ "./apps/cli/src/actions/end.action.ts");
 const list_action_1 = __webpack_require__(/*! ./actions/list.action */ "./apps/cli/src/actions/list.action.ts");
@@ -1619,7 +1531,6 @@ const rtv_tasks_action_1 = __webpack_require__(/*! ./actions/rtv-tasks.action */
 const show_diff_action_1 = __webpack_require__(/*! ./actions/show-diff.action */ "./apps/cli/src/actions/show-diff.action.ts");
 const start_action_1 = __webpack_require__(/*! ./actions/start.action */ "./apps/cli/src/actions/start.action.ts");
 const switch_action_1 = __webpack_require__(/*! ./actions/switch.action */ "./apps/cli/src/actions/switch.action.ts");
-const time_action_1 = __webpack_require__(/*! ./actions/time.action */ "./apps/cli/src/actions/time.action.ts");
 const to_do_action_1 = __webpack_require__(/*! ./actions/to-do.action */ "./apps/cli/src/actions/to-do.action.ts");
 const track_action_1 = __webpack_require__(/*! ./actions/track.action */ "./apps/cli/src/actions/track.action.ts");
 const update_action_1 = __webpack_require__(/*! ./actions/update.action */ "./apps/cli/src/actions/update.action.ts");
@@ -1634,13 +1545,10 @@ const actions = {
     crossChecklist: cross_checklist_action_1.crossChecklistAction,
     RTVTasks: rtv_tasks_action_1.RTVTasksAction,
     check: check_action_1.checkAction,
-    comment: comment_action_1.commentAction,
     myTasks: my_tasks_action_1.myTasksAction,
     list: list_action_1.listAction,
     toDo: to_do_action_1.toDoAction,
-    time: time_action_1.timeAction,
     copy: copy_action_1.copyAction,
-    copyTask: copyTask_actions_1.copyTaskAction,
     showDiff: show_diff_action_1.showDiffAction,
 };
 (() => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
