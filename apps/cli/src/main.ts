@@ -1,6 +1,5 @@
 import { checkAction } from "./actions/check.action";
 import { copyAction } from "./actions/copy.action";
-import { copyTaskAction } from "./actions/copyTask.actions";
 import { crossChecklistAction } from "./actions/cross-checklist.action";
 import { endAction } from "./actions/end.action";
 import { listAction } from "./actions/list.action";
@@ -11,7 +10,6 @@ import { RTVTasksAction } from "./actions/rtv-tasks.action";
 import { showDiffAction } from "./actions/show-diff.action";
 import { startAction } from "./actions/start.action";
 import { switchAction } from "./actions/switch.action";
-import { timeAction } from "./actions/time.action";
 import { toDoAction } from "./actions/to-do.action";
 import { trackAction } from "./actions/track.action";
 import { updateAction } from "./actions/update.action";
@@ -30,9 +28,7 @@ const actions: { [key: string]: () => Promise<void> } = {
   myTasks: myTasksAction,
   list: listAction,
   toDo: toDoAction,
-  time: timeAction,
   copy: copyAction,
-  copyTask: copyTaskAction,
   showDiff: showDiffAction,
 };
 
