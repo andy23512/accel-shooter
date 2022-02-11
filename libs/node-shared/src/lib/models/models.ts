@@ -12,7 +12,6 @@ export interface GitLabProject {
   repo: string;
   id: string;
   stagingStatus?: Record<string, string>;
-  deployedStatus?: Record<string, string>;
   checkItems?: ProjectCheckItem[];
   projectType: "full" | "frontend" | "other";
 }

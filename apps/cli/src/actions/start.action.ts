@@ -7,7 +7,6 @@ import {
   normalizeMarkdownChecklist,
   sleep,
 } from "@accel-shooter/node-shared";
-import clipboardy from "clipboardy";
 import { readFileSync, writeFileSync } from "fs";
 import inquirer from "inquirer";
 import { render } from "mustache";
@@ -82,7 +81,6 @@ export async function startAction() {
     "Create GitLab Merge Request",
     "Create Checklist at ClickUp",
     "Add Daily Progress Entry",
-    "Copy Sync Command",
     "Add Tracker Item",
     "Do Git Fetch and Checkout",
   ]);
@@ -172,11 +170,8 @@ export async function startAction() {
   p.next(); // Add Daily Progress Entry
   const dailyProgressString = `* (In Progress) [${gitLabMergeRequestTitle}](${clickUpTaskUrl}) [${answers.gitLabProject.name} ${gitLabMergeRequestIId}](${gitLabMergeRequest.web_url})`;
   new DailyProgress().addProgressToBuffer(dailyProgressString);
-  p.next(); // Copy Sync Command
-  const syncCommand = `acst sync ${answers.gitLabProject.name} ${gitLabMergeRequestIId}`;
-  clipboardy.writeSync(syncCommand);
   p.next(); // Add Tracker Item
-  new Tracker().addItem(answers.gitLabProject.name, gitLabMergeRequestIId);
+  new Tracker().addItem(answers.clickUpTaskId);
   p.next(); // Do Git Fetch and Checkout
   process.chdir(answers.gitLabProject.path.replace("~", os.homedir()));
   await promiseSpawn("git", ["fetch"], "pipe");
