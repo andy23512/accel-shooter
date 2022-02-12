@@ -9,14 +9,13 @@ import { concatMap, debounceTime, take, tap } from "rxjs/operators";
 export function normalizeClickUpChecklist(
   checklist: ChecklistItem[]
 ): NormalizedChecklist {
-  return checklist
-    .sort((a, b) => a.orderindex - b.orderindex)
-    .map((item, index) => ({
-      name: item.name,
-      checked: item.resolved,
-      order: index,
-      id: item.id,
-    }));
+  checklist.sort((a, b) => a.orderindex - b.orderindex);
+  return checklist.map((item, index) => ({
+    name: item.name,
+    checked: item.resolved,
+    order: index,
+    id: item.id,
+  }));
 }
 
 @Component({

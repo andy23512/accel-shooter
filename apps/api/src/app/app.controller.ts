@@ -1,3 +1,4 @@
+import { SummarizedTask } from "@accel-shooter/api-interfaces";
 import {
   ClickUp,
   getSyncChecklistActions,
@@ -26,6 +27,13 @@ const CONFIG_KEY_MAP = {
 export class AppController {
   constructor(private configService: ConfigService) {}
 
+  @Get("tasks")
+  async getTasks(): Promise<{ tasks: SummarizedTask[] }> {
+    const path = this.configService.get<string>("MySummarizedTasksFile");
+    const tasks = JSON.parse(readFileSync(path, { encoding: "utf-8" }));
+    return { tasks };
+  }
+
   @Get("markdown/:id")
   async getMarkdown(
     @Param("id") markdownId: "todo" | "work_note"
@@ -40,7 +48,7 @@ export class AppController {
   }
 
   @Put("markdown/:id")
-  async putTodo(
+  async putMarkdown(
     @Param("id") markdownId: "todo" | "work_note",
     @Body("content") content: string
   ) {

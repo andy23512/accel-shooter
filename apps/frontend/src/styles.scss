@@ -34,8 +34,11 @@ $frontend-theme: mat.define-light-theme(
 // that you are using.
 @include mat.all-component-themes($frontend-theme);
 
-@import "~codemirror/lib/codemirror";
-@import "./one-dark";
+@import 'ag-grid-community/dist/styles/ag-grid.css';
+@import 'ag-grid-community/dist/styles/ag-theme-balham-dark.css';
+
+@import '~codemirror/lib/codemirror';
+@import './one-dark';
 
 html,
 body {
@@ -44,7 +47,7 @@ body {
 }
 
 .CodeMirror {
-  font-family: "Source Code Pro", Consolas, monaco, monospace;
+  font-family: 'Source Code Pro', Consolas, monaco, monospace;
   letter-spacing: 0.025em;
   line-height: 1.25;
   font-size: 18px;
@@ -53,19 +56,19 @@ body {
   height: 100vh;
 }
 /* support japanese font */
-.CodeMirror[lang^="ja"] {
-  font-family: "Source Code Pro", Consolas, monaco, Meiryo, "ＭＳ ゴシック",
-    "MS Gothic", monospace;
+.CodeMirror[lang^='ja'] {
+  font-family: 'Source Code Pro', Consolas, monaco, Meiryo, 'ＭＳ ゴシック',
+    'MS Gothic', monospace;
 }
 /* support zh-tw font */
-.CodeMirror[lang="zh-tw"] {
-  font-family: "Source Code Pro", Consolas, monaco, "Microsoft JhengHei",
-    "微軟正黑", monospace;
+.CodeMirror[lang='zh-tw'] {
+  font-family: 'Source Code Pro', Consolas, monaco, 'Microsoft JhengHei',
+    '微軟正黑', monospace;
 }
 /* support zh-cn font */
-.CodeMirror[lang="zh-cn"] {
-  font-family: "Source Code Pro", Consolas, monaco, "Microsoft YaHei",
-    "微软雅黑", monospace;
+.CodeMirror[lang='zh-cn'] {
+  font-family: 'Source Code Pro', Consolas, monaco, 'Microsoft YaHei',
+    '微软雅黑', monospace;
 }
 .CodeMirror-placeholder {
   color: #777 !important;
@@ -119,12 +122,12 @@ body {
   padding-top: 2px;
 }
 .CodeMirror-foldgutter-open:after {
-  content: "⌵";
+  content: '⌵';
   font-size: 1em;
   /*    opacity: 0.5;*/
 }
 .CodeMirror-foldgutter-folded:after {
-  content: "+";
+  content: '+';
   font-size: 1em;
   font-weight: 700;
 }
@@ -164,5 +167,5 @@ body {
 }
 body {
   margin: 0;
-  font-family: Roboto, "Helvetica Neue", sans-serif;
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
 }
