@@ -224,6 +224,31 @@ exports.crossChecklistAction = crossChecklistAction;
 
 /***/ }),
 
+/***/ "./apps/cli/src/actions/dump-my-tasks.action.ts":
+/*!******************************************************!*\
+  !*** ./apps/cli/src/actions/dump-my-tasks.action.ts ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.dumpMyTasksAction = void 0;
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
+const fs_1 = __webpack_require__(/*! fs */ "fs");
+function dumpMyTasksAction() {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const mySummarizedTasks = yield node_shared_1.ClickUp.getMySummarizedTasks();
+        fs_1.writeFileSync(node_shared_1.CONFIG.MySummarizedTasksFile, JSON.stringify(mySummarizedTasks));
+    });
+}
+exports.dumpMyTasksAction = dumpMyTasksAction;
+
+
+/***/ }),
+
 /***/ "./apps/cli/src/actions/end.action.ts":
 /*!********************************************!*\
   !*** ./apps/cli/src/actions/end.action.ts ***!
@@ -290,137 +315,6 @@ function listAction() {
     });
 }
 exports.listAction = listAction;
-
-
-/***/ }),
-
-/***/ "./apps/cli/src/actions/my-tasks.action.ts":
-/*!*************************************************!*\
-  !*** ./apps/cli/src/actions/my-tasks.action.ts ***!
-  \*************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.myTasksAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
-const chalk_1 = tslib_1.__importDefault(__webpack_require__(/*! chalk */ "chalk"));
-const moment_1 = tslib_1.__importDefault(__webpack_require__(/*! moment */ "moment"));
-const table_1 = __webpack_require__(/*! table */ "table");
-const emoji_progress_class_1 = __webpack_require__(/*! ../classes/emoji-progress.class */ "./apps/cli/src/classes/emoji-progress.class.ts");
-function myTasksAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const user = (yield node_shared_1.ClickUp.getCurrentUser()).user;
-        const team = (yield node_shared_1.ClickUp.getTeams()).teams.find((t) => t.name === node_shared_1.CONFIG.ClickUpTeam);
-        if (!team) {
-            console.log("Team does not exist.");
-            return;
-        }
-        const tasks = (yield node_shared_1.ClickUp.getMyTasks(team.id, user.id)).tasks;
-        const summarizedTasks = [];
-        const ep = new emoji_progress_class_1.CustomEmojiProgress(0, tasks.length);
-        for (const task of tasks) {
-            const taskPath = [task];
-            let t = task;
-            while (t.parent) {
-                t = yield new node_shared_1.ClickUp(t.parent).getTask();
-                taskPath.push(t);
-            }
-            const simpleTaskPath = taskPath.map((t) => ({
-                name: t.name,
-                id: t.id,
-                priority: t.priority,
-                due_date: t.due_date,
-            }));
-            const reducedTask = simpleTaskPath.reduce((a, c) => ({
-                name: c.name + "\n" + a.name,
-                id: a.id,
-                priority: (a.priority === null && c.priority !== null) ||
-                    (a.priority !== null &&
-                        c.priority !== null &&
-                        parseInt(a.priority.orderindex) > parseInt(c.priority.orderindex))
-                    ? c.priority
-                    : a.priority,
-                due_date: (a.due_date === null && c.due_date !== null) ||
-                    (a.due_date !== null &&
-                        c.due_date !== null &&
-                        parseInt(a.due_date) > parseInt(c.due_date))
-                    ? c.due_date
-                    : a.due_date,
-            }));
-            summarizedTasks.push({
-                name: reducedTask.name,
-                id: task.id,
-                url: task.url,
-                priority: reducedTask.priority,
-                due_date: reducedTask.due_date,
-                original_priority: task.priority,
-                original_due_date: task.due_date,
-            });
-            ep.increase(1);
-        }
-        const compare = (a, b) => {
-            if (a === b) {
-                return 0;
-            }
-            else if (a === null || typeof a === "undefined") {
-                return 1;
-            }
-            else if (b === null || typeof b === "undefined") {
-                return -1;
-            }
-            return parseInt(a) - parseInt(b);
-        };
-        const colorPriority = (priority) => {
-            switch (priority) {
-                case "urgent":
-                    return chalk_1.default.redBright(priority);
-                case "high":
-                    return chalk_1.default.yellowBright(priority);
-                case "normal":
-                    return chalk_1.default.cyanBright(priority);
-                default:
-                    return chalk_1.default.white(priority);
-            }
-        };
-        const topDueDateTasks = summarizedTasks
-            .filter((t) => t.due_date)
-            .sort((a, b) => {
-            var _a, _b;
-            return (compare(a.due_date, b.due_date) ||
-                compare((_a = a.priority) === null || _a === void 0 ? void 0 : _a.orderindex, (_b = b.priority) === null || _b === void 0 ? void 0 : _b.orderindex));
-        });
-        console.log("Sort by Due Date:");
-        console.log(table_1.table(topDueDateTasks.map((t) => {
-            var _a;
-            return [
-                t.name + "\n" + t.url,
-                colorPriority((_a = t.priority) === null || _a === void 0 ? void 0 : _a.priority),
-                moment_1.default(+t.due_date).format("YYYY-MM-DD"),
-            ];
-        })));
-        const topPriorityTasks = summarizedTasks
-            .filter((t) => t.priority)
-            .sort((a, b) => {
-            var _a, _b;
-            return (compare((_a = a.priority) === null || _a === void 0 ? void 0 : _a.orderindex, (_b = b.priority) === null || _b === void 0 ? void 0 : _b.orderindex) ||
-                compare(a.due_date, b.due_date));
-        });
-        console.log("Sort by Priority:");
-        console.log(table_1.table(topPriorityTasks.map((t) => {
-            var _a;
-            return [
-                t.name + "\n" + t.url,
-                colorPriority((_a = t.priority) === null || _a === void 0 ? void 0 : _a.priority),
-                t.due_date ? moment_1.default(+t.due_date).format("YYYY-MM-DD") : "",
-            ];
-        })));
-    });
-}
-exports.myTasksAction = myTasksAction;
 
 
 /***/ }),
@@ -1211,45 +1105,6 @@ exports.DailyProgress = DailyProgress;
 
 /***/ }),
 
-/***/ "./apps/cli/src/classes/emoji-progress.class.ts":
-/*!******************************************************!*\
-  !*** ./apps/cli/src/classes/emoji-progress.class.ts ***!
-  \******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.CustomEmojiProgress = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const emoji_progress_1 = tslib_1.__importDefault(__webpack_require__(/*! emoji-progress */ "emoji-progress"));
-class CustomEmojiProgress extends emoji_progress_1.default {
-    constructor(start, end) {
-        super({
-            start,
-            end,
-            unit: "🥕",
-            fillerRight: "🥕",
-            fillerLeft: " ",
-            indicator: "🐰",
-            autostart: true,
-        });
-    }
-    setValueAndEndValue(value, endValue) {
-        this.endValue = endValue;
-        this.value = value;
-        if (this.value >= this.endValue) {
-            this.value = this.endValue;
-            this.complete();
-        }
-    }
-}
-exports.CustomEmojiProgress = CustomEmojiProgress;
-
-
-/***/ }),
-
 /***/ "./apps/cli/src/classes/progress-log.class.ts":
 /*!****************************************************!*\
   !*** ./apps/cli/src/classes/progress-log.class.ts ***!
@@ -1524,7 +1379,7 @@ const copy_action_1 = __webpack_require__(/*! ./actions/copy.action */ "./apps/c
 const cross_checklist_action_1 = __webpack_require__(/*! ./actions/cross-checklist.action */ "./apps/cli/src/actions/cross-checklist.action.ts");
 const end_action_1 = __webpack_require__(/*! ./actions/end.action */ "./apps/cli/src/actions/end.action.ts");
 const list_action_1 = __webpack_require__(/*! ./actions/list.action */ "./apps/cli/src/actions/list.action.ts");
-const my_tasks_action_1 = __webpack_require__(/*! ./actions/my-tasks.action */ "./apps/cli/src/actions/my-tasks.action.ts");
+const dump_my_tasks_action_1 = __webpack_require__(/*! ./actions/dump-my-tasks.action */ "./apps/cli/src/actions/dump-my-tasks.action.ts");
 const open_action_1 = __webpack_require__(/*! ./actions/open.action */ "./apps/cli/src/actions/open.action.ts");
 const revert_end_action_1 = __webpack_require__(/*! ./actions/revert-end.action */ "./apps/cli/src/actions/revert-end.action.ts");
 const rtv_tasks_action_1 = __webpack_require__(/*! ./actions/rtv-tasks.action */ "./apps/cli/src/actions/rtv-tasks.action.ts");
@@ -1545,7 +1400,7 @@ const actions = {
     crossChecklist: cross_checklist_action_1.crossChecklistAction,
     RTVTasks: rtv_tasks_action_1.RTVTasksAction,
     check: check_action_1.checkAction,
-    myTasks: my_tasks_action_1.myTasksAction,
+    dumpMyTasks: dump_my_tasks_action_1.dumpMyTasksAction,
     list: list_action_1.listAction,
     toDo: to_do_action_1.toDoAction,
     copy: copy_action_1.copyAction,
@@ -1753,6 +1608,7 @@ tslib_1.__exportStar(__webpack_require__(/*! ./lib/node-shared */ "./libs/node-s
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClickUp = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const cli_progress_1 = __webpack_require__(/*! cli-progress */ "cli-progress");
 const config_1 = __webpack_require__(/*! ../config */ "./libs/node-shared/src/lib/config.ts");
 const api_utils_1 = __webpack_require__(/*! ../utils/api.utils */ "./libs/node-shared/src/lib/utils/api.utils.ts");
 const callApi = api_utils_1.callApiFactory("ClickUp");
@@ -1880,6 +1736,63 @@ class ClickUp {
                 result = `${task.name} - ${result}`;
             }
             return result;
+        });
+    }
+    static getMySummarizedTasks() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const user = (yield ClickUp.getCurrentUser()).user;
+            const team = (yield ClickUp.getTeams()).teams.find((t) => t.name === config_1.CONFIG.ClickUpTeam);
+            if (!team) {
+                console.log("Team does not exist.");
+                return;
+            }
+            const tasks = (yield ClickUp.getMyTasks(team.id, user.id)).tasks;
+            const summarizedTasks = [];
+            const bar = new cli_progress_1.SingleBar({
+                stopOnComplete: true,
+            }, cli_progress_1.Presets.shades_classic);
+            bar.start(tasks.length, 0);
+            for (const task of tasks) {
+                const taskPath = [task];
+                let currentTask = task;
+                while (currentTask.parent) {
+                    currentTask = yield new ClickUp(currentTask.parent).getTask();
+                    taskPath.push(currentTask);
+                }
+                const simpleTaskPath = taskPath.map((t) => ({
+                    name: t.name,
+                    id: t.id,
+                    priority: t.priority,
+                    due_date: t.due_date,
+                }));
+                const reducedTask = simpleTaskPath.reduce((a, c) => ({
+                    name: c.name + " | " + a.name,
+                    id: a.id,
+                    priority: (a.priority === null && c.priority !== null) ||
+                        (a.priority !== null &&
+                            c.priority !== null &&
+                            parseInt(a.priority.orderindex) > parseInt(c.priority.orderindex))
+                        ? c.priority
+                        : a.priority,
+                    due_date: (a.due_date === null && c.due_date !== null) ||
+                        (a.due_date !== null &&
+                            c.due_date !== null &&
+                            parseInt(a.due_date) > parseInt(c.due_date))
+                        ? c.due_date
+                        : a.due_date,
+                }));
+                summarizedTasks.push({
+                    name: reducedTask.name,
+                    id: task.id,
+                    url: task.url,
+                    priority: reducedTask.priority,
+                    due_date: reducedTask.due_date,
+                    original_priority: task.priority,
+                    original_due_date: task.due_date,
+                });
+                bar.increment(1);
+            }
+            return summarizedTasks;
         });
     }
 }
@@ -2037,6 +1950,7 @@ function getConfig() {
     config.TaskTodoFolder = untildify_1.default(config.TaskTodoFolder);
     config.TodoFile = untildify_1.default(config.TodoFile);
     config.WorkNoteFile = untildify_1.default(config.WorkNoteFile);
+    config.MySummarizedTasksFile = untildify_1.default(config.MySummarizedTasksFile);
     return config;
 }
 exports.getConfig = getConfig;
@@ -2352,17 +2266,6 @@ module.exports = __webpack_require__(/*! /Users/nanoha/git/accel-shooter/apps/cl
 
 /***/ }),
 
-/***/ "chalk":
-/*!************************!*\
-  !*** external "chalk" ***!
-  \************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("chalk");
-
-/***/ }),
-
 /***/ "child_process":
 /*!********************************!*\
   !*** external "child_process" ***!
@@ -2371,6 +2274,17 @@ module.exports = require("chalk");
 /***/ (function(module, exports) {
 
 module.exports = require("child_process");
+
+/***/ }),
+
+/***/ "cli-progress":
+/*!*******************************!*\
+  !*** external "cli-progress" ***!
+  \*******************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("cli-progress");
 
 /***/ }),
 
@@ -2393,17 +2307,6 @@ module.exports = require("clipboardy");
 /***/ (function(module, exports) {
 
 module.exports = require("date-fns");
-
-/***/ }),
-
-/***/ "emoji-progress":
-/*!*********************************!*\
-  !*** external "emoji-progress" ***!
-  \*********************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("emoji-progress");
 
 /***/ }),
 
@@ -2437,17 +2340,6 @@ module.exports = require("inquirer");
 /***/ (function(module, exports) {
 
 module.exports = require("instance-locker");
-
-/***/ }),
-
-/***/ "moment":
-/*!*************************!*\
-  !*** external "moment" ***!
-  \*************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("moment");
 
 /***/ }),
 
@@ -2558,17 +2450,6 @@ module.exports = require("rxjs");
 /***/ (function(module, exports) {
 
 module.exports = require("rxjs/operators");
-
-/***/ }),
-
-/***/ "table":
-/*!************************!*\
-  !*** external "table" ***!
-  \************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("table");
 
 /***/ }),
 

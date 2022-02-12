@@ -3,7 +3,7 @@ import { copyAction } from "./actions/copy.action";
 import { crossChecklistAction } from "./actions/cross-checklist.action";
 import { endAction } from "./actions/end.action";
 import { listAction } from "./actions/list.action";
-import { myTasksAction } from "./actions/my-tasks.action";
+import { dumpMyTasksAction } from "./actions/dump-my-tasks.action";
 import { openAction } from "./actions/open.action";
 import { revertEndAction } from "./actions/revert-end.action";
 import { RTVTasksAction } from "./actions/rtv-tasks.action";
@@ -25,7 +25,7 @@ const actions: { [key: string]: () => Promise<void> } = {
   crossChecklist: crossChecklistAction,
   RTVTasks: RTVTasksAction,
   check: checkAction,
-  myTasks: myTasksAction,
+  dumpMyTasks: dumpMyTasksAction,
   list: listAction,
   toDo: toDoAction,
   copy: copyAction,

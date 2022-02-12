@@ -275,9 +275,6 @@ exports.AppService = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 let AppService = class AppService {
-    getData() {
-        return { message: 'Welcome to api!' };
-    }
 };
 AppService = tslib_1.__decorate([
     common_1.Injectable()
@@ -349,6 +346,7 @@ tslib_1.__exportStar(__webpack_require__(/*! ./lib/node-shared */ "./libs/node-s
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClickUp = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const cli_progress_1 = __webpack_require__(/*! cli-progress */ "cli-progress");
 const config_1 = __webpack_require__(/*! ../config */ "./libs/node-shared/src/lib/config.ts");
 const api_utils_1 = __webpack_require__(/*! ../utils/api.utils */ "./libs/node-shared/src/lib/utils/api.utils.ts");
 const callApi = api_utils_1.callApiFactory("ClickUp");
@@ -476,6 +474,63 @@ class ClickUp {
                 result = `${task.name} - ${result}`;
             }
             return result;
+        });
+    }
+    static getMySummarizedTasks() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const user = (yield ClickUp.getCurrentUser()).user;
+            const team = (yield ClickUp.getTeams()).teams.find((t) => t.name === config_1.CONFIG.ClickUpTeam);
+            if (!team) {
+                console.log("Team does not exist.");
+                return;
+            }
+            const tasks = (yield ClickUp.getMyTasks(team.id, user.id)).tasks;
+            const summarizedTasks = [];
+            const bar = new cli_progress_1.SingleBar({
+                stopOnComplete: true,
+            }, cli_progress_1.Presets.shades_classic);
+            bar.start(tasks.length, 0);
+            for (const task of tasks) {
+                const taskPath = [task];
+                let currentTask = task;
+                while (currentTask.parent) {
+                    currentTask = yield new ClickUp(currentTask.parent).getTask();
+                    taskPath.push(currentTask);
+                }
+                const simpleTaskPath = taskPath.map((t) => ({
+                    name: t.name,
+                    id: t.id,
+                    priority: t.priority,
+                    due_date: t.due_date,
+                }));
+                const reducedTask = simpleTaskPath.reduce((a, c) => ({
+                    name: c.name + " | " + a.name,
+                    id: a.id,
+                    priority: (a.priority === null && c.priority !== null) ||
+                        (a.priority !== null &&
+                            c.priority !== null &&
+                            parseInt(a.priority.orderindex) > parseInt(c.priority.orderindex))
+                        ? c.priority
+                        : a.priority,
+                    due_date: (a.due_date === null && c.due_date !== null) ||
+                        (a.due_date !== null &&
+                            c.due_date !== null &&
+                            parseInt(a.due_date) > parseInt(c.due_date))
+                        ? c.due_date
+                        : a.due_date,
+                }));
+                summarizedTasks.push({
+                    name: reducedTask.name,
+                    id: task.id,
+                    url: task.url,
+                    priority: reducedTask.priority,
+                    due_date: reducedTask.due_date,
+                    original_priority: task.priority,
+                    original_due_date: task.due_date,
+                });
+                bar.increment(1);
+            }
+            return summarizedTasks;
         });
     }
 }
@@ -633,6 +688,7 @@ function getConfig() {
     config.TaskTodoFolder = untildify_1.default(config.TaskTodoFolder);
     config.TodoFile = untildify_1.default(config.TodoFile);
     config.WorkNoteFile = untildify_1.default(config.WorkNoteFile);
+    config.MySummarizedTasksFile = untildify_1.default(config.MySummarizedTasksFile);
     return config;
 }
 exports.getConfig = getConfig;
@@ -989,6 +1045,17 @@ module.exports = require("@nestjs/core");
 /***/ (function(module, exports) {
 
 module.exports = require("@nestjs/serve-static");
+
+/***/ }),
+
+/***/ "cli-progress":
+/*!*******************************!*\
+  !*** external "cli-progress" ***!
+  \*******************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("cli-progress");
 
 /***/ }),
 

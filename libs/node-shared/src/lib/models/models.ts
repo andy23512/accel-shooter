@@ -31,6 +31,7 @@ export interface Config {
   TaskTodoFolder: string;
   TodoFile: string;
   WorkNoteFile: string;
+  MySummarizedTasksFile: string;
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];
 export interface NormalizedChecklistItem {
