@@ -9,8 +9,8 @@ export interface SummarizedTask {
   name: string;
   id: string;
   url: string;
-  priority: Priority;
-  due_date: string;
-  original_priority: Priority;
-  original_due_date: string;
+  priority: null | Priority;
+  due_date: null | string;
+  original_priority: null | Priority;
+  original_due_date: null | string;
 }
