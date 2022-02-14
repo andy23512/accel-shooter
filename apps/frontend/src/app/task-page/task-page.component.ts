@@ -1,10 +1,10 @@
-import { ChecklistItem, NormalizedChecklist } from "@accel-shooter/node-shared";
-import { HttpClient } from "@angular/common/http";
-import { Component, OnInit } from "@angular/core";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute } from "@angular/router";
-import { merge, Subject } from "rxjs";
-import { concatMap, debounceTime, take, tap } from "rxjs/operators";
+import { ChecklistItem, NormalizedChecklist } from '@accel-shooter/node-shared';
+import { HttpClient } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ActivatedRoute } from '@angular/router';
+import { merge, Subject } from 'rxjs';
+import { concatMap, debounceTime, take, tap } from 'rxjs/operators';
 
 export function normalizeClickUpChecklist(
   checklist: ChecklistItem[]
@@ -19,17 +19,18 @@ export function normalizeClickUpChecklist(
 }
 
 @Component({
-  selector: "accel-shooter-task-page",
-  templateUrl: "./task-page.component.html",
-  styleUrls: ["./task-page.component.scss"],
+  selector: 'accel-shooter-task-page',
+  templateUrl: './task-page.component.html',
+  styleUrls: ['./task-page.component.scss'],
 })
 export class TaskPageComponent implements OnInit {
-  public taskId = "";
-  public checklistMarkDown = "";
-  public taskLink = "";
-  public mergeRequestLink = "";
-  public frameUrl = "";
-  public fullTaskName = "";
+  public loaded = false;
+  public taskId = '';
+  public checklistMarkDown = '';
+  public taskLink = '';
+  public mergeRequestLink = '';
+  public frameUrl = '';
+  public fullTaskName = '';
   public changeSubject = new Subject();
   public saveSubject = new Subject();
 
@@ -40,7 +41,7 @@ export class TaskPageComponent implements OnInit {
   ) {}
 
   public ngOnInit(): void {
-    this.taskId = this.route.snapshot.paramMap.get("id") as string;
+    this.taskId = this.route.snapshot.paramMap.get('id') as string;
     this.http
       .get<{
         mergeRequestLink: string;
@@ -57,6 +58,7 @@ export class TaskPageComponent implements OnInit {
           this.frameUrl = frameUrl;
           this.checklistMarkDown = content;
           this.fullTaskName = fullTaskName;
+          this.loaded = true;
           this.startSync();
         }
       );
@@ -85,10 +87,10 @@ export class TaskPageComponent implements OnInit {
             .pipe(
               tap({
                 next: () => {
-                  this.matSnackBar.open("Saved!", "", { duration: 5000 });
+                  this.matSnackBar.open('Saved!', '', { duration: 5000 });
                 },
                 error: () => {
-                  this.matSnackBar.open("Error!", "", { duration: 5000 });
+                  this.matSnackBar.open('Error!', '', { duration: 5000 });
                 },
               })
             )

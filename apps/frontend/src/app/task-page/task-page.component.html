@@ -3,7 +3,7 @@
   (contentChange)="onContentChange($event)"
   (save)="onSave()"
 ></accel-shooter-editor>
-<div class="refs">
+<div class="refs" *ngIf="loaded">
   <span>{{ fullTaskName }}</span
   ><br />
   <a [href]="mergeRequestLink" target="_blank">Merge Request</a><br />
