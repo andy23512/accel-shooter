@@ -262,7 +262,8 @@ AppModule = tslib_1.__decorate([
         imports: [
             config_1.ConfigModule.forRoot({ isGlobal: true, load: [node_shared_1.getConfig] }),
             serve_static_1.ServeStaticModule.forRoot({
-                rootPath: path_1.join(__dirname, "..", "frontend"),
+                rootPath: path_1.join(__dirname, '..', 'frontend'),
+                serveStaticOptions: { cacheControl: false },
             }),
         ],
         controllers: [app_controller_1.AppController],
