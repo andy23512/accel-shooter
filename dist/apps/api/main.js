@@ -363,67 +363,67 @@ const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const cli_progress_1 = __webpack_require__(/*! cli-progress */ "cli-progress");
 const config_1 = __webpack_require__(/*! ../config */ "./libs/node-shared/src/lib/config.ts");
 const api_utils_1 = __webpack_require__(/*! ../utils/api.utils */ "./libs/node-shared/src/lib/utils/api.utils.ts");
-const callApi = api_utils_1.callApiFactory("ClickUp");
+const callApi = api_utils_1.callApiFactory('ClickUp');
 class ClickUp {
     constructor(taskId) {
         this.taskId = taskId;
     }
     static getCurrentUser() {
-        return callApi("get", `/user/`);
+        return callApi('get', `/user/`);
     }
     static getList(listId) {
-        return callApi("get", `/list/${listId}`);
+        return callApi('get', `/list/${listId}`);
     }
     static getTeams() {
-        return callApi("get", `/team/`);
+        return callApi('get', `/team/`);
     }
     static getRTVTasks(teamId, userID) {
-        return callApi("get", `/team/${teamId}/task/`, {
-            statuses: ["ready to verify"],
+        return callApi('get', `/team/${teamId}/task/`, {
+            statuses: ['ready to verify'],
             include_closed: true,
             assignees: [userID],
         });
     }
     static getMyTasks(teamId, userID) {
-        return callApi("get", `/team/${teamId}/task/`, {
-            statuses: ["Open", "pending", "ready to do", "in progress"],
+        return callApi('get', `/team/${teamId}/task/`, {
+            statuses: ['Open', 'pending', 'ready to do', 'in progress'],
             assignees: [userID],
             subtasks: true,
         });
     }
     getTask() {
-        return callApi("get", `/task/${this.taskId}`);
+        return callApi('get', `/task/${this.taskId}`);
     }
     getTaskIncludeSubTasks() {
-        return callApi("get", `/task/${this.taskId}`, {
+        return callApi('get', `/task/${this.taskId}`, {
             include_subtasks: true,
         });
     }
     getTaskComments() {
-        return callApi("get", `/task/${this.taskId}/comment/`).then((r) => r.comments);
+        return callApi('get', `/task/${this.taskId}/comment/`).then((r) => r.comments);
     }
     setTaskStatus(status) {
-        return callApi("put", `/task/${this.taskId}`, null, { status });
+        return callApi('put', `/task/${this.taskId}`, null, { status });
     }
     createChecklist(name) {
-        return callApi("post", `/task/${this.taskId}/checklist`, null, { name });
+        return callApi('post', `/task/${this.taskId}/checklist`, null, { name });
     }
     createChecklistItem(checklistId, name, resolved, orderindex) {
-        return callApi("post", `/checklist/${checklistId}/checklist_item`, null, {
+        return callApi('post', `/checklist/${checklistId}/checklist_item`, null, {
             name,
             resolved,
             orderindex,
         });
     }
     updateChecklistItem(checklistId, checklistItemId, name, resolved, orderindex) {
-        return callApi("put", `/checklist/${checklistId}/checklist_item/${checklistItemId}`, null, {
+        return callApi('put', `/checklist/${checklistId}/checklist_item/${checklistItemId}`, null, {
             name,
             resolved,
             orderindex,
         });
     }
     deleteChecklistItem(checklistId, checklistItemId) {
-        return callApi("delete", `/checklist/${checklistId}/checklist_item/${checklistItemId}`);
+        return callApi('delete', `/checklist/${checklistId}/checklist_item/${checklistItemId}`);
     }
     getFrameUrls() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -445,7 +445,7 @@ class ClickUp {
                 const comments = yield clickUp.getTaskComments();
                 comments.forEach((co) => {
                     co.comment
-                        .filter((c) => c.type === "frame")
+                        .filter((c) => c.type === 'frame')
                         .forEach((c) => {
                         var _a;
                         if ((_a = c === null || c === void 0 ? void 0 : c.frame) === null || _a === void 0 ? void 0 : _a.url) {
@@ -466,7 +466,7 @@ class ClickUp {
     getGitLabProjectAndMergeRequestIId() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const task = yield this.getTask();
-            const clickUpChecklist = task.checklists.find((c) => c.name.toLowerCase().includes("synced checklist"));
+            const clickUpChecklist = task.checklists.find((c) => c.name.toLowerCase().includes('synced checklist'));
             if (clickUpChecklist) {
                 const match = clickUpChecklist.name.match(/\[(.*?) !([\d]+)\]/);
                 if (match) {
@@ -495,7 +495,7 @@ class ClickUp {
             const user = (yield ClickUp.getCurrentUser()).user;
             const team = (yield ClickUp.getTeams()).teams.find((t) => t.name === config_1.CONFIG.ClickUpTeam);
             if (!team) {
-                console.log("Team does not exist.");
+                console.log('Team does not exist.');
                 return;
             }
             const tasks = (yield ClickUp.getMyTasks(team.id, user.id)).tasks;
@@ -518,7 +518,7 @@ class ClickUp {
                     due_date: t.due_date,
                 }));
                 const reducedTask = simpleTaskPath.reduce((a, c) => ({
-                    name: c.name + " | " + a.name,
+                    name: c.name + ' | ' + a.name,
                     id: a.id,
                     priority: (a.priority === null && c.priority !== null) ||
                         (a.priority !== null &&
@@ -541,6 +541,7 @@ class ClickUp {
                     due_date: reducedTask.due_date,
                     original_priority: task.priority,
                     original_due_date: task.due_date,
+                    date_created: task.date_created,
                 });
                 bar.increment(1);
             }

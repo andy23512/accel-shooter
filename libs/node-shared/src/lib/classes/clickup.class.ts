@@ -1,71 +1,71 @@
-import { SummarizedTask } from "@accel-shooter/api-interfaces";
-import { Presets, SingleBar } from "cli-progress";
-import { CONFIG } from "../config";
-import { ChecklistResponse } from "../models/clickup.models";
-import { Comment } from "../models/clickup/comment.models";
-import { List } from "../models/clickup/list.models";
-import { TaskIncludeSubTasks } from "../models/clickup/task.models";
-import { Team } from "../models/clickup/team.models";
-import { User } from "../models/clickup/user.models";
-import { callApiFactory } from "../utils/api.utils";
-import { Task } from "./../models/clickup/task.models";
-const callApi = callApiFactory("ClickUp");
+import { SummarizedTask } from '@accel-shooter/api-interfaces';
+import { Presets, SingleBar } from 'cli-progress';
+import { CONFIG } from '../config';
+import { ChecklistResponse } from '../models/clickup.models';
+import { Comment } from '../models/clickup/comment.models';
+import { List } from '../models/clickup/list.models';
+import { TaskIncludeSubTasks } from '../models/clickup/task.models';
+import { Team } from '../models/clickup/team.models';
+import { User } from '../models/clickup/user.models';
+import { callApiFactory } from '../utils/api.utils';
+import { Task } from './../models/clickup/task.models';
+const callApi = callApiFactory('ClickUp');
 
 export class ClickUp {
   constructor(public taskId: string) {}
 
   public static getCurrentUser() {
-    return callApi<{ user: User }>("get", `/user/`);
+    return callApi<{ user: User }>('get', `/user/`);
   }
 
   public static getList(listId: string) {
-    return callApi<List>("get", `/list/${listId}`);
+    return callApi<List>('get', `/list/${listId}`);
   }
 
   public static getTeams() {
-    return callApi<{ teams: Team[] }>("get", `/team/`);
+    return callApi<{ teams: Team[] }>('get', `/team/`);
   }
 
   public static getRTVTasks(teamId: string, userID: number) {
-    return callApi<{ tasks: Task[] }>("get", `/team/${teamId}/task/`, {
-      statuses: ["ready to verify"],
+    return callApi<{ tasks: Task[] }>('get', `/team/${teamId}/task/`, {
+      statuses: ['ready to verify'],
       include_closed: true,
       assignees: [userID],
     });
   }
 
   public static getMyTasks(teamId: string, userID: number) {
-    return callApi<{ tasks: Task[] }>("get", `/team/${teamId}/task/`, {
-      statuses: ["Open", "pending", "ready to do", "in progress"],
+    return callApi<{ tasks: Task[] }>('get', `/team/${teamId}/task/`, {
+      statuses: ['Open', 'pending', 'ready to do', 'in progress'],
       assignees: [userID],
       subtasks: true,
     });
   }
 
   public getTask() {
-    return callApi<Task>("get", `/task/${this.taskId}`);
+    return callApi<Task>('get', `/task/${this.taskId}`);
   }
 
   public getTaskIncludeSubTasks() {
-    return callApi<TaskIncludeSubTasks>("get", `/task/${this.taskId}`, {
+    return callApi<TaskIncludeSubTasks>('get', `/task/${this.taskId}`, {
       include_subtasks: true,
     });
   }
 
   public getTaskComments() {
     return callApi<{ comments: Comment[] }>(
-      "get",
+      'get',
       `/task/${this.taskId}/comment/`
     ).then((r) => r.comments);
   }
 
   public setTaskStatus(status: string) {
-    return callApi<Task>("put", `/task/${this.taskId}`, null, { status });
+    return callApi<Task>('put', `/task/${this.taskId}`, null, { status });
   }
 
   public createChecklist(name: string) {
     return callApi<ChecklistResponse>(
-      "post",
+      'post',
       `/task/${this.taskId}/checklist`,
       null,
       { name }
@@ -79,7 +79,7 @@ export class ClickUp {
     orderindex: number
   ) {
     return callApi<ChecklistResponse>(
-      "post",
+      'post',
       `/checklist/${checklistId}/checklist_item`,
       null,
       {
@@ -98,7 +98,7 @@ export class ClickUp {
     orderindex: number
   ) {
     return callApi<ChecklistResponse>(
-      "put",
+      'put',
       `/checklist/${checklistId}/checklist_item/${checklistItemId}`,
       null,
       {
@@ -111,7 +111,7 @@ export class ClickUp {
 
   public deleteChecklistItem(checklistId: string, checklistItemId: string) {
     return callApi<void>(
-      "delete",
+      'delete',
       `/checklist/${checklistId}/checklist_item/${checklistItemId}`
     );
   }
@@ -135,7 +135,7 @@ export class ClickUp {
       const comments = await clickUp.getTaskComments();
       comments.forEach((co) => {
         co.comment
-          .filter((c) => c.type === "frame")
+          .filter((c) => c.type === 'frame')
           .forEach((c) => {
             if (c?.frame?.url) {
               frameUrls.push(c.frame.url);
@@ -155,7 +155,7 @@ export class ClickUp {
   public async getGitLabProjectAndMergeRequestIId() {
     const task = await this.getTask();
     const clickUpChecklist = task.checklists.find((c) =>
-      c.name.toLowerCase().includes("synced checklist")
+      c.name.toLowerCase().includes('synced checklist')
     );
     if (clickUpChecklist) {
       const match = clickUpChecklist.name.match(/\[(.*?) !([\d]+)\]/);
@@ -187,7 +187,7 @@ export class ClickUp {
       (t) => t.name === CONFIG.ClickUpTeam
     );
     if (!team) {
-      console.log("Team does not exist.");
+      console.log('Team does not exist.');
       return;
     }
     const tasks = (await ClickUp.getMyTasks(team.id, user.id)).tasks;
@@ -213,7 +213,7 @@ export class ClickUp {
         due_date: t.due_date,
       }));
       const reducedTask = simpleTaskPath.reduce((a, c) => ({
-        name: c.name + " | " + a.name,
+        name: c.name + ' | ' + a.name,
         id: a.id,
         priority:
           (a.priority === null && c.priority !== null) ||
@@ -238,6 +238,7 @@ export class ClickUp {
         due_date: reducedTask.due_date,
         original_priority: task.priority,
         original_due_date: task.due_date,
+        date_created: task.date_created,
       });
       bar.increment(1);
     }

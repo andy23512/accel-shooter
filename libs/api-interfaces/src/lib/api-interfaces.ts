@@ -13,4 +13,5 @@ export interface SummarizedTask {
   due_date: null | string;
   original_priority: null | Priority;
   original_due_date: null | string;
+  date_created: null | string;
 }

@@ -21,7 +21,7 @@ const comparator = (a: null | string, b: null | string) => {
 @Component({
   selector: 'accel-shooter-tasks-page',
   templateUrl: './tasks-page.component.html',
-  styleUrls: ['./tasks-page.component.css'],
+  styleUrls: ['./tasks-page.component.scss'],
 })
 export class TasksPageComponent {
   public columnDefs: ColDef[] = [
@@ -34,13 +34,27 @@ export class TasksPageComponent {
       comparator,
       cellRenderer: PriorityCellRendererComponent,
       sort: 'asc',
+      sortingOrder: ['asc', null],
     },
     {
       width: 100,
       field: 'due_date',
+      headerName: 'Due Date',
       sortable: true,
       valueFormatter: (p) =>
         p.data.due_date ? moment(+p.data.due_date).format('YYYY-MM-DD') : '',
+      comparator,
+    },
+    {
+      width: 150,
+      field: 'date_created',
+      headerName: 'Created Date',
+      sortable: true,
+      sortingOrder: ['desc', 'asc', null],
+      valueFormatter: (p) =>
+        p.data.date_created
+          ? moment(+p.data.date_created).format('YYYY-MM-DD HH:mm:ss')
+          : '',
       comparator,
     },
   ];
