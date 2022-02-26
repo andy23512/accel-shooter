@@ -239,6 +239,7 @@ export class ClickUp {
         original_priority: task.priority,
         original_due_date: task.due_date,
         date_created: task.date_created,
+        status: task.status,
       });
       bar.increment(1);
     }

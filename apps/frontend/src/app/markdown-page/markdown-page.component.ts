@@ -1,28 +1,30 @@
-import { HttpClient } from "@angular/common/http";
-import { Component, OnInit } from "@angular/core";
-import { MatSnackBar } from "@angular/material/snack-bar";
-import { ActivatedRoute } from "@angular/router";
-import { merge, Subject } from "rxjs";
-import { concatMap, debounceTime, take, tap } from "rxjs/operators";
+import { HttpClient } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { ActivatedRoute } from '@angular/router';
+import { SseClient } from 'angular-sse-client';
+import { merge, Subject } from 'rxjs';
+import { concatMap, debounceTime, take, tap } from 'rxjs/operators';
 
 @Component({
-  selector: "accel-shooter-markdown-page",
-  templateUrl: "./markdown-page.component.html",
-  styleUrls: ["./markdown-page.component.scss"],
+  selector: 'accel-shooter-markdown-page',
+  templateUrl: './markdown-page.component.html',
+  styleUrls: ['./markdown-page.component.scss'],
 })
 export class MarkdownPageComponent implements OnInit {
-  public markdownId = "";
-  public markdownContent = "";
+  public markdownId = '';
+  public markdownContent = '';
   public changeSubject = new Subject();
   public saveSubject = new Subject();
   constructor(
     private http: HttpClient,
     private matSnackBar: MatSnackBar,
-    private route: ActivatedRoute
+    private route: ActivatedRoute,
+    private sseClient: SseClient
   ) {}
 
   public ngOnInit(): void {
-    this.markdownId = this.route.snapshot.paramMap.get("id") as string;
+    this.markdownId = this.route.snapshot.paramMap.get('id') as string;
     this.http
       .get<{
         content: string;
@@ -30,6 +32,9 @@ export class MarkdownPageComponent implements OnInit {
       .pipe(take(1))
       .subscribe(({ content }) => {
         this.markdownContent = content;
+        if (this.markdownId === 'todo') {
+          this.startTodoSse();
+        }
       });
     this.startSync();
   }
@@ -57,15 +62,23 @@ export class MarkdownPageComponent implements OnInit {
             .pipe(
               tap({
                 next: () => {
-                  this.matSnackBar.open("Saved!", "", { duration: 5000 });
+                  this.matSnackBar.open('Saved!', '', { duration: 5000 });
                 },
                 error: () => {
-                  this.matSnackBar.open("Error!", "", { duration: 5000 });
+                  this.matSnackBar.open('Error!', '', { duration: 5000 });
                 },
               })
             )
         )
       )
       .subscribe();
+  }
+
+  public startTodoSse() {
+    this.sseClient.get('/api/todo-sse').subscribe((data) => {
+      if (this.markdownContent !== data) {
+        this.markdownContent = data;
+      }
+    });
   }
 }

@@ -6,6 +6,7 @@ import moment from 'moment';
 import { map, take } from 'rxjs/operators';
 import { PriorityCellRendererComponent } from './priority-cell-renderer.component';
 import { TaskNameCellRendererComponent } from './task-name-cell-renderer.component';
+import { TaskStatusCellRendererComponent } from './task-status-cell-renderer.component';
 
 const comparator = (a: null | string, b: null | string) => {
   if (a === b) {
@@ -25,6 +26,13 @@ const comparator = (a: null | string, b: null | string) => {
 })
 export class TasksPageComponent {
   public columnDefs: ColDef[] = [
+    {
+      width: 36,
+      cellRenderer: TaskStatusCellRendererComponent,
+      valueGetter: (p) => p.data.status?.orderindex,
+      comparator,
+      sortable: true,
+    },
     { width: 800, field: 'name', cellRenderer: TaskNameCellRendererComponent },
     {
       width: 100,

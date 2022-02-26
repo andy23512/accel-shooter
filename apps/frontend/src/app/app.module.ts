@@ -3,6 +3,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
@@ -17,6 +18,7 @@ import { MarkdownPageComponent } from './markdown-page/markdown-page.component';
 import { TaskPageComponent } from './task-page/task-page.component';
 import { PriorityCellRendererComponent } from './tasks-page/priority-cell-renderer.component';
 import { TaskNameCellRendererComponent } from './tasks-page/task-name-cell-renderer.component';
+import { TaskStatusCellRendererComponent } from './tasks-page/task-status-cell-renderer.component';
 import { TasksPageComponent } from './tasks-page/tasks-page.component';
 
 @NgModule({
@@ -28,6 +30,7 @@ import { TasksPageComponent } from './tasks-page/tasks-page.component';
     TasksPageComponent,
     TaskNameCellRendererComponent,
     PriorityCellRendererComponent,
+    TaskStatusCellRendererComponent,
   ],
   imports: [
     BrowserModule,
@@ -55,6 +58,7 @@ import { TasksPageComponent } from './tasks-page/tasks-page.component';
       },
     ]),
     MatSnackBarModule,
+    MatTooltipModule,
     LoadingBarHttpClientModule,
     LoadingBarRouterModule,
     LoadingBarModule,
@@ -62,6 +66,7 @@ import { TasksPageComponent } from './tasks-page/tasks-page.component';
     AgGridModule.withComponents([
       TaskNameCellRendererComponent,
       PriorityCellRendererComponent,
+      TaskStatusCellRendererComponent,
     ]),
   ],
   providers: [],

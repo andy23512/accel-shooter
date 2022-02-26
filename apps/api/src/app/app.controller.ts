@@ -1,11 +1,12 @@
-import { SummarizedTask } from "@accel-shooter/api-interfaces";
+import { SummarizedTask } from '@accel-shooter/api-interfaces';
 import {
   ClickUp,
+  CONFIG,
   getSyncChecklistActions,
   GitLab,
   normalizeClickUpChecklist,
   normalizeMarkdownChecklist,
-} from "@accel-shooter/node-shared";
+} from '@accel-shooter/node-shared';
 import {
   Body,
   Controller,
@@ -13,44 +14,48 @@ import {
   NotFoundException,
   Param,
   Put,
-} from "@nestjs/common";
-import { ConfigService } from "@nestjs/config";
-import { readFileSync, writeFileSync } from "fs";
-import { join } from "path";
+  Sse,
+} from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { readFileSync, writeFileSync } from 'fs';
+import { join } from 'path';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { watchRx } from 'watch-rx';
 
 const CONFIG_KEY_MAP = {
-  todo: "TodoFile",
-  work_note: "WorkNoteFile",
+  todo: 'TodoFile',
+  work_note: 'WorkNoteFile',
 } as const;
 
 @Controller()
 export class AppController {
   constructor(private configService: ConfigService) {}
 
-  @Get("tasks")
+  @Get('tasks')
   async getTasks(): Promise<{ tasks: SummarizedTask[] }> {
-    const path = this.configService.get<string>("MySummarizedTasksFile");
-    const tasks = JSON.parse(readFileSync(path, { encoding: "utf-8" }));
+    const path = this.configService.get<string>('MySummarizedTasksFile');
+    const tasks = JSON.parse(readFileSync(path, { encoding: 'utf-8' }));
     return { tasks };
   }
 
-  @Get("markdown/:id")
+  @Get('markdown/:id')
   async getMarkdown(
-    @Param("id") markdownId: "todo" | "work_note"
+    @Param('id') markdownId: 'todo' | 'work_note'
   ): Promise<{ content: string }> {
     const configKey = CONFIG_KEY_MAP[markdownId];
     if (!configKey) {
       throw new NotFoundException();
     }
     const path = this.configService.get<string>(configKey);
-    const content = readFileSync(path, { encoding: "utf-8" });
+    const content = readFileSync(path, { encoding: 'utf-8' });
     return { content };
   }
 
-  @Put("markdown/:id")
+  @Put('markdown/:id')
   async putMarkdown(
-    @Param("id") markdownId: "todo" | "work_note",
-    @Body("content") content: string
+    @Param('id') markdownId: 'todo' | 'work_note',
+    @Body('content') content: string
   ) {
     const configKey = CONFIG_KEY_MAP[markdownId];
     if (!configKey) {
@@ -60,8 +65,8 @@ export class AppController {
     writeFileSync(path, content);
   }
 
-  @Get("task/:id/checklist")
-  async getChecklist(@Param("id") taskId: string): Promise<{
+  @Get('task/:id/checklist')
+  async getChecklist(@Param('id') taskId: string): Promise<{
     mergeRequestLink: string;
     taskLink: string;
     content: string;
@@ -76,9 +81,9 @@ export class AppController {
       await clickUp.getGitLabProjectAndMergeRequestIId();
     const gitLab = new GitLab(gitLabProject.id);
     const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
-    const folderPath = this.configService.get<string>("TaskTodoFolder");
-    const path = join(folderPath, taskId + ".md");
-    const content = readFileSync(path, { encoding: "utf-8" });
+    const folderPath = this.configService.get<string>('TaskTodoFolder');
+    const path = join(folderPath, taskId + '.md');
+    const content = readFileSync(path, { encoding: 'utf-8' });
     return {
       mergeRequestLink: mergeRequest.web_url,
       taskLink: task.url,
@@ -88,13 +93,13 @@ export class AppController {
     };
   }
 
-  @Put("task/:id/checklist")
+  @Put('task/:id/checklist')
   async putChecklist(
-    @Param("id") taskId: string,
-    @Body("checklist") checklist: string
+    @Param('id') taskId: string,
+    @Body('checklist') checklist: string
   ) {
-    const folderPath = this.configService.get<string>("TaskTodoFolder");
-    writeFileSync(join(folderPath, taskId + ".md"), checklist);
+    const folderPath = this.configService.get<string>('TaskTodoFolder');
+    writeFileSync(join(folderPath, taskId + '.md'), checklist);
     const markdownNormalizedChecklist = normalizeMarkdownChecklist(
       checklist,
       true
@@ -102,7 +107,7 @@ export class AppController {
     const clickUp = new ClickUp(taskId);
     const task = await clickUp.getTask();
     const clickUpChecklist = task.checklists.find((c) =>
-      c.name.toLowerCase().includes("synced checklist")
+      c.name.toLowerCase().includes('synced checklist')
     );
     if (clickUpChecklist) {
       const clickUpNormalizedChecklist = normalizeClickUpChecklist(
@@ -144,5 +149,12 @@ export class AppController {
         );
       }
     }
+  }
+
+  @Sse('todo-sse')
+  public todoSse(): Observable<string> {
+    return watchRx(CONFIG.TodoFile).pipe(
+      map(() => readFileSync(CONFIG.TodoFile, { encoding: 'utf-8' }))
+    );
   }
 }

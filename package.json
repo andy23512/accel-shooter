@@ -13,7 +13,7 @@
     "ng": "nx",
     "postinstall": "if [ -e ./decorate-angular-cli.js ]; then node ./decorate-angular-cli.js && ngcc --properties es2015 browser module main; fi",
     "start-api": "nx serve api",
-    "start-frontend": "nx serve frontend",
+    "start-frontend": "nx serve frontend --port 4203",
     "start": "nx serve cli",
     "build": "nx build cli",
     "build-ext": "tsc --project apps/extension/tsconfig.app.json && cp apps/extension/manifest.json dist/apps/extension",
@@ -79,7 +79,8 @@
     "set-interval-async": "^2.0.3",
     "table": "^6.7.1",
     "tslib": "^2.0.0",
-    "untildify": "^4.0.0"
+    "untildify": "^4.0.0",
+    "watch-rx": "^1.1.0"
   },
   "devDependencies": {
     "@angular-devkit/build-angular": "~12.1.0",
@@ -132,6 +133,7 @@
     "@typescript-eslint/parser": "~4.28.3",
     "ag-grid-angular": "^27.0.0",
     "ag-grid-community": "^27.0.1",
+    "angular-sse-client": "^0.1.0",
     "codemirror": "^5.65.0",
     "cypress": "^7.3.0",
     "eslint": "7.22.0",

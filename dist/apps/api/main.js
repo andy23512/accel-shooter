@@ -95,7 +95,7 @@
 
 "use strict";
 
-var _a, _b, _c, _d;
+var _a, _b, _c, _d, _e;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppController = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
@@ -104,9 +104,12 @@ const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
 const config_1 = __webpack_require__(/*! @nestjs/config */ "@nestjs/config");
 const fs_1 = __webpack_require__(/*! fs */ "fs");
 const path_1 = __webpack_require__(/*! path */ "path");
+const rxjs_1 = __webpack_require__(/*! rxjs */ "rxjs");
+const operators_1 = __webpack_require__(/*! rxjs/operators */ "rxjs/operators");
+const watch_rx_1 = __webpack_require__(/*! watch-rx */ "watch-rx");
 const CONFIG_KEY_MAP = {
-    todo: "TodoFile",
-    work_note: "WorkNoteFile",
+    todo: 'TodoFile',
+    work_note: 'WorkNoteFile',
 };
 let AppController = class AppController {
     constructor(configService) {
@@ -114,8 +117,8 @@ let AppController = class AppController {
     }
     getTasks() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const path = this.configService.get("MySummarizedTasksFile");
-            const tasks = JSON.parse(fs_1.readFileSync(path, { encoding: "utf-8" }));
+            const path = this.configService.get('MySummarizedTasksFile');
+            const tasks = JSON.parse(fs_1.readFileSync(path, { encoding: 'utf-8' }));
             return { tasks };
         });
     }
@@ -126,7 +129,7 @@ let AppController = class AppController {
                 throw new common_1.NotFoundException();
             }
             const path = this.configService.get(configKey);
-            const content = fs_1.readFileSync(path, { encoding: "utf-8" });
+            const content = fs_1.readFileSync(path, { encoding: 'utf-8' });
             return { content };
         });
     }
@@ -149,9 +152,9 @@ let AppController = class AppController {
             const { gitLabProject, mergeRequestIId } = yield clickUp.getGitLabProjectAndMergeRequestIId();
             const gitLab = new node_shared_1.GitLab(gitLabProject.id);
             const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
-            const folderPath = this.configService.get("TaskTodoFolder");
-            const path = path_1.join(folderPath, taskId + ".md");
-            const content = fs_1.readFileSync(path, { encoding: "utf-8" });
+            const folderPath = this.configService.get('TaskTodoFolder');
+            const path = path_1.join(folderPath, taskId + '.md');
+            const content = fs_1.readFileSync(path, { encoding: 'utf-8' });
             return {
                 mergeRequestLink: mergeRequest.web_url,
                 taskLink: task.url,
@@ -163,12 +166,12 @@ let AppController = class AppController {
     }
     putChecklist(taskId, checklist) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const folderPath = this.configService.get("TaskTodoFolder");
-            fs_1.writeFileSync(path_1.join(folderPath, taskId + ".md"), checklist);
+            const folderPath = this.configService.get('TaskTodoFolder');
+            fs_1.writeFileSync(path_1.join(folderPath, taskId + '.md'), checklist);
             const markdownNormalizedChecklist = node_shared_1.normalizeMarkdownChecklist(checklist, true);
             const clickUp = new node_shared_1.ClickUp(taskId);
             const task = yield clickUp.getTask();
-            const clickUpChecklist = task.checklists.find((c) => c.name.toLowerCase().includes("synced checklist"));
+            const clickUpChecklist = task.checklists.find((c) => c.name.toLowerCase().includes('synced checklist'));
             if (clickUpChecklist) {
                 const clickUpNormalizedChecklist = node_shared_1.normalizeClickUpChecklist(clickUpChecklist.items);
                 const actions = node_shared_1.getSyncChecklistActions(clickUpNormalizedChecklist, markdownNormalizedChecklist);
@@ -190,46 +193,55 @@ let AppController = class AppController {
             }
         });
     }
+    todoSse() {
+        return watch_rx_1.watchRx(node_shared_1.CONFIG.TodoFile).pipe(operators_1.map(() => fs_1.readFileSync(node_shared_1.CONFIG.TodoFile, { encoding: 'utf-8' })));
+    }
 };
 tslib_1.__decorate([
-    common_1.Get("tasks"),
+    common_1.Get('tasks'),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", []),
     tslib_1.__metadata("design:returntype", typeof (_a = typeof Promise !== "undefined" && Promise) === "function" ? _a : Object)
 ], AppController.prototype, "getTasks", null);
 tslib_1.__decorate([
-    common_1.Get("markdown/:id"),
-    tslib_1.__param(0, common_1.Param("id")),
+    common_1.Get('markdown/:id'),
+    tslib_1.__param(0, common_1.Param('id')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String]),
     tslib_1.__metadata("design:returntype", typeof (_b = typeof Promise !== "undefined" && Promise) === "function" ? _b : Object)
 ], AppController.prototype, "getMarkdown", null);
 tslib_1.__decorate([
-    common_1.Put("markdown/:id"),
-    tslib_1.__param(0, common_1.Param("id")),
-    tslib_1.__param(1, common_1.Body("content")),
+    common_1.Put('markdown/:id'),
+    tslib_1.__param(0, common_1.Param('id')),
+    tslib_1.__param(1, common_1.Body('content')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String, String]),
     tslib_1.__metadata("design:returntype", Promise)
 ], AppController.prototype, "putMarkdown", null);
 tslib_1.__decorate([
-    common_1.Get("task/:id/checklist"),
-    tslib_1.__param(0, common_1.Param("id")),
+    common_1.Get('task/:id/checklist'),
+    tslib_1.__param(0, common_1.Param('id')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String]),
     tslib_1.__metadata("design:returntype", typeof (_c = typeof Promise !== "undefined" && Promise) === "function" ? _c : Object)
 ], AppController.prototype, "getChecklist", null);
 tslib_1.__decorate([
-    common_1.Put("task/:id/checklist"),
-    tslib_1.__param(0, common_1.Param("id")),
-    tslib_1.__param(1, common_1.Body("checklist")),
+    common_1.Put('task/:id/checklist'),
+    tslib_1.__param(0, common_1.Param('id')),
+    tslib_1.__param(1, common_1.Body('checklist')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String, String]),
     tslib_1.__metadata("design:returntype", Promise)
 ], AppController.prototype, "putChecklist", null);
+tslib_1.__decorate([
+    common_1.Sse('todo-sse'),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", []),
+    tslib_1.__metadata("design:returntype", typeof (_d = typeof rxjs_1.Observable !== "undefined" && rxjs_1.Observable) === "function" ? _d : Object)
+], AppController.prototype, "todoSse", null);
 AppController = tslib_1.__decorate([
     common_1.Controller(),
-    tslib_1.__metadata("design:paramtypes", [typeof (_d = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _d : Object])
+    tslib_1.__metadata("design:paramtypes", [typeof (_e = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _e : Object])
 ], AppController);
 exports.AppController = AppController;
 
@@ -542,6 +554,7 @@ class ClickUp {
                     original_priority: task.priority,
                     original_due_date: task.due_date,
                     date_created: task.date_created,
+                    status: task.status,
                 });
                 bar.increment(1);
             }
@@ -1118,6 +1131,28 @@ module.exports = require("qs");
 
 /***/ }),
 
+/***/ "rxjs":
+/*!***********************!*\
+  !*** external "rxjs" ***!
+  \***********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("rxjs");
+
+/***/ }),
+
+/***/ "rxjs/operators":
+/*!*********************************!*\
+  !*** external "rxjs/operators" ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("rxjs/operators");
+
+/***/ }),
+
 /***/ "tslib":
 /*!************************!*\
   !*** external "tslib" ***!
@@ -1137,6 +1172,17 @@ module.exports = require("tslib");
 /***/ (function(module, exports) {
 
 module.exports = require("untildify");
+
+/***/ }),
+
+/***/ "watch-rx":
+/*!***************************!*\
+  !*** external "watch-rx" ***!
+  \***************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("watch-rx");
 
 /***/ })
 

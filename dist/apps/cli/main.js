@@ -473,6 +473,7 @@ const path_1 = __webpack_require__(/*! path */ "path");
 const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
 const daily_progress_class_1 = __webpack_require__(/*! ../classes/daily-progress.class */ "./apps/cli/src/classes/daily-progress.class.ts");
 const progress_log_class_1 = __webpack_require__(/*! ../classes/progress-log.class */ "./apps/cli/src/classes/progress-log.class.ts");
+const todo_class_1 = __webpack_require__(/*! ../classes/todo.class */ "./apps/cli/src/classes/todo.class.ts");
 const tracker_class_1 = __webpack_require__(/*! ../classes/tracker.class */ "./apps/cli/src/classes/tracker.class.ts");
 const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 const open_action_1 = __webpack_require__(/*! ./open.action */ "./apps/cli/src/actions/open.action.ts");
@@ -480,19 +481,19 @@ function startAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const answers = yield inquirer_1.default.prompt([
             {
-                name: "gitLabProject",
-                message: "Choose GitLab Project",
-                type: "list",
+                name: 'gitLabProject',
+                message: 'Choose GitLab Project',
+                type: 'list',
                 choices: node_shared_1.CONFIG.GitLabProjects.map((p) => ({
                     name: `${p.name} (${p.repo})`,
                     value: p,
                 })),
                 filter(input) {
                     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-                        process.chdir(input.path.replace("~", os_1.default.homedir()));
+                        process.chdir(input.path.replace('~', os_1.default.homedir()));
                         const isClean = yield utils_1.checkWorkingTreeClean();
                         if (!isClean) {
-                            console.log("\nWorking tree is not clean or something is not pushed. Aborted.");
+                            console.log('\nWorking tree is not clean or something is not pushed. Aborted.');
                             process.exit();
                         }
                         return input;
@@ -500,20 +501,20 @@ function startAction() {
                 },
             },
             {
-                name: "clickUpTaskId",
-                message: "Enter ClickUp Task ID",
-                type: "input",
-                filter: (input) => input.replace("#", ""),
+                name: 'clickUpTaskId',
+                message: 'Enter ClickUp Task ID',
+                type: 'input',
+                filter: (input) => input.replace('#', ''),
             },
             {
-                name: "mergeRequestTitle",
-                message: "Enter Merge Request Title",
-                type: "input",
+                name: 'mergeRequestTitle',
+                message: 'Enter Merge Request Title',
+                type: 'input',
                 default: (answers) => tslib_1.__awaiter(this, void 0, void 0, function* () {
                     let task = yield new node_shared_1.ClickUp(answers.clickUpTaskId).getTask();
                     const user = (yield node_shared_1.ClickUp.getCurrentUser()).user;
                     if (!task.assignees.find((a) => a.id === user.id)) {
-                        console.log("\nTask is not assigned to you. Aborted.");
+                        console.log('\nTask is not assigned to you. Aborted.');
                         process.exit();
                     }
                     let result = task.name;
@@ -525,33 +526,34 @@ function startAction() {
                 }),
             },
             {
-                name: "todoConfig",
-                message: "Choose Preset To-do Config",
-                type: "checkbox",
+                name: 'todoConfig',
+                message: 'Choose Preset To-do Config',
+                type: 'checkbox',
                 choices: node_shared_1.CONFIG.ToDoConfigChoices,
             },
         ]);
-        const p = new progress_log_class_1.CustomProgressLog("Start", [
-            "Get ClickUp Task",
-            "Set ClickUp Task Status",
-            "Render Todo List",
-            "Create GitLab Branch",
-            "Create GitLab Merge Request",
-            "Create Checklist at ClickUp",
-            "Add Daily Progress Entry",
-            "Add Tracker Item",
-            "Do Git Fetch and Checkout",
+        const p = new progress_log_class_1.CustomProgressLog('Start', [
+            'Get ClickUp Task',
+            'Set ClickUp Task Status',
+            'Render Todo List',
+            'Create GitLab Branch',
+            'Create GitLab Merge Request',
+            'Create Checklist at ClickUp',
+            'Add Daily Progress Entry',
+            'Add Todo Entry',
+            'Add Tracker Item',
+            'Do Git Fetch and Checkout',
         ]);
-        process.chdir(answers.gitLabProject.path.replace("~", os_1.default.homedir()));
+        process.chdir(answers.gitLabProject.path.replace('~', os_1.default.homedir()));
         yield utils_1.checkWorkingTreeClean();
         const gitLab = new node_shared_1.GitLab(answers.gitLabProject.id);
         const clickUp = new node_shared_1.ClickUp(answers.clickUpTaskId);
         p.start(); // Get ClickUp Task
         const clickUpTask = yield clickUp.getTask();
-        const clickUpTaskUrl = clickUpTask["url"];
+        const clickUpTaskUrl = clickUpTask['url'];
         const gitLabMergeRequestTitle = answers.mergeRequestTitle;
         p.next(); // Set ClickUp Task Status
-        yield clickUp.setTaskStatus("in progress");
+        yield clickUp.setTaskStatus('in progress');
         p.next(); // Render Todo List
         const todoConfigMap = {};
         answers.todoConfig.forEach((c) => {
@@ -559,10 +561,10 @@ function startAction() {
         });
         todoConfigMap[answers.gitLabProject.name] = true;
         const template = fs_1.readFileSync(untildify_1.default(node_shared_1.CONFIG.ToDoTemplate), {
-            encoding: "utf-8",
+            encoding: 'utf-8',
         });
         const endingTodo = mustache_1.render(template, todoConfigMap);
-        const path = path_1.join(node_shared_1.CONFIG.TaskTodoFolder, answers.clickUpTaskId + ".md");
+        const path = path_1.join(node_shared_1.CONFIG.TaskTodoFolder, answers.clickUpTaskId + '.md');
         fs_1.writeFileSync(path, endingTodo);
         p.next(); // Create GitLab Branch
         const gitLabBranch = yield gitLab.createBranch(`CU-${answers.clickUpTaskId}`);
@@ -571,7 +573,7 @@ function startAction() {
         const gitLabMergeRequest = yield gitLab.createMergeRequest(gitLabMergeRequestTitle, gitLabBranch.name);
         const gitLabMergeRequestIId = gitLabMergeRequest.iid;
         p.next(); // Create Checklist at ClickUp
-        const clickUpChecklistTitle = `Synced checklist [${answers.gitLabProject.id.replace("%2F", "/")} !${gitLabMergeRequestIId}]`;
+        const clickUpChecklistTitle = `Synced checklist [${answers.gitLabProject.id.replace('%2F', '/')} !${gitLabMergeRequestIId}]`;
         let clickUpChecklist = clickUpTask.checklists.find((c) => c.name === clickUpChecklistTitle);
         if (!clickUpChecklist) {
             clickUpChecklist = (yield clickUp.createChecklist(clickUpChecklistTitle))
@@ -596,14 +598,17 @@ function startAction() {
         p.next(); // Add Daily Progress Entry
         const dailyProgressString = `* (In Progress) [${gitLabMergeRequestTitle}](${clickUpTaskUrl})`;
         new daily_progress_class_1.DailyProgress().addProgressToBuffer(dailyProgressString);
+        p.next(); // Add Todo Entry
+        const todoString = `- [ ] [${gitLabMergeRequestTitle}](${clickUpTaskUrl})`;
+        new todo_class_1.Todo().addTodoToBuffer(todoString);
         p.next(); // Add Tracker Item
         new tracker_class_1.Tracker().addItem(answers.clickUpTaskId);
         p.next(); // Do Git Fetch and Checkout
-        process.chdir(answers.gitLabProject.path.replace("~", os_1.default.homedir()));
-        yield utils_1.promiseSpawn("git", ["fetch"], "pipe");
+        process.chdir(answers.gitLabProject.path.replace('~', os_1.default.homedir()));
+        yield utils_1.promiseSpawn('git', ['fetch'], 'pipe');
         yield node_shared_1.sleep(1000);
-        yield utils_1.promiseSpawn("git", ["checkout", gitLabBranch.name], "pipe");
-        yield utils_1.promiseSpawn("git", ["submodule", "update", "--init", "--recursive"], "pipe");
+        yield utils_1.promiseSpawn('git', ['checkout', gitLabBranch.name], 'pipe');
+        yield utils_1.promiseSpawn('git', ['submodule', 'update', '--init', '--recursive'], 'pipe');
         yield open_action_1.openAction();
         p.end(0);
     });
@@ -1171,6 +1176,36 @@ class CustomProgressLog extends progress_logs_1.default {
     }
 }
 exports.CustomProgressLog = CustomProgressLog;
+
+
+/***/ }),
+
+/***/ "./apps/cli/src/classes/todo.class.ts":
+/*!********************************************!*\
+  !*** ./apps/cli/src/classes/todo.class.ts ***!
+  \********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Todo = void 0;
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
+const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
+const base_file_ref_class_1 = __webpack_require__(/*! ./base-file-ref.class */ "./apps/cli/src/classes/base-file-ref.class.ts");
+class Todo extends base_file_ref_class_1.BaseFileRef {
+    get path() {
+        return untildify_1.default(node_shared_1.CONFIG.TodoFile);
+    }
+    addTodoToBuffer(todoString) {
+        const content = this.readFile();
+        const updatedDpContent = content.replace('## Buffer End', `    ${todoString}\n## Buffer End`);
+        this.writeFile(updatedDpContent);
+    }
+}
+exports.Todo = Todo;
 
 
 /***/ }),
@@ -1817,6 +1852,7 @@ class ClickUp {
                     original_priority: task.priority,
                     original_due_date: task.due_date,
                     date_created: task.date_created,
+                    status: task.status,
                 });
                 bar.increment(1);
             }
