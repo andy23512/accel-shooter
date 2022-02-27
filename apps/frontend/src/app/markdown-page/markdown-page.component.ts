@@ -3,6 +3,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute } from '@angular/router';
 import { SseClient } from 'angular-sse-client';
+import moment, { Moment } from 'moment';
 import { merge, Subject } from 'rxjs';
 import { concatMap, debounceTime, take, tap } from 'rxjs/operators';
 
@@ -16,6 +17,7 @@ export class MarkdownPageComponent implements OnInit {
   public markdownContent = '';
   public changeSubject = new Subject();
   public saveSubject = new Subject();
+  public lastChangedTime!: Moment;
   constructor(
     private http: HttpClient,
     private matSnackBar: MatSnackBar,
@@ -32,6 +34,7 @@ export class MarkdownPageComponent implements OnInit {
       .pipe(take(1))
       .subscribe(({ content }) => {
         this.markdownContent = content;
+        this.lastChangedTime = moment();
         if (this.markdownId === 'todo') {
           this.startTodoSse();
         }
@@ -41,6 +44,7 @@ export class MarkdownPageComponent implements OnInit {
 
   public onContentChange(content: string) {
     this.markdownContent = content;
+    this.lastChangedTime = moment();
     this.changeSubject.next();
   }
 
@@ -76,8 +80,13 @@ export class MarkdownPageComponent implements OnInit {
 
   public startTodoSse() {
     this.sseClient.get('/api/todo-sse').subscribe((data) => {
-      if (this.markdownContent !== data) {
+      const receiveTime = moment();
+      if (
+        receiveTime.isAfter(this.lastChangedTime) &&
+        this.markdownContent !== data
+      ) {
         this.markdownContent = data;
+        this.lastChangedTime = receiveTime;
       }
     });
   }
