@@ -1201,8 +1201,8 @@ class Todo extends base_file_ref_class_1.BaseFileRef {
     }
     addTodoToBuffer(todoString) {
         const content = this.readFile();
-        const updatedDpContent = content.replace('## Buffer End', `    ${todoString}\n## Buffer End`);
-        this.writeFile(updatedDpContent);
+        const updatedTodoContent = content.replace('## Buffer End', `${todoString}\n## Buffer End`);
+        this.writeFile(updatedTodoContent);
     }
 }
 exports.Todo = Todo;

@@ -9,10 +9,10 @@ export class Todo extends BaseFileRef {
 
   public addTodoToBuffer(todoString: string) {
     const content = this.readFile();
-    const updatedDpContent = content.replace(
+    const updatedTodoContent = content.replace(
       '## Buffer End',
-      `    ${todoString}\n## Buffer End`
+      `${todoString}\n## Buffer End`
     );
-    this.writeFile(updatedDpContent);
+    this.writeFile(updatedTodoContent);
   }
 }
