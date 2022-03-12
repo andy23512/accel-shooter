@@ -295,6 +295,45 @@ exports.endAction = endAction;
 
 /***/ }),
 
+/***/ "./apps/cli/src/actions/fetch-holiday.action.ts":
+/*!******************************************************!*\
+  !*** ./apps/cli/src/actions/fetch-holiday.action.ts ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.fetchHolidayAction = void 0;
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
+const fs_1 = __webpack_require__(/*! fs */ "fs");
+const node_fetch_1 = tslib_1.__importDefault(__webpack_require__(/*! node-fetch */ "node-fetch"));
+function fetchHolidayAction() {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        let page = 0;
+        let holidays = [];
+        let data = null;
+        while (data === null || data.length !== 0) {
+            const response = yield node_fetch_1.default(`https://data.ntpc.gov.tw/api/datasets/308DCD75-6434-45BC-A95F-584DA4FED251/json?page=${page}&size=1000`);
+            data = yield response.json();
+            holidays = [...holidays, ...data];
+            page += 1;
+        }
+        holidays = holidays
+            .filter((h) => h.isHoliday === '是' ||
+            h.holidayCategory === '補行上班日' ||
+            h.name === '勞動節')
+            .map((h) => (Object.assign(Object.assign({}, h), { isMyHoliday: true })));
+        fs_1.writeFileSync(node_shared_1.CONFIG.HolidayFile, JSON.stringify(holidays, null, 2));
+    });
+}
+exports.fetchHolidayAction = fetchHolidayAction;
+
+
+/***/ }),
+
 /***/ "./apps/cli/src/actions/list.action.ts":
 /*!*********************************************!*\
   !*** ./apps/cli/src/actions/list.action.ts ***!
@@ -1439,6 +1478,7 @@ const copy_action_1 = __webpack_require__(/*! ./actions/copy.action */ "./apps/c
 const cross_checklist_action_1 = __webpack_require__(/*! ./actions/cross-checklist.action */ "./apps/cli/src/actions/cross-checklist.action.ts");
 const dump_my_tasks_action_1 = __webpack_require__(/*! ./actions/dump-my-tasks.action */ "./apps/cli/src/actions/dump-my-tasks.action.ts");
 const end_action_1 = __webpack_require__(/*! ./actions/end.action */ "./apps/cli/src/actions/end.action.ts");
+const fetch_holiday_action_1 = __webpack_require__(/*! ./actions/fetch-holiday.action */ "./apps/cli/src/actions/fetch-holiday.action.ts");
 const list_action_1 = __webpack_require__(/*! ./actions/list.action */ "./apps/cli/src/actions/list.action.ts");
 const open_action_1 = __webpack_require__(/*! ./actions/open.action */ "./apps/cli/src/actions/open.action.ts");
 const revert_end_action_1 = __webpack_require__(/*! ./actions/revert-end.action */ "./apps/cli/src/actions/revert-end.action.ts");
@@ -1467,6 +1507,10 @@ const actions = {
     copy: copy_action_1.copyAction,
     showDiff: show_diff_action_1.showDiffAction,
     time: time_action_1.timeAction,
+    fetchHoliday: fetch_holiday_action_1.fetchHolidayAction,
+    test: () => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
+        console.log('test');
+    }),
 };
 (() => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     const action = process.argv[2];
@@ -2000,21 +2044,27 @@ function getConfigPath() {
         return untildify_1.default(process.env.ACCEL_SHOOTER_CONFIG_FILE);
     }
     else {
-        throw Error("environment variable ACCEL_SHOOTER_CONFIG_FILE not found");
+        throw Error('environment variable ACCEL_SHOOTER_CONFIG_FILE not found');
     }
 }
 exports.getConfigPath = getConfigPath;
 function getConfig() {
     const configPath = getConfigPath();
     if (!fs_1.existsSync) {
-        throw Error("config file does not exist");
+        throw Error('config file does not exist');
     }
-    const config = JSON.parse(fs_1.readFileSync(configPath, { encoding: "utf-8" }));
+    const config = JSON.parse(fs_1.readFileSync(configPath, { encoding: 'utf-8' }));
     config.GitLabProjects = config.GitLabProjects.map((p) => (Object.assign(Object.assign({}, p), { path: untildify_1.default(p.path) })));
-    config.TaskTodoFolder = untildify_1.default(config.TaskTodoFolder);
-    config.TodoFile = untildify_1.default(config.TodoFile);
-    config.WorkNoteFile = untildify_1.default(config.WorkNoteFile);
-    config.MySummarizedTasksFile = untildify_1.default(config.MySummarizedTasksFile);
+    const filePathKeys = [
+        'TaskTodoFolder',
+        'TodoFile',
+        'WorkNoteFile',
+        'MySummarizedTasksFile',
+        'HolidayFile',
+    ];
+    filePathKeys.forEach((key) => {
+        config[key] = untildify_1.default(config[key]);
+    });
     return config;
 }
 exports.getConfig = getConfig;

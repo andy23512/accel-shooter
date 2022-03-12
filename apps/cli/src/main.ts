@@ -3,6 +3,7 @@ import { copyAction } from './actions/copy.action';
 import { crossChecklistAction } from './actions/cross-checklist.action';
 import { dumpMyTasksAction } from './actions/dump-my-tasks.action';
 import { endAction } from './actions/end.action';
+import { fetchHolidayAction } from './actions/fetch-holiday.action';
 import { listAction } from './actions/list.action';
 import { openAction } from './actions/open.action';
 import { revertEndAction } from './actions/revert-end.action';
@@ -32,6 +33,10 @@ const actions: { [key: string]: () => Promise<void> } = {
   copy: copyAction,
   showDiff: showDiffAction,
   time: timeAction,
+  fetchHoliday: fetchHolidayAction,
+  test: async () => {
+    console.log('test');
+  },
 };
 
 (async () => {

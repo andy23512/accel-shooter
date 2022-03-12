@@ -1,31 +1,37 @@
-import { existsSync, readFileSync } from "fs";
-import untildify from "untildify";
-import { Config } from "./models/models";
+import { existsSync, readFileSync } from 'fs';
+import untildify from 'untildify';
+import { Config } from './models/models';
 
 export function getConfigPath() {
   if (process.env.ACCEL_SHOOTER_CONFIG_FILE) {
     return untildify(process.env.ACCEL_SHOOTER_CONFIG_FILE);
   } else {
-    throw Error("environment variable ACCEL_SHOOTER_CONFIG_FILE not found");
+    throw Error('environment variable ACCEL_SHOOTER_CONFIG_FILE not found');
   }
 }
 
 export function getConfig(): Config {
   const configPath = getConfigPath();
   if (!existsSync) {
-    throw Error("config file does not exist");
+    throw Error('config file does not exist');
   }
   const config = JSON.parse(
-    readFileSync(configPath, { encoding: "utf-8" })
+    readFileSync(configPath, { encoding: 'utf-8' })
   ) as Config;
   config.GitLabProjects = config.GitLabProjects.map((p) => ({
     ...p,
     path: untildify(p.path),
   }));
-  config.TaskTodoFolder = untildify(config.TaskTodoFolder);
-  config.TodoFile = untildify(config.TodoFile);
-  config.WorkNoteFile = untildify(config.WorkNoteFile);
-  config.MySummarizedTasksFile = untildify(config.MySummarizedTasksFile);
+  const filePathKeys = [
+    'TaskTodoFolder',
+    'TodoFile',
+    'WorkNoteFile',
+    'MySummarizedTasksFile',
+    'HolidayFile',
+  ] as const;
+  filePathKeys.forEach((key) => {
+    config[key] = untildify(config[key]);
+  });
   return config;
 }
 

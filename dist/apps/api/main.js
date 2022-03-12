@@ -702,21 +702,27 @@ function getConfigPath() {
         return untildify_1.default(process.env.ACCEL_SHOOTER_CONFIG_FILE);
     }
     else {
-        throw Error("environment variable ACCEL_SHOOTER_CONFIG_FILE not found");
+        throw Error('environment variable ACCEL_SHOOTER_CONFIG_FILE not found');
     }
 }
 exports.getConfigPath = getConfigPath;
 function getConfig() {
     const configPath = getConfigPath();
     if (!fs_1.existsSync) {
-        throw Error("config file does not exist");
+        throw Error('config file does not exist');
     }
-    const config = JSON.parse(fs_1.readFileSync(configPath, { encoding: "utf-8" }));
+    const config = JSON.parse(fs_1.readFileSync(configPath, { encoding: 'utf-8' }));
     config.GitLabProjects = config.GitLabProjects.map((p) => (Object.assign(Object.assign({}, p), { path: untildify_1.default(p.path) })));
-    config.TaskTodoFolder = untildify_1.default(config.TaskTodoFolder);
-    config.TodoFile = untildify_1.default(config.TodoFile);
-    config.WorkNoteFile = untildify_1.default(config.WorkNoteFile);
-    config.MySummarizedTasksFile = untildify_1.default(config.MySummarizedTasksFile);
+    const filePathKeys = [
+        'TaskTodoFolder',
+        'TodoFile',
+        'WorkNoteFile',
+        'MySummarizedTasksFile',
+        'HolidayFile',
+    ];
+    filePathKeys.forEach((key) => {
+        config[key] = untildify_1.default(config[key]);
+    });
     return config;
 }
 exports.getConfig = getConfig;

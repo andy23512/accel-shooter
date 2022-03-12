@@ -1,5 +1,5 @@
-export type Site = "ClickUp" | "GitLab";
-export type HttpMethod = "get" | "post" | "put" | "delete";
+export type Site = 'ClickUp' | 'GitLab';
+export type HttpMethod = 'get' | 'post' | 'put' | 'delete';
 export interface ProjectCheckItem {
   group: string;
   name: string;
@@ -13,7 +13,7 @@ export interface GitLabProject {
   id: string;
   stagingStatus?: Record<string, string>;
   checkItems?: ProjectCheckItem[];
-  projectType: "full" | "frontend" | "other";
+  projectType: 'full' | 'frontend' | 'other';
 }
 export interface Config {
   ClickUpToken: string;
@@ -32,6 +32,7 @@ export interface Config {
   TodoFile: string;
   WorkNoteFile: string;
   MySummarizedTasksFile: string;
+  HolidayFile: string;
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];
 export interface NormalizedChecklistItem {
