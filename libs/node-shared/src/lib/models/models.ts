@@ -41,3 +41,12 @@ export interface NormalizedChecklistItem {
   order: number;
   id?: string;
 }
+
+export interface IHoliday {
+  date: string;
+  name: string;
+  isHoliday: string;
+  holidayCategory: string;
+  description: string;
+  isMyHoliday?: boolean;
+}

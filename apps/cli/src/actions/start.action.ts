@@ -13,7 +13,6 @@ import { render } from 'mustache';
 import os from 'os';
 import { join } from 'path';
 import untildify from 'untildify';
-import { DailyProgress } from '../classes/daily-progress.class';
 import { CustomProgressLog } from '../classes/progress-log.class';
 import { Todo } from '../classes/todo.class';
 import { Tracker } from '../classes/tracker.class';
@@ -81,7 +80,6 @@ export async function startAction() {
     'Create GitLab Branch',
     'Create GitLab Merge Request',
     'Create Checklist at ClickUp',
-    'Add Daily Progress Entry',
     'Add Todo Entry',
     'Add Tracker Item',
     'Do Git Fetch and Checkout',
@@ -169,9 +167,6 @@ export async function startAction() {
       );
     }
   }
-  p.next(); // Add Daily Progress Entry
-  const dailyProgressString = `* (In Progress) [${gitLabMergeRequestTitle}](${clickUpTaskUrl})`;
-  new DailyProgress().addProgressToBuffer(dailyProgressString);
   p.next(); // Add Todo Entry
   const todoString = `- [ ] [${gitLabMergeRequestTitle}](${clickUpTaskUrl})`;
   new Todo().addTodoToBuffer(todoString);

@@ -1,15 +1,6 @@
-import { CONFIG } from '@accel-shooter/node-shared';
+import { CONFIG, IHoliday } from '@accel-shooter/node-shared';
 import { writeFileSync } from 'fs';
 import fetch from 'node-fetch';
-
-interface IHoliday {
-  date: string;
-  name: string;
-  isHoliday: string;
-  holidayCategory: string;
-  description: string;
-  isMyHoliday?: boolean;
-}
 
 export async function fetchHolidayAction() {
   let page = 0;

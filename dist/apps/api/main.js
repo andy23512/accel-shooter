@@ -373,8 +373,12 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ClickUp = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const cli_progress_1 = __webpack_require__(/*! cli-progress */ "cli-progress");
+const fs_1 = __webpack_require__(/*! fs */ "fs");
+const path_1 = __webpack_require__(/*! path */ "path");
 const config_1 = __webpack_require__(/*! ../config */ "./libs/node-shared/src/lib/config.ts");
 const api_utils_1 = __webpack_require__(/*! ../utils/api.utils */ "./libs/node-shared/src/lib/utils/api.utils.ts");
+const case_utils_1 = __webpack_require__(/*! ../utils/case.utils */ "./libs/node-shared/src/lib/utils/case.utils.ts");
+const checklist_utils_1 = __webpack_require__(/*! ../utils/checklist.utils */ "./libs/node-shared/src/lib/utils/checklist.utils.ts");
 const callApi = api_utils_1.callApiFactory('ClickUp');
 class ClickUp {
     constructor(taskId) {
@@ -491,16 +495,45 @@ class ClickUp {
             return null;
         });
     }
-    getFullTaskName() {
+    getFullTaskName(task) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            let task = yield this.getTask();
-            let result = task.name;
-            while (task.parent) {
-                task = yield new ClickUp(task.parent).getTask();
-                result = `${task.name} - ${result}`;
+            let t = task || (yield this.getTask());
+            let result = t.name;
+            while (t.parent) {
+                t = yield new ClickUp(t.parent).getTask();
+                result = `${t.name} - ${result}`;
             }
             return result;
         });
+    }
+    getTaskString(mode) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const task = yield this.getTask();
+            const name = yield this.getFullTaskName(task);
+            const progress = this.getTaskProgress();
+            const link = `[${name}](${task.url})`;
+            switch (mode) {
+                case 'todo':
+                    return `- [ ] ${link}`;
+                case 'dp':
+                    return task.status.status === 'in progress' && progress
+                        ? `* (${case_utils_1.titleCase(task.status.status)} ${progress}) ${link}`
+                        : `* (${case_utils_1.titleCase(task.status.status)}) ${link}`;
+            }
+        });
+    }
+    getTaskProgress() {
+        const path = path_1.join(config_1.CONFIG.TaskTodoFolder, this.taskId + '.md');
+        if (fs_1.existsSync(path)) {
+            const content = fs_1.readFileSync(path, { encoding: 'utf-8' });
+            const checklist = checklist_utils_1.normalizeMarkdownChecklist(content);
+            const total = checklist.length;
+            const done = checklist.filter((c) => c.checked).length;
+            return `${Math.round((done / total) * 100)}%`;
+        }
+        else {
+            return null;
+        }
     }
     static getMySummarizedTasks() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -581,13 +614,13 @@ exports.GitLab = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const config_1 = __webpack_require__(/*! ../config */ "./libs/node-shared/src/lib/config.ts");
 const api_utils_1 = __webpack_require__(/*! ../utils/api.utils */ "./libs/node-shared/src/lib/utils/api.utils.ts");
-const callApi = api_utils_1.callApiFactory("GitLab");
+const callApi = api_utils_1.callApiFactory('GitLab');
 class GitLab {
     constructor(projectId) {
         this.projectId = projectId;
     }
     getProject() {
-        return callApi("get", `/projects/${this.projectId}`);
+        return callApi('get', `/projects/${this.projectId}`);
     }
     getDefaultBranchName() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -596,30 +629,30 @@ class GitLab {
         });
     }
     getOpenedMergeRequests() {
-        return callApi("get", `/projects/${this.projectId}/merge_requests`, { state: "opened", per_page: "100" });
+        return callApi('get', `/projects/${this.projectId}/merge_requests`, { state: 'opened', per_page: '100' });
     }
     getMergeRequest(mergeRequestNumber) {
-        return callApi("get", `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}`);
+        return callApi('get', `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}`);
     }
     getMergeRequestChanges(mergeRequestNumber) {
-        return callApi("get", `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}/changes`);
+        return callApi('get', `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}/changes`);
     }
     getCommit(sha) {
-        return callApi("get", `/projects/${this.projectId}/repository/commits/${sha}`);
+        return callApi('get', `/projects/${this.projectId}/repository/commits/${sha}`);
     }
     getEndingAssignee() {
         if (!config_1.CONFIG.EndingAssignee) {
-            throw Error("No ending assignee was set");
+            throw Error('No ending assignee was set');
         }
-        return callApi("get", `/users`, {
+        return callApi('get', `/users`, {
             username: config_1.CONFIG.EndingAssignee,
         }).then((users) => users[0]);
     }
     listPipelineJobs(pipelineId) {
-        return callApi("get", `/projects/${this.projectId}/pipelines/${pipelineId}/jobs`);
+        return callApi('get', `/projects/${this.projectId}/pipelines/${pipelineId}/jobs`);
     }
     getCompare(from, to) {
-        return callApi("get", `/projects/${this.projectId}/repository/compare`, {
+        return callApi('get', `/projects/${this.projectId}/repository/compare`, {
             from,
             to,
             straight: true,
@@ -628,12 +661,12 @@ class GitLab {
     listPipelines(query) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             query.ref = query.ref || (yield this.getDefaultBranchName());
-            return callApi("get", `/projects/${this.projectId}/pipelines/`, query);
+            return callApi('get', `/projects/${this.projectId}/pipelines/`, query);
         });
     }
     createBranch(branch) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            return callApi("post", `/projects/${this.projectId}/repository/branches`, null, {
+            return callApi('post', `/projects/${this.projectId}/repository/branches`, null, {
                 branch,
                 ref: yield this.getDefaultBranchName(),
             });
@@ -641,7 +674,7 @@ class GitLab {
     }
     createMergeRequest(title, branch) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            return callApi("post", `/projects/${this.projectId}/merge_requests`, null, {
+            return callApi('post', `/projects/${this.projectId}/merge_requests`, null, {
                 source_branch: branch,
                 target_branch: yield this.getDefaultBranchName(),
                 title: `Draft: Resolve "${title}"`,
@@ -650,30 +683,40 @@ class GitLab {
     }
     createMergeRequestNote(merge_request, content) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            yield callApi("post", `/projects/${this.projectId}/merge_requests/${merge_request.iid}/notes`, { body: content });
+            yield callApi('post', `/projects/${this.projectId}/merge_requests/${merge_request.iid}/notes`, { body: content });
         });
     }
     markMergeRequestAsReadyAndAddAssignee(merge_request) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const assignee = yield this.getEndingAssignee();
-            yield callApi("put", `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
-                title: merge_request.title.replace("WIP: ", "").replace("Draft: ", ""),
+            yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
+                title: merge_request.title.replace('WIP: ', '').replace('Draft: ', ''),
                 assignee_id: assignee.id,
             });
         });
     }
     markMergeRequestAsUnreadyAndSetAssigneeToSelf(merge_request) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            yield callApi("put", `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
-                title: "Draft: " +
-                    merge_request.title.replace("WIP: ", "").replace("Draft: ", ""),
+            yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
+                title: 'Draft: ' +
+                    merge_request.title.replace('WIP: ', '').replace('Draft: ', ''),
                 assignee_id: yield this.getUserId(),
+            });
+        });
+    }
+    static getPushedEvents(after, before) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return callApi('get', '/events', {
+                action: 'pushed',
+                before,
+                after,
+                sort: 'asc',
             });
         });
     }
     getUserId() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const user = yield callApi("get", "/user");
+            const user = yield callApi('get', '/user');
             return user.id;
         });
     }
@@ -811,7 +854,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sleep = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Task = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.GitLab = exports.ClickUp = void 0;
+exports.sleep = exports.getTaskIdFromBranchName = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.titleCase = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.IHoliday = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Task = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.GitLab = exports.ClickUp = void 0;
 var clickup_class_1 = __webpack_require__(/*! ./classes/clickup.class */ "./libs/node-shared/src/lib/classes/clickup.class.ts");
 Object.defineProperty(exports, "ClickUp", { enumerable: true, get: function () { return clickup_class_1.ClickUp; } });
 var gitlab_class_1 = __webpack_require__(/*! ./classes/gitlab.class */ "./libs/node-shared/src/lib/classes/gitlab.class.ts");
@@ -830,12 +873,17 @@ Object.defineProperty(exports, "Change", { enumerable: true, get: function () { 
 Object.defineProperty(exports, "FullMergeRequest", { enumerable: true, get: function () { return merge_request_models_1.FullMergeRequest; } });
 var models_1 = __webpack_require__(/*! ./models/models */ "./libs/node-shared/src/lib/models/models.ts");
 Object.defineProperty(exports, "GitLabProject", { enumerable: true, get: function () { return models_1.GitLabProject; } });
+Object.defineProperty(exports, "IHoliday", { enumerable: true, get: function () { return models_1.IHoliday; } });
 Object.defineProperty(exports, "NormalizedChecklist", { enumerable: true, get: function () { return models_1.NormalizedChecklist; } });
 Object.defineProperty(exports, "ProjectCheckItem", { enumerable: true, get: function () { return models_1.ProjectCheckItem; } });
+var case_utils_1 = __webpack_require__(/*! ./utils/case.utils */ "./libs/node-shared/src/lib/utils/case.utils.ts");
+Object.defineProperty(exports, "titleCase", { enumerable: true, get: function () { return case_utils_1.titleCase; } });
 var checklist_utils_1 = __webpack_require__(/*! ./utils/checklist.utils */ "./libs/node-shared/src/lib/utils/checklist.utils.ts");
 Object.defineProperty(exports, "getSyncChecklistActions", { enumerable: true, get: function () { return checklist_utils_1.getSyncChecklistActions; } });
 Object.defineProperty(exports, "normalizeClickUpChecklist", { enumerable: true, get: function () { return checklist_utils_1.normalizeClickUpChecklist; } });
 Object.defineProperty(exports, "normalizeMarkdownChecklist", { enumerable: true, get: function () { return checklist_utils_1.normalizeMarkdownChecklist; } });
+var clickup_utils_1 = __webpack_require__(/*! ./utils/clickup.utils */ "./libs/node-shared/src/lib/utils/clickup.utils.ts");
+Object.defineProperty(exports, "getTaskIdFromBranchName", { enumerable: true, get: function () { return clickup_utils_1.getTaskIdFromBranchName; } });
 var sleep_utils_1 = __webpack_require__(/*! ./utils/sleep.utils */ "./libs/node-shared/src/lib/utils/sleep.utils.ts");
 Object.defineProperty(exports, "sleep", { enumerable: true, get: function () { return sleep_utils_1.sleep; } });
 
@@ -942,6 +990,63 @@ exports.callApiFactory = callApiFactory;
 
 /***/ }),
 
+/***/ "./libs/node-shared/src/lib/utils/case.utils.ts":
+/*!******************************************************!*\
+  !*** ./libs/node-shared/src/lib/utils/case.utils.ts ***!
+  \******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.titleCase = void 0;
+const KEEP_LOWERCASE_WORD_LIST = [
+    'and',
+    'as',
+    'but',
+    'for',
+    'if',
+    'nor',
+    'or',
+    'so',
+    'yet',
+    'a',
+    'an',
+    'the',
+    'at',
+    'by',
+    'for',
+    'in',
+    'of',
+    'off',
+    'on',
+    'per',
+    'to',
+    'up',
+    'via',
+];
+function firstLetterCapitalize(str) {
+    return str[0].toUpperCase() + str.slice(1);
+}
+function titleCase(str) {
+    const sentence = str.toLowerCase().split(' ');
+    const resultSentence = sentence.map((w, i) => {
+        if (i === 0) {
+            return firstLetterCapitalize(w);
+        }
+        if (KEEP_LOWERCASE_WORD_LIST.includes(w)) {
+            return w;
+        }
+        return firstLetterCapitalize(w);
+    });
+    return resultSentence.join(' ');
+}
+exports.titleCase = titleCase;
+
+
+/***/ }),
+
 /***/ "./libs/node-shared/src/lib/utils/checklist.utils.ts":
 /*!***********************************************************!*\
   !*** ./libs/node-shared/src/lib/utils/checklist.utils.ts ***!
@@ -1003,6 +1108,26 @@ function getSyncChecklistActions(oldClickUpChecklist, newGitLabChecklist) {
     return actions;
 }
 exports.getSyncChecklistActions = getSyncChecklistActions;
+
+
+/***/ }),
+
+/***/ "./libs/node-shared/src/lib/utils/clickup.utils.ts":
+/*!*********************************************************!*\
+  !*** ./libs/node-shared/src/lib/utils/clickup.utils.ts ***!
+  \*********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.getTaskIdFromBranchName = void 0;
+function getTaskIdFromBranchName(branchName) {
+    const result = branchName.match(/CU-([a-z0-9]+)/);
+    return result ? result[1] : null;
+}
+exports.getTaskIdFromBranchName = getTaskIdFromBranchName;
 
 
 /***/ }),

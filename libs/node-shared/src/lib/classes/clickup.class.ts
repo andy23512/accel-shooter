@@ -1,5 +1,7 @@
 import { SummarizedTask } from '@accel-shooter/api-interfaces';
 import { Presets, SingleBar } from 'cli-progress';
+import { existsSync, readFileSync } from 'fs';
+import { join } from 'path';
 import { CONFIG } from '../config';
 import { ChecklistResponse } from '../models/clickup.models';
 import { Comment } from '../models/clickup/comment.models';
@@ -8,6 +10,8 @@ import { TaskIncludeSubTasks } from '../models/clickup/task.models';
 import { Team } from '../models/clickup/team.models';
 import { User } from '../models/clickup/user.models';
 import { callApiFactory } from '../utils/api.utils';
+import { titleCase } from '../utils/case.utils';
+import { normalizeMarkdownChecklist } from '../utils/checklist.utils';
 import { Task } from './../models/clickup/task.models';
 const callApi = callApiFactory('ClickUp');
 
@@ -171,14 +175,42 @@ export class ClickUp {
     return null;
   }
 
-  public async getFullTaskName() {
-    let task = await this.getTask();
+  public async getFullTaskName(task?: Task) {
+    let t = task || (await this.getTask());
     let result = task.name;
-    while (task.parent) {
-      task = await new ClickUp(task.parent).getTask();
-      result = `${task.name} - ${result}`;
+    while (t.parent) {
+      t = await new ClickUp(t.parent).getTask();
+      result = `${t.name} - ${result}`;
     }
     return result;
+  }
+
+  public async getTaskString(mode: 'todo' | 'dp') {
+    const task = await this.getTask();
+    const name = await this.getFullTaskName(task);
+    const progress = this.getTaskProgress();
+    const link = `[${name}](${task.url})`;
+    switch (mode) {
+      case 'todo':
+        return `- [ ] ${link}`;
+      case 'dp':
+        return task.status.status === 'in progress' && progress
+          ? `* (${titleCase(task.status.status)} ${progress}) ${link}`
+          : `* (${titleCase(task.status.status)}) ${link}`;
+    }
+  }
+
+  public getTaskProgress() {
+    const path = join(CONFIG.TaskTodoFolder, this.taskId + '.md');
+    if (existsSync(path)) {
+      const content = readFileSync(path, { encoding: 'utf-8' });
+      const checklist = normalizeMarkdownChecklist(content);
+      const total = checklist.length;
+      const done = checklist.filter((c) => c.checked).length;
+      return `${Math.round((done / total) * 100)}%`;
+    } else {
+      return null;
+    }
   }
 
   public static async getMySummarizedTasks() {

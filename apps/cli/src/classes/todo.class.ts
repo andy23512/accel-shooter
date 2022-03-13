@@ -10,8 +10,8 @@ export class Todo extends BaseFileRef {
   public addTodoToBuffer(todoString: string) {
     const content = this.readFile();
     const updatedTodoContent = content.replace(
-      '## Buffer End',
-      `${todoString}\n## Buffer End`
+      '## Waiting',
+      `${todoString}\n## Waiting`
     );
     this.writeFile(updatedTodoContent);
   }
