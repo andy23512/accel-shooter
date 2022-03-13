@@ -1227,11 +1227,17 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Todo = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
+const fs_1 = __webpack_require__(/*! fs */ "fs");
 const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
+const uuid_1 = __webpack_require__(/*! uuid */ "uuid");
 const base_file_ref_class_1 = __webpack_require__(/*! ./base-file-ref.class */ "./apps/cli/src/classes/base-file-ref.class.ts");
 class Todo extends base_file_ref_class_1.BaseFileRef {
     get path() {
         return untildify_1.default(node_shared_1.CONFIG.TodoFile);
+    }
+    writeFile(content) {
+        super.writeFile(content);
+        fs_1.writeFileSync(untildify_1.default(node_shared_1.CONFIG.TodoChangeNotificationFile), uuid_1.v4());
     }
     addTodoToBuffer(todoString) {
         const content = this.readFile();
@@ -2095,6 +2101,7 @@ function getConfig() {
     const filePathKeys = [
         'TaskTodoFolder',
         'TodoFile',
+        'TodoChangeNotificationFile',
         'WorkNoteFile',
         'MySummarizedTasksFile',
         'HolidayFile',
@@ -2705,6 +2712,17 @@ module.exports = require("tslib");
 /***/ (function(module, exports) {
 
 module.exports = require("untildify");
+
+/***/ }),
+
+/***/ "uuid":
+/*!***********************!*\
+  !*** external "uuid" ***!
+  \***********************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("uuid");
 
 /***/ })
 

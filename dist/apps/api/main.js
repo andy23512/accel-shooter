@@ -194,7 +194,7 @@ let AppController = class AppController {
         });
     }
     todoSse() {
-        return watch_rx_1.watchRx(node_shared_1.CONFIG.TodoFile).pipe(operators_1.map(() => fs_1.readFileSync(node_shared_1.CONFIG.TodoFile, { encoding: 'utf-8' })));
+        return watch_rx_1.watchRx(node_shared_1.CONFIG.TodoChangeNotificationFile).pipe(operators_1.map(() => fs_1.readFileSync(node_shared_1.CONFIG.TodoFile, { encoding: 'utf-8' })));
     }
 };
 tslib_1.__decorate([
@@ -759,6 +759,7 @@ function getConfig() {
     const filePathKeys = [
         'TaskTodoFolder',
         'TodoFile',
+        'TodoChangeNotificationFile',
         'WorkNoteFile',
         'MySummarizedTasksFile',
         'HolidayFile',

@@ -30,6 +30,7 @@ export interface Config {
   ClickUpTeam: string;
   TaskTodoFolder: string;
   TodoFile: string;
+  TodoChangeNotificationFile: string;
   WorkNoteFile: string;
   MySummarizedTasksFile: string;
   HolidayFile: string;

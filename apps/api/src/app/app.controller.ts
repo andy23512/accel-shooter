@@ -153,7 +153,7 @@ export class AppController {
 
   @Sse('todo-sse')
   public todoSse(): Observable<string> {
-    return watchRx(CONFIG.TodoFile).pipe(
+    return watchRx(CONFIG.TodoChangeNotificationFile).pipe(
       map(() => readFileSync(CONFIG.TodoFile, { encoding: 'utf-8' }))
     );
   }

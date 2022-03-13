@@ -25,6 +25,7 @@ export function getConfig(): Config {
   const filePathKeys = [
     'TaskTodoFolder',
     'TodoFile',
+    'TodoChangeNotificationFile',
     'WorkNoteFile',
     'MySummarizedTasksFile',
     'HolidayFile',

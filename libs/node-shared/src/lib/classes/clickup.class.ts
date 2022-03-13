@@ -177,7 +177,7 @@ export class ClickUp {
 
   public async getFullTaskName(task?: Task) {
     let t = task || (await this.getTask());
-    let result = task.name;
+    let result = t.name;
     while (t.parent) {
       t = await new ClickUp(t.parent).getTask();
       result = `${t.name} - ${result}`;
