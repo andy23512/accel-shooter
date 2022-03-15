@@ -1,12 +1,5 @@
 import { SummarizedTask } from '@accel-shooter/api-interfaces';
-import {
-  ClickUp,
-  CONFIG,
-  getSyncChecklistActions,
-  GitLab,
-  normalizeClickUpChecklist,
-  normalizeMarkdownChecklist,
-} from '@accel-shooter/node-shared';
+import { ClickUp, CONFIG, GitLab } from '@accel-shooter/node-shared';
 import {
   Body,
   Controller,
@@ -100,54 +93,13 @@ export class AppController {
   ) {
     const folderPath = this.configService.get<string>('TaskTodoFolder');
     writeFileSync(join(folderPath, taskId + '.md'), checklist);
-    const markdownNormalizedChecklist = normalizeMarkdownChecklist(
-      checklist,
-      true
-    );
     const clickUp = new ClickUp(taskId);
     const task = await clickUp.getTask();
     const clickUpChecklist = task.checklists.find((c) =>
       c.name.toLowerCase().includes('synced checklist')
     );
     if (clickUpChecklist) {
-      const clickUpNormalizedChecklist = normalizeClickUpChecklist(
-        clickUpChecklist.items
-      );
-      const actions = getSyncChecklistActions(
-        clickUpNormalizedChecklist,
-        markdownNormalizedChecklist
-      );
-      if (
-        actions.update.length +
-          actions.create.length +
-          actions.delete.length ===
-        0
-      ) {
-        return;
-      }
-      for (const checklistItem of actions.update) {
-        await clickUp.updateChecklistItem(
-          clickUpChecklist.id,
-          checklistItem.id as string,
-          checklistItem.name,
-          checklistItem.checked,
-          checklistItem.order
-        );
-      }
-      for (const checklistItem of actions.create) {
-        await clickUp.createChecklistItem(
-          clickUpChecklist.id,
-          checklistItem.name,
-          checklistItem.checked,
-          checklistItem.order
-        );
-      }
-      for (const checklistItem of actions.delete) {
-        await clickUp.deleteChecklistItem(
-          clickUpChecklist.id,
-          checklistItem.id as string
-        );
-      }
+      await clickUp.updateChecklist(clickUpChecklist, checklist);
     }
   }
 

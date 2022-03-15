@@ -630,22 +630,7 @@ function startAction() {
         if (!clickUpChecklist) {
             clickUpChecklist = (yield clickUp.createChecklist(clickUpChecklistTitle))
                 .checklist;
-            const markdownNormalizedChecklist = node_shared_1.normalizeMarkdownChecklist(endingTodo, true);
-            const clickUpNormalizedChecklist = node_shared_1.normalizeClickUpChecklist(clickUpChecklist.items);
-            const actions = node_shared_1.getSyncChecklistActions(clickUpNormalizedChecklist, markdownNormalizedChecklist);
-            if (actions.update.length + actions.create.length + actions.delete.length ===
-                0) {
-                return;
-            }
-            for (const checklistItem of actions.update) {
-                yield clickUp.updateChecklistItem(clickUpChecklist.id, checklistItem.id, checklistItem.name, checklistItem.checked, checklistItem.order);
-            }
-            for (const checklistItem of actions.create) {
-                yield clickUp.createChecklistItem(clickUpChecklist.id, checklistItem.name, checklistItem.checked, checklistItem.order);
-            }
-            for (const checklistItem of actions.delete) {
-                yield clickUp.deleteChecklistItem(clickUpChecklist.id, checklistItem.id);
-            }
+            yield clickUp.updateChecklist(clickUpChecklist, endingTodo);
         }
         p.next(); // Add Todo Entry
         const todoString = `- [ ] [${gitLabMergeRequestTitle}](${clickUpTaskUrl})`;
@@ -1934,6 +1919,26 @@ class ClickUp {
                 bar.increment(1);
             }
             return summarizedTasks;
+        });
+    }
+    updateChecklist(clickUpChecklist, markdownChecklistString) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const markdownNormalizedChecklist = checklist_utils_1.normalizeMarkdownChecklist(markdownChecklistString, true);
+            const clickUpNormalizedChecklist = checklist_utils_1.normalizeClickUpChecklist(clickUpChecklist.items);
+            const actions = checklist_utils_1.getSyncChecklistActions(clickUpNormalizedChecklist, markdownNormalizedChecklist);
+            if (actions.update.length + actions.create.length + actions.delete.length ===
+                0) {
+                return;
+            }
+            for (const checklistItem of actions.update) {
+                yield this.updateChecklistItem(clickUpChecklist.id, checklistItem.id, checklistItem.name, checklistItem.checked, checklistItem.order);
+            }
+            for (const checklistItem of actions.create) {
+                yield this.createChecklistItem(clickUpChecklist.id, checklistItem.name, checklistItem.checked, checklistItem.order);
+            }
+            for (const checklistItem of actions.delete) {
+                yield this.deleteChecklistItem(clickUpChecklist.id, checklistItem.id);
+            }
         });
     }
 }

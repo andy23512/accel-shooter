@@ -1,12 +1,4 @@
-import {
-  ClickUp,
-  CONFIG,
-  getSyncChecklistActions,
-  GitLab,
-  normalizeClickUpChecklist,
-  normalizeMarkdownChecklist,
-  sleep,
-} from '@accel-shooter/node-shared';
+import { ClickUp, CONFIG, GitLab, sleep } from '@accel-shooter/node-shared';
 import { readFileSync, writeFileSync } from 'fs';
 import inquirer from 'inquirer';
 import { render } from 'mustache';
@@ -126,46 +118,7 @@ export async function startAction() {
   if (!clickUpChecklist) {
     clickUpChecklist = (await clickUp.createChecklist(clickUpChecklistTitle))
       .checklist;
-    const markdownNormalizedChecklist = normalizeMarkdownChecklist(
-      endingTodo,
-      true
-    );
-    const clickUpNormalizedChecklist = normalizeClickUpChecklist(
-      clickUpChecklist.items
-    );
-    const actions = getSyncChecklistActions(
-      clickUpNormalizedChecklist,
-      markdownNormalizedChecklist
-    );
-    if (
-      actions.update.length + actions.create.length + actions.delete.length ===
-      0
-    ) {
-      return;
-    }
-    for (const checklistItem of actions.update) {
-      await clickUp.updateChecklistItem(
-        clickUpChecklist.id,
-        checklistItem.id as string,
-        checklistItem.name,
-        checklistItem.checked,
-        checklistItem.order
-      );
-    }
-    for (const checklistItem of actions.create) {
-      await clickUp.createChecklistItem(
-        clickUpChecklist.id,
-        checklistItem.name,
-        checklistItem.checked,
-        checklistItem.order
-      );
-    }
-    for (const checklistItem of actions.delete) {
-      await clickUp.deleteChecklistItem(
-        clickUpChecklist.id,
-        checklistItem.id as string
-      );
-    }
+    await clickUp.updateChecklist(clickUpChecklist, endingTodo);
   }
   p.next(); // Add Todo Entry
   const todoString = `- [ ] [${gitLabMergeRequestTitle}](${clickUpTaskUrl})`;

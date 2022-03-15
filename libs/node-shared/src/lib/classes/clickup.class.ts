@@ -4,6 +4,7 @@ import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { CONFIG } from '../config';
 import { ChecklistResponse } from '../models/clickup.models';
+import { Checklist } from '../models/clickup/checklist.models';
 import { Comment } from '../models/clickup/comment.models';
 import { List } from '../models/clickup/list.models';
 import { TaskIncludeSubTasks } from '../models/clickup/task.models';
@@ -11,7 +12,11 @@ import { Team } from '../models/clickup/team.models';
 import { User } from '../models/clickup/user.models';
 import { callApiFactory } from '../utils/api.utils';
 import { titleCase } from '../utils/case.utils';
-import { normalizeMarkdownChecklist } from '../utils/checklist.utils';
+import {
+  getSyncChecklistActions,
+  normalizeClickUpChecklist,
+  normalizeMarkdownChecklist,
+} from '../utils/checklist.utils';
 import { Task } from './../models/clickup/task.models';
 const callApi = callApiFactory('ClickUp');
 
@@ -276,5 +281,51 @@ export class ClickUp {
       bar.increment(1);
     }
     return summarizedTasks;
+  }
+
+  public async updateChecklist(
+    clickUpChecklist: Checklist,
+    markdownChecklistString: string
+  ) {
+    const markdownNormalizedChecklist = normalizeMarkdownChecklist(
+      markdownChecklistString,
+      true
+    );
+    const clickUpNormalizedChecklist = normalizeClickUpChecklist(
+      clickUpChecklist.items
+    );
+    const actions = getSyncChecklistActions(
+      clickUpNormalizedChecklist,
+      markdownNormalizedChecklist
+    );
+    if (
+      actions.update.length + actions.create.length + actions.delete.length ===
+      0
+    ) {
+      return;
+    }
+    for (const checklistItem of actions.update) {
+      await this.updateChecklistItem(
+        clickUpChecklist.id,
+        checklistItem.id as string,
+        checklistItem.name,
+        checklistItem.checked,
+        checklistItem.order
+      );
+    }
+    for (const checklistItem of actions.create) {
+      await this.createChecklistItem(
+        clickUpChecklist.id,
+        checklistItem.name,
+        checklistItem.checked,
+        checklistItem.order
+      );
+    }
+    for (const checklistItem of actions.delete) {
+      await this.deleteChecklistItem(
+        clickUpChecklist.id,
+        checklistItem.id as string
+      );
+    }
   }
 }

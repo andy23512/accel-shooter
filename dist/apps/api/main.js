@@ -168,28 +168,11 @@ let AppController = class AppController {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const folderPath = this.configService.get('TaskTodoFolder');
             fs_1.writeFileSync(path_1.join(folderPath, taskId + '.md'), checklist);
-            const markdownNormalizedChecklist = node_shared_1.normalizeMarkdownChecklist(checklist, true);
             const clickUp = new node_shared_1.ClickUp(taskId);
             const task = yield clickUp.getTask();
             const clickUpChecklist = task.checklists.find((c) => c.name.toLowerCase().includes('synced checklist'));
             if (clickUpChecklist) {
-                const clickUpNormalizedChecklist = node_shared_1.normalizeClickUpChecklist(clickUpChecklist.items);
-                const actions = node_shared_1.getSyncChecklistActions(clickUpNormalizedChecklist, markdownNormalizedChecklist);
-                if (actions.update.length +
-                    actions.create.length +
-                    actions.delete.length ===
-                    0) {
-                    return;
-                }
-                for (const checklistItem of actions.update) {
-                    yield clickUp.updateChecklistItem(clickUpChecklist.id, checklistItem.id, checklistItem.name, checklistItem.checked, checklistItem.order);
-                }
-                for (const checklistItem of actions.create) {
-                    yield clickUp.createChecklistItem(clickUpChecklist.id, checklistItem.name, checklistItem.checked, checklistItem.order);
-                }
-                for (const checklistItem of actions.delete) {
-                    yield clickUp.deleteChecklistItem(clickUpChecklist.id, checklistItem.id);
-                }
+                yield clickUp.updateChecklist(clickUpChecklist, checklist);
             }
         });
     }
@@ -592,6 +575,26 @@ class ClickUp {
                 bar.increment(1);
             }
             return summarizedTasks;
+        });
+    }
+    updateChecklist(clickUpChecklist, markdownChecklistString) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const markdownNormalizedChecklist = checklist_utils_1.normalizeMarkdownChecklist(markdownChecklistString, true);
+            const clickUpNormalizedChecklist = checklist_utils_1.normalizeClickUpChecklist(clickUpChecklist.items);
+            const actions = checklist_utils_1.getSyncChecklistActions(clickUpNormalizedChecklist, markdownNormalizedChecklist);
+            if (actions.update.length + actions.create.length + actions.delete.length ===
+                0) {
+                return;
+            }
+            for (const checklistItem of actions.update) {
+                yield this.updateChecklistItem(clickUpChecklist.id, checklistItem.id, checklistItem.name, checklistItem.checked, checklistItem.order);
+            }
+            for (const checklistItem of actions.create) {
+                yield this.createChecklistItem(clickUpChecklist.id, checklistItem.name, checklistItem.checked, checklistItem.order);
+            }
+            for (const checklistItem of actions.delete) {
+                yield this.deleteChecklistItem(clickUpChecklist.id, checklistItem.id);
+            }
         });
     }
 }
