@@ -1521,13 +1521,11 @@ const actions = {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getTaskProgress = exports.openUrlsInTabGroup = exports.checkWorkingTreeClean = exports.getInfoFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabMergeRequest = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = void 0;
+exports.openUrlsInTabGroup = exports.checkWorkingTreeClean = exports.getInfoFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabMergeRequest = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const child_process_1 = tslib_1.__importStar(__webpack_require__(/*! child_process */ "child_process"));
-const fs_1 = __webpack_require__(/*! fs */ "fs");
 const open_1 = tslib_1.__importDefault(__webpack_require__(/*! open */ "open"));
-const path_1 = __webpack_require__(/*! path */ "path");
 const qs_1 = tslib_1.__importDefault(__webpack_require__(/*! qs */ "qs"));
 function promiseSpawn(command, args, stdio = 'inherit') {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -1586,7 +1584,7 @@ function updateTaskStatusInDp(dp) {
             const clickUpTaskId = match[1];
             const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
             const task = yield clickUp.getTask();
-            const progress = getTaskProgress(task);
+            const progress = clickUp.getTaskProgress();
             const updatedFull = full.replace(/\* \([A-Za-z0-9 %]+\)/, task.status.status === 'in progress' && progress
                 ? `* (${node_shared_1.titleCase(task.status.status)} ${progress})`
                 : `* (${node_shared_1.titleCase(task.status.status)})`);
@@ -1653,20 +1651,6 @@ function openUrlsInTabGroup(urls, group) {
         }));
 }
 exports.openUrlsInTabGroup = openUrlsInTabGroup;
-function getTaskProgress(task) {
-    const path = path_1.join(node_shared_1.CONFIG.TaskTodoFolder, task.id + '.md');
-    if (fs_1.existsSync(path)) {
-        const content = fs_1.readFileSync(path, { encoding: 'utf-8' });
-        const checklist = node_shared_1.normalizeMarkdownChecklist(content);
-        const total = checklist.length;
-        const done = checklist.filter((c) => c.checked).length;
-        return `${Math.round((done / total) * 100)}%`;
-    }
-    else {
-        return null;
-    }
-}
-exports.getTaskProgress = getTaskProgress;
 
 
 /***/ }),

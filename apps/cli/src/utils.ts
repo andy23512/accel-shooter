@@ -3,14 +3,10 @@ import {
   CONFIG,
   FullMergeRequest,
   GitLab,
-  normalizeMarkdownChecklist,
-  Task,
   titleCase,
 } from '@accel-shooter/node-shared';
 import childProcess, { execSync, StdioOptions } from 'child_process';
-import { existsSync, readFileSync } from 'fs';
 import open from 'open';
-import { join } from 'path';
 import qs from 'qs';
 
 export async function promiseSpawn(
@@ -84,7 +80,7 @@ export async function updateTaskStatusInDp(dp: string) {
     const clickUpTaskId = match[1];
     const clickUp = new ClickUp(clickUpTaskId);
     const task = await clickUp.getTask();
-    const progress = getTaskProgress(task);
+    const progress = clickUp.getTaskProgress();
     const updatedFull = full.replace(
       /\* \([A-Za-z0-9 %]+\)/,
       task.status.status === 'in progress' && progress
@@ -150,17 +146,4 @@ export function openUrlsInTabGroup(urls: string[], group: string) {
         group,
       })
   );
-}
-
-export function getTaskProgress(task: Task) {
-  const path = join(CONFIG.TaskTodoFolder, task.id + '.md');
-  if (existsSync(path)) {
-    const content = readFileSync(path, { encoding: 'utf-8' });
-    const checklist = normalizeMarkdownChecklist(content);
-    const total = checklist.length;
-    const done = checklist.filter((c) => c.checked).length;
-    return `${Math.round((done / total) * 100)}%`;
-  } else {
-    return null;
-  }
 }
