@@ -103,7 +103,7 @@ export async function startAction() {
   p.next(); // Create GitLab Merge Request
   await sleep(2000); // prevent "branch restored" bug
   const gitLabMergeRequest = await gitLab.createMergeRequest(
-    `CU-${answers.clickUpTaskId} ` + gitLabMergeRequestTitle,
+    gitLabMergeRequestTitle + `__CU-${answers.clickUpTaskId}`,
     gitLabBranch.name
   );
   const gitLabMergeRequestIId = gitLabMergeRequest.iid;

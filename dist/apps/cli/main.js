@@ -622,7 +622,7 @@ function startAction() {
         const gitLabBranch = yield gitLab.createBranch(`CU-${answers.clickUpTaskId}`);
         p.next(); // Create GitLab Merge Request
         yield node_shared_1.sleep(2000); // prevent "branch restored" bug
-        const gitLabMergeRequest = yield gitLab.createMergeRequest(`CU-${answers.clickUpTaskId} ` + gitLabMergeRequestTitle, gitLabBranch.name);
+        const gitLabMergeRequest = yield gitLab.createMergeRequest(gitLabMergeRequestTitle + `__CU-${answers.clickUpTaskId}`, gitLabBranch.name);
         const gitLabMergeRequestIId = gitLabMergeRequest.iid;
         p.next(); // Create Checklist at ClickUp
         const clickUpChecklistTitle = `Synced checklist [${answers.gitLabProject.id.replace('%2F', '/')} !${gitLabMergeRequestIId}]`;
