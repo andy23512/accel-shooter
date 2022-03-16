@@ -116,7 +116,7 @@ export class GitLab {
       {
         source_branch: branch,
         target_branch: await this.getDefaultBranchName(),
-        title: `Draft: Resolve "${title}"`,
+        title: `Draft: ${title}`,
       }
     );
   }

@@ -680,7 +680,7 @@ class GitLab {
             return callApi('post', `/projects/${this.projectId}/merge_requests`, null, {
                 source_branch: branch,
                 target_branch: yield this.getDefaultBranchName(),
-                title: `Draft: Resolve "${title}"`,
+                title: `Draft: ${title}`,
             });
         });
     }
