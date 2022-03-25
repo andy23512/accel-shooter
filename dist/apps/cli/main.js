@@ -2017,6 +2017,13 @@ class GitLab {
             yield callApi('post', `/projects/${this.projectId}/merge_requests/${merge_request.iid}/notes`, { body: content });
         });
     }
+    updateMergeRequestDescription(merge_request, description) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
+                description,
+            });
+        });
+    }
     markMergeRequestAsReadyAndAddAssignee(merge_request) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const assignee = yield this.getEndingAssignee();

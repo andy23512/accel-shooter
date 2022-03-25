@@ -95,7 +95,7 @@
 
 "use strict";
 
-var _a, _b, _c, _d, _e;
+var _a, _b, _c, _d, _e, _f;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppController = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
@@ -176,6 +176,24 @@ let AppController = class AppController {
             }
         });
     }
+    getMRDescription(taskId) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const clickUp = new node_shared_1.ClickUp(taskId);
+            const { gitLabProject, mergeRequestIId } = yield clickUp.getGitLabProjectAndMergeRequestIId();
+            const gitLab = new node_shared_1.GitLab(gitLabProject.id);
+            const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
+            return { content: mergeRequest.description };
+        });
+    }
+    putMRDescription(taskId, content) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const clickUp = new node_shared_1.ClickUp(taskId);
+            const { gitLabProject, mergeRequestIId } = yield clickUp.getGitLabProjectAndMergeRequestIId();
+            const gitLab = new node_shared_1.GitLab(gitLabProject.id);
+            const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
+            yield gitLab.updateMergeRequestDescription(mergeRequest, content);
+        });
+    }
     todoSse() {
         return watch_rx_1.watchRx(node_shared_1.CONFIG.TodoChangeNotificationFile).pipe(operators_1.map(() => fs_1.readFileSync(node_shared_1.CONFIG.TodoFile, { encoding: 'utf-8' })));
     }
@@ -217,14 +235,29 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:returntype", Promise)
 ], AppController.prototype, "putChecklist", null);
 tslib_1.__decorate([
+    common_1.Get('task/:id/mr_description'),
+    tslib_1.__param(0, common_1.Param('id')),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [String]),
+    tslib_1.__metadata("design:returntype", typeof (_d = typeof Promise !== "undefined" && Promise) === "function" ? _d : Object)
+], AppController.prototype, "getMRDescription", null);
+tslib_1.__decorate([
+    common_1.Put('task/:id/mr_description'),
+    tslib_1.__param(0, common_1.Param('id')),
+    tslib_1.__param(1, common_1.Body('content')),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [String, String]),
+    tslib_1.__metadata("design:returntype", Promise)
+], AppController.prototype, "putMRDescription", null);
+tslib_1.__decorate([
     common_1.Sse('todo-sse'),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", []),
-    tslib_1.__metadata("design:returntype", typeof (_d = typeof rxjs_1.Observable !== "undefined" && rxjs_1.Observable) === "function" ? _d : Object)
+    tslib_1.__metadata("design:returntype", typeof (_e = typeof rxjs_1.Observable !== "undefined" && rxjs_1.Observable) === "function" ? _e : Object)
 ], AppController.prototype, "todoSse", null);
 AppController = tslib_1.__decorate([
     common_1.Controller(),
-    tslib_1.__metadata("design:paramtypes", [typeof (_e = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _e : Object])
+    tslib_1.__metadata("design:paramtypes", [typeof (_f = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _f : Object])
 ], AppController);
 exports.AppController = AppController;
 
@@ -687,6 +720,13 @@ class GitLab {
     createMergeRequestNote(merge_request, content) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             yield callApi('post', `/projects/${this.projectId}/merge_requests/${merge_request.iid}/notes`, { body: content });
+        });
+    }
+    updateMergeRequestDescription(merge_request, description) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
+                description,
+            });
         });
     }
     markMergeRequestAsReadyAndAddAssignee(merge_request) {

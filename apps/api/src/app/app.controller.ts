@@ -103,6 +103,31 @@ export class AppController {
     }
   }
 
+  @Get('task/:id/mr_description')
+  async getMRDescription(
+    @Param('id') taskId: string
+  ): Promise<{ content: string }> {
+    const clickUp = new ClickUp(taskId);
+    const { gitLabProject, mergeRequestIId } =
+      await clickUp.getGitLabProjectAndMergeRequestIId();
+    const gitLab = new GitLab(gitLabProject.id);
+    const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
+    return { content: mergeRequest.description };
+  }
+
+  @Put('task/:id/mr_description')
+  async putMRDescription(
+    @Param('id') taskId: string,
+    @Body('content') content: string
+  ) {
+    const clickUp = new ClickUp(taskId);
+    const { gitLabProject, mergeRequestIId } =
+      await clickUp.getGitLabProjectAndMergeRequestIId();
+    const gitLab = new GitLab(gitLabProject.id);
+    const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
+    await gitLab.updateMergeRequestDescription(mergeRequest, content);
+  }
+
   @Sse('todo-sse')
   public todoSse(): Observable<string> {
     return watchRx(CONFIG.TodoChangeNotificationFile).pipe(

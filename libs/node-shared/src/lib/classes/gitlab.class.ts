@@ -132,6 +132,20 @@ export class GitLab {
     );
   }
 
+  public async updateMergeRequestDescription(
+    merge_request: FullMergeRequest,
+    description: string
+  ) {
+    await callApi(
+      'put',
+      `/projects/${this.projectId}/merge_requests/${merge_request.iid}`,
+      null,
+      {
+        description,
+      }
+    );
+  }
+
   public async markMergeRequestAsReadyAndAddAssignee(
     merge_request: FullMergeRequest
   ) {

@@ -15,6 +15,7 @@ import { AgGridModule } from 'ag-grid-angular';
 import { AppComponent } from './app.component';
 import { EditorComponent } from './editor/editor.component';
 import { MarkdownPageComponent } from './markdown-page/markdown-page.component';
+import { MergeRequestDescriptionPageComponent } from './merge-request-description-page/merge-request-description-page.component';
 import { TaskPageComponent } from './task-page/task-page.component';
 import { PriorityCellRendererComponent } from './tasks-page/priority-cell-renderer.component';
 import { TaskNameCellRendererComponent } from './tasks-page/task-name-cell-renderer.component';
@@ -31,6 +32,7 @@ import { TasksPageComponent } from './tasks-page/tasks-page.component';
     TaskNameCellRendererComponent,
     PriorityCellRendererComponent,
     TaskStatusCellRendererComponent,
+    MergeRequestDescriptionPageComponent,
   ],
   imports: [
     BrowserModule,
@@ -50,6 +52,10 @@ import { TasksPageComponent } from './tasks-page/tasks-page.component';
       {
         path: 'markdown/:id',
         component: MarkdownPageComponent,
+      },
+      {
+        path: 'merge_request_description/:id',
+        component: MergeRequestDescriptionPageComponent,
       },
       {
         path: '',
