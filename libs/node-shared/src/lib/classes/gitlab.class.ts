@@ -108,7 +108,11 @@ export class GitLab {
     );
   }
 
-  public async createMergeRequest(title: string, branch: string) {
+  public async createMergeRequest(
+    title: string,
+    branch: string,
+    description: string
+  ) {
     return callApi<MergeRequest>(
       'post',
       `/projects/${this.projectId}/merge_requests`,
@@ -117,6 +121,7 @@ export class GitLab {
         source_branch: branch,
         target_branch: await this.getDefaultBranchName(),
         title: `Draft: ${title}`,
+        description,
       }
     );
   }
@@ -174,6 +179,17 @@ export class GitLab {
           merge_request.title.replace('WIP: ', '').replace('Draft: ', ''),
         assignee_id: await this.getUserId(),
       }
+    );
+  }
+
+  public async getMergeRequestTemplate() {
+    const defaultBranchName = await this.getDefaultBranchName();
+    return callApi<string>(
+      'get',
+      `/projects/${this.projectId}/repository/files/%2Egitlab%2Fmerge_request_templates%2FDefault%2Emd/raw`,
+      { ref: defaultBranchName },
+      null,
+      true
     );
   }
 

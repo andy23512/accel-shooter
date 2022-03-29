@@ -104,7 +104,10 @@ export async function startAction() {
   await sleep(2000); // prevent "branch restored" bug
   const gitLabMergeRequest = await gitLab.createMergeRequest(
     gitLabMergeRequestTitle + `__CU-${answers.clickUpTaskId}`,
-    gitLabBranch.name
+    gitLabBranch.name,
+    answers.gitLabProject.hasMergeRequestTemplate
+      ? await gitLab.getMergeRequestTemplate()
+      : ''
   );
   const gitLabMergeRequestIId = gitLabMergeRequest.iid;
   p.next(); // Create Checklist at ClickUp

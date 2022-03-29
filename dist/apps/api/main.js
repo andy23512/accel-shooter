@@ -708,12 +708,13 @@ class GitLab {
             });
         });
     }
-    createMergeRequest(title, branch) {
+    createMergeRequest(title, branch, description) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return callApi('post', `/projects/${this.projectId}/merge_requests`, null, {
                 source_branch: branch,
                 target_branch: yield this.getDefaultBranchName(),
                 title: `Draft: ${title}`,
+                description,
             });
         });
     }
@@ -745,6 +746,12 @@ class GitLab {
                     merge_request.title.replace('WIP: ', '').replace('Draft: ', ''),
                 assignee_id: yield this.getUserId(),
             });
+        });
+    }
+    getMergeRequestTemplate() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const defaultBranchName = yield this.getDefaultBranchName();
+            return callApi('get', `/projects/${this.projectId}/repository/files/%2Egitlab%2Fmerge_request_templates%2FDefault%2Emd/raw`, { ref: defaultBranchName }, undefined, true);
         });
     }
     static getPushedEvents(after, before) {
@@ -987,42 +994,42 @@ function checkStatus(res) {
         }
     }
     else {
-        throw Error("Response is undefined.");
+        throw Error('Response is undefined.');
     }
 }
 function callApiFactory(site) {
-    let apiUrl = "";
+    let apiUrl = '';
     let headers = {};
     switch (site) {
-        case "GitLab":
-            apiUrl = "https://gitlab.com/api/v4";
-            headers = { "Private-Token": config_1.CONFIG.GitLabToken };
+        case 'GitLab':
+            apiUrl = 'https://gitlab.com/api/v4';
+            headers = { 'Private-Token': config_1.CONFIG.GitLabToken };
             break;
-        case "ClickUp":
-            apiUrl = "https://api.clickup.com/api/v2";
+        case 'ClickUp':
+            apiUrl = 'https://api.clickup.com/api/v2';
             headers = { Authorization: config_1.CONFIG.ClickUpToken };
             break;
         default:
             throw Error(`Site {site} is not supported.`);
     }
-    return (method, url, queryParams, body) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+    return (method, url, queryParams, body, responseText) => tslib_1.__awaiter(this, void 0, void 0, function* () {
         let params;
-        if (typeof body === "object") {
+        if (typeof body === 'object' && body) {
             params = new URLSearchParams();
             Object.entries(body).forEach(([key, value]) => {
                 params.set(key, value);
             });
         }
-        if (typeof body === "string") {
+        if (typeof body === 'string') {
             params = body;
         }
         if (queryParams) {
-            url += "?" + qs_1.default.stringify(queryParams, { arrayFormat: "brackets" });
+            url += '?' + qs_1.default.stringify(queryParams, { arrayFormat: 'brackets' });
         }
-        return fetchRetry(apiUrl + url, method === "get"
+        return fetchRetry(apiUrl + url, method === 'get'
             ? Object.assign({ method,
                 headers }, RETRY_SETTING) : Object.assign({ method, headers, body: params }, RETRY_SETTING))
-            .then((res) => res === null || res === void 0 ? void 0 : res.json())
+            .then((res) => (responseText ? res === null || res === void 0 ? void 0 : res.text() : res === null || res === void 0 ? void 0 : res.json()))
             .catch((error) => {
             console.log(apiUrl + url);
             throw error;

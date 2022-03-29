@@ -1,8 +1,8 @@
-import fetch, { RequestInfo, RequestInit, Response } from "node-fetch";
-import qs from "qs";
-import { CONFIG } from "../config";
-import { HttpMethod, Site } from "../models/models";
-import { sleep } from "./sleep.utils";
+import fetch, { RequestInfo, RequestInit, Response } from 'node-fetch';
+import qs from 'qs';
+import { CONFIG } from '../config';
+import { HttpMethod, Site } from '../models/models';
+import { sleep } from './sleep.utils';
 
 const RETRY_SETTING = {
   retry: 5,
@@ -46,20 +46,20 @@ function checkStatus(res: Response | undefined) {
       throw Error(res.statusText);
     }
   } else {
-    throw Error("Response is undefined.");
+    throw Error('Response is undefined.');
   }
 }
 
 export function callApiFactory(site: Site) {
-  let apiUrl = "";
+  let apiUrl = '';
   let headers = {};
   switch (site) {
-    case "GitLab":
-      apiUrl = "https://gitlab.com/api/v4";
-      headers = { "Private-Token": CONFIG.GitLabToken };
+    case 'GitLab':
+      apiUrl = 'https://gitlab.com/api/v4';
+      headers = { 'Private-Token': CONFIG.GitLabToken };
       break;
-    case "ClickUp":
-      apiUrl = "https://api.clickup.com/api/v2";
+    case 'ClickUp':
+      apiUrl = 'https://api.clickup.com/api/v2';
       headers = { Authorization: CONFIG.ClickUpToken };
       break;
     default:
@@ -69,24 +69,25 @@ export function callApiFactory(site: Site) {
     method: HttpMethod,
     url: string,
     queryParams?: { [key: string]: any } | null,
-    body?: { [key: string]: any } | string
+    body?: { [key: string]: any } | string,
+    responseText?: boolean
   ): Promise<T> => {
     let params: any;
-    if (typeof body === "object") {
+    if (typeof body === 'object' && body) {
       params = new URLSearchParams();
       Object.entries(body).forEach(([key, value]) => {
         params.set(key, value);
       });
     }
-    if (typeof body === "string") {
+    if (typeof body === 'string') {
       params = body;
     }
     if (queryParams) {
-      url += "?" + qs.stringify(queryParams, { arrayFormat: "brackets" });
+      url += '?' + qs.stringify(queryParams, { arrayFormat: 'brackets' });
     }
     return fetchRetry(
       apiUrl + url,
-      method === "get"
+      method === 'get'
         ? {
             method,
             headers,
@@ -94,7 +95,7 @@ export function callApiFactory(site: Site) {
           }
         : { method, headers, body: params, ...RETRY_SETTING }
     )
-      .then((res) => res?.json())
+      .then((res) => (responseText ? res?.text() : res?.json()))
       .catch((error) => {
         console.log(apiUrl + url);
         throw error;

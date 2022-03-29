@@ -14,6 +14,7 @@ export interface GitLabProject {
   stagingStatus?: Record<string, string>;
   checkItems?: ProjectCheckItem[];
   projectType: 'full' | 'frontend' | 'other';
+  hasMergeRequestTemplate?: boolean;
 }
 export interface Config {
   ClickUpToken: string;
