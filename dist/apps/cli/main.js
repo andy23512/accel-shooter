@@ -292,7 +292,7 @@ function endAction() {
         p.next(); // Remove Todo
         const todo = new todo_class_1.Todo();
         const todoContent = todo.readFile();
-        const matchResult = todoContent.match(/## Todos\n([\s\S]+)\n## Waiting/);
+        const matchResult = todoContent.match(/## Todos\n([\s\S]+)## Waiting/);
         if (matchResult) {
             const todoList = matchResult[1].split('\n');
             const newTodoList = todoList.filter((t) => !t.includes(clickUpTaskId));

@@ -188,7 +188,7 @@ export class GitLab {
       'get',
       `/projects/${this.projectId}/repository/files/%2Egitlab%2Fmerge_request_templates%2FDefault%2Emd/raw`,
       { ref: defaultBranchName },
-      null,
+      undefined,
       true
     );
   }
