@@ -1782,12 +1782,6 @@ class ClickUp {
                         }
                     });
                 });
-                const task = yield clickUp.getTaskIncludeSubTasks();
-                if (task.subtasks) {
-                    task.subtasks.forEach((t) => {
-                        taskQueue.push(t.id);
-                    });
-                }
             }
             return frameUrls;
         });

@@ -151,12 +151,6 @@ export class ClickUp {
             }
           });
       });
-      const task = await clickUp.getTaskIncludeSubTasks();
-      if (task.subtasks) {
-        task.subtasks.forEach((t) => {
-          taskQueue.push(t.id);
-        });
-      }
     }
     return frameUrls;
   }
