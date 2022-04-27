@@ -2,7 +2,7 @@ import { ChecklistItem, NormalizedChecklist } from '@accel-shooter/node-shared';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { merge, Subject } from 'rxjs';
 import { concatMap, debounceTime, take, tap } from 'rxjs/operators';
 
@@ -37,7 +37,8 @@ export class TaskPageComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private http: HttpClient,
-    private matSnackBar: MatSnackBar
+    private matSnackBar: MatSnackBar,
+    private router: Router
   ) {}
 
   public ngOnInit(): void {
@@ -73,6 +74,10 @@ export class TaskPageComponent implements OnInit {
     this.saveSubject.next();
   }
 
+  public openMergeRequestDescriptionLink() {
+    window.open(this.getMergeRequestDescriptionLink(this.taskId));
+  }
+
   public startSync() {
     merge(
       this.changeSubject.asObservable().pipe(debounceTime(2000)),
@@ -97,5 +102,18 @@ export class TaskPageComponent implements OnInit {
         )
       )
       .subscribe();
+  }
+
+  private getMergeRequestDescriptionLink(id: string) {
+    const internalUrl = `/merge_request_description/${id}`;
+
+    // Resolve the base url as the full absolute url subtract the relative url.
+    const currentAbsoluteUrl = window.location.href;
+    const currentRelativeUrl = this.router.url;
+    const index = currentAbsoluteUrl.indexOf(currentRelativeUrl);
+    const baseUrl = currentAbsoluteUrl.substring(0, index);
+
+    // Concatenate the urls to construct the desired absolute url.
+    return baseUrl + internalUrl;
   }
 }
