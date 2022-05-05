@@ -856,7 +856,7 @@ function updateAction() {
         const result2 = [];
         const todo = new todo_class_1.Todo();
         const todoContent = todo.readFile();
-        let matchResult = todoContent.match(/## Todos\n([\s\S]+)\n## Waiting/);
+        let matchResult = todoContent.match(/## Todos\n([\s\S]+)\n##/);
         if (matchResult) {
             const todoList = matchResult[1].split('\n');
             const firstTodo = todoList[0];
@@ -869,6 +869,15 @@ function updateAction() {
             else {
                 result2.push('    ' + firstTodo.replace('- [ ]', '*'));
             }
+        }
+        else {
+            throw Error('Todo File Broken');
+        }
+        matchResult = todoContent.match(/## Processing\n([\s\S]+)\n##/);
+        if (matchResult) {
+            const processingList = matchResult[1].split('\n');
+            const firstProcessingItem = processingList[0];
+            result.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
         }
         else {
             throw Error('Todo File Broken');
