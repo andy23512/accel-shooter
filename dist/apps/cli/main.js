@@ -867,7 +867,7 @@ function updateAction() {
                 result2.push('    ' + (yield clickUp.getTaskString('dp')));
             }
             else {
-                throw Error('Todo File Broken');
+                result2.push('    ' + firstTodo.replace('- [ ]', '*'));
             }
         }
         else {

@@ -51,7 +51,7 @@ export async function updateAction() {
       const clickUp = new ClickUp(taskId);
       result2.push('    ' + (await clickUp.getTaskString('dp')));
     } else {
-      throw Error('Todo File Broken');
+      result2.push('    ' + firstTodo.replace('- [ ]', '*'));
     }
   } else {
     throw Error('Todo File Broken');
