@@ -292,7 +292,7 @@ function endAction() {
         p.next(); // Remove Todo
         const todo = new todo_class_1.Todo();
         const todoContent = todo.readFile();
-        const matchResult = todoContent.match(/## Todos\n([\s\S]+)## Waiting/);
+        const matchResult = todoContent.match(/## Todos\n([\s\S]+)\n## Processing/);
         if (matchResult) {
             const todoList = matchResult[1].split('\n');
             const newTodoList = todoList.filter((t) => !t.includes(clickUpTaskId));
@@ -1237,7 +1237,7 @@ class Todo extends base_file_ref_class_1.BaseFileRef {
     }
     addTodoToBuffer(todoString) {
         const content = this.readFile();
-        const updatedTodoContent = content.replace('## Waiting', `${todoString}\n## Waiting`);
+        const updatedTodoContent = content.replace('## Processing', `${todoString}\n## Processing`);
         this.writeFile(updatedTodoContent);
     }
 }

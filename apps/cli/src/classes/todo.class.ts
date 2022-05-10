@@ -17,8 +17,8 @@ export class Todo extends BaseFileRef {
   public addTodoToBuffer(todoString: string) {
     const content = this.readFile();
     const updatedTodoContent = content.replace(
-      '## Waiting',
-      `${todoString}\n## Waiting`
+      '## Processing',
+      `${todoString}\n## Processing`
     );
     this.writeFile(updatedTodoContent);
   }
