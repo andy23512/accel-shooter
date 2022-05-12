@@ -873,7 +873,7 @@ function updateAction() {
         else {
             throw Error('Todo File Broken');
         }
-        matchResult = todoContent.match(/## Processing\n([\s\S]+)\n##/);
+        matchResult = todoContent.match(/## Processing\n([\s\S]+)\n## Waiting/);
         if (matchResult) {
             const processingList = matchResult[1].split('\n');
             const firstProcessingItem = processingList[0];
