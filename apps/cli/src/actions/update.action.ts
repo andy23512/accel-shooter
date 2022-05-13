@@ -61,8 +61,6 @@ export async function updateAction() {
     const processingList = matchResult[1].split('\n');
     const firstProcessingItem = processingList[0];
     result.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
-  } else {
-    throw Error('Todo File Broken');
   }
   const dayDp = `### ${format(
     day,

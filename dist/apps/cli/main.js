@@ -879,9 +879,6 @@ function updateAction() {
             const firstProcessingItem = processingList[0];
             result.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
         }
-        else {
-            throw Error('Todo File Broken');
-        }
         const dayDp = `### ${date_fns_1.format(day, 'yyyy/MM/dd')}\n1. Previous Day\n${result.join('\n')}\n2. Today\n${result2.join('\n')}\n3. No blockers so far`;
         new daily_progress_class_1.DailyProgress().addDayProgress(dayDp);
     });
