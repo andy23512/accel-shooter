@@ -1276,9 +1276,9 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
     getItems() {
         const content = this.readFile();
         return content
-            .split("\n")
+            .split('\n')
             .filter(Boolean)
-            .filter((line) => !line.startsWith("#"));
+            .filter((line) => !line.startsWith('#'));
     }
     trackTask() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -1296,23 +1296,23 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
             const gitLab = new node_shared_1.GitLab(gitLabProject.id);
             const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
             const clickUpTask = yield clickUp.getTask();
-            if (["closed", "verified", "ready to verify", "done"].includes(clickUpTask.status.status.toLowerCase())) {
+            if (['closed', 'verified', 'ready to verify', 'done'].includes(clickUpTask.status.status.toLowerCase())) {
                 this.closeItem(clickUpTaskId);
                 return;
             }
-            if (gitLabProject.stagingStatus && mergeRequest.state === "merged") {
-                if (clickUpTask.status.status === "in review") {
+            if (gitLabProject.stagingStatus && mergeRequest.state === 'merged') {
+                if (clickUpTask.status.status === 'in review') {
                     const list = yield node_shared_1.ClickUp.getList(clickUpTask.list.id);
                     let stagingStatus = gitLabProject.stagingStatus[list.name] ||
-                        gitLabProject.stagingStatus["*"];
+                        gitLabProject.stagingStatus['*'];
                     if (list.statuses.find((s) => s.status.toLowerCase() === stagingStatus)) {
                         yield clickUp.setTaskStatus(stagingStatus);
                     }
                     else {
-                        stagingStatus = "done";
+                        stagingStatus = 'done';
                         yield clickUp.setTaskStatus(stagingStatus);
                     }
-                    const message = `${clickUpTaskId}: In Review -> ${stagingStatus}`;
+                    const message = `${yield clickUp.getFullTaskName()} (${clickUpTaskId}): In Review -> ${stagingStatus}`;
                     child_process_1.default.execSync(`osascript -e 'display notification "${message}" with title "Accel Shooter"'`);
                     console.log(message);
                     this.closeItem(clickUpTaskId);
@@ -1323,10 +1323,10 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
     closeItem(clickUpTaskId) {
         const content = this.readFile();
         const lines = content
-            .split("\n")
+            .split('\n')
             .filter(Boolean)
             .filter((line) => line !== clickUpTaskId);
-        this.writeFile(lines.join("\n"));
+        this.writeFile(lines.join('\n'));
     }
 }
 exports.Tracker = Tracker;

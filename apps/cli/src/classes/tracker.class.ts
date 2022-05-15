@@ -1,8 +1,8 @@
-import { ClickUp, CONFIG, GitLab } from "@accel-shooter/node-shared";
-import childProcess from "child_process";
-import { appendFileSync } from "fs";
-import untildify from "untildify";
-import { BaseFileRef } from "./base-file-ref.class";
+import { ClickUp, CONFIG, GitLab } from '@accel-shooter/node-shared';
+import childProcess from 'child_process';
+import { appendFileSync } from 'fs';
+import untildify from 'untildify';
+import { BaseFileRef } from './base-file-ref.class';
 
 export class Tracker extends BaseFileRef {
   protected get path() {
@@ -23,9 +23,9 @@ export class Tracker extends BaseFileRef {
   public getItems() {
     const content = this.readFile();
     return content
-      .split("\n")
+      .split('\n')
       .filter(Boolean)
-      .filter((line) => !line.startsWith("#"));
+      .filter((line) => !line.startsWith('#'));
   }
 
   public async trackTask() {
@@ -46,28 +46,28 @@ export class Tracker extends BaseFileRef {
     const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
     const clickUpTask = await clickUp.getTask();
     if (
-      ["closed", "verified", "ready to verify", "done"].includes(
+      ['closed', 'verified', 'ready to verify', 'done'].includes(
         clickUpTask.status.status.toLowerCase()
       )
     ) {
       this.closeItem(clickUpTaskId);
       return;
     }
-    if (gitLabProject.stagingStatus && mergeRequest.state === "merged") {
-      if (clickUpTask.status.status === "in review") {
+    if (gitLabProject.stagingStatus && mergeRequest.state === 'merged') {
+      if (clickUpTask.status.status === 'in review') {
         const list = await ClickUp.getList(clickUpTask.list.id);
         let stagingStatus =
           gitLabProject.stagingStatus[list.name] ||
-          gitLabProject.stagingStatus["*"];
+          gitLabProject.stagingStatus['*'];
         if (
           list.statuses.find((s) => s.status.toLowerCase() === stagingStatus)
         ) {
           await clickUp.setTaskStatus(stagingStatus);
         } else {
-          stagingStatus = "done";
+          stagingStatus = 'done';
           await clickUp.setTaskStatus(stagingStatus);
         }
-        const message = `${clickUpTaskId}: In Review -> ${stagingStatus}`;
+        const message = `${await clickUp.getFullTaskName()} (${clickUpTaskId}): In Review -> ${stagingStatus}`;
         childProcess.execSync(
           `osascript -e 'display notification "${message}" with title "Accel Shooter"'`
         );
@@ -80,9 +80,9 @@ export class Tracker extends BaseFileRef {
   public closeItem(clickUpTaskId: string) {
     const content = this.readFile();
     const lines = content
-      .split("\n")
+      .split('\n')
       .filter(Boolean)
       .filter((line) => line !== clickUpTaskId);
-    this.writeFile(lines.join("\n"));
+    this.writeFile(lines.join('\n'));
   }
 }
