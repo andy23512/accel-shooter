@@ -755,6 +755,7 @@ class GitLab {
                 before,
                 after,
                 sort: 'asc',
+                per_page: 100,
             });
         });
     }
