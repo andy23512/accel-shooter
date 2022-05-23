@@ -74,7 +74,8 @@ export class TaskPageComponent implements OnInit {
     this.saveSubject.next();
   }
 
-  public openMergeRequestDescriptionLink() {
+  public openMergeRequestDescriptionLink(event: MouseEvent) {
+    event.preventDefault();
     window.open(this.getMergeRequestDescriptionLink(this.taskId));
   }
 
