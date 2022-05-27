@@ -1712,6 +1712,9 @@ class ClickUp {
     static getTeams() {
         return callApi('get', `/team/`);
     }
+    static getSpace(spaceId) {
+        return callApi('get', `/space/${spaceId}`);
+    }
     static getRTVTasks(teamId, userID) {
         return callApi('get', `/team/${teamId}/task/`, {
             statuses: ['ready to verify'],
@@ -1901,6 +1904,7 @@ class ClickUp {
                     original_due_date: task.due_date,
                     date_created: task.date_created,
                     status: task.status,
+                    space: (yield ClickUp.getSpace(task.space.id)).name,
                 });
                 bar.increment(1);
             }
@@ -2137,6 +2141,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 
 /***/ }),
 
+/***/ "./libs/node-shared/src/lib/models/clickup/space.models.ts":
+/*!*****************************************************************!*\
+  !*** ./libs/node-shared/src/lib/models/clickup/space.models.ts ***!
+  \*****************************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+
+
+/***/ }),
+
 /***/ "./libs/node-shared/src/lib/models/clickup/task.models.ts":
 /*!****************************************************************!*\
   !*** ./libs/node-shared/src/lib/models/clickup/task.models.ts ***!
@@ -2203,7 +2221,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sleep = exports.getTaskIdFromBranchName = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.titleCase = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.IHoliday = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Task = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.GitLab = exports.ClickUp = void 0;
+exports.sleep = exports.getTaskIdFromBranchName = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.titleCase = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.IHoliday = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Task = exports.Space = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.GitLab = exports.ClickUp = void 0;
 var clickup_class_1 = __webpack_require__(/*! ./classes/clickup.class */ "./libs/node-shared/src/lib/classes/clickup.class.ts");
 Object.defineProperty(exports, "ClickUp", { enumerable: true, get: function () { return clickup_class_1.ClickUp; } });
 var gitlab_class_1 = __webpack_require__(/*! ./classes/gitlab.class */ "./libs/node-shared/src/lib/classes/gitlab.class.ts");
@@ -2213,6 +2231,8 @@ Object.defineProperty(exports, "CONFIG", { enumerable: true, get: function () { 
 Object.defineProperty(exports, "getConfig", { enumerable: true, get: function () { return config_1.getConfig; } });
 var checklist_models_1 = __webpack_require__(/*! ./models/clickup/checklist.models */ "./libs/node-shared/src/lib/models/clickup/checklist.models.ts");
 Object.defineProperty(exports, "ChecklistItem", { enumerable: true, get: function () { return checklist_models_1.ChecklistItem; } });
+var space_models_1 = __webpack_require__(/*! ./models/clickup/space.models */ "./libs/node-shared/src/lib/models/clickup/space.models.ts");
+Object.defineProperty(exports, "Space", { enumerable: true, get: function () { return space_models_1.Space; } });
 var task_models_1 = __webpack_require__(/*! ./models/clickup/task.models */ "./libs/node-shared/src/lib/models/clickup/task.models.ts");
 Object.defineProperty(exports, "Task", { enumerable: true, get: function () { return task_models_1.Task; } });
 var job_models_1 = __webpack_require__(/*! ./models/gitlab/job.models */ "./libs/node-shared/src/lib/models/gitlab/job.models.ts");

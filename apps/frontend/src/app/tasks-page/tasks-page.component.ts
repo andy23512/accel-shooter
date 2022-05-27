@@ -34,6 +34,7 @@ export class TasksPageComponent {
       sortable: true,
     },
     { width: 800, field: 'name', cellRenderer: TaskNameCellRendererComponent },
+    { width: 100, field: 'space' },
     {
       width: 100,
       field: 'priority',

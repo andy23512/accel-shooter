@@ -22,4 +22,5 @@ export interface SummarizedTask {
   original_due_date: null | string;
   date_created: null | string;
   status: Status;
+  space: string;
 }

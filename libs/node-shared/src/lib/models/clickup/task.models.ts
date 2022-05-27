@@ -1,5 +1,5 @@
-import { Assignee } from "./assignee.models";
-import { Checklist } from "./checklist.models";
+import { Assignee } from './assignee.models';
+import { Checklist } from './checklist.models';
 
 export interface Task {
   id: string;
@@ -26,7 +26,9 @@ export interface Task {
   time_spent?: any;
   list: List;
   folder: List;
-  space: List;
+  space: {
+    id: string;
+  };
   url: string;
   custom_fields?: {
     id: string;

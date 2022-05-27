@@ -7,6 +7,7 @@ import { ChecklistResponse } from '../models/clickup.models';
 import { Checklist } from '../models/clickup/checklist.models';
 import { Comment } from '../models/clickup/comment.models';
 import { List } from '../models/clickup/list.models';
+import { Space } from '../models/clickup/space.models';
 import { TaskIncludeSubTasks } from '../models/clickup/task.models';
 import { Team } from '../models/clickup/team.models';
 import { User } from '../models/clickup/user.models';
@@ -33,6 +34,10 @@ export class ClickUp {
 
   public static getTeams() {
     return callApi<{ teams: Team[] }>('get', `/team/`);
+  }
+
+  public static getSpace(spaceId: string) {
+    return callApi<Space>('get', `/space/${spaceId}`);
   }
 
   public static getRTVTasks(teamId: string, userID: number) {
@@ -271,6 +276,7 @@ export class ClickUp {
         original_due_date: task.due_date,
         date_created: task.date_created,
         status: task.status,
+        space: (await ClickUp.getSpace(task.space.id)).name,
       });
       bar.increment(1);
     }
