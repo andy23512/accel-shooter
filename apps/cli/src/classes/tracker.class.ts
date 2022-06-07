@@ -69,10 +69,9 @@ export class Tracker extends BaseFileRef {
         }
         const message = `${await clickUp.getFullTaskName()} (${clickUpTaskId}): In Review -> ${stagingStatus}`;
         childProcess.execSync(
-          `osascript -e 'display notification "${message.replace(
-            /"/g,
-            ''
-          )}" with title "Accel Shooter"'`
+          `osascript -e 'display notification "${message
+            .replace(/"/g, '')
+            .replace(/'/g, '')}" with title "Accel Shooter"'`
         );
         console.log(message);
         this.closeItem(clickUpTaskId);

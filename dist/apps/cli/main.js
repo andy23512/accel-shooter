@@ -1313,7 +1313,9 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
                         yield clickUp.setTaskStatus(stagingStatus);
                     }
                     const message = `${yield clickUp.getFullTaskName()} (${clickUpTaskId}): In Review -> ${stagingStatus}`;
-                    child_process_1.default.execSync(`osascript -e 'display notification "${message.replace(/"/g, '')}" with title "Accel Shooter"'`);
+                    child_process_1.default.execSync(`osascript -e 'display notification "${message
+                        .replace(/"/g, '')
+                        .replace(/'/g, '')}" with title "Accel Shooter"'`);
                     console.log(message);
                     this.closeItem(clickUpTaskId);
                 }
