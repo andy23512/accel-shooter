@@ -127,7 +127,7 @@ export class GitLab {
   }
 
   public async createMergeRequestNote(
-    merge_request: FullMergeRequest,
+    merge_request: FullMergeRequest | MergeRequest,
     content: string
   ) {
     await callApi(
