@@ -1727,7 +1727,13 @@ class ClickUp {
     }
     static getMyTasks(teamId, userID) {
         return callApi('get', `/team/${teamId}/task/`, {
-            statuses: ['Open', 'pending', 'ready to do', 'in progress'],
+            statuses: [
+                'Open',
+                'pending',
+                'ready to do',
+                'in progress',
+                'in discussion',
+            ],
             assignees: [userID],
             subtasks: true,
         });

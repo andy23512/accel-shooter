@@ -50,7 +50,13 @@ export class ClickUp {
 
   public static getMyTasks(teamId: string, userID: number) {
     return callApi<{ tasks: Task[] }>('get', `/team/${teamId}/task/`, {
-      statuses: ['Open', 'pending', 'ready to do', 'in progress'],
+      statuses: [
+        'Open',
+        'pending',
+        'ready to do',
+        'in progress',
+        'in discussion',
+      ],
       assignees: [userID],
       subtasks: true,
     });
