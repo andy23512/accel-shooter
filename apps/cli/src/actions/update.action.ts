@@ -38,7 +38,7 @@ export async function updateAction() {
     const clickUp = new ClickUp(getTaskIdFromBranchName(b));
     result.push('    ' + (await clickUp.getTaskString('dp')));
   }
-  const result2 = [];
+  let result2 = [];
   const todo = new Todo();
   const todoContent = todo.readFile();
   let matchResult = todoContent.match(/## Todos\n([\s\S]+)\n##/);
@@ -56,12 +56,22 @@ export async function updateAction() {
   } else {
     throw Error('Todo File Broken');
   }
-  matchResult = todoContent.match(/## Processing\n([\s\S]+)\n## Waiting/);
+  matchResult = todoContent.match(/## Processing\n([\s\S]+)\n##/);
   if (matchResult) {
     const processingList = matchResult[1].split('\n');
     const firstProcessingItem = processingList[0];
-    result.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
+    matchResult = firstProcessingItem.match(
+      /https:\/\/app.clickup.com\/t\/(\w+)\)/
+    );
+    if (matchResult) {
+      const taskId = matchResult[1];
+      const clickUp = new ClickUp(taskId);
+      result2.push('    ' + (await clickUp.getTaskString('dp')));
+    } else {
+      result2.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
+    }
   }
+  result2 = [...new Set(result2)];
   const dayDp = `### ${format(
     day,
     'yyyy/MM/dd'

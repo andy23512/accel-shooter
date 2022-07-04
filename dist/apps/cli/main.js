@@ -854,7 +854,7 @@ function updateAction() {
             const clickUp = new node_shared_1.ClickUp(node_shared_1.getTaskIdFromBranchName(b));
             result.push('    ' + (yield clickUp.getTaskString('dp')));
         }
-        const result2 = [];
+        let result2 = [];
         const todo = new todo_class_1.Todo();
         const todoContent = todo.readFile();
         let matchResult = todoContent.match(/## Todos\n([\s\S]+)\n##/);
@@ -874,12 +874,21 @@ function updateAction() {
         else {
             throw Error('Todo File Broken');
         }
-        matchResult = todoContent.match(/## Processing\n([\s\S]+)\n## Waiting/);
+        matchResult = todoContent.match(/## Processing\n([\s\S]+)\n##/);
         if (matchResult) {
             const processingList = matchResult[1].split('\n');
             const firstProcessingItem = processingList[0];
-            result.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
+            matchResult = firstProcessingItem.match(/https:\/\/app.clickup.com\/t\/(\w+)\)/);
+            if (matchResult) {
+                const taskId = matchResult[1];
+                const clickUp = new node_shared_1.ClickUp(taskId);
+                result2.push('    ' + (yield clickUp.getTaskString('dp')));
+            }
+            else {
+                result2.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
+            }
         }
+        result2 = [...new Set(result2)];
         const dayDp = `### ${date_fns_1.format(day, 'yyyy/MM/dd')}\n1. Previous Day\n${result.join('\n')}\n2. Today\n${result2.join('\n')}\n3. No blockers so far`;
         new daily_progress_class_1.DailyProgress().addDayProgress(dayDp);
     });
