@@ -865,7 +865,8 @@ function updateAction() {
             if (matchResult) {
                 const taskId = matchResult[1];
                 const clickUp = new node_shared_1.ClickUp(taskId);
-                result2.push('    ' + (yield clickUp.getTaskString('dp')));
+                const taskString = yield clickUp.getTaskString('dp');
+                result2.push('    ' + taskString);
             }
             else {
                 result2.push('    ' + firstTodo.replace('- [ ]', '*'));
@@ -882,9 +883,12 @@ function updateAction() {
             if (matchResult) {
                 const taskId = matchResult[1];
                 const clickUp = new node_shared_1.ClickUp(taskId);
+                const taskString = yield clickUp.getTaskString('dp');
+                result.push('    ' + taskString);
                 result2.push('    ' + (yield clickUp.getTaskString('dp')));
             }
             else {
+                result.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
                 result2.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
             }
         }
