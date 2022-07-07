@@ -69,7 +69,7 @@ export class MarkdownPageComponent implements OnInit {
                   this.matSnackBar.open('Saved!', '', { duration: 5000 });
                 },
                 error: () => {
-                  this.matSnackBar.open('Error!', '', { duration: 5000 });
+                  this.matSnackBar.open('Error!', '');
                 },
               })
             )
