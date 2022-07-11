@@ -1,9 +1,10 @@
 import { SummarizedTask } from '@accel-shooter/api-interfaces';
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { ColDef } from 'ag-grid-community';
 import moment from 'moment';
 import { map, take } from 'rxjs/operators';
+import { PageTitleService } from '../page-title.service';
 import { PriorityCellRendererComponent } from './priority-cell-renderer.component';
 import { TaskNameCellRendererComponent } from './task-name-cell-renderer.component';
 import { TaskStatusCellRendererComponent } from './task-status-cell-renderer.component';
@@ -24,7 +25,7 @@ const comparator = (a: null | string, b: null | string) => {
   templateUrl: './tasks-page.component.html',
   styleUrls: ['./tasks-page.component.scss'],
 })
-export class TasksPageComponent {
+export class TasksPageComponent implements OnInit {
   public columnDefs: ColDef[] = [
     {
       width: 36,
@@ -73,5 +74,12 @@ export class TasksPageComponent {
       take(1),
       map((r) => r.tasks)
     );
-  constructor(private http: HttpClient) {}
+  constructor(
+    private http: HttpClient,
+    private pageTitleService: PageTitleService
+  ) {}
+
+  public ngOnInit(): void {
+    this.pageTitleService.setTitle('Tasks');
+  }
 }

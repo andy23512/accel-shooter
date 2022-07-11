@@ -5,6 +5,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { merge, Subject } from 'rxjs';
 import { concatMap, debounceTime, take, tap } from 'rxjs/operators';
+import { PageTitleService } from '../page-title.service';
 
 export function normalizeClickUpChecklist(
   checklist: ChecklistItem[]
@@ -38,11 +39,13 @@ export class TaskPageComponent implements OnInit {
     private route: ActivatedRoute,
     private http: HttpClient,
     private matSnackBar: MatSnackBar,
-    private router: Router
+    private router: Router,
+    private pageTitleService: PageTitleService
   ) {}
 
   public ngOnInit(): void {
     this.taskId = this.route.snapshot.paramMap.get('id') as string;
+    this.pageTitleService.setTitle(`Task "${this.taskId}"`);
     this.http
       .get<{
         mergeRequestLink: string;

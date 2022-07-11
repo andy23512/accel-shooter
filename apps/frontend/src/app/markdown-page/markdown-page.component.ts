@@ -6,6 +6,7 @@ import { SseClient } from 'angular-sse-client';
 import moment, { Moment } from 'moment';
 import { merge, Subject } from 'rxjs';
 import { concatMap, debounceTime, take, tap } from 'rxjs/operators';
+import { PageTitleService } from './../page-title.service';
 
 @Component({
   selector: 'accel-shooter-markdown-page',
@@ -22,11 +23,13 @@ export class MarkdownPageComponent implements OnInit {
     private http: HttpClient,
     private matSnackBar: MatSnackBar,
     private route: ActivatedRoute,
-    private sseClient: SseClient
+    private sseClient: SseClient,
+    private pageTitleService: PageTitleService
   ) {}
 
   public ngOnInit(): void {
     this.markdownId = this.route.snapshot.paramMap.get('id') as string;
+    this.pageTitleService.setTitle(`Markdown "${this.markdownId}"`);
     this.http
       .get<{
         content: string;
