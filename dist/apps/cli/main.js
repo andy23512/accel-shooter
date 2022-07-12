@@ -887,7 +887,7 @@ function updateAction() {
                 result.push('    ' + taskString);
                 result2.push('    ' + (yield clickUp.getTaskString('dp')));
             }
-            else {
+            else if (firstProcessingItem.includes('- [ ]')) {
                 result.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
                 result2.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
             }

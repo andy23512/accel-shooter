@@ -70,7 +70,7 @@ export async function updateAction() {
       const taskString = await clickUp.getTaskString('dp');
       result.push('    ' + taskString);
       result2.push('    ' + (await clickUp.getTaskString('dp')));
-    } else {
+    } else if (firstProcessingItem.includes('- [ ]')) {
       result.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
       result2.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
     }
