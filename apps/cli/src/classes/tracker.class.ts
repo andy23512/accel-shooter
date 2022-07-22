@@ -1,4 +1,4 @@
-import { ClickUp, CONFIG, GitLab } from '@accel-shooter/node-shared';
+import { ClickUp, CONFIG, GitLab, titleCase } from '@accel-shooter/node-shared';
 import childProcess from 'child_process';
 import { appendFileSync } from 'fs';
 import untildify from 'untildify';
@@ -67,7 +67,9 @@ export class Tracker extends BaseFileRef {
           stagingStatus = 'done';
           await clickUp.setTaskStatus(stagingStatus);
         }
-        const message = `${await clickUp.getFullTaskName()} (${clickUpTaskId}): In Review -> ${stagingStatus}`;
+        const message = `${await clickUp.getFullTaskName()} (${clickUpTaskId}): In Review -> ${titleCase(
+          stagingStatus
+        )}`;
         childProcess.execSync(
           `osascript -e 'display notification "${message
             .replace(/"/g, '')

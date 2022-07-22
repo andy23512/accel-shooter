@@ -1326,7 +1326,7 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
                         stagingStatus = 'done';
                         yield clickUp.setTaskStatus(stagingStatus);
                     }
-                    const message = `${yield clickUp.getFullTaskName()} (${clickUpTaskId}): In Review -> ${stagingStatus}`;
+                    const message = `${yield clickUp.getFullTaskName()} (${clickUpTaskId}): In Review -> ${node_shared_1.titleCase(stagingStatus)}`;
                     child_process_1.default.execSync(`osascript -e 'display notification "${message
                         .replace(/"/g, '')
                         .replace(/'/g, '')}" with title "Accel Shooter"'`);
