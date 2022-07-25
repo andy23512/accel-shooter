@@ -4,7 +4,14 @@ import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { interval, merge, Subject } from 'rxjs';
-import { concatMap, debounceTime, switchMap, take, tap } from 'rxjs/operators';
+import {
+  concatMap,
+  debounceTime,
+  startWith,
+  switchMap,
+  take,
+  tap,
+} from 'rxjs/operators';
 import { PageTitleService } from '../page-title.service';
 
 export function normalizeClickUpChecklist(
@@ -69,6 +76,7 @@ export class TaskPageComponent implements OnInit {
       );
     interval(30000)
       .pipe(
+        startWith(0),
         switchMap(() =>
           this.http.get<{ content: string }>(
             `/api/task/${this.taskId}/mr_pipeline_status`
