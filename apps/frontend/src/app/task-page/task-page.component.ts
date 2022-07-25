@@ -3,8 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { merge, Subject } from 'rxjs';
-import { concatMap, debounceTime, take, tap } from 'rxjs/operators';
+import { interval, merge, Subject } from 'rxjs';
+import { concatMap, debounceTime, switchMap, take, tap } from 'rxjs/operators';
 import { PageTitleService } from '../page-title.service';
 
 export function normalizeClickUpChecklist(
@@ -32,6 +32,7 @@ export class TaskPageComponent implements OnInit {
   public mergeRequestLink = '';
   public frameUrl = '';
   public fullTaskName = '';
+  public mrPipelineStatus = '';
   public changeSubject = new Subject();
   public saveSubject = new Subject();
 
@@ -66,6 +67,18 @@ export class TaskPageComponent implements OnInit {
           this.startSync();
         }
       );
+    interval(30000)
+      .pipe(
+        switchMap(() =>
+          this.http.get<{ content: string }>(
+            `/api/task/${this.taskId}/mr_pipeline_status`
+          )
+        ),
+        tap((r) => {
+          this.mrPipelineStatus = r.content;
+        })
+      )
+      .subscribe();
   }
 
   public onContentChange(content: string) {

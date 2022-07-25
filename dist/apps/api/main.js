@@ -95,7 +95,7 @@
 
 "use strict";
 
-var _a, _b, _c, _d, _e, _f;
+var _a, _b, _c, _d, _e, _f, _g;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AppController = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
@@ -194,6 +194,15 @@ let AppController = class AppController {
             yield gitLab.updateMergeRequestDescription(mergeRequest, content);
         });
     }
+    getMRPipelineStatus(taskId) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const clickUp = new node_shared_1.ClickUp(taskId);
+            const { gitLabProject, mergeRequestIId } = yield clickUp.getGitLabProjectAndMergeRequestIId();
+            const gitLab = new node_shared_1.GitLab(gitLabProject.id);
+            const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
+            return { content: mergeRequest.head_pipeline.status };
+        });
+    }
     todoSse() {
         return watch_rx_1.watchRx(node_shared_1.CONFIG.TodoChangeNotificationFile).pipe(operators_1.map(() => fs_1.readFileSync(node_shared_1.CONFIG.TodoFile, { encoding: 'utf-8' })));
     }
@@ -250,14 +259,21 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:returntype", Promise)
 ], AppController.prototype, "putMRDescription", null);
 tslib_1.__decorate([
+    common_1.Get('task/:id/mr_pipeline_status'),
+    tslib_1.__param(0, common_1.Param('id')),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [String]),
+    tslib_1.__metadata("design:returntype", typeof (_e = typeof Promise !== "undefined" && Promise) === "function" ? _e : Object)
+], AppController.prototype, "getMRPipelineStatus", null);
+tslib_1.__decorate([
     common_1.Sse('todo-sse'),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", []),
-    tslib_1.__metadata("design:returntype", typeof (_e = typeof rxjs_1.Observable !== "undefined" && rxjs_1.Observable) === "function" ? _e : Object)
+    tslib_1.__metadata("design:returntype", typeof (_f = typeof rxjs_1.Observable !== "undefined" && rxjs_1.Observable) === "function" ? _f : Object)
 ], AppController.prototype, "todoSse", null);
 AppController = tslib_1.__decorate([
     common_1.Controller(),
-    tslib_1.__metadata("design:paramtypes", [typeof (_f = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _f : Object])
+    tslib_1.__metadata("design:paramtypes", [typeof (_g = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _g : Object])
 ], AppController);
 exports.AppController = AppController;
 

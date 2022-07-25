@@ -11,5 +11,6 @@
     >Merge Request Description</a
   ><br />
   <a [href]="taskLink" target="_blank">ClickUp Task</a><br />
-  <a *ngIf="frameUrl" [href]="frameUrl" target="_blank">Frame</a>
+  <a *ngIf="frameUrl" [href]="frameUrl" target="_blank">Frame</a><br />
+  <span *ngIf="mrPipelineStatus">{{ mrPipelineStatus }}</span>
 </div>

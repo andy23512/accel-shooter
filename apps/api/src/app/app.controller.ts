@@ -128,6 +128,18 @@ export class AppController {
     await gitLab.updateMergeRequestDescription(mergeRequest, content);
   }
 
+  @Get('task/:id/mr_pipeline_status')
+  async getMRPipelineStatus(
+    @Param('id') taskId: string
+  ): Promise<{ content: string }> {
+    const clickUp = new ClickUp(taskId);
+    const { gitLabProject, mergeRequestIId } =
+      await clickUp.getGitLabProjectAndMergeRequestIId();
+    const gitLab = new GitLab(gitLabProject.id);
+    const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
+    return { content: mergeRequest.head_pipeline.status };
+  }
+
   @Sse('todo-sse')
   public todoSse(): Observable<string> {
     return watchRx(CONFIG.TodoChangeNotificationFile).pipe(
