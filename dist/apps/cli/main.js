@@ -849,7 +849,7 @@ function updateAction() {
         const modifiedBranches = [
             ...new Set(pushedToEvents.map((e) => e.push_data.ref)),
         ];
-        const result = [];
+        let result = [];
         for (const b of modifiedBranches) {
             const clickUp = new node_shared_1.ClickUp(node_shared_1.getTaskIdFromBranchName(b));
             result.push('    ' + (yield clickUp.getTaskString('dp')));
@@ -892,6 +892,7 @@ function updateAction() {
                 result2.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
             }
         }
+        result = [...new Set(result)];
         result2 = [...new Set(result2)];
         const dayDp = `### ${date_fns_1.format(day, 'yyyy/MM/dd')}\n1. Previous Day\n${result.join('\n')}\n2. Today\n${result2.join('\n')}\n3. No blockers so far`;
         new daily_progress_class_1.DailyProgress().addDayProgress(dayDp);

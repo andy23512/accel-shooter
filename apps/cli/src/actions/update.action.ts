@@ -33,7 +33,7 @@ export async function updateAction() {
   const modifiedBranches = [
     ...new Set(pushedToEvents.map((e) => e.push_data.ref)),
   ];
-  const result = [];
+  let result = [];
   for (const b of modifiedBranches) {
     const clickUp = new ClickUp(getTaskIdFromBranchName(b));
     result.push('    ' + (await clickUp.getTaskString('dp')));
@@ -75,6 +75,7 @@ export async function updateAction() {
       result2.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
     }
   }
+  result = [...new Set(result)];
   result2 = [...new Set(result2)];
   const dayDp = `### ${format(
     day,
