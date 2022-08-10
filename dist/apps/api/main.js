@@ -195,12 +195,13 @@ let AppController = class AppController {
         });
     }
     getMRPipelineStatus(taskId) {
+        var _a;
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const clickUp = new node_shared_1.ClickUp(taskId);
             const { gitLabProject, mergeRequestIId } = yield clickUp.getGitLabProjectAndMergeRequestIId();
             const gitLab = new node_shared_1.GitLab(gitLabProject.id);
             const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
-            return { content: mergeRequest.head_pipeline.status };
+            return { content: ((_a = mergeRequest.head_pipeline) === null || _a === void 0 ? void 0 : _a.status) || 'none' };
         });
     }
     todoSse() {

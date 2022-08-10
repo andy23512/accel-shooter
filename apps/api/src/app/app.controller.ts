@@ -7,7 +7,7 @@ import {
   NotFoundException,
   Param,
   Put,
-  Sse,
+  Sse
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { readFileSync, writeFileSync } from 'fs';
@@ -137,7 +137,7 @@ export class AppController {
       await clickUp.getGitLabProjectAndMergeRequestIId();
     const gitLab = new GitLab(gitLabProject.id);
     const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
-    return { content: mergeRequest.head_pipeline.status };
+    return { content: mergeRequest.head_pipeline?.status || 'none' };
   }
 
   @Sse('todo-sse')
