@@ -903,6 +903,51 @@ exports.updateAction = updateAction;
 
 /***/ }),
 
+/***/ "./apps/cli/src/actions/watch-pipeline.action.ts":
+/*!*******************************************************!*\
+  !*** ./apps/cli/src/actions/watch-pipeline.action.ts ***!
+  \*******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.watchPipelineAction = void 0;
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
+const child_process_1 = tslib_1.__importDefault(__webpack_require__(/*! child_process */ "child_process"));
+const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+function watchPipelineAction() {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const projectName = process.argv[3];
+        const mergeRequestIId = process.argv[4];
+        const gitLabProject = utils_1.getGitLabProjectConfigByName(projectName);
+        const gitLab = new node_shared_1.GitLab(gitLabProject.id);
+        function getAndPrintPipelineStatus() {
+            var _a;
+            return tslib_1.__awaiter(this, void 0, void 0, function* () {
+                const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
+                const status = ((_a = mergeRequest.head_pipeline) === null || _a === void 0 ? void 0 : _a.status) || 'none';
+                console.log(status);
+                if (status !== 'running' && status !== 'none') {
+                    const message = `Pipeline of ${projectName} !${mergeRequestIId} status: ${status}`;
+                    child_process_1.default.execSync(`osascript -e 'display notification "${message
+                        .replace(/"/g, '')
+                        .replace(/'/g, '')}" with title "Accel Shooter"'`);
+                    process.exit();
+                }
+            });
+        }
+        getAndPrintPipelineStatus();
+        setInterval(getAndPrintPipelineStatus, 30 * 1000);
+    });
+}
+exports.watchPipelineAction = watchPipelineAction;
+
+
+/***/ }),
+
 /***/ "./apps/cli/src/classes/base-file-ref.class.ts":
 /*!*****************************************************!*\
   !*** ./apps/cli/src/classes/base-file-ref.class.ts ***!
@@ -1501,6 +1546,7 @@ const time_action_1 = __webpack_require__(/*! ./actions/time.action */ "./apps/c
 const to_do_action_1 = __webpack_require__(/*! ./actions/to-do.action */ "./apps/cli/src/actions/to-do.action.ts");
 const track_action_1 = __webpack_require__(/*! ./actions/track.action */ "./apps/cli/src/actions/track.action.ts");
 const update_action_1 = __webpack_require__(/*! ./actions/update.action */ "./apps/cli/src/actions/update.action.ts");
+const watch_pipeline_action_1 = __webpack_require__(/*! ./actions/watch-pipeline.action */ "./apps/cli/src/actions/watch-pipeline.action.ts");
 const actions = {
     start: start_action_1.startAction,
     open: open_action_1.openAction,
@@ -1519,6 +1565,7 @@ const actions = {
     showDiff: show_diff_action_1.showDiffAction,
     time: time_action_1.timeAction,
     fetchHoliday: fetch_holiday_action_1.fetchHolidayAction,
+    watchPipeline: watch_pipeline_action_1.watchPipelineAction,
     test: () => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
         console.log('test');
     }),

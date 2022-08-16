@@ -15,6 +15,7 @@ import { timeAction } from './actions/time.action';
 import { toDoAction } from './actions/to-do.action';
 import { trackAction } from './actions/track.action';
 import { updateAction } from './actions/update.action';
+import { watchPipelineAction } from './actions/watch-pipeline.action';
 
 const actions: { [key: string]: () => Promise<void> } = {
   start: startAction,
@@ -34,6 +35,7 @@ const actions: { [key: string]: () => Promise<void> } = {
   showDiff: showDiffAction,
   time: timeAction,
   fetchHoliday: fetchHolidayAction,
+  watchPipeline: watchPipelineAction,
   test: async () => {
     console.log('test');
   },
