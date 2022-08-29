@@ -292,11 +292,11 @@ function endAction() {
         p.next(); // Remove Todo
         const todo = new todo_class_1.Todo();
         const todoContent = todo.readFile();
-        const matchResult = todoContent.match(/## Todos\n([\s\S]+)\n## Processing/);
+        const matchResult = todoContent.match(/## Todos\n([\s\S]+)## Processing/);
         if (matchResult) {
             const todoList = matchResult[1].split('\n');
             const newTodoList = todoList.filter((t) => !t.includes(clickUpTaskId));
-            const newTodoContent = todoContent.replace(matchResult[1], newTodoList.join('\n'));
+            const newTodoContent = todoContent.replace(matchResult[1], newTodoList.map(str => str + '\n').join(''));
             todo.writeFile(newTodoContent);
         }
         else {
