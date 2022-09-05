@@ -1902,7 +1902,8 @@ class ClickUp {
             const task = yield this.getTask();
             const name = yield this.getFullTaskName(task);
             const progress = this.getTaskProgress();
-            const link = `[${name}](${task.url})`;
+            const spaceName = (yield ClickUp.getSpace(task.space.id)).name;
+            const link = `[${spaceName}: ${name}](${task.url})`;
             switch (mode) {
                 case 'todo':
                     return `- [ ] ${link}`;
