@@ -851,8 +851,13 @@ function updateAction() {
         ];
         let result = [];
         for (const b of modifiedBranches) {
-            const clickUp = new node_shared_1.ClickUp(node_shared_1.getTaskIdFromBranchName(b));
-            result.push('    ' + (yield clickUp.getTaskString('dp')));
+            try {
+                const clickUp = new node_shared_1.ClickUp(node_shared_1.getTaskIdFromBranchName(b));
+                result.push('    ' + (yield clickUp.getTaskString('dp')));
+            }
+            catch (e) {
+                console.log(e);
+            }
         }
         let result2 = [];
         const todo = new todo_class_1.Todo();

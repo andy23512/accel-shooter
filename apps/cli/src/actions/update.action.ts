@@ -35,8 +35,12 @@ export async function updateAction() {
   ];
   let result = [];
   for (const b of modifiedBranches) {
-    const clickUp = new ClickUp(getTaskIdFromBranchName(b));
-    result.push('    ' + (await clickUp.getTaskString('dp')));
+    try {
+      const clickUp = new ClickUp(getTaskIdFromBranchName(b));
+      result.push('    ' + (await clickUp.getTaskString('dp')));
+    } catch (e) {
+      console.log(e);
+    }
   }
   let result2 = [];
   const todo = new Todo();
