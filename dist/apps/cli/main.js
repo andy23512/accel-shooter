@@ -135,6 +135,83 @@ exports.checkAction = checkAction;
 
 /***/ }),
 
+/***/ "./apps/cli/src/actions/commit.action.ts":
+/*!***********************************************!*\
+  !*** ./apps/cli/src/actions/commit.action.ts ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.commitAction = void 0;
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const fuzzy_1 = tslib_1.__importDefault(__webpack_require__(/*! fuzzy */ "fuzzy"));
+const inquirer_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer */ "inquirer"));
+const inquirer_autocomplete_prompt_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer-autocomplete-prompt */ "inquirer-autocomplete-prompt"));
+const commit_scope_class_1 = __webpack_require__(/*! ../classes/commit-scope.class */ "./apps/cli/src/classes/commit-scope.class.ts");
+const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+const TYPES = [
+    'feat',
+    'fix',
+    'docs',
+    'style',
+    'refactor',
+    'perf',
+    'test',
+    'build',
+    'ci',
+    'chore',
+    'revert',
+];
+function commitAction() {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        inquirer_1.default.registerPrompt('autocomplete', inquirer_autocomplete_prompt_1.default);
+        const commitScope = new commit_scope_class_1.CommitScope();
+        const commitScopeItems = commitScope.getItems();
+        const answers = yield inquirer_1.default.prompt([
+            {
+                name: 'type',
+                message: 'Enter commit type',
+                type: 'autocomplete',
+                source: (_, input = '') => {
+                    return Promise.resolve(fuzzy_1.default.filter(input, TYPES).map((t) => t.original));
+                },
+            },
+            {
+                name: 'scope',
+                message: 'Enter commit scope',
+                type: 'autocomplete',
+                source: (_, input = '') => {
+                    return Promise.resolve(fuzzy_1.default.filter(input, commitScopeItems).map((t) => t.original));
+                },
+            },
+            {
+                name: 'subject',
+                message: 'Enter commit subject',
+                type: 'input',
+            },
+        ]);
+        const { type, scope, subject } = answers;
+        if (!commitScopeItems.includes(scope)) {
+            commitScope.addItem(scope);
+        }
+        const message = `${type}${scope ? '(' + scope + ')' : ''}: ${subject}`;
+        const { stdout, stderr } = yield utils_1.promiseSpawn('git', ['commit', '-m', `"${message}"`], 'pipe');
+        if (stderr) {
+            console.error(stderr);
+        }
+        if (stdout) {
+            console.log(stdout);
+        }
+    });
+}
+exports.commitAction = commitAction;
+
+
+/***/ }),
+
 /***/ "./apps/cli/src/actions/copy.action.ts":
 /*!*********************************************!*\
   !*** ./apps/cli/src/actions/copy.action.ts ***!
@@ -1166,6 +1243,38 @@ exports.Checker = Checker;
 
 /***/ }),
 
+/***/ "./apps/cli/src/classes/commit-scope.class.ts":
+/*!****************************************************!*\
+  !*** ./apps/cli/src/classes/commit-scope.class.ts ***!
+  \****************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.CommitScope = void 0;
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
+const fs_1 = __webpack_require__(/*! fs */ "fs");
+const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
+const base_file_ref_class_1 = __webpack_require__(/*! ./base-file-ref.class */ "./apps/cli/src/classes/base-file-ref.class.ts");
+class CommitScope extends base_file_ref_class_1.BaseFileRef {
+    get path() {
+        return untildify_1.default(node_shared_1.CONFIG.CommitScopeListFile);
+    }
+    getItems() {
+        return this.readFile().split('\n').filter(Boolean);
+    }
+    addItem(commitScope) {
+        fs_1.appendFileSync(this.path, `\n${commitScope}`);
+    }
+}
+exports.CommitScope = CommitScope;
+
+
+/***/ }),
+
 /***/ "./apps/cli/src/classes/daily-progress.class.ts":
 /*!******************************************************!*\
   !*** ./apps/cli/src/classes/daily-progress.class.ts ***!
@@ -1535,6 +1644,7 @@ exports.checkItemsMap = {
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const check_action_1 = __webpack_require__(/*! ./actions/check.action */ "./apps/cli/src/actions/check.action.ts");
+const commit_action_1 = __webpack_require__(/*! ./actions/commit.action */ "./apps/cli/src/actions/commit.action.ts");
 const copy_action_1 = __webpack_require__(/*! ./actions/copy.action */ "./apps/cli/src/actions/copy.action.ts");
 const cross_checklist_action_1 = __webpack_require__(/*! ./actions/cross-checklist.action */ "./apps/cli/src/actions/cross-checklist.action.ts");
 const dump_my_tasks_action_1 = __webpack_require__(/*! ./actions/dump-my-tasks.action */ "./apps/cli/src/actions/dump-my-tasks.action.ts");
@@ -1571,6 +1681,7 @@ const actions = {
     time: time_action_1.timeAction,
     fetchHoliday: fetch_holiday_action_1.fetchHolidayAction,
     watchPipeline: watch_pipeline_action_1.watchPipelineAction,
+    commit: commit_action_1.commitAction,
     test: () => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
         console.log('test');
     }),
@@ -2191,6 +2302,7 @@ function getConfig() {
         'WorkNoteFile',
         'MySummarizedTasksFile',
         'HolidayFile',
+        'CommitScopeListFile',
     ];
     filePathKeys.forEach((key) => {
         config[key] = untildify_1.default(config[key]);
@@ -2663,6 +2775,17 @@ module.exports = require("fs");
 
 /***/ }),
 
+/***/ "fuzzy":
+/*!************************!*\
+  !*** external "fuzzy" ***!
+  \************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("fuzzy");
+
+/***/ }),
+
 /***/ "inquirer":
 /*!***************************!*\
   !*** external "inquirer" ***!
@@ -2671,6 +2794,17 @@ module.exports = require("fs");
 /***/ (function(module, exports) {
 
 module.exports = require("inquirer");
+
+/***/ }),
+
+/***/ "inquirer-autocomplete-prompt":
+/*!***********************************************!*\
+  !*** external "inquirer-autocomplete-prompt" ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("inquirer-autocomplete-prompt");
 
 /***/ }),
 

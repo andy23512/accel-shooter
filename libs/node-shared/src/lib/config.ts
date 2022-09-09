@@ -29,6 +29,7 @@ export function getConfig(): Config {
     'WorkNoteFile',
     'MySummarizedTasksFile',
     'HolidayFile',
+    'CommitScopeListFile',
   ] as const;
   filePathKeys.forEach((key) => {
     config[key] = untildify(config[key]);

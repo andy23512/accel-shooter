@@ -35,6 +35,7 @@ export interface Config {
   WorkNoteFile: string;
   MySummarizedTasksFile: string;
   HolidayFile: string;
+  CommitScopeListFile: string;
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];
 export interface NormalizedChecklistItem {

@@ -1,4 +1,5 @@
 import { checkAction } from './actions/check.action';
+import { commitAction } from './actions/commit.action';
 import { copyAction } from './actions/copy.action';
 import { crossChecklistAction } from './actions/cross-checklist.action';
 import { dumpMyTasksAction } from './actions/dump-my-tasks.action';
@@ -36,6 +37,7 @@ const actions: { [key: string]: () => Promise<void> } = {
   time: timeAction,
   fetchHoliday: fetchHolidayAction,
   watchPipeline: watchPipelineAction,
+  commit: commitAction,
   test: async () => {
     console.log('test');
   },
