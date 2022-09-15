@@ -53,7 +53,10 @@ export async function commitAction() {
   if (!commitScopeItems.includes(scope)) {
     commitScope.addItem(scope);
   }
-  const message = `${type}${scope ? '(' + scope + ')' : ''}: ${subject}`;
+  const finalScope = scope === 'empty' ? null : scope;
+  const message = `${type}${
+    finalScope ? '(' + finalScope + ')' : ''
+  }: ${subject}`;
   const { stdout, stderr } = await promiseSpawn(
     'git',
     ['commit', '-m', `"${message}"`],

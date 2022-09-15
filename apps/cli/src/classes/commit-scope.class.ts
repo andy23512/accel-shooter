@@ -9,7 +9,9 @@ export class CommitScope extends BaseFileRef {
   }
 
   public getItems() {
-    return this.readFile().split('\n').filter(Boolean);
+    const items = this.readFile().split('\n').filter(Boolean);
+    items.unshift('empty');
+    return items;
   }
 
   public addItem(commitScope: string) {

@@ -197,7 +197,8 @@ function commitAction() {
         if (!commitScopeItems.includes(scope)) {
             commitScope.addItem(scope);
         }
-        const message = `${type}${scope ? '(' + scope + ')' : ''}: ${subject}`;
+        const finalScope = scope === 'empty' ? null : scope;
+        const message = `${type}${finalScope ? '(' + finalScope + ')' : ''}: ${subject}`;
         const { stdout, stderr } = yield utils_1.promiseSpawn('git', ['commit', '-m', `"${message}"`], 'pipe');
         if (stderr) {
             console.error(stderr);
@@ -1264,7 +1265,9 @@ class CommitScope extends base_file_ref_class_1.BaseFileRef {
         return untildify_1.default(node_shared_1.CONFIG.CommitScopeListFile);
     }
     getItems() {
-        return this.readFile().split('\n').filter(Boolean);
+        const items = this.readFile().split('\n').filter(Boolean);
+        items.unshift('empty');
+        return items;
     }
     addItem(commitScope) {
         fs_1.appendFileSync(this.path, `\n${commitScope}`);
