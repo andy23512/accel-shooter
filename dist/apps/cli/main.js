@@ -199,13 +199,7 @@ function commitAction() {
         }
         const finalScope = scope === 'empty' ? null : scope;
         const message = `${type}${finalScope ? '(' + finalScope + ')' : ''}: ${subject}`;
-        const { stdout, stderr } = yield utils_1.promiseSpawn('git', ['commit', '-m', `"${message}"`], 'pipe');
-        if (stderr) {
-            console.error(stderr);
-        }
-        if (stdout) {
-            console.log(stdout);
-        }
+        yield utils_1.promiseSpawn('git', ['commit', '-m', `"${message}"`], 'inherit');
     });
 }
 exports.commitAction = commitAction;

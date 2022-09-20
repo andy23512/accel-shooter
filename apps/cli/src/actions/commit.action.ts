@@ -57,15 +57,5 @@ export async function commitAction() {
   const message = `${type}${
     finalScope ? '(' + finalScope + ')' : ''
   }: ${subject}`;
-  const { stdout, stderr } = await promiseSpawn(
-    'git',
-    ['commit', '-m', `"${message}"`],
-    'pipe'
-  );
-  if (stderr) {
-    console.error(stderr);
-  }
-  if (stdout) {
-    console.log(stdout);
-  }
+  await promiseSpawn('git', ['commit', '-m', `"${message}"`], 'inherit');
 }
