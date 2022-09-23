@@ -1,14 +1,5 @@
 <ngx-codemirror
   [ngModel]="content"
-  [options]="{
-    lineNumbers: true,
-    theme: 'one-dark',
-    mode: 'gfm',
-    tabSize: 2,
-    indentWithTabs: false,
-    keyMap: 'vim',
-    lineWrapping: lineWrapping,
-    extraKeys: { Enter: 'newlineAndIndentContinueMarkdownList' }
-  }"
+  [options]="option"
   (ngModelChange)="contentChange.emit($event)"
 ></ngx-codemirror>

@@ -150,11 +150,11 @@ borrow some color from tomorrow-night-eighties
   box-shadow: 0px 0px 6px rgba(66, 133, 244, 0.8);
 }
 .cm-s-one-dark .CodeMirror-cursor {
-  border-left: 2px solid #528bff !important;
+  border-left: 2px solid #fff !important;
 }
 .cm-fat-cursor .CodeMirror-cursor {
-  border-left: 2px solid #3c5b9e !important;
-  background: #3c5b9e;
+  border-left: 2px solid #fff !important;
+  background: #fff;
 }
 .cm-s-one-dark .CodeMirror-gutters {
   /*  background-color: #282c34;*/
