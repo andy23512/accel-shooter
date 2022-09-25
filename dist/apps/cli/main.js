@@ -147,6 +147,7 @@ exports.checkAction = checkAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.commitAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const child_process_1 = __webpack_require__(/*! child_process */ "child_process");
 const fuzzy_1 = tslib_1.__importDefault(__webpack_require__(/*! fuzzy */ "fuzzy"));
 const inquirer_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer */ "inquirer"));
 const inquirer_autocomplete_prompt_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer-autocomplete-prompt */ "inquirer-autocomplete-prompt"));
@@ -167,9 +168,12 @@ const TYPES = [
 ];
 function commitAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const repoName = child_process_1.execSync('basename -s .git `git config --get remote.origin.url`')
+            .toString()
+            .trim();
         inquirer_1.default.registerPrompt('autocomplete', inquirer_autocomplete_prompt_1.default);
         const commitScope = new commit_scope_class_1.CommitScope();
-        const commitScopeItems = commitScope.getItems();
+        const commitScopeItems = commitScope.getItems(repoName);
         const answers = yield inquirer_1.default.prompt([
             {
                 name: 'type',
@@ -194,9 +198,6 @@ function commitAction() {
             },
         ]);
         const { type, scope, subject } = answers;
-        if (!commitScopeItems.includes(scope)) {
-            commitScope.addItem(scope);
-        }
         const finalScope = scope === 'empty' ? null : scope;
         const message = `${type}${finalScope ? '(' + finalScope + ')' : ''}: ${subject}`;
         yield utils_1.promiseSpawn('git', ['commit', '-m', `"${message}"`], 'inherit');
@@ -1251,20 +1252,18 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CommitScope = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
-const fs_1 = __webpack_require__(/*! fs */ "fs");
+const js_yaml_1 = tslib_1.__importDefault(__webpack_require__(/*! js-yaml */ "js-yaml"));
 const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
 const base_file_ref_class_1 = __webpack_require__(/*! ./base-file-ref.class */ "./apps/cli/src/classes/base-file-ref.class.ts");
 class CommitScope extends base_file_ref_class_1.BaseFileRef {
     get path() {
-        return untildify_1.default(node_shared_1.CONFIG.CommitScopeListFile);
+        return untildify_1.default(node_shared_1.CONFIG.CommitScopeFile);
     }
-    getItems() {
-        const items = this.readFile().split('\n').filter(Boolean);
+    getItems(repoName) {
+        const commitScopeDict = js_yaml_1.default.load(this.readFile());
+        const items = commitScopeDict[repoName] || [];
         items.unshift('empty');
         return items;
-    }
-    addItem(commitScope) {
-        fs_1.appendFileSync(this.path, `\n${commitScope}`);
     }
 }
 exports.CommitScope = CommitScope;
@@ -2299,7 +2298,7 @@ function getConfig() {
         'WorkNoteFile',
         'MySummarizedTasksFile',
         'HolidayFile',
-        'CommitScopeListFile',
+        'CommitScopeFile',
     ];
     filePathKeys.forEach((key) => {
         config[key] = untildify_1.default(config[key]);
@@ -2813,6 +2812,17 @@ module.exports = require("inquirer-autocomplete-prompt");
 /***/ (function(module, exports) {
 
 module.exports = require("instance-locker");
+
+/***/ }),
+
+/***/ "js-yaml":
+/*!**************************!*\
+  !*** external "js-yaml" ***!
+  \**************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("js-yaml");
 
 /***/ }),
 

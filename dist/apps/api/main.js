@@ -836,7 +836,7 @@ function getConfig() {
         'WorkNoteFile',
         'MySummarizedTasksFile',
         'HolidayFile',
-        'CommitScopeListFile',
+        'CommitScopeFile',
     ];
     filePathKeys.forEach((key) => {
         config[key] = untildify_1.default(config[key]);

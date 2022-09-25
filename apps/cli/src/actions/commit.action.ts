@@ -1,3 +1,4 @@
+import { execSync } from 'child_process';
 import fuzzy from 'fuzzy';
 import inquirer from 'inquirer';
 import inquirerAutoCompletePrompt from 'inquirer-autocomplete-prompt';
@@ -19,9 +20,14 @@ const TYPES = [
 ];
 
 export async function commitAction() {
+  const repoName = execSync(
+    'basename -s .git `git config --get remote.origin.url`'
+  )
+    .toString()
+    .trim();
   inquirer.registerPrompt('autocomplete', inquirerAutoCompletePrompt);
   const commitScope = new CommitScope();
-  const commitScopeItems = commitScope.getItems();
+  const commitScopeItems = commitScope.getItems(repoName);
   const answers = await inquirer.prompt([
     {
       name: 'type',
@@ -50,9 +56,6 @@ export async function commitAction() {
     },
   ]);
   const { type, scope, subject } = answers;
-  if (!commitScopeItems.includes(scope)) {
-    commitScope.addItem(scope);
-  }
   const finalScope = scope === 'empty' ? null : scope;
   const message = `${type}${
     finalScope ? '(' + finalScope + ')' : ''
