@@ -168,6 +168,11 @@ const TYPES = [
 ];
 function commitAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const dryRunResult = yield utils_1.promiseSpawn('git', ['commit', '--dry-run'], 'pipe');
+        if (dryRunResult.stdout.includes('nothing to commit, working tree clean')) {
+            console.log('Nothing to commit.');
+            return;
+        }
         const repoName = child_process_1.execSync('basename -s .git `git config --get remote.origin.url`')
             .toString()
             .trim();

@@ -20,6 +20,15 @@ const TYPES = [
 ];
 
 export async function commitAction() {
+  const dryRunResult = await promiseSpawn(
+    'git',
+    ['commit', '--dry-run'],
+    'pipe'
+  );
+  if (dryRunResult.stdout.includes('nothing to commit, working tree clean')) {
+    console.log('Nothing to commit.');
+    return;
+  }
   const repoName = execSync(
     'basename -s .git `git config --get remote.origin.url`'
   )
