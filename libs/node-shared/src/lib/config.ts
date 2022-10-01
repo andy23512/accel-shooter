@@ -1,4 +1,5 @@
 import { existsSync, readFileSync } from 'fs';
+import jsYaml from 'js-yaml';
 import untildify from 'untildify';
 import { Config } from './models/models';
 
@@ -15,7 +16,7 @@ export function getConfig(): Config {
   if (!existsSync) {
     throw Error('config file does not exist');
   }
-  const config = JSON.parse(
+  const config = jsYaml.load(
     readFileSync(configPath, { encoding: 'utf-8' })
   ) as Config;
   config.GitLabProjects = config.GitLabProjects.map((p) => ({

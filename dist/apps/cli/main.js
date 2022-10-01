@@ -2292,6 +2292,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.CONFIG = exports.getConfig = exports.getConfigPath = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const fs_1 = __webpack_require__(/*! fs */ "fs");
+const js_yaml_1 = tslib_1.__importDefault(__webpack_require__(/*! js-yaml */ "js-yaml"));
 const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
 function getConfigPath() {
     if (process.env.ACCEL_SHOOTER_CONFIG_FILE) {
@@ -2307,7 +2308,7 @@ function getConfig() {
     if (!fs_1.existsSync) {
         throw Error('config file does not exist');
     }
-    const config = JSON.parse(fs_1.readFileSync(configPath, { encoding: 'utf-8' }));
+    const config = js_yaml_1.default.load(fs_1.readFileSync(configPath, { encoding: 'utf-8' }));
     config.GitLabProjects = config.GitLabProjects.map((p) => (Object.assign(Object.assign({}, p), { path: untildify_1.default(p.path) })));
     const filePathKeys = [
         'TaskTodoFolder',
