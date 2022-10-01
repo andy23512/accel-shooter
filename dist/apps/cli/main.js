@@ -648,6 +648,13 @@ function startAction() {
                         console.log('\nTask is not assigned to you. Aborted.');
                         process.exit();
                     }
+                    if (answers.gitLabProject.clickUpSpaces) {
+                        const spaceName = (yield node_shared_1.ClickUp.getSpace(task.space.id)).name;
+                        if (!answers.gitLabProject.clickUpSpaces.includes(spaceName)) {
+                            console.log('\nTask is not in spaces of project. Aborted.');
+                            process.exit();
+                        }
+                    }
                     let result = task.name;
                     while (task.parent) {
                         task = yield new node_shared_1.ClickUp(task.parent).getTask();

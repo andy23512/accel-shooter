@@ -15,6 +15,7 @@ export interface GitLabProject {
   checkItems?: ProjectCheckItem[];
   projectType: 'full' | 'frontend' | 'other';
   hasMergeRequestTemplate?: boolean;
+  clickUpSpaces?: string[];
 }
 export interface Config {
   ClickUpToken: string;

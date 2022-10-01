@@ -1,4 +1,10 @@
-import { ClickUp, CONFIG, GitLab, sleep } from '@accel-shooter/node-shared';
+import {
+  ClickUp,
+  CONFIG,
+  GitLab,
+  GitLabProject,
+  sleep,
+} from '@accel-shooter/node-shared';
 import { readFileSync, writeFileSync } from 'fs';
 import inquirer from 'inquirer';
 import { render } from 'mustache';
@@ -48,12 +54,22 @@ export async function startAction() {
       name: 'mergeRequestTitle',
       message: 'Enter Merge Request Title',
       type: 'input',
-      default: async (answers: { clickUpTaskId: string }) => {
+      default: async (answers: {
+        clickUpTaskId: string;
+        gitLabProject: GitLabProject;
+      }) => {
         let task = await new ClickUp(answers.clickUpTaskId).getTask();
         const user = (await ClickUp.getCurrentUser()).user;
         if (!task.assignees.find((a) => a.id === user.id)) {
           console.log('\nTask is not assigned to you. Aborted.');
           process.exit();
+        }
+        if (answers.gitLabProject.clickUpSpaces) {
+          const spaceName = (await ClickUp.getSpace(task.space.id)).name;
+          if (!answers.gitLabProject.clickUpSpaces.includes(spaceName)) {
+            console.log('\nTask is not in spaces of project. Aborted.');
+            process.exit();
+          }
         }
         let result = task.name;
         while (task.parent) {
