@@ -1,9 +1,8 @@
-import { execSync } from 'child_process';
 import fuzzy from 'fuzzy';
 import inquirer from 'inquirer';
 import inquirerAutoCompletePrompt from 'inquirer-autocomplete-prompt';
 import { CommitScope } from '../classes/commit-scope.class';
-import { promiseSpawn } from '../utils';
+import { getRepoName, promiseSpawn } from '../utils';
 
 const TYPES = [
   'feat',
@@ -29,11 +28,7 @@ export async function commitAction() {
     console.log('Nothing to commit.');
     return;
   }
-  const repoName = execSync(
-    'basename -s .git `git config --get remote.origin.url`'
-  )
-    .toString()
-    .trim();
+  const repoName = getRepoName();
   inquirer.registerPrompt('autocomplete', inquirerAutoCompletePrompt);
   const commitScope = new CommitScope();
   const commitScopeItems = commitScope.getItems(repoName);

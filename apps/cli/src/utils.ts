@@ -147,3 +147,9 @@ export function openUrlsInTabGroup(urls: string[], group: string) {
       })
   );
 }
+
+export function getRepoName() {
+  return execSync('basename -s .git `git config --get remote.origin.url`')
+    .toString()
+    .trim();
+}

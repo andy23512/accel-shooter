@@ -147,7 +147,6 @@ exports.checkAction = checkAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.commitAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const child_process_1 = __webpack_require__(/*! child_process */ "child_process");
 const fuzzy_1 = tslib_1.__importDefault(__webpack_require__(/*! fuzzy */ "fuzzy"));
 const inquirer_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer */ "inquirer"));
 const inquirer_autocomplete_prompt_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer-autocomplete-prompt */ "inquirer-autocomplete-prompt"));
@@ -173,9 +172,7 @@ function commitAction() {
             console.log('Nothing to commit.');
             return;
         }
-        const repoName = child_process_1.execSync('basename -s .git `git config --get remote.origin.url`')
-            .toString()
-            .trim();
+        const repoName = utils_1.getRepoName();
         inquirer_1.default.registerPrompt('autocomplete', inquirer_autocomplete_prompt_1.default);
         const commitScope = new commit_scope_class_1.CommitScope();
         const commitScopeItems = commitScope.getItems(repoName);
@@ -610,6 +607,8 @@ const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 const open_action_1 = __webpack_require__(/*! ./open.action */ "./apps/cli/src/actions/open.action.ts");
 function startAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const repoName = utils_1.getRepoName();
+        const index = node_shared_1.CONFIG.GitLabProjects.findIndex((p) => p.repo.endsWith(`/${repoName}`));
         const answers = yield inquirer_1.default.prompt([
             {
                 name: 'gitLabProject',
@@ -619,6 +618,7 @@ function startAction() {
                     name: `${p.name} (${p.repo})`,
                     value: p,
                 })),
+                default: index >= 0 ? index : null,
                 filter(input) {
                     return tslib_1.__awaiter(this, void 0, void 0, function* () {
                         process.chdir(input.path.replace('~', os_1.default.homedir()));
@@ -1710,7 +1710,7 @@ const actions = {
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.openUrlsInTabGroup = exports.checkWorkingTreeClean = exports.getInfoFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabMergeRequest = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = void 0;
+exports.getRepoName = exports.openUrlsInTabGroup = exports.checkWorkingTreeClean = exports.getInfoFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabMergeRequest = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const child_process_1 = tslib_1.__importStar(__webpack_require__(/*! child_process */ "child_process"));
@@ -1840,6 +1840,12 @@ function openUrlsInTabGroup(urls, group) {
         }));
 }
 exports.openUrlsInTabGroup = openUrlsInTabGroup;
+function getRepoName() {
+    return child_process_1.execSync('basename -s .git `git config --get remote.origin.url`')
+        .toString()
+        .trim();
+}
+exports.getRepoName = getRepoName;
 
 
 /***/ }),

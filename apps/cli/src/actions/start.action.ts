@@ -8,10 +8,14 @@ import untildify from 'untildify';
 import { CustomProgressLog } from '../classes/progress-log.class';
 import { Todo } from '../classes/todo.class';
 import { Tracker } from '../classes/tracker.class';
-import { checkWorkingTreeClean, promiseSpawn } from '../utils';
+import { checkWorkingTreeClean, getRepoName, promiseSpawn } from '../utils';
 import { openAction } from './open.action';
 
 export async function startAction() {
+  const repoName = getRepoName();
+  const index = CONFIG.GitLabProjects.findIndex((p) =>
+    p.repo.endsWith(`/${repoName}`)
+  );
   const answers = await inquirer.prompt([
     {
       name: 'gitLabProject',
@@ -21,6 +25,7 @@ export async function startAction() {
         name: `${p.name} (${p.repo})`,
         value: p,
       })),
+      default: index >= 0 ? index : null,
       async filter(input: any) {
         process.chdir(input.path.replace('~', os.homedir()));
         const isClean = await checkWorkingTreeClean();
