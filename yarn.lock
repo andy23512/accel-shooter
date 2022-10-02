@@ -5459,6 +5459,11 @@ cypress@^7.3.0:
     url "^0.11.0"
     yauzl "^2.10.0"
 
+darkreader@^4.9.58:
+  version "4.9.58"
+  resolved "https://registry.yarnpkg.com/darkreader/-/darkreader-4.9.58.tgz#6544d6cb51fa643dc7995d128d32b357e1650e49"
+  integrity sha512-D/JGoJqW3m2AWBLhO+Pev+eThfs+CwRT4bcLb/1zKjql2yVwG0lx8C2XRDdSVGHw4y11n26W7syWoBpUfuhMqQ==
+
 dashdash@^1.12.0:
   version "1.14.1"
   resolved "https://registry.yarnpkg.com/dashdash/-/dashdash-1.14.1.tgz#853cfa0f7cbe2fed5de20326b8dd581035f6e2f0"
