@@ -151,15 +151,19 @@ export class EditorComponent implements AfterViewInit, OnChanges {
         Vim.defineAction('checkMdCheckbox', (cm: any) => {
           if (cm.state.vim.visualMode) {
             Vim.handleEx(cm, "'<,'>s/- \\[\\s\\]/- [x]/g");
+            Vim.handleKey(cm, 'j');
           } else {
             Vim.handleEx(cm, 's/- \\[\\s\\]/- [x]/g');
+            Vim.handleKey(cm, 'j');
           }
         });
         Vim.defineAction('uncheckMdCheckbox', (cm: any) => {
           if (cm.state.vim.visualMode) {
             Vim.handleEx(cm, "'<,'>s/- \\[x\\]/- [ ]/g");
+            Vim.handleKey(cm, 'j');
           } else {
             Vim.handleEx(cm, 's/- \\[x\\]/- [ ]/g');
+            Vim.handleKey(cm, 'j');
           }
         });
         Vim.mapCommand('z', 'action', 'checkMdCheckbox');
