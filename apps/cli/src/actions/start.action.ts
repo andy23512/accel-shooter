@@ -149,7 +149,7 @@ export async function startAction() {
     await clickUp.updateChecklist(clickUpChecklist, endingTodo);
   }
   p.next(); // Add Todo Entry
-  const todoString = `- [ ] [${gitLabMergeRequestTitle}](${clickUpTaskUrl})`;
+  const todoString = await clickUp.getTaskString('todo');
   new Todo().addTodoToBuffer(todoString);
   p.next(); // Add Tracker Item
   new Tracker().addItem(answers.clickUpTaskId);

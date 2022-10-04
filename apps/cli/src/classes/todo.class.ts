@@ -17,8 +17,8 @@ export class Todo extends BaseFileRef {
   public addTodoToBuffer(todoString: string) {
     const content = this.readFile();
     const updatedTodoContent = content.replace(
-      '## Processing',
-      `${todoString}\n## Processing`
+      '## Todos',
+      `## Todos\n${todoString}`
     );
     this.writeFile(updatedTodoContent);
   }

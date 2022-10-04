@@ -721,7 +721,7 @@ function startAction() {
             yield clickUp.updateChecklist(clickUpChecklist, endingTodo);
         }
         p.next(); // Add Todo Entry
-        const todoString = `- [ ] [${gitLabMergeRequestTitle}](${clickUpTaskUrl})`;
+        const todoString = yield clickUp.getTaskString('todo');
         new todo_class_1.Todo().addTodoToBuffer(todoString);
         p.next(); // Add Tracker Item
         new tracker_class_1.Tracker().addItem(answers.clickUpTaskId);
@@ -1416,7 +1416,7 @@ class Todo extends base_file_ref_class_1.BaseFileRef {
     }
     addTodoToBuffer(todoString) {
         const content = this.readFile();
-        const updatedTodoContent = content.replace('## Processing', `${todoString}\n## Processing`);
+        const updatedTodoContent = content.replace('## Todos', `## Todos\n${todoString}`);
         this.writeFile(updatedTodoContent);
     }
 }
