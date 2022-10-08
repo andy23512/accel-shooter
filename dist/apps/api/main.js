@@ -787,6 +787,20 @@ class GitLab {
             });
         });
     }
+    fork(namespace_id, name, path) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return callApi('post', `/projects/${this.projectId}/fork`, {
+                namespace_id,
+                name,
+                path,
+            });
+        });
+    }
+    static getNamespaces() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return callApi('get', '/namespaces');
+        });
+    }
     getUserId() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const user = yield callApi('get', '/user');

@@ -38,9 +38,7 @@ const actions: { [key: string]: () => Promise<void> } = {
   fetchHoliday: fetchHolidayAction,
   watchPipeline: watchPipelineAction,
   commit: commitAction,
-  test: async () => {
-    console.log('test');
-  },
+  test: async () => {},
 };
 
 (async () => {

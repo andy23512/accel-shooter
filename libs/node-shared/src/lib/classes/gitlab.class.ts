@@ -203,6 +203,18 @@ export class GitLab {
     });
   }
 
+  public async fork(namespace_id: number, name: string, path: string) {
+    return callApi('post', `/projects/${this.projectId}/fork`, {
+      namespace_id,
+      name,
+      path,
+    });
+  }
+
+  public static async getNamespaces() {
+    return callApi('get', '/namespaces');
+  }
+
   private async getUserId() {
     const user = await callApi<User>('get', '/user');
     return user.id;

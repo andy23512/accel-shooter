@@ -878,19 +878,19 @@ exports.toDoAction = toDoAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.trackAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const instance_locker_1 = tslib_1.__importDefault(__webpack_require__(/*! instance-locker */ "instance-locker"));
+const single_instance_lock_1 = __webpack_require__(/*! single-instance-lock */ "single-instance-lock");
 const tracker_class_1 = __webpack_require__(/*! ../classes/tracker.class */ "./apps/cli/src/classes/tracker.class.ts");
-const locker = instance_locker_1.default("accel-shooter track");
+const locker = new single_instance_lock_1.SingleInstanceLock('accel-shooter');
 function trackAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const success = yield locker.Lock();
-        if (success) {
+        locker.lock(single_instance_lock_1.LockType.First);
+        locker.on('locked', () => {
             const tracker = new tracker_class_1.Tracker();
             tracker.startSync();
-        }
-        else {
-            console.log("Lock occupied!");
-        }
+        });
+        locker.on('error', () => {
+            console.log('Lock occupied!');
+        });
     });
 }
 exports.trackAction = trackAction;
@@ -1690,9 +1690,7 @@ const actions = {
     fetchHoliday: fetch_holiday_action_1.fetchHolidayAction,
     watchPipeline: watch_pipeline_action_1.watchPipelineAction,
     commit: commit_action_1.commitAction,
-    test: () => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
-        console.log('test');
-    }),
+    test: () => tslib_1.__awaiter(void 0, void 0, void 0, function* () { }),
 };
 (() => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     const action = process.argv[2];
@@ -2267,6 +2265,20 @@ class GitLab {
             });
         });
     }
+    fork(namespace_id, name, path) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return callApi('post', `/projects/${this.projectId}/fork`, {
+                namespace_id,
+                name,
+                path,
+            });
+        });
+    }
+    static getNamespaces() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return callApi('get', '/namespaces');
+        });
+    }
     getUserId() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const user = yield callApi('get', '/user');
@@ -2823,17 +2835,6 @@ module.exports = require("inquirer-autocomplete-prompt");
 
 /***/ }),
 
-/***/ "instance-locker":
-/*!**********************************!*\
-  !*** external "instance-locker" ***!
-  \**********************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("instance-locker");
-
-/***/ }),
-
 /***/ "js-yaml":
 /*!**************************!*\
   !*** external "js-yaml" ***!
@@ -2952,6 +2953,17 @@ module.exports = require("rxjs");
 /***/ (function(module, exports) {
 
 module.exports = require("rxjs/operators");
+
+/***/ }),
+
+/***/ "single-instance-lock":
+/*!***************************************!*\
+  !*** external "single-instance-lock" ***!
+  \***************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("single-instance-lock");
 
 /***/ }),
 
