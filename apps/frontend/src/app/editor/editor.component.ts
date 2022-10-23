@@ -1,21 +1,15 @@
+import { EditorConfiguration } from 'codemirror';
+import { fromEvent, interval } from 'rxjs';
+import { filter, map, take } from 'rxjs/operators';
+
 import { Clipboard } from '@angular/cdk/clipboard';
 import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  EventEmitter,
-  Input,
-  OnChanges,
-  Output,
-  SimpleChanges,
-  ViewChild,
+    AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges,
+    ViewChild
 } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
-import { EditorConfiguration } from 'codemirror';
-import { interval } from 'rxjs';
-import { filter, map, take } from 'rxjs/operators';
 
 @Component({
   selector: 'accel-shooter-editor',
@@ -172,6 +166,13 @@ export class EditorComponent implements AfterViewInit, OnChanges {
           this.save.next();
         });
       });
+    fromEvent(this.elementRef.nativeElement, 'mouseup').subscribe(() => {
+      const codeMirror = this.codemirrorComponent?.codeMirror;
+      const selectedText = codeMirror?.getSelection();
+      if (selectedText) {
+        this.clipboard.copy(selectedText);
+      }
+    });
   }
 
   public getTaskLink(id: string) {
