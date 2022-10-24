@@ -1,11 +1,10 @@
-import clipboardy from "clipboardy";
-import { getInfoFromArgv } from "../utils";
+import clipboardy from 'clipboardy';
+
+import { getInfoFromArgv } from '../utils';
 
 export async function copyAction() {
   const { clickUp } = await getInfoFromArgv(true);
-  const task = await clickUp.getTask();
-  const name = await clickUp.getFullTaskName();
-  const string = `- [ ] [${name}](${task.url})`;
+  const string = await clickUp.getTaskString('todo');
   clipboardy.writeSync(string);
-  console.log("Copied!");
+  console.log('Copied!');
 }

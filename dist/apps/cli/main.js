@@ -227,11 +227,9 @@ const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
 function copyAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const { clickUp } = yield utils_1.getInfoFromArgv(true);
-        const task = yield clickUp.getTask();
-        const name = yield clickUp.getFullTaskName();
-        const string = `- [ ] [${name}](${task.url})`;
+        const string = yield clickUp.getTaskString('todo');
         clipboardy_1.default.writeSync(string);
-        console.log("Copied!");
+        console.log('Copied!');
     });
 }
 exports.copyAction = copyAction;
