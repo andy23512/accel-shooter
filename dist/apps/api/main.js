@@ -761,6 +761,13 @@ class GitLab {
             });
         });
     }
+    closeMergeRequest(merge_request) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
+                state_event: 'close',
+            });
+        });
+    }
     markMergeRequestAsUnreadyAndSetAssigneeToSelf(merge_request) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {

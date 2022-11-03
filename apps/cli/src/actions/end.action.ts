@@ -1,4 +1,5 @@
 import { normalizeClickUpChecklist } from '@accel-shooter/node-shared';
+
 import { CustomProgressLog } from '../classes/progress-log.class';
 import { Todo } from '../classes/todo.class';
 import { getInfoFromArgv, openUrlsInTabGroup } from '../utils';
@@ -35,18 +36,6 @@ export async function endAction() {
   openUrlsInTabGroup([], clickUpTaskId);
   p.next(); // Remove Todo
   const todo = new Todo();
-  const todoContent = todo.readFile();
-  const matchResult = todoContent.match(/## Todos\n([\s\S]+)## Processing/);
-  if (matchResult) {
-    const todoList = matchResult[1].split('\n');
-    const newTodoList = todoList.filter((t) => t && !t.includes(clickUpTaskId));
-    const newTodoContent = todoContent.replace(
-      matchResult[1],
-      newTodoList.map((str) => str + '\n').join('')
-    );
-    todo.writeFile(newTodoContent);
-  } else {
-    throw Error('Todo File Broken');
-  }
+  todo.removeTodo(clickUpTaskId);
   p.end(0);
 }

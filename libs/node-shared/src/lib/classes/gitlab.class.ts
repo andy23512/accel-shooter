@@ -2,14 +2,11 @@ import { CONFIG } from '../config';
 import { Branch, MergeRequest, Project, User } from '../models/gitlab.models';
 import { Commit } from '../models/gitlab/commit.models';
 import { Compare } from '../models/gitlab/compare.models';
+import { Event } from '../models/gitlab/event.models';
 import { Job } from '../models/gitlab/job.models';
-import {
-  FullMergeRequest,
-  MergeRequestChanges,
-} from '../models/gitlab/merge-request.models';
+import { FullMergeRequest, MergeRequestChanges } from '../models/gitlab/merge-request.models';
 import { Pipeline } from '../models/gitlab/pipeline.models';
 import { callApiFactory } from '../utils/api.utils';
-import { Event } from './../models/gitlab/event.models';
 
 const callApi = callApiFactory('GitLab');
 
@@ -162,6 +159,17 @@ export class GitLab {
       {
         title: merge_request.title.replace('WIP: ', '').replace('Draft: ', ''),
         assignee_id: assignee.id,
+      }
+    );
+  }
+
+  public async closeMergeRequest(merge_request: FullMergeRequest) {
+    await callApi(
+      'put',
+      `/projects/${this.projectId}/merge_requests/${merge_request.iid}`,
+      null,
+      {
+        state_event: 'close',
       }
     );
   }

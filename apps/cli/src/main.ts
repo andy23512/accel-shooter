@@ -1,4 +1,9 @@
+import fs from 'fs/promises';
+
+import { ClickUp, GitLab } from '@accel-shooter/node-shared';
+
 import { checkAction } from './actions/check.action';
+import { closeAction } from './actions/close.action';
 import { commitAction } from './actions/commit.action';
 import { copyAction } from './actions/copy.action';
 import { crossChecklistAction } from './actions/cross-checklist.action';
@@ -38,7 +43,35 @@ const actions: { [key: string]: () => Promise<void> } = {
   fetchHoliday: fetchHolidayAction,
   watchPipeline: watchPipelineAction,
   commit: commitAction,
-  test: async () => {},
+  close: closeAction,
+  test: async () => {
+    const itemListJson = await fs.readFile('./dp-analysis', 'utf-8');
+    const itemList = JSON.parse(itemListJson);
+    const outputItem: any[] = [];
+    for (const item of itemList) {
+      const taskId = item.url.match(/https:\/\/app.clickup.com\/t\/(\w+)/)[1];
+      const clickUp = new ClickUp(taskId);
+      const task = await clickUp.getTask();
+      const spaceName = (await ClickUp.getSpace(task.space.id)).name;
+      const gitLabInfo = await clickUp.getGitLabProjectAndMergeRequestIId();
+      let mergeRequestLink = null;
+      if (gitLabInfo) {
+        const { gitLabProject, mergeRequestIId } = gitLabInfo;
+        const gitLab = new GitLab(gitLabProject.id);
+        const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
+        mergeRequestLink = mergeRequest.web_url;
+      }
+      outputItem.push({
+        ...item,
+        spaceName,
+        mergeRequestLink,
+      });
+    }
+    await fs.writeFile(
+      './output-final.json',
+      JSON.stringify(outputItem, null, 2)
+    );
+  },
 };
 
 (async () => {

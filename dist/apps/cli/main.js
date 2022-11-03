@@ -135,6 +135,47 @@ exports.checkAction = checkAction;
 
 /***/ }),
 
+/***/ "./apps/cli/src/actions/close.action.ts":
+/*!**********************************************!*\
+  !*** ./apps/cli/src/actions/close.action.ts ***!
+  \**********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.closeAction = void 0;
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const progress_log_class_1 = __webpack_require__(/*! ../classes/progress-log.class */ "./apps/cli/src/classes/progress-log.class.ts");
+const todo_class_1 = __webpack_require__(/*! ../classes/todo.class */ "./apps/cli/src/classes/todo.class.ts");
+const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+function closeAction() {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const { gitLab, mergeRequest, clickUp, clickUpTaskId } = yield utils_1.getInfoFromArgv();
+        const p = new progress_log_class_1.CustomProgressLog('Close', [
+            'Close GitLab Merge Request',
+            'Update ClickUp Task Status',
+            'Close Tab Group',
+            'Remove Todo',
+        ]);
+        p.next(); // Close GitLab Merge Request
+        yield gitLab.closeMergeRequest(mergeRequest);
+        p.next(); // Update ClickUp Task Status
+        yield clickUp.setTaskStatus('suspended');
+        p.next(); // Close Tab Group
+        utils_1.openUrlsInTabGroup([], clickUpTaskId);
+        p.next(); // Remove Todo
+        const todo = new todo_class_1.Todo();
+        todo.removeTodo(clickUpTaskId);
+        p.end(0);
+    });
+}
+exports.closeAction = closeAction;
+
+
+/***/ }),
+
 /***/ "./apps/cli/src/actions/commit.action.ts":
 /*!***********************************************!*\
   !*** ./apps/cli/src/actions/commit.action.ts ***!
@@ -364,17 +405,7 @@ function endAction() {
         utils_1.openUrlsInTabGroup([], clickUpTaskId);
         p.next(); // Remove Todo
         const todo = new todo_class_1.Todo();
-        const todoContent = todo.readFile();
-        const matchResult = todoContent.match(/## Todos\n([\s\S]+)## Processing/);
-        if (matchResult) {
-            const todoList = matchResult[1].split('\n');
-            const newTodoList = todoList.filter((t) => t && !t.includes(clickUpTaskId));
-            const newTodoContent = todoContent.replace(matchResult[1], newTodoList.map((str) => str + '\n').join(''));
-            todo.writeFile(newTodoContent);
-        }
-        else {
-            throw Error('Todo File Broken');
-        }
+        todo.removeTodo(clickUpTaskId);
         p.end(0);
     });
 }
@@ -1397,10 +1428,10 @@ exports.CustomProgressLog = CustomProgressLog;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Todo = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const fs_1 = __webpack_require__(/*! fs */ "fs");
 const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
 const uuid_1 = __webpack_require__(/*! uuid */ "uuid");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const base_file_ref_class_1 = __webpack_require__(/*! ./base-file-ref.class */ "./apps/cli/src/classes/base-file-ref.class.ts");
 class Todo extends base_file_ref_class_1.BaseFileRef {
     get path() {
@@ -1414,6 +1445,19 @@ class Todo extends base_file_ref_class_1.BaseFileRef {
         const content = this.readFile();
         const updatedTodoContent = content.replace('## Todos', `## Todos\n${todoString}`);
         this.writeFile(updatedTodoContent);
+    }
+    removeTodo(clickUpTaskId) {
+        const todoContent = this.readFile();
+        const matchResult = todoContent.match(/## Todos\n([\s\S]+)## Processing/);
+        if (matchResult) {
+            const todoList = matchResult[1].split('\n');
+            const newTodoList = todoList.filter((t) => t && !t.includes(clickUpTaskId));
+            const newTodoContent = todoContent.replace(matchResult[1], newTodoList.map((str) => str + '\n').join(''));
+            this.writeFile(newTodoContent);
+        }
+        else {
+            throw Error('Todo File Broken');
+        }
     }
 }
 exports.Todo = Todo;
@@ -1647,7 +1691,10 @@ exports.checkItemsMap = {
 
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const promises_1 = tslib_1.__importDefault(__webpack_require__(/*! fs/promises */ "fs/promises"));
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const check_action_1 = __webpack_require__(/*! ./actions/check.action */ "./apps/cli/src/actions/check.action.ts");
+const close_action_1 = __webpack_require__(/*! ./actions/close.action */ "./apps/cli/src/actions/close.action.ts");
 const commit_action_1 = __webpack_require__(/*! ./actions/commit.action */ "./apps/cli/src/actions/commit.action.ts");
 const copy_action_1 = __webpack_require__(/*! ./actions/copy.action */ "./apps/cli/src/actions/copy.action.ts");
 const cross_checklist_action_1 = __webpack_require__(/*! ./actions/cross-checklist.action */ "./apps/cli/src/actions/cross-checklist.action.ts");
@@ -1686,7 +1733,29 @@ const actions = {
     fetchHoliday: fetch_holiday_action_1.fetchHolidayAction,
     watchPipeline: watch_pipeline_action_1.watchPipelineAction,
     commit: commit_action_1.commitAction,
-    test: () => tslib_1.__awaiter(void 0, void 0, void 0, function* () { }),
+    close: close_action_1.closeAction,
+    test: () => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
+        const itemListJson = yield promises_1.default.readFile('./dp-analysis', 'utf-8');
+        const itemList = JSON.parse(itemListJson);
+        const outputItem = [];
+        for (const item of itemList) {
+            const taskId = item.url.match(/https:\/\/app.clickup.com\/t\/(\w+)/)[1];
+            const clickUp = new node_shared_1.ClickUp(taskId);
+            const task = yield clickUp.getTask();
+            const spaceName = (yield node_shared_1.ClickUp.getSpace(task.space.id)).name;
+            const gitLabInfo = yield clickUp.getGitLabProjectAndMergeRequestIId();
+            let mergeRequestLink = null;
+            if (gitLabInfo) {
+                const { gitLabProject, mergeRequestIId } = gitLabInfo;
+                const gitLab = new node_shared_1.GitLab(gitLabProject.id);
+                const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
+                mergeRequestLink = mergeRequest.web_url;
+            }
+            outputItem.push(Object.assign(Object.assign({}, item), { spaceName,
+                mergeRequestLink }));
+        }
+        yield promises_1.default.writeFile('./output-final.json', JSON.stringify(outputItem, null, 2));
+    }),
 };
 (() => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     const action = process.argv[2];
@@ -2232,6 +2301,13 @@ class GitLab {
             yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
                 title: merge_request.title.replace('WIP: ', '').replace('Draft: ', ''),
                 assignee_id: assignee.id,
+            });
+        });
+    }
+    closeMergeRequest(merge_request) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
+                state_event: 'close',
             });
         });
     }
@@ -2795,6 +2871,17 @@ module.exports = require("date-fns");
 /***/ (function(module, exports) {
 
 module.exports = require("fs");
+
+/***/ }),
+
+/***/ "fs/promises":
+/*!******************************!*\
+  !*** external "fs/promises" ***!
+  \******************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("fs/promises");
 
 /***/ }),
 
