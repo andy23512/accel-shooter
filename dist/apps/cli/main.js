@@ -407,6 +407,7 @@ function endAction() {
         const todo = new todo_class_1.Todo();
         todo.removeTodo(clickUpTaskId);
         p.end(0);
+        console.log('Merge Request URL: ' + mergeRequest.web_url);
     });
 }
 exports.endAction = endAction;

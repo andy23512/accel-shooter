@@ -38,4 +38,5 @@ export async function endAction() {
   const todo = new Todo();
   todo.removeTodo(clickUpTaskId);
   p.end(0);
+  console.log('Merge Request URL: ' + mergeRequest.web_url);
 }
