@@ -1,8 +1,9 @@
 import fuzzy from 'fuzzy';
 import inquirer from 'inquirer';
 import inquirerAutoCompletePrompt from 'inquirer-autocomplete-prompt';
+
 import { CommitScope } from '../classes/commit-scope.class';
-import { getRepoName, promiseSpawn } from '../utils';
+import { getInfoFromArgv, getRepoName, promiseSpawn } from '../utils';
 
 const TYPES = [
   'feat',
@@ -19,6 +20,14 @@ const TYPES = [
 ];
 
 export async function commitAction() {
+  const { mergeRequest } = await getInfoFromArgv(false, true);
+  if (mergeRequest) {
+    const title = mergeRequest.title;
+    if (!(title.startsWith('WIP: ') || title.startsWith('Draft: '))) {
+      console.log('Merge request is ready. Cannot commit.');
+      return;
+    }
+  }
   const dryRunResult = await promiseSpawn(
     'git',
     ['commit', '--dry-run'],

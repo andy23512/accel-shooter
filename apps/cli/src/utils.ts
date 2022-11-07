@@ -1,13 +1,8 @@
-import {
-  ClickUp,
-  CONFIG,
-  FullMergeRequest,
-  GitLab,
-  titleCase,
-} from '@accel-shooter/node-shared';
 import childProcess, { execSync, StdioOptions } from 'child_process';
 import open from 'open';
 import qs from 'qs';
+
+import { ClickUp, CONFIG, FullMergeRequest, GitLab, titleCase } from '@accel-shooter/node-shared';
 
 export async function promiseSpawn(
   command: string,
@@ -92,7 +87,10 @@ export async function updateTaskStatusInDp(dp: string) {
   return resultDp;
 }
 
-export async function getInfoFromArgv(clickUpOnly?: boolean) {
+export async function getInfoFromArgv(
+  clickUpOnly?: boolean,
+  allowEmptyInfo?: boolean
+) {
   let clickUpTaskId = null;
   if (process.argv.length === 3) {
     const branchName = execSync('git branch --show-current', {
@@ -100,6 +98,17 @@ export async function getInfoFromArgv(clickUpOnly?: boolean) {
     });
     const match = branchName.match(/CU-([a-z0-9]+)/);
     if (!match) {
+      if (allowEmptyInfo) {
+        return {
+          gitLab: null,
+          gitLabProject: null,
+          mergeRequestIId: null,
+          mergeRequest: null,
+          clickUp: null,
+          clickUpTaskId: null,
+          clickUpTask: null,
+        };
+      }
       throw Error('Cannot get task number from branch');
     }
     clickUpTaskId = match[1];

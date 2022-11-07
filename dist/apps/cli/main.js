@@ -208,6 +208,14 @@ const TYPES = [
 ];
 function commitAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const { mergeRequest } = yield utils_1.getInfoFromArgv(false, true);
+        if (mergeRequest) {
+            const title = mergeRequest.title;
+            if (!(title.startsWith('WIP: ') || title.startsWith('Draft: '))) {
+                console.log('Merge request is ready. Cannot commit.');
+                return;
+            }
+        }
         const dryRunResult = yield utils_1.promiseSpawn('git', ['commit', '--dry-run'], 'pipe');
         if (dryRunResult.stdout.includes('nothing to commit, working tree clean')) {
             console.log('Nothing to commit.');
@@ -1783,10 +1791,10 @@ const actions = {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getRepoName = exports.openUrlsInTabGroup = exports.checkWorkingTreeClean = exports.getInfoFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabMergeRequest = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const child_process_1 = tslib_1.__importStar(__webpack_require__(/*! child_process */ "child_process"));
 const open_1 = tslib_1.__importDefault(__webpack_require__(/*! open */ "open"));
 const qs_1 = tslib_1.__importDefault(__webpack_require__(/*! qs */ "qs"));
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 function promiseSpawn(command, args, stdio = 'inherit') {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
@@ -1854,7 +1862,7 @@ function updateTaskStatusInDp(dp) {
     });
 }
 exports.updateTaskStatusInDp = updateTaskStatusInDp;
-function getInfoFromArgv(clickUpOnly) {
+function getInfoFromArgv(clickUpOnly, allowEmptyInfo) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         let clickUpTaskId = null;
         if (process.argv.length === 3) {
@@ -1863,6 +1871,17 @@ function getInfoFromArgv(clickUpOnly) {
             });
             const match = branchName.match(/CU-([a-z0-9]+)/);
             if (!match) {
+                if (allowEmptyInfo) {
+                    return {
+                        gitLab: null,
+                        gitLabProject: null,
+                        mergeRequestIId: null,
+                        mergeRequest: null,
+                        clickUp: null,
+                        clickUpTaskId: null,
+                        clickUpTask: null,
+                    };
+                }
                 throw Error('Cannot get task number from branch');
             }
             clickUpTaskId = match[1];
