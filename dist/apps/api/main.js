@@ -794,6 +794,17 @@ class GitLab {
             });
         });
     }
+    static getApprovedEvents(after, before) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return callApi('get', '/events', {
+                action: 'approved',
+                before,
+                after,
+                sort: 'asc',
+                per_page: 100,
+            });
+        });
+    }
     fork(namespace_id, name, path) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return callApi('post', `/projects/${this.projectId}/fork`, {

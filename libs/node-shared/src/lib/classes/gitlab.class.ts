@@ -211,6 +211,16 @@ export class GitLab {
     });
   }
 
+  public static async getApprovedEvents(after: string, before: string) {
+    return callApi<Event[]>('get', '/events', {
+      action: 'approved',
+      before,
+      after,
+      sort: 'asc',
+      per_page: 100,
+    });
+  }
+
   public async fork(namespace_id: number, name: string, path: string) {
     return callApi('post', `/projects/${this.projectId}/fork`, {
       namespace_id,

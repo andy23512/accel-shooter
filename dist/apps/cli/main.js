@@ -948,9 +948,9 @@ exports.trackAction = trackAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const date_fns_1 = __webpack_require__(/*! date-fns */ "date-fns");
 const fs_1 = __webpack_require__(/*! fs */ "fs");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const daily_progress_class_1 = __webpack_require__(/*! ../classes/daily-progress.class */ "./apps/cli/src/classes/daily-progress.class.ts");
 const todo_class_1 = __webpack_require__(/*! ../classes/todo.class */ "./apps/cli/src/classes/todo.class.ts");
 function updateAction() {
@@ -1016,6 +1016,17 @@ function updateAction() {
             else if (firstProcessingItem.includes('- [ ]')) {
                 result.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
                 result2.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
+            }
+        }
+        const approvedEvents = yield node_shared_1.GitLab.getApprovedEvents(after, before);
+        if (approvedEvents.length > 0) {
+            result.push('    * Review');
+            for (const approvedEvent of approvedEvents) {
+                const projectId = approvedEvent.project_id;
+                const mergeRequestIId = approvedEvent.target_iid;
+                const gitLab = new node_shared_1.GitLab(projectId.toString());
+                const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
+                result.push(`        * [${mergeRequest.title}](${mergeRequest.web_url})`);
             }
         }
         result = [...new Set(result)];
@@ -2350,6 +2361,17 @@ class GitLab {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return callApi('get', '/events', {
                 action: 'pushed',
+                before,
+                after,
+                sort: 'asc',
+                per_page: 100,
+            });
+        });
+    }
+    static getApprovedEvents(after, before) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return callApi('get', '/events', {
+                action: 'approved',
                 before,
                 after,
                 sort: 'asc',

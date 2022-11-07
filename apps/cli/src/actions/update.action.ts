@@ -1,12 +1,10 @@
-import {
-  ClickUp,
-  CONFIG,
-  getTaskIdFromBranchName,
-  GitLab,
-  IHoliday,
-} from '@accel-shooter/node-shared';
 import { add, format, parse } from 'date-fns';
 import { readFileSync } from 'fs';
+
+import {
+    ClickUp, CONFIG, getTaskIdFromBranchName, GitLab, IHoliday
+} from '@accel-shooter/node-shared';
+
 import { DailyProgress } from '../classes/daily-progress.class';
 import { Todo } from '../classes/todo.class';
 
@@ -76,6 +74,17 @@ export async function updateAction() {
     } else if (firstProcessingItem.includes('- [ ]')) {
       result.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
       result2.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
+    }
+  }
+  const approvedEvents = await GitLab.getApprovedEvents(after, before);
+  if (approvedEvents.length > 0) {
+    result.push('    * Review');
+    for (const approvedEvent of approvedEvents) {
+      const projectId = approvedEvent.project_id;
+      const mergeRequestIId = approvedEvent.target_iid;
+      const gitLab = new GitLab(projectId.toString());
+      const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
+      result.push(`        * [${mergeRequest.title}](${mergeRequest.web_url})`);
     }
   }
   result = [...new Set(result)];

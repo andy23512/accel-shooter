@@ -12,6 +12,7 @@ export interface Event {
   author_username: string;
   push_data?: Pushdata;
   note?: Note;
+  target_iid?: number;
 }
 
 interface Note {
