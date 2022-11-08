@@ -1018,6 +1018,8 @@ function updateAction() {
                 result2.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
             }
         }
+        result = [...new Set(result)];
+        result2 = [...new Set(result2)];
         const approvedEvents = yield node_shared_1.GitLab.getApprovedEvents(after, before);
         if (approvedEvents.length > 0) {
             result.push('    * Review');
@@ -1029,8 +1031,21 @@ function updateAction() {
                 result.push(`        * [${mergeRequest.title}](${mergeRequest.web_url})`);
             }
         }
-        result = [...new Set(result)];
-        result2 = [...new Set(result2)];
+        const g = new node_shared_1.Google();
+        const previousDayMeeting = yield g.listEvent(previousWorkDay.toISOString(), day.toISOString());
+        const todayMeeting = yield g.listEvent(day.toISOString(), date_fns_1.add(day, { days: 1 }).toISOString());
+        if (previousDayMeeting.length > 0) {
+            result.push('    * Meeting');
+            for (const m of previousDayMeeting) {
+                result.push(`        * ${m.summary}`);
+            }
+        }
+        if (todayMeeting.length > 0) {
+            result2.push('    * Meeting');
+            for (const m of todayMeeting) {
+                result2.push(`        * ${m.summary}`);
+            }
+        }
         const dayDp = `### ${date_fns_1.format(day, 'yyyy/MM/dd')}\n1. Previous Day\n${result.join('\n')}\n2. Today\n${result2.join('\n')}\n3. No blockers so far`;
         new daily_progress_class_1.DailyProgress().addDayProgress(dayDp);
     });
@@ -2405,6 +2420,94 @@ exports.GitLab = GitLab;
 
 /***/ }),
 
+/***/ "./libs/node-shared/src/lib/classes/google.class.ts":
+/*!**********************************************************!*\
+  !*** ./libs/node-shared/src/lib/classes/google.class.ts ***!
+  \**********************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Google = void 0;
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const fs_1 = tslib_1.__importDefault(__webpack_require__(/*! fs */ "fs"));
+const googleapis_1 = __webpack_require__(/*! googleapis */ "googleapis");
+const local_auth_1 = __webpack_require__(/*! @google-cloud/local-auth */ "@google-cloud/local-auth");
+const config_1 = __webpack_require__(/*! ../config */ "./libs/node-shared/src/lib/config.ts");
+class Google {
+    constructor() {
+        this.scopes = [
+            'https://www.googleapis.com/auth/calendar.readonly',
+        ];
+        this.tokenFile = config_1.CONFIG.GoogleTokenFile;
+        this.credentialsFile = config_1.CONFIG.GoogleCredentialsFile;
+    }
+    loadSavedCredentialsIfExist() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            try {
+                const content = yield fs_1.default.promises.readFile(this.tokenFile, 'utf-8');
+                const credentials = JSON.parse(content);
+                return googleapis_1.google.auth.fromJSON(credentials);
+            }
+            catch (err) {
+                return null;
+            }
+        });
+    }
+    saveCredentials(client) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const content = yield fs_1.default.promises.readFile(this.credentialsFile, 'utf-8');
+            const keys = JSON.parse(content);
+            const key = keys.installed || keys.web;
+            const payload = JSON.stringify({
+                type: 'authorized_user',
+                client_id: key.client_id,
+                client_secret: key.client_secret,
+                refresh_token: client.credentials.refresh_token,
+            });
+            yield fs_1.default.promises.writeFile(this.tokenFile, payload);
+        });
+    }
+    authorize() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            let client = yield this.loadSavedCredentialsIfExist();
+            if (client) {
+                return client;
+            }
+            client = (yield local_auth_1.authenticate({
+                scopes: this.scopes,
+                keyfilePath: this.credentialsFile,
+            }));
+            if (client.credentials) {
+                yield this.saveCredentials(client);
+            }
+            return client;
+        });
+    }
+    listEvent(timeMin, timeMax) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const auth = yield this.authorize();
+            const calendar = googleapis_1.google.calendar({ version: 'v3', auth });
+            const res = yield calendar.events.list({
+                calendarId: 'primary',
+                timeMin,
+                timeMax,
+                maxResults: 10,
+                singleEvents: true,
+                orderBy: 'startTime',
+            });
+            const events = res.data.items;
+            return events;
+        });
+    }
+}
+exports.Google = Google;
+
+
+/***/ }),
+
 /***/ "./libs/node-shared/src/lib/config.ts":
 /*!********************************************!*\
   !*** ./libs/node-shared/src/lib/config.ts ***!
@@ -2444,6 +2547,8 @@ function getConfig() {
         'MySummarizedTasksFile',
         'HolidayFile',
         'CommitScopeFile',
+        'GoogleTokenFile',
+        'GoogleCredentialsFile',
     ];
     filePathKeys.forEach((key) => {
         config[key] = untildify_1.default(config[key]);
@@ -2550,11 +2655,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.sleep = exports.getTaskIdFromBranchName = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.titleCase = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.IHoliday = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Task = exports.Space = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.GitLab = exports.ClickUp = void 0;
+exports.sleep = exports.getTaskIdFromBranchName = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.titleCase = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.IHoliday = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Task = exports.Space = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.Google = exports.GitLab = exports.ClickUp = void 0;
 var clickup_class_1 = __webpack_require__(/*! ./classes/clickup.class */ "./libs/node-shared/src/lib/classes/clickup.class.ts");
 Object.defineProperty(exports, "ClickUp", { enumerable: true, get: function () { return clickup_class_1.ClickUp; } });
 var gitlab_class_1 = __webpack_require__(/*! ./classes/gitlab.class */ "./libs/node-shared/src/lib/classes/gitlab.class.ts");
 Object.defineProperty(exports, "GitLab", { enumerable: true, get: function () { return gitlab_class_1.GitLab; } });
+var google_class_1 = __webpack_require__(/*! ./classes/google.class */ "./libs/node-shared/src/lib/classes/google.class.ts");
+Object.defineProperty(exports, "Google", { enumerable: true, get: function () { return google_class_1.Google; } });
 var config_1 = __webpack_require__(/*! ./config */ "./libs/node-shared/src/lib/config.ts");
 Object.defineProperty(exports, "CONFIG", { enumerable: true, get: function () { return config_1.CONFIG; } });
 Object.defineProperty(exports, "getConfig", { enumerable: true, get: function () { return config_1.getConfig; } });
@@ -2861,6 +2968,17 @@ module.exports = __webpack_require__(/*! /Users/nanoha/git/accel-shooter/apps/cl
 
 /***/ }),
 
+/***/ "@google-cloud/local-auth":
+/*!*******************************************!*\
+  !*** external "@google-cloud/local-auth" ***!
+  \*******************************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("@google-cloud/local-auth");
+
+/***/ }),
+
 /***/ "child_process":
 /*!********************************!*\
   !*** external "child_process" ***!
@@ -2935,6 +3053,17 @@ module.exports = require("fs/promises");
 /***/ (function(module, exports) {
 
 module.exports = require("fuzzy");
+
+/***/ }),
+
+/***/ "googleapis":
+/*!*****************************!*\
+  !*** external "googleapis" ***!
+  \*****************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("googleapis");
 
 /***/ }),
 

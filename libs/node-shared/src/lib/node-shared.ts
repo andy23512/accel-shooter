@@ -1,5 +1,6 @@
 export { ClickUp } from './classes/clickup.class';
 export { GitLab } from './classes/gitlab.class';
+export { Google } from './classes/google.class';
 export { CONFIG, getConfig } from './config';
 export { ChecklistItem } from './models/clickup/checklist.models';
 export { Space } from './models/clickup/space.models';

@@ -1,6 +1,7 @@
 import { existsSync, readFileSync } from 'fs';
 import jsYaml from 'js-yaml';
 import untildify from 'untildify';
+
 import { Config } from './models/models';
 
 export function getConfigPath() {
@@ -31,6 +32,8 @@ export function getConfig(): Config {
     'MySummarizedTasksFile',
     'HolidayFile',
     'CommitScopeFile',
+    'GoogleTokenFile',
+    'GoogleCredentialsFile',
   ] as const;
   filePathKeys.forEach((key) => {
     config[key] = untildify(config[key]);

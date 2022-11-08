@@ -2,7 +2,7 @@ import { add, format, parse } from 'date-fns';
 import { readFileSync } from 'fs';
 
 import {
-    ClickUp, CONFIG, getTaskIdFromBranchName, GitLab, IHoliday
+    ClickUp, CONFIG, getTaskIdFromBranchName, GitLab, Google, IHoliday
 } from '@accel-shooter/node-shared';
 
 import { DailyProgress } from '../classes/daily-progress.class';
@@ -76,6 +76,8 @@ export async function updateAction() {
       result2.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
     }
   }
+  result = [...new Set(result)];
+  result2 = [...new Set(result2)];
   const approvedEvents = await GitLab.getApprovedEvents(after, before);
   if (approvedEvents.length > 0) {
     result.push('    * Review');
@@ -87,8 +89,27 @@ export async function updateAction() {
       result.push(`        * [${mergeRequest.title}](${mergeRequest.web_url})`);
     }
   }
-  result = [...new Set(result)];
-  result2 = [...new Set(result2)];
+  const g = new Google();
+  const previousDayMeeting = await g.listEvent(
+    previousWorkDay.toISOString(),
+    day.toISOString()
+  );
+  const todayMeeting = await g.listEvent(
+    day.toISOString(),
+    add(day, { days: 1 }).toISOString()
+  );
+  if (previousDayMeeting.length > 0) {
+    result.push('    * Meeting');
+    for (const m of previousDayMeeting) {
+      result.push(`        * ${m.summary}`);
+    }
+  }
+  if (todayMeeting.length > 0) {
+    result2.push('    * Meeting');
+    for (const m of todayMeeting) {
+      result2.push(`        * ${m.summary}`);
+    }
+  }
   const dayDp = `### ${format(
     day,
     'yyyy/MM/dd'

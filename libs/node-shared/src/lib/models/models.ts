@@ -37,6 +37,8 @@ export interface Config {
   MySummarizedTasksFile: string;
   HolidayFile: string;
   CommitScopeFile: string;
+  GoogleTokenFile: string;
+  GoogleCredentialsFile: string;
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];
 export interface NormalizedChecklistItem {
