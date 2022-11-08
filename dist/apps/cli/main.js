@@ -435,9 +435,9 @@ exports.endAction = endAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fetchHolidayAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const fs_1 = __webpack_require__(/*! fs */ "fs");
 const node_fetch_1 = tslib_1.__importDefault(__webpack_require__(/*! node-fetch */ "node-fetch"));
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 function fetchHolidayAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         let page = 0;
@@ -450,9 +450,7 @@ function fetchHolidayAction() {
             page += 1;
         }
         holidays = holidays
-            .filter((h) => h.isHoliday === '是' ||
-            h.holidayCategory === '補行上班日' ||
-            h.name === '勞動節')
+            .filter((h) => h.isHoliday === '是' || h.name === '勞動節')
             .map((h) => (Object.assign(Object.assign({}, h), { isMyHoliday: true })));
         fs_1.writeFileSync(node_shared_1.CONFIG.HolidayFile, JSON.stringify(holidays, null, 2));
     });

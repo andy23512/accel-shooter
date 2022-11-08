@@ -1,6 +1,7 @@
-import { CONFIG, IHoliday } from '@accel-shooter/node-shared';
 import { writeFileSync } from 'fs';
 import fetch from 'node-fetch';
+
+import { CONFIG, IHoliday } from '@accel-shooter/node-shared';
 
 export async function fetchHolidayAction() {
   let page = 0;
@@ -15,12 +16,7 @@ export async function fetchHolidayAction() {
     page += 1;
   }
   holidays = holidays
-    .filter(
-      (h) =>
-        h.isHoliday === '是' ||
-        h.holidayCategory === '補行上班日' ||
-        h.name === '勞動節'
-    )
+    .filter((h) => h.isHoliday === '是' || h.name === '勞動節')
     .map((h) => ({
       ...h,
       isMyHoliday: true,

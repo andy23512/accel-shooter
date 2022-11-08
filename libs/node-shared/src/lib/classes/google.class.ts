@@ -63,12 +63,14 @@ export class Google {
       orderBy: 'startTime',
     });
     const events = res.data.items;
-    return events.filter((event) => {
-      if (!event.attendees) {
-        return true;
-      }
-      const self = event.attendees.find((a) => a.self);
-      return !self || self.responseStatus !== 'declined';
-    });
+    return (
+      events?.filter((event) => {
+        if (!event.attendees) {
+          return true;
+        }
+        const self = event.attendees.find((a) => a.self);
+        return !self || self.responseStatus !== 'declined';
+      }) || []
+    );
   }
 }
