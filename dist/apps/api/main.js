@@ -897,7 +897,7 @@ class Google {
             return client;
         });
     }
-    listEvent(timeMin, timeMax) {
+    listAttendingEvent(timeMin, timeMax) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const auth = yield this.authorize();
             const calendar = googleapis_1.google.calendar({ version: 'v3', auth });
@@ -910,7 +910,13 @@ class Google {
                 orderBy: 'startTime',
             });
             const events = res.data.items;
-            return events;
+            return ((events === null || events === void 0 ? void 0 : events.filter((event) => {
+                if (!event.attendees) {
+                    return true;
+                }
+                const self = event.attendees.find((a) => a.self);
+                return !self || self.responseStatus !== 'declined';
+            })) || []);
         });
     }
 }

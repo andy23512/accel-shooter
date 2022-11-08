@@ -90,11 +90,11 @@ export async function updateAction() {
     }
   }
   const g = new Google();
-  const previousDayMeeting = await g.listEvent(
+  const previousDayMeeting = await g.listAttendingEvent(
     previousWorkDay.toISOString(),
     day.toISOString()
   );
-  const todayMeeting = await g.listEvent(
+  const todayMeeting = await g.listAttendingEvent(
     day.toISOString(),
     add(day, { days: 1 }).toISOString()
   );

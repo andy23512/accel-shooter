@@ -51,7 +51,7 @@ export class Google {
     return client;
   }
 
-  public async listEvent(timeMin: string, timeMax: string) {
+  public async listAttendingEvent(timeMin: string, timeMax: string) {
     const auth = await this.authorize();
     const calendar = google.calendar({ version: 'v3', auth });
     const res = await calendar.events.list({
@@ -63,6 +63,12 @@ export class Google {
       orderBy: 'startTime',
     });
     const events = res.data.items;
-    return events;
+    return events.filter((event) => {
+      if (!event.attendees) {
+        return true;
+      }
+      const self = event.attendees.find((a) => a.self);
+      return !self || self.responseStatus !== 'declined';
+    });
   }
 }

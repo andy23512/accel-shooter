@@ -1032,8 +1032,8 @@ function updateAction() {
             }
         }
         const g = new node_shared_1.Google();
-        const previousDayMeeting = yield g.listEvent(previousWorkDay.toISOString(), day.toISOString());
-        const todayMeeting = yield g.listEvent(day.toISOString(), date_fns_1.add(day, { days: 1 }).toISOString());
+        const previousDayMeeting = yield g.listAttendingEvent(previousWorkDay.toISOString(), day.toISOString());
+        const todayMeeting = yield g.listAttendingEvent(day.toISOString(), date_fns_1.add(day, { days: 1 }).toISOString());
         if (previousDayMeeting.length > 0) {
             result.push('    * Meeting');
             for (const m of previousDayMeeting) {
@@ -2486,7 +2486,7 @@ class Google {
             return client;
         });
     }
-    listEvent(timeMin, timeMax) {
+    listAttendingEvent(timeMin, timeMax) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const auth = yield this.authorize();
             const calendar = googleapis_1.google.calendar({ version: 'v3', auth });
@@ -2499,7 +2499,13 @@ class Google {
                 orderBy: 'startTime',
             });
             const events = res.data.items;
-            return events;
+            return ((events === null || events === void 0 ? void 0 : events.filter((event) => {
+                if (!event.attendees) {
+                    return true;
+                }
+                const self = event.attendees.find((a) => a.self);
+                return !self || self.responseStatus !== 'declined';
+            })) || []);
         });
     }
 }
