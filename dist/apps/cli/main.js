@@ -1098,6 +1098,53 @@ exports.watchPipelineAction = watchPipelineAction;
 
 /***/ }),
 
+/***/ "./apps/cli/src/actions/work.action.ts":
+/*!*********************************************!*\
+  !*** ./apps/cli/src/actions/work.action.ts ***!
+  \*********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.workAction = void 0;
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
+const kexec_1 = tslib_1.__importDefault(__webpack_require__(/*! @jcoreio/kexec */ "@jcoreio/kexec"));
+const todo_class_1 = __webpack_require__(/*! ../classes/todo.class */ "./apps/cli/src/classes/todo.class.ts");
+const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+function workAction() {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const todo = new todo_class_1.Todo();
+        const todoContent = todo.readFile();
+        let matchResult = todoContent.match(/## Todos\n([\s\S]+)\n##/);
+        if (!matchResult) {
+            throw Error('Todo File Broken');
+        }
+        const todoList = matchResult[1].split('\n');
+        const firstTodo = todoList[0];
+        matchResult = firstTodo.match(/https:\/\/app.clickup.com\/t\/(\w+)\)/);
+        if (!matchResult) {
+            throw Error('First Todo is not a ClickUp task');
+        }
+        const clickUpTaskId = matchResult[1];
+        const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
+        const { gitLabProject } = yield clickUp.getGitLabProjectAndMergeRequestIId();
+        // Open Task Page
+        const urls = [`localhost:8112/task/${clickUpTaskId}`];
+        utils_1.openUrlsInTabGroup(urls, clickUpTaskId);
+        // Open tmux
+        const folder = gitLabProject.path;
+        const shortName = gitLabProject.shortName;
+        kexec_1.default(`cd ${folder}; tmux new -A -d -s ${shortName} -c ${folder}; tmux new -A -D -s ${shortName}`);
+    });
+}
+exports.workAction = workAction;
+
+
+/***/ }),
+
 /***/ "./apps/cli/src/classes/base-file-ref.class.ts":
 /*!*****************************************************!*\
   !*** ./apps/cli/src/classes/base-file-ref.class.ts ***!
@@ -1746,6 +1793,7 @@ const to_do_action_1 = __webpack_require__(/*! ./actions/to-do.action */ "./apps
 const track_action_1 = __webpack_require__(/*! ./actions/track.action */ "./apps/cli/src/actions/track.action.ts");
 const update_action_1 = __webpack_require__(/*! ./actions/update.action */ "./apps/cli/src/actions/update.action.ts");
 const watch_pipeline_action_1 = __webpack_require__(/*! ./actions/watch-pipeline.action */ "./apps/cli/src/actions/watch-pipeline.action.ts");
+const work_action_1 = __webpack_require__(/*! ./actions/work.action */ "./apps/cli/src/actions/work.action.ts");
 const actions = {
     start: start_action_1.startAction,
     open: open_action_1.openAction,
@@ -1767,6 +1815,7 @@ const actions = {
     watchPipeline: watch_pipeline_action_1.watchPipelineAction,
     commit: commit_action_1.commitAction,
     close: close_action_1.closeAction,
+    work: work_action_1.workAction,
     test: () => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
         const itemListJson = yield promises_1.default.readFile('./dp-analysis', 'utf-8');
         const itemList = JSON.parse(itemListJson);
@@ -2980,6 +3029,17 @@ module.exports = __webpack_require__(/*! /Users/nanoha/git/accel-shooter/apps/cl
 /***/ (function(module, exports) {
 
 module.exports = require("@google-cloud/local-auth");
+
+/***/ }),
+
+/***/ "@jcoreio/kexec":
+/*!*********************************!*\
+  !*** external "@jcoreio/kexec" ***!
+  \*********************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("@jcoreio/kexec");
 
 /***/ }),
 

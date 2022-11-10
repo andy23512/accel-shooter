@@ -22,6 +22,7 @@ import { toDoAction } from './actions/to-do.action';
 import { trackAction } from './actions/track.action';
 import { updateAction } from './actions/update.action';
 import { watchPipelineAction } from './actions/watch-pipeline.action';
+import { workAction } from './actions/work.action';
 
 const actions: { [key: string]: () => Promise<void> } = {
   start: startAction,
@@ -44,6 +45,7 @@ const actions: { [key: string]: () => Promise<void> } = {
   watchPipeline: watchPipelineAction,
   commit: commitAction,
   close: closeAction,
+  work: workAction,
   test: async () => {
     const itemListJson = await fs.readFile('./dp-analysis', 'utf-8');
     const itemList = JSON.parse(itemListJson);
