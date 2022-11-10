@@ -1,16 +1,12 @@
-import {
-  ClickUp,
-  CONFIG,
-  GitLab,
-  GitLabProject,
-  sleep,
-} from '@accel-shooter/node-shared';
 import { readFileSync, writeFileSync } from 'fs';
 import inquirer from 'inquirer';
 import { render } from 'mustache';
 import os from 'os';
 import { join } from 'path';
 import untildify from 'untildify';
+
+import { ClickUp, CONFIG, GitLab, GitLabProject, sleep } from '@accel-shooter/node-shared';
+
 import { CustomProgressLog } from '../classes/progress-log.class';
 import { Todo } from '../classes/todo.class';
 import { Tracker } from '../classes/tracker.class';
@@ -64,10 +60,10 @@ export async function startAction() {
           console.log('\nTask is not assigned to you. Aborted.');
           process.exit();
         }
-        if (answers.gitLabProject.clickUpSpaces) {
-          const spaceName = (await ClickUp.getSpace(task.space.id)).name;
-          if (!answers.gitLabProject.clickUpSpaces.includes(spaceName)) {
-            console.log('\nTask is not in spaces of project. Aborted.');
+        if (answers.gitLabProject.products) {
+          const product = await ClickUp.getProduct(task);
+          if (!answers.gitLabProject.products.includes(product)) {
+            console.log('\nTask is not in products of project. Aborted.');
             process.exit();
           }
         }

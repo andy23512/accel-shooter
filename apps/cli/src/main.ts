@@ -54,7 +54,7 @@ const actions: { [key: string]: () => Promise<void> } = {
       const taskId = item.url.match(/https:\/\/app.clickup.com\/t\/(\w+)/)[1];
       const clickUp = new ClickUp(taskId);
       const task = await clickUp.getTask();
-      const spaceName = (await ClickUp.getSpace(task.space.id)).name;
+      const product = await ClickUp.getProduct(task);
       const gitLabInfo = await clickUp.getGitLabProjectAndMergeRequestIId();
       let mergeRequestLink = null;
       if (gitLabInfo) {
@@ -65,7 +65,7 @@ const actions: { [key: string]: () => Promise<void> } = {
       }
       outputItem.push({
         ...item,
-        spaceName,
+        product,
         mergeRequestLink,
       });
     }

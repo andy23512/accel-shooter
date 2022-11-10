@@ -1,24 +1,24 @@
-import { SummarizedTask } from '@accel-shooter/api-interfaces';
 import { Presets, SingleBar } from 'cli-progress';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
+
+import { SummarizedTask } from '@accel-shooter/api-interfaces';
+
 import { CONFIG } from '../config';
 import { ChecklistResponse } from '../models/clickup.models';
 import { Checklist } from '../models/clickup/checklist.models';
 import { Comment } from '../models/clickup/comment.models';
 import { List } from '../models/clickup/list.models';
 import { Space } from '../models/clickup/space.models';
-import { TaskIncludeSubTasks } from '../models/clickup/task.models';
+import { Task, TaskIncludeSubTasks } from '../models/clickup/task.models';
 import { Team } from '../models/clickup/team.models';
 import { User } from '../models/clickup/user.models';
 import { callApiFactory } from '../utils/api.utils';
 import { titleCase } from '../utils/case.utils';
 import {
-  getSyncChecklistActions,
-  normalizeClickUpChecklist,
-  normalizeMarkdownChecklist,
+    getSyncChecklistActions, normalizeClickUpChecklist, normalizeMarkdownChecklist
 } from '../utils/checklist.utils';
-import { Task } from './../models/clickup/task.models';
+
 const callApi = callApiFactory('ClickUp');
 
 export class ClickUp {
@@ -38,6 +38,26 @@ export class ClickUp {
 
   public static getSpace(spaceId: string) {
     return callApi<Space>('get', `/space/${spaceId}`);
+  }
+
+  public static async getProduct(task: Task) {
+    const space = await ClickUp.getSpace(task.space.id);
+    if (space.name === 'Product Team') {
+      const productField = task.custom_fields?.find(
+        (f) => f.name === 'Product'
+      );
+      if (!productField) {
+        throw Error('No product field in this task');
+      }
+      const product = productField.type_config.options.find(
+        (t: { orderindex: any }) => t.orderindex === productField.value
+      );
+      if (!product) {
+        throw Error('No matched product in this task');
+      }
+      return product.name;
+    }
+    return space.name;
   }
 
   public static getRTVTasks(teamId: string, userID: number) {
@@ -199,8 +219,8 @@ export class ClickUp {
     const task = await this.getTask();
     const name = await this.getFullTaskName(task);
     const progress = this.getTaskProgress();
-    const spaceName = (await ClickUp.getSpace(task.space.id)).name;
-    const link = `[${spaceName}: ${name}](${task.url})`;
+    const product = await ClickUp.getProduct(task);
+    const link = `[${product}: ${name}](${task.url})`;
     switch (mode) {
       case 'todo':
         return `- [ ] ${link}`;
@@ -283,7 +303,7 @@ export class ClickUp {
         original_due_date: task.due_date,
         date_created: task.date_created,
         status: task.status,
-        space: (await ClickUp.getSpace(task.space.id)).name,
+        product: await ClickUp.getProduct(task),
       });
       bar.increment(1);
     }

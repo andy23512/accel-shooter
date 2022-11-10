@@ -429,6 +429,24 @@ class ClickUp {
     static getSpace(spaceId) {
         return callApi('get', `/space/${spaceId}`);
     }
+    static getProduct(task) {
+        var _a;
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const space = yield ClickUp.getSpace(task.space.id);
+            if (space.name === 'Product Team') {
+                const productField = (_a = task.custom_fields) === null || _a === void 0 ? void 0 : _a.find((f) => f.name === 'Product');
+                if (!productField) {
+                    throw Error('No product field in this task');
+                }
+                const product = productField.type_config.options.find((t) => t.orderindex === productField.value);
+                if (!product) {
+                    throw Error('No matched product in this task');
+                }
+                return product.name;
+            }
+            return space.name;
+        });
+    }
     static getRTVTasks(teamId, userID) {
         return callApi('get', `/team/${teamId}/task/`, {
             statuses: ['ready to verify'],
@@ -547,8 +565,8 @@ class ClickUp {
             const task = yield this.getTask();
             const name = yield this.getFullTaskName(task);
             const progress = this.getTaskProgress();
-            const spaceName = (yield ClickUp.getSpace(task.space.id)).name;
-            const link = `[${spaceName}: ${name}](${task.url})`;
+            const product = yield ClickUp.getProduct(task);
+            const link = `[${product}: ${name}](${task.url})`;
             switch (mode) {
                 case 'todo':
                     return `- [ ] ${link}`;
@@ -625,7 +643,7 @@ class ClickUp {
                     original_due_date: task.due_date,
                     date_created: task.date_created,
                     status: task.status,
-                    space: (yield ClickUp.getSpace(task.space.id)).name,
+                    product: yield ClickUp.getProduct(task),
                 });
                 bar.increment(1);
             }

@@ -629,13 +629,13 @@ exports.showDiffAction = showDiffAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.startAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const fs_1 = __webpack_require__(/*! fs */ "fs");
 const inquirer_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer */ "inquirer"));
 const mustache_1 = __webpack_require__(/*! mustache */ "mustache");
 const os_1 = tslib_1.__importDefault(__webpack_require__(/*! os */ "os"));
 const path_1 = __webpack_require__(/*! path */ "path");
 const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const progress_log_class_1 = __webpack_require__(/*! ../classes/progress-log.class */ "./apps/cli/src/classes/progress-log.class.ts");
 const todo_class_1 = __webpack_require__(/*! ../classes/todo.class */ "./apps/cli/src/classes/todo.class.ts");
 const tracker_class_1 = __webpack_require__(/*! ../classes/tracker.class */ "./apps/cli/src/classes/tracker.class.ts");
@@ -684,10 +684,10 @@ function startAction() {
                         console.log('\nTask is not assigned to you. Aborted.');
                         process.exit();
                     }
-                    if (answers.gitLabProject.clickUpSpaces) {
-                        const spaceName = (yield node_shared_1.ClickUp.getSpace(task.space.id)).name;
-                        if (!answers.gitLabProject.clickUpSpaces.includes(spaceName)) {
-                            console.log('\nTask is not in spaces of project. Aborted.');
+                    if (answers.gitLabProject.products) {
+                        const product = yield node_shared_1.ClickUp.getProduct(task);
+                        if (!answers.gitLabProject.products.includes(product)) {
+                            console.log('\nTask is not in products of project. Aborted.');
                             process.exit();
                         }
                     }
@@ -1824,7 +1824,7 @@ const actions = {
             const taskId = item.url.match(/https:\/\/app.clickup.com\/t\/(\w+)/)[1];
             const clickUp = new node_shared_1.ClickUp(taskId);
             const task = yield clickUp.getTask();
-            const spaceName = (yield node_shared_1.ClickUp.getSpace(task.space.id)).name;
+            const product = yield node_shared_1.ClickUp.getProduct(task);
             const gitLabInfo = yield clickUp.getGitLabProjectAndMergeRequestIId();
             let mergeRequestLink = null;
             if (gitLabInfo) {
@@ -1833,7 +1833,7 @@ const actions = {
                 const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
                 mergeRequestLink = mergeRequest.web_url;
             }
-            outputItem.push(Object.assign(Object.assign({}, item), { spaceName,
+            outputItem.push(Object.assign(Object.assign({}, item), { product,
                 mergeRequestLink }));
         }
         yield promises_1.default.writeFile('./output-final.json', JSON.stringify(outputItem, null, 2));
@@ -2065,6 +2065,24 @@ class ClickUp {
     static getSpace(spaceId) {
         return callApi('get', `/space/${spaceId}`);
     }
+    static getProduct(task) {
+        var _a;
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const space = yield ClickUp.getSpace(task.space.id);
+            if (space.name === 'Product Team') {
+                const productField = (_a = task.custom_fields) === null || _a === void 0 ? void 0 : _a.find((f) => f.name === 'Product');
+                if (!productField) {
+                    throw Error('No product field in this task');
+                }
+                const product = productField.type_config.options.find((t) => t.orderindex === productField.value);
+                if (!product) {
+                    throw Error('No matched product in this task');
+                }
+                return product.name;
+            }
+            return space.name;
+        });
+    }
     static getRTVTasks(teamId, userID) {
         return callApi('get', `/team/${teamId}/task/`, {
             statuses: ['ready to verify'],
@@ -2183,8 +2201,8 @@ class ClickUp {
             const task = yield this.getTask();
             const name = yield this.getFullTaskName(task);
             const progress = this.getTaskProgress();
-            const spaceName = (yield ClickUp.getSpace(task.space.id)).name;
-            const link = `[${spaceName}: ${name}](${task.url})`;
+            const product = yield ClickUp.getProduct(task);
+            const link = `[${product}: ${name}](${task.url})`;
             switch (mode) {
                 case 'todo':
                     return `- [ ] ${link}`;
@@ -2261,7 +2279,7 @@ class ClickUp {
                     original_due_date: task.due_date,
                     date_created: task.date_created,
                     status: task.status,
-                    space: (yield ClickUp.getSpace(task.space.id)).name,
+                    product: yield ClickUp.getProduct(task),
                 });
                 bar.increment(1);
             }

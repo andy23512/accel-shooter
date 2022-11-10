@@ -37,7 +37,7 @@ export class TasksPageComponent implements OnInit {
       sortable: true,
     },
     { width: 800, field: 'name', cellRenderer: TaskNameCellRendererComponent },
-    { width: 100, field: 'space', sortable: true },
+    { width: 100, field: 'product', sortable: true },
     {
       width: 100,
       field: 'priority',
