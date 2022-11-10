@@ -1,9 +1,11 @@
-import { SummarizedTask } from '@accel-shooter/api-interfaces';
-import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
 import { ColDef } from 'ag-grid-community';
 import moment from 'moment';
 import { map, take } from 'rxjs/operators';
+
+import { SummarizedTask } from '@accel-shooter/api-interfaces';
+import { HttpClient } from '@angular/common/http';
+import { Component, OnInit } from '@angular/core';
+
 import { PageTitleService } from '../page-title.service';
 import { PriorityCellRendererComponent } from './priority-cell-renderer.component';
 import { TaskNameCellRendererComponent } from './task-name-cell-renderer.component';
@@ -35,7 +37,7 @@ export class TasksPageComponent implements OnInit {
       sortable: true,
     },
     { width: 800, field: 'name', cellRenderer: TaskNameCellRendererComponent },
-    { width: 100, field: 'space' },
+    { width: 100, field: 'space', sortable: true },
     {
       width: 100,
       field: 'priority',
