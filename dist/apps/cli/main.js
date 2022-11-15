@@ -435,9 +435,8 @@ exports.endAction = endAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.fetchHolidayAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const fs_1 = __webpack_require__(/*! fs */ "fs");
 const node_fetch_1 = tslib_1.__importDefault(__webpack_require__(/*! node-fetch */ "node-fetch"));
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
+const holiday_class_1 = __webpack_require__(/*! ../classes/holiday.class */ "./apps/cli/src/classes/holiday.class.ts");
 function fetchHolidayAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         let page = 0;
@@ -449,10 +448,7 @@ function fetchHolidayAction() {
             holidays = [...holidays, ...data];
             page += 1;
         }
-        holidays = holidays
-            .filter((h) => h.isHoliday === '是' || h.name === '勞動節')
-            .map((h) => (Object.assign(Object.assign({}, h), { isMyHoliday: true })));
-        fs_1.writeFileSync(node_shared_1.CONFIG.HolidayFile, JSON.stringify(holidays, null, 2));
+        new holiday_class_1.Holiday().writeFile(JSON.stringify(holidays, null, 2));
     });
 }
 exports.fetchHolidayAction = fetchHolidayAction;
@@ -538,6 +534,163 @@ function revertEndAction() {
     });
 }
 exports.revertEndAction = revertEndAction;
+
+
+/***/ }),
+
+/***/ "./apps/cli/src/actions/routine.action.ts":
+/*!************************************************!*\
+  !*** ./apps/cli/src/actions/routine.action.ts ***!
+  \************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.punch = exports.routineAction = void 0;
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const child_process_1 = tslib_1.__importDefault(__webpack_require__(/*! child_process */ "child_process"));
+const date_fns_1 = __webpack_require__(/*! date-fns */ "date-fns");
+const fs_1 = tslib_1.__importDefault(__webpack_require__(/*! fs */ "fs"));
+const inquirer_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer */ "inquirer"));
+const puppeteer_1 = tslib_1.__importDefault(__webpack_require__(/*! puppeteer */ "puppeteer"));
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
+const holiday_class_1 = __webpack_require__(/*! ../classes/holiday.class */ "./apps/cli/src/classes/holiday.class.ts");
+function routineAction() {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const ITEMS = [
+            {
+                name: 'Punch',
+                type: 'confirm',
+                validate(input) {
+                    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+                        if (input) {
+                            const result = yield punch();
+                            console.log(result);
+                        }
+                        else {
+                            process.exit();
+                        }
+                    });
+                },
+            },
+            {
+                name: 'isa',
+                type: 'confirm',
+                morningOnly: true,
+            },
+            {
+                name: 'check tasks',
+                type: 'confirm',
+                morningOnly: true,
+            },
+            {
+                name: 'check todo',
+                type: 'confirm',
+                morningOnly: true,
+            },
+            {
+                name: 'dpcp',
+                type: 'confirm',
+                morningOnly: true,
+            },
+            {
+                name: 'send dp to slack',
+                type: 'confirm',
+                morningOnly: true,
+            },
+        ];
+        const today = new Date();
+        const hour = today.getHours();
+        const items = hour > 12 ? ITEMS.filter(({ morningOnly }) => !morningOnly) : ITEMS;
+        const day = process.argv.length >= 4
+            ? date_fns_1.parse(process.argv[3], 'yyyy/MM/dd', today)
+            : today;
+        const holiday = new holiday_class_1.Holiday();
+        const isWorkDay = holiday.checkIsWorkday(date_fns_1.format(day, 'yyyy/M/d'));
+        if (!isWorkDay) {
+            const message = 'Today is holiday!';
+            console.log(message);
+            child_process_1.default.execSync(`osascript -e 'display notification "${message
+                .replace(/"/g, '')
+                .replace(/'/g, '')}" with title "Accel Shooter"'`);
+            return;
+        }
+        console.log('Today is workday!');
+        yield inquirer_1.default.prompt(items);
+        console.log('Complete');
+    });
+}
+exports.routineAction = routineAction;
+function punch() {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const { account, password, url } = JSON.parse(fs_1.default.readFileSync(node_shared_1.CONFIG.PunchInfoFile, { encoding: 'utf-8' }));
+        const browser = yield puppeteer_1.default.launch({
+            headless: false,
+        });
+        const page = yield browser.newPage();
+        yield page.goto(url);
+        yield page.evaluate((a, p) => {
+            const userName = document.querySelector('#user_username');
+            if (userName) {
+                userName.value = a;
+            }
+            const userPassword = document.querySelector('#user_passwd');
+            if (userPassword) {
+                userPassword.value = p;
+            }
+            const button = document.querySelector('#s_buttom');
+            if (button) {
+                button.click();
+            }
+        }, account, password);
+        yield page.waitForNavigation();
+        const hour = new Date().getHours();
+        yield page.evaluate((h) => {
+            const punchInputs = document.querySelectorAll('.clock_enabled');
+            const punchTimes = document.querySelectorAll('#clock_listing td:nth-child(2)');
+            if (!punchTimes[0].textContent || !punchTimes[1].textContent) {
+                return;
+            }
+            const start = punchTimes[0].textContent.replace(/[\s\n]/g, '');
+            const end = punchTimes[1].textContent.replace(/[\s\n]/g, '');
+            if (h > 7 && h < 11 && start === '') {
+                punchInputs[0].click();
+            }
+            else if (h > 16 && h < 20 && end === '') {
+                punchInputs[1].click();
+            }
+        }, hour);
+        yield page.waitForFunction((h) => {
+            const punchTimes = document.querySelectorAll('#clock_listing td:nth-child(2)');
+            if (!punchTimes[0].textContent || !punchTimes[1].textContent) {
+                return;
+            }
+            const start = punchTimes[0].textContent.replace(/[\s\n]/g, '');
+            const end = punchTimes[1].textContent.replace(/[\s\n]/g, '');
+            if (h > 7 && h < 11) {
+                return start !== '';
+            }
+            else if (h > 16 && h < 20) {
+                return end !== '';
+            }
+        }, {}, hour);
+        const result = yield page.evaluate(() => {
+            const punchTimes = document.querySelectorAll('#clock_listing td:nth-child(2)');
+            if (!punchTimes[0].textContent || !punchTimes[1].textContent) {
+                return;
+            }
+            const start = punchTimes[0].textContent.replace(/[\s\n]/g, '');
+            const end = punchTimes[1].textContent.replace(/[\s\n]/g, '');
+            return [start, end];
+        });
+        yield node_shared_1.sleep(3000);
+        yield browser.close();
+        return result;
+    });
+}
+exports.punch = punch;
 
 
 /***/ }),
@@ -947,9 +1100,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.updateAction = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const date_fns_1 = __webpack_require__(/*! date-fns */ "date-fns");
-const fs_1 = __webpack_require__(/*! fs */ "fs");
 const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const daily_progress_class_1 = __webpack_require__(/*! ../classes/daily-progress.class */ "./apps/cli/src/classes/daily-progress.class.ts");
+const holiday_class_1 = __webpack_require__(/*! ../classes/holiday.class */ "./apps/cli/src/classes/holiday.class.ts");
 const todo_class_1 = __webpack_require__(/*! ../classes/todo.class */ "./apps/cli/src/classes/todo.class.ts");
 function updateAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -958,11 +1111,12 @@ function updateAction() {
             ? date_fns_1.parse(process.argv[3], 'yyyy/MM/dd', today)
             : today;
         let previousDay = date_fns_1.add(day, { days: -1 });
-        const holidays = JSON.parse(fs_1.readFileSync(node_shared_1.CONFIG.HolidayFile, { encoding: 'utf8' }));
-        while (holidays.find((h) => h.date === date_fns_1.format(previousDay, 'yyyy/M/d'))) {
+        const holiday = new holiday_class_1.Holiday();
+        while (!holiday.checkIsWorkday(date_fns_1.format(previousDay, 'yyyy/M/d'))) {
             previousDay = date_fns_1.add(previousDay, { days: -1 });
         }
         const previousWorkDay = previousDay;
+        console.log('Previous work day: ', previousWorkDay);
         const after = date_fns_1.format(date_fns_1.add(previousWorkDay, { days: -1 }), 'yyyy-MM-dd');
         const before = date_fns_1.format(day, 'yyyy-MM-dd');
         const pushedEvents = yield node_shared_1.GitLab.getPushedEvents(after, before);
@@ -1451,6 +1605,40 @@ exports.DailyProgress = DailyProgress;
 
 /***/ }),
 
+/***/ "./apps/cli/src/classes/holiday.class.ts":
+/*!***********************************************!*\
+  !*** ./apps/cli/src/classes/holiday.class.ts ***!
+  \***********************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.Holiday = void 0;
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
+const base_file_ref_class_1 = __webpack_require__(/*! ./base-file-ref.class */ "./apps/cli/src/classes/base-file-ref.class.ts");
+class Holiday extends base_file_ref_class_1.BaseFileRef {
+    get path() {
+        return untildify_1.default(node_shared_1.CONFIG.HolidayFile);
+    }
+    checkIsWorkday(day) {
+        const holidayData = JSON.parse(this.readFile());
+        const h = holidayData.find((d) => d.date === day);
+        if (!h) {
+            return true;
+        }
+        return ((h.isHoliday === '否' && h.name !== '勞動節') ||
+            (h.name === '軍人節' && h.holidayCategory === '特定節日'));
+    }
+}
+exports.Holiday = Holiday;
+
+
+/***/ }),
+
 /***/ "./apps/cli/src/classes/progress-log.class.ts":
 /*!****************************************************!*\
   !*** ./apps/cli/src/classes/progress-log.class.ts ***!
@@ -1784,6 +1972,7 @@ const fetch_holiday_action_1 = __webpack_require__(/*! ./actions/fetch-holiday.a
 const list_action_1 = __webpack_require__(/*! ./actions/list.action */ "./apps/cli/src/actions/list.action.ts");
 const open_action_1 = __webpack_require__(/*! ./actions/open.action */ "./apps/cli/src/actions/open.action.ts");
 const revert_end_action_1 = __webpack_require__(/*! ./actions/revert-end.action */ "./apps/cli/src/actions/revert-end.action.ts");
+const routine_action_1 = __webpack_require__(/*! ./actions/routine.action */ "./apps/cli/src/actions/routine.action.ts");
 const rtv_tasks_action_1 = __webpack_require__(/*! ./actions/rtv-tasks.action */ "./apps/cli/src/actions/rtv-tasks.action.ts");
 const show_diff_action_1 = __webpack_require__(/*! ./actions/show-diff.action */ "./apps/cli/src/actions/show-diff.action.ts");
 const start_action_1 = __webpack_require__(/*! ./actions/start.action */ "./apps/cli/src/actions/start.action.ts");
@@ -1816,6 +2005,7 @@ const actions = {
     commit: commit_action_1.commitAction,
     close: close_action_1.closeAction,
     work: work_action_1.workAction,
+    routine: routine_action_1.routineAction,
     test: () => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
         const itemListJson = yield promises_1.default.readFile('./dp-analysis', 'utf-8');
         const itemList = JSON.parse(itemListJson);
@@ -2620,6 +2810,7 @@ function getConfig() {
         'CommitScopeFile',
         'GoogleTokenFile',
         'GoogleCredentialsFile',
+        'PunchInfoFile',
     ];
     filePathKeys.forEach((key) => {
         config[key] = untildify_1.default(config[key]);
@@ -3245,6 +3436,17 @@ module.exports = require("path");
 /***/ (function(module, exports) {
 
 module.exports = require("progress-logs");
+
+/***/ }),
+
+/***/ "puppeteer":
+/*!****************************!*\
+  !*** external "puppeteer" ***!
+  \****************************/
+/*! no static exports found */
+/***/ (function(module, exports) {
+
+module.exports = require("puppeteer");
 
 /***/ }),
 

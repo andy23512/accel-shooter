@@ -13,6 +13,7 @@ import { fetchHolidayAction } from './actions/fetch-holiday.action';
 import { listAction } from './actions/list.action';
 import { openAction } from './actions/open.action';
 import { revertEndAction } from './actions/revert-end.action';
+import { routineAction } from './actions/routine.action';
 import { RTVTasksAction } from './actions/rtv-tasks.action';
 import { showDiffAction } from './actions/show-diff.action';
 import { startAction } from './actions/start.action';
@@ -46,6 +47,7 @@ const actions: { [key: string]: () => Promise<void> } = {
   commit: commitAction,
   close: closeAction,
   work: workAction,
+  routine: routineAction,
   test: async () => {
     const itemListJson = await fs.readFile('./dp-analysis', 'utf-8');
     const itemList = JSON.parse(itemListJson);

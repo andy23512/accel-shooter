@@ -1,7 +1,8 @@
-import { writeFileSync } from 'fs';
 import fetch from 'node-fetch';
 
-import { CONFIG, IHoliday } from '@accel-shooter/node-shared';
+import { IHoliday } from '@accel-shooter/node-shared';
+
+import { Holiday } from '../classes/holiday.class';
 
 export async function fetchHolidayAction() {
   let page = 0;
@@ -15,11 +16,5 @@ export async function fetchHolidayAction() {
     holidays = [...holidays, ...data];
     page += 1;
   }
-  holidays = holidays
-    .filter((h) => h.isHoliday === '是' || h.name === '勞動節')
-    .map((h) => ({
-      ...h,
-      isMyHoliday: true,
-    }));
-  writeFileSync(CONFIG.HolidayFile, JSON.stringify(holidays, null, 2));
+  new Holiday().writeFile(JSON.stringify(holidays, null, 2));
 }

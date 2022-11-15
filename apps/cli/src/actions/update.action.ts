@@ -1,11 +1,9 @@
 import { add, format, parse } from 'date-fns';
-import { readFileSync } from 'fs';
 
-import {
-    ClickUp, CONFIG, getTaskIdFromBranchName, GitLab, Google, IHoliday
-} from '@accel-shooter/node-shared';
+import { ClickUp, getTaskIdFromBranchName, GitLab, Google } from '@accel-shooter/node-shared';
 
 import { DailyProgress } from '../classes/daily-progress.class';
+import { Holiday } from '../classes/holiday.class';
 import { Todo } from '../classes/todo.class';
 
 export async function updateAction() {
@@ -15,13 +13,12 @@ export async function updateAction() {
       ? parse(process.argv[3], 'yyyy/MM/dd', today)
       : today;
   let previousDay = add(day, { days: -1 });
-  const holidays: IHoliday[] = JSON.parse(
-    readFileSync(CONFIG.HolidayFile, { encoding: 'utf8' })
-  );
-  while (holidays.find((h) => h.date === format(previousDay, 'yyyy/M/d'))) {
+  const holiday = new Holiday();
+  while (!holiday.checkIsWorkday(format(previousDay, 'yyyy/M/d'))) {
     previousDay = add(previousDay, { days: -1 });
   }
   const previousWorkDay = previousDay;
+  console.log('Previous work day: ', previousWorkDay);
   const after = format(add(previousWorkDay, { days: -1 }), 'yyyy-MM-dd');
   const before = format(day, 'yyyy-MM-dd');
   const pushedEvents = await GitLab.getPushedEvents(after, before);

@@ -40,6 +40,7 @@ export interface Config {
   CommitScopeFile: string;
   GoogleTokenFile: string;
   GoogleCredentialsFile: string;
+  PunchInfoFile: string;
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];
 export interface NormalizedChecklistItem {
@@ -55,5 +56,4 @@ export interface IHoliday {
   isHoliday: string;
   holidayCategory: string;
   description: string;
-  isMyHoliday?: boolean;
 }

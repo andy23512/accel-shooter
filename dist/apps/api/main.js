@@ -984,6 +984,7 @@ function getConfig() {
         'CommitScopeFile',
         'GoogleTokenFile',
         'GoogleCredentialsFile',
+        'PunchInfoFile',
     ];
     filePathKeys.forEach((key) => {
         config[key] = untildify_1.default(config[key]);

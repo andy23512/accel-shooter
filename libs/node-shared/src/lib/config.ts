@@ -34,6 +34,7 @@ export function getConfig(): Config {
     'CommitScopeFile',
     'GoogleTokenFile',
     'GoogleCredentialsFile',
+    'PunchInfoFile',
   ] as const;
   filePathKeys.forEach((key) => {
     config[key] = untildify(config[key]);
