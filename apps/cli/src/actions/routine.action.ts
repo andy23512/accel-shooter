@@ -12,11 +12,12 @@ export async function routineAction() {
   const ITEMS = [
     {
       name: 'Punch',
-      type: 'confirm',
-      async validate(input) {
+      type: 'input',
+      async validate(input: string) {
         if (input) {
           const result = await punch();
           console.log(result);
+          return true;
         } else {
           process.exit();
         }

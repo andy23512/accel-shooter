@@ -562,12 +562,13 @@ function routineAction() {
         const ITEMS = [
             {
                 name: 'Punch',
-                type: 'confirm',
+                type: 'input',
                 validate(input) {
                     return tslib_1.__awaiter(this, void 0, void 0, function* () {
                         if (input) {
                             const result = yield punch();
                             console.log(result);
+                            return true;
                         }
                         else {
                             process.exit();
