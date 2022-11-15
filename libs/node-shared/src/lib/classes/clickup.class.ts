@@ -53,7 +53,7 @@ export class ClickUp {
         (t: { orderindex: any }) => t.orderindex === productField.value
       );
       if (!product) {
-        throw Error('No matched product in this task');
+        throw Error(`No matched product in this task (${task.id})`);
       }
       return product.name;
     }

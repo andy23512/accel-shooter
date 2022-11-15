@@ -18,7 +18,7 @@ export async function updateAction() {
     previousDay = add(previousDay, { days: -1 });
   }
   const previousWorkDay = previousDay;
-  console.log('Previous work day: ', previousWorkDay);
+  console.log('Previous work day: ', format(previousWorkDay, 'yyyy-MM-dd'));
   const after = format(add(previousWorkDay, { days: -1 }), 'yyyy-MM-dd');
   const before = format(day, 'yyyy-MM-dd');
   const pushedEvents = await GitLab.getPushedEvents(after, before);

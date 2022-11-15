@@ -440,7 +440,7 @@ class ClickUp {
                 }
                 const product = productField.type_config.options.find((t) => t.orderindex === productField.value);
                 if (!product) {
-                    throw Error('No matched product in this task');
+                    throw Error(`No matched product in this task (${task.id})`);
                 }
                 return product.name;
             }

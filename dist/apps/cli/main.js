@@ -1116,7 +1116,7 @@ function updateAction() {
             previousDay = date_fns_1.add(previousDay, { days: -1 });
         }
         const previousWorkDay = previousDay;
-        console.log('Previous work day: ', previousWorkDay);
+        console.log('Previous work day: ', date_fns_1.format(previousWorkDay, 'yyyy-MM-dd'));
         const after = date_fns_1.format(date_fns_1.add(previousWorkDay, { days: -1 }), 'yyyy-MM-dd');
         const before = date_fns_1.format(day, 'yyyy-MM-dd');
         const pushedEvents = yield node_shared_1.GitLab.getPushedEvents(after, before);
@@ -2266,7 +2266,7 @@ class ClickUp {
                 }
                 const product = productField.type_config.options.find((t) => t.orderindex === productField.value);
                 if (!product) {
-                    throw Error('No matched product in this task');
+                    throw Error(`No matched product in this task (${task.id})`);
                 }
                 return product.name;
             }
