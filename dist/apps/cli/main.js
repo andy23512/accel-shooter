@@ -1117,7 +1117,7 @@ function updateAction() {
             previousDay = date_fns_1.add(previousDay, { days: -1 });
         }
         const previousWorkDay = previousDay;
-        console.log('Previous work day: ', date_fns_1.format(previousWorkDay, 'yyyy-MM-dd'));
+        console.log('Previous work day:', date_fns_1.format(previousWorkDay, 'yyyy-MM-dd'));
         const after = date_fns_1.format(date_fns_1.add(previousWorkDay, { days: -1 }), 'yyyy-MM-dd');
         const before = date_fns_1.format(day, 'yyyy-MM-dd');
         const pushedEvents = yield node_shared_1.GitLab.getPushedEvents(after, before);
