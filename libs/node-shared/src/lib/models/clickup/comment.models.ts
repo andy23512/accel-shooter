@@ -4,6 +4,7 @@ export interface Comment {
     text: string;
     type?: string;
     frame?: { id: string; service: string; url: string; src: string };
+    bookmark?: { service: string; url: string };
   }[];
   comment_text: string;
   user: User;

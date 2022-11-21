@@ -528,6 +528,14 @@ class ClickUp {
                             frameUrls.push(c.frame.url);
                         }
                     });
+                    co.comment
+                        .filter((c) => { var _a; return c.type === 'bookmark' && ((_a = c.bookmark) === null || _a === void 0 ? void 0 : _a.service) === 'figma'; })
+                        .forEach((c) => {
+                        var _a;
+                        if ((_a = c === null || c === void 0 ? void 0 : c.bookmark) === null || _a === void 0 ? void 0 : _a.url) {
+                            frameUrls.push(c.bookmark.url);
+                        }
+                    });
                 });
             }
             return frameUrls;

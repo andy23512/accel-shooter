@@ -181,6 +181,13 @@ export class ClickUp {
               frameUrls.push(c.frame.url);
             }
           });
+        co.comment
+          .filter(
+            (c) => c.type === 'bookmark' && c.bookmark?.service === 'figma'
+          )
+          .forEach((c) => {
+            frameUrls.push(c.bookmark.url);
+          });
       });
     }
     return frameUrls;
