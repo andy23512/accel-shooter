@@ -601,6 +601,11 @@ function routineAction() {
                 type: 'confirm',
                 morningOnly: true,
             },
+            {
+                name: 'topgrade',
+                type: 'confirm',
+                morningOnly: true,
+            },
         ];
         const today = new Date();
         const hour = today.getHours();
