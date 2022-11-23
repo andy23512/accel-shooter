@@ -186,7 +186,9 @@ export class ClickUp {
             (c) => c.type === 'bookmark' && c.bookmark?.service === 'figma'
           )
           .forEach((c) => {
-            frameUrls.push(c.bookmark.url);
+            if (c?.bookmark?.url) {
+              frameUrls.push(c.bookmark.url);
+            }
           });
       });
     }
