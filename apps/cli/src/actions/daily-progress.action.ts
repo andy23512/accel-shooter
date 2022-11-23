@@ -1,3 +1,4 @@
+import { execSync } from 'child_process';
 import { add, format, parse } from 'date-fns';
 
 import { ClickUp, getTaskIdFromBranchName, GitLab, Google } from '@accel-shooter/node-shared';
@@ -6,7 +7,7 @@ import { DailyProgress } from '../classes/daily-progress.class';
 import { Holiday } from '../classes/holiday.class';
 import { Todo } from '../classes/todo.class';
 
-export async function updateAction() {
+export async function dailyProgressAction() {
   const today = new Date();
   const day =
     process.argv.length >= 4
@@ -73,6 +74,10 @@ export async function updateAction() {
       result2.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
     }
   }
+  if (result2.length === 0) {
+    console.log('Todo of today is empty!');
+    process.exit();
+  }
   result = [...new Set(result)];
   result2 = [...new Set(result2)];
   const approvedEvents = await GitLab.getApprovedEvents(after, before);
@@ -114,4 +119,26 @@ export async function updateAction() {
     '\n'
   )}\n3. No blockers so far`;
   new DailyProgress().addDayProgress(dayDp);
+
+  let resultRecord = dayDp;
+  resultRecord = resultRecord
+    .replace(
+      /\* (\([A-Za-z0-9 %]+\)) \[(.*?)\]\((https:\/\/app.clickup.com\/t\/\w+)\).*/g,
+      '* $1 <a href="$3">$2</a>'
+    )
+    .replace(
+      /\* \[(.*?)\]\((https:\/\/gitlab\.com.*?)\)/g,
+      '* <a href="$2">$1</a>'
+    )
+    .replace(/ {2}-/g, '&nbsp;&nbsp;-')
+    .replace(/ {8}\*/g, '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*')
+    .replace(/ {4}\*/g, '&nbsp;&nbsp;&nbsp;&nbsp;*')
+    .replace(/\n/g, '<br/>')
+    .replace(/'/g, '');
+  execSync(`
+  echo '${resultRecord}' |\
+  hexdump -ve '1/1 "%.2x"' |\
+  xargs printf "set the clipboard to {text:\\\" \\\", «class HTML»:«data HTML%s»}" |\
+  osascript -
+  `);
 }

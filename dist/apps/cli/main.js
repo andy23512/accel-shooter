@@ -346,6 +346,146 @@ exports.crossChecklistAction = crossChecklistAction;
 
 /***/ }),
 
+/***/ "./apps/cli/src/actions/daily-progress.action.ts":
+/*!*******************************************************!*\
+  !*** ./apps/cli/src/actions/daily-progress.action.ts ***!
+  \*******************************************************/
+/*! no static exports found */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.dailyProgressAction = void 0;
+const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
+const child_process_1 = __webpack_require__(/*! child_process */ "child_process");
+const date_fns_1 = __webpack_require__(/*! date-fns */ "date-fns");
+const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
+const daily_progress_class_1 = __webpack_require__(/*! ../classes/daily-progress.class */ "./apps/cli/src/classes/daily-progress.class.ts");
+const holiday_class_1 = __webpack_require__(/*! ../classes/holiday.class */ "./apps/cli/src/classes/holiday.class.ts");
+const todo_class_1 = __webpack_require__(/*! ../classes/todo.class */ "./apps/cli/src/classes/todo.class.ts");
+function dailyProgressAction() {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const today = new Date();
+        const day = process.argv.length >= 4
+            ? date_fns_1.parse(process.argv[3], 'yyyy/MM/dd', today)
+            : today;
+        let previousDay = date_fns_1.add(day, { days: -1 });
+        const holiday = new holiday_class_1.Holiday();
+        while (!holiday.checkIsWorkday(date_fns_1.format(previousDay, 'yyyy/M/d'))) {
+            previousDay = date_fns_1.add(previousDay, { days: -1 });
+        }
+        const previousWorkDay = previousDay;
+        console.log('Previous work day:', date_fns_1.format(previousWorkDay, 'yyyy-MM-dd'));
+        const after = date_fns_1.format(date_fns_1.add(previousWorkDay, { days: -1 }), 'yyyy-MM-dd');
+        const before = date_fns_1.format(day, 'yyyy-MM-dd');
+        const pushedEvents = yield node_shared_1.GitLab.getPushedEvents(after, before);
+        const pushedToEvents = pushedEvents.filter((e) => e.action_name === 'pushed to');
+        const modifiedBranches = [
+            ...new Set(pushedToEvents.map((e) => e.push_data.ref)),
+        ];
+        let result = [];
+        for (const b of modifiedBranches) {
+            const taskId = node_shared_1.getTaskIdFromBranchName(b);
+            if (taskId) {
+                const clickUp = new node_shared_1.ClickUp(node_shared_1.getTaskIdFromBranchName(b));
+                result.push('    ' + (yield clickUp.getTaskString('dp')));
+            }
+        }
+        let result2 = [];
+        const todo = new todo_class_1.Todo();
+        const todoContent = todo.readFile();
+        let matchResult = todoContent.match(/## Todos\n([\s\S]+)\n##/);
+        if (matchResult) {
+            const todoList = matchResult[1].split('\n');
+            const firstTodo = todoList[0];
+            matchResult = firstTodo.match(/https:\/\/app.clickup.com\/t\/(\w+)\)/);
+            if (matchResult) {
+                const taskId = matchResult[1];
+                const clickUp = new node_shared_1.ClickUp(taskId);
+                const taskString = yield clickUp.getTaskString('dp');
+                result2.push('    ' + taskString);
+            }
+            else {
+                result2.push('    ' + firstTodo.replace('- [ ]', '*'));
+            }
+        }
+        else {
+            throw Error('Todo File Broken');
+        }
+        matchResult = todoContent.match(/## Processing\n([\s\S]+)\n##/);
+        if (matchResult) {
+            const processingList = matchResult[1].split('\n');
+            const firstProcessingItem = processingList[0];
+            matchResult = firstProcessingItem.match(/https:\/\/app.clickup.com\/t\/(\w+)\)/);
+            if (matchResult) {
+                const taskId = matchResult[1];
+                const clickUp = new node_shared_1.ClickUp(taskId);
+                const taskString = yield clickUp.getTaskString('dp');
+                result.push('    ' + taskString);
+                result2.push('    ' + (yield clickUp.getTaskString('dp')));
+            }
+            else if (firstProcessingItem.includes('- [ ]')) {
+                result.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
+                result2.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
+            }
+        }
+        if (result2.length === 0) {
+            console.log('Todo of today is empty!');
+            process.exit();
+        }
+        result = [...new Set(result)];
+        result2 = [...new Set(result2)];
+        const approvedEvents = yield node_shared_1.GitLab.getApprovedEvents(after, before);
+        if (approvedEvents.length > 0) {
+            result.push('    * Review');
+            for (const approvedEvent of approvedEvents) {
+                const projectId = approvedEvent.project_id;
+                const mergeRequestIId = approvedEvent.target_iid;
+                const gitLab = new node_shared_1.GitLab(projectId.toString());
+                const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
+                result.push(`        * [${mergeRequest.title}](${mergeRequest.web_url})`);
+            }
+        }
+        const g = new node_shared_1.Google();
+        const previousDayMeeting = yield g.listAttendingEvent(previousWorkDay.toISOString(), day.toISOString());
+        const todayMeeting = yield g.listAttendingEvent(day.toISOString(), date_fns_1.add(day, { days: 1 }).toISOString());
+        if (previousDayMeeting.length > 0) {
+            result.push('    * Meeting');
+            for (const m of previousDayMeeting) {
+                result.push(`        * ${m.summary}`);
+            }
+        }
+        if (todayMeeting.length > 0) {
+            result2.push('    * Meeting');
+            for (const m of todayMeeting) {
+                result2.push(`        * ${m.summary}`);
+            }
+        }
+        const dayDp = `### ${date_fns_1.format(day, 'yyyy/MM/dd')}\n1. Previous Day\n${result.join('\n')}\n2. Today\n${result2.join('\n')}\n3. No blockers so far`;
+        new daily_progress_class_1.DailyProgress().addDayProgress(dayDp);
+        let resultRecord = dayDp;
+        resultRecord = resultRecord
+            .replace(/\* (\([A-Za-z0-9 %]+\)) \[(.*?)\]\((https:\/\/app.clickup.com\/t\/\w+)\).*/g, '* $1 <a href="$3">$2</a>')
+            .replace(/\* \[(.*?)\]\((https:\/\/gitlab\.com.*?)\)/g, '* <a href="$2">$1</a>')
+            .replace(/ {2}-/g, '&nbsp;&nbsp;-')
+            .replace(/ {8}\*/g, '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*')
+            .replace(/ {4}\*/g, '&nbsp;&nbsp;&nbsp;&nbsp;*')
+            .replace(/\n/g, '<br/>')
+            .replace(/'/g, '');
+        child_process_1.execSync(`
+  echo '${resultRecord}' |\
+  hexdump -ve '1/1 "%.2x"' |\
+  xargs printf "set the clipboard to {text:\\\" \\\", «class HTML»:«data HTML%s»}" |\
+  osascript -
+  `);
+    });
+}
+exports.dailyProgressAction = dailyProgressAction;
+
+
+/***/ }),
+
 /***/ "./apps/cli/src/actions/dump-my-tasks.action.ts":
 /*!******************************************************!*\
   !*** ./apps/cli/src/actions/dump-my-tasks.action.ts ***!
@@ -1089,126 +1229,6 @@ function trackAction() {
     });
 }
 exports.trackAction = trackAction;
-
-
-/***/ }),
-
-/***/ "./apps/cli/src/actions/update.action.ts":
-/*!***********************************************!*\
-  !*** ./apps/cli/src/actions/update.action.ts ***!
-  \***********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.updateAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const date_fns_1 = __webpack_require__(/*! date-fns */ "date-fns");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
-const daily_progress_class_1 = __webpack_require__(/*! ../classes/daily-progress.class */ "./apps/cli/src/classes/daily-progress.class.ts");
-const holiday_class_1 = __webpack_require__(/*! ../classes/holiday.class */ "./apps/cli/src/classes/holiday.class.ts");
-const todo_class_1 = __webpack_require__(/*! ../classes/todo.class */ "./apps/cli/src/classes/todo.class.ts");
-function updateAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const today = new Date();
-        const day = process.argv.length >= 4
-            ? date_fns_1.parse(process.argv[3], 'yyyy/MM/dd', today)
-            : today;
-        let previousDay = date_fns_1.add(day, { days: -1 });
-        const holiday = new holiday_class_1.Holiday();
-        while (!holiday.checkIsWorkday(date_fns_1.format(previousDay, 'yyyy/M/d'))) {
-            previousDay = date_fns_1.add(previousDay, { days: -1 });
-        }
-        const previousWorkDay = previousDay;
-        console.log('Previous work day:', date_fns_1.format(previousWorkDay, 'yyyy-MM-dd'));
-        const after = date_fns_1.format(date_fns_1.add(previousWorkDay, { days: -1 }), 'yyyy-MM-dd');
-        const before = date_fns_1.format(day, 'yyyy-MM-dd');
-        const pushedEvents = yield node_shared_1.GitLab.getPushedEvents(after, before);
-        const pushedToEvents = pushedEvents.filter((e) => e.action_name === 'pushed to');
-        const modifiedBranches = [
-            ...new Set(pushedToEvents.map((e) => e.push_data.ref)),
-        ];
-        let result = [];
-        for (const b of modifiedBranches) {
-            const taskId = node_shared_1.getTaskIdFromBranchName(b);
-            if (taskId) {
-                const clickUp = new node_shared_1.ClickUp(node_shared_1.getTaskIdFromBranchName(b));
-                result.push('    ' + (yield clickUp.getTaskString('dp')));
-            }
-        }
-        let result2 = [];
-        const todo = new todo_class_1.Todo();
-        const todoContent = todo.readFile();
-        let matchResult = todoContent.match(/## Todos\n([\s\S]+)\n##/);
-        if (matchResult) {
-            const todoList = matchResult[1].split('\n');
-            const firstTodo = todoList[0];
-            matchResult = firstTodo.match(/https:\/\/app.clickup.com\/t\/(\w+)\)/);
-            if (matchResult) {
-                const taskId = matchResult[1];
-                const clickUp = new node_shared_1.ClickUp(taskId);
-                const taskString = yield clickUp.getTaskString('dp');
-                result2.push('    ' + taskString);
-            }
-            else {
-                result2.push('    ' + firstTodo.replace('- [ ]', '*'));
-            }
-        }
-        else {
-            throw Error('Todo File Broken');
-        }
-        matchResult = todoContent.match(/## Processing\n([\s\S]+)\n##/);
-        if (matchResult) {
-            const processingList = matchResult[1].split('\n');
-            const firstProcessingItem = processingList[0];
-            matchResult = firstProcessingItem.match(/https:\/\/app.clickup.com\/t\/(\w+)\)/);
-            if (matchResult) {
-                const taskId = matchResult[1];
-                const clickUp = new node_shared_1.ClickUp(taskId);
-                const taskString = yield clickUp.getTaskString('dp');
-                result.push('    ' + taskString);
-                result2.push('    ' + (yield clickUp.getTaskString('dp')));
-            }
-            else if (firstProcessingItem.includes('- [ ]')) {
-                result.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
-                result2.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
-            }
-        }
-        result = [...new Set(result)];
-        result2 = [...new Set(result2)];
-        const approvedEvents = yield node_shared_1.GitLab.getApprovedEvents(after, before);
-        if (approvedEvents.length > 0) {
-            result.push('    * Review');
-            for (const approvedEvent of approvedEvents) {
-                const projectId = approvedEvent.project_id;
-                const mergeRequestIId = approvedEvent.target_iid;
-                const gitLab = new node_shared_1.GitLab(projectId.toString());
-                const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
-                result.push(`        * [${mergeRequest.title}](${mergeRequest.web_url})`);
-            }
-        }
-        const g = new node_shared_1.Google();
-        const previousDayMeeting = yield g.listAttendingEvent(previousWorkDay.toISOString(), day.toISOString());
-        const todayMeeting = yield g.listAttendingEvent(day.toISOString(), date_fns_1.add(day, { days: 1 }).toISOString());
-        if (previousDayMeeting.length > 0) {
-            result.push('    * Meeting');
-            for (const m of previousDayMeeting) {
-                result.push(`        * ${m.summary}`);
-            }
-        }
-        if (todayMeeting.length > 0) {
-            result2.push('    * Meeting');
-            for (const m of todayMeeting) {
-                result2.push(`        * ${m.summary}`);
-            }
-        }
-        const dayDp = `### ${date_fns_1.format(day, 'yyyy/MM/dd')}\n1. Previous Day\n${result.join('\n')}\n2. Today\n${result2.join('\n')}\n3. No blockers so far`;
-        new daily_progress_class_1.DailyProgress().addDayProgress(dayDp);
-    });
-}
-exports.updateAction = updateAction;
 
 
 /***/ }),
@@ -1972,6 +1992,7 @@ const close_action_1 = __webpack_require__(/*! ./actions/close.action */ "./apps
 const commit_action_1 = __webpack_require__(/*! ./actions/commit.action */ "./apps/cli/src/actions/commit.action.ts");
 const copy_action_1 = __webpack_require__(/*! ./actions/copy.action */ "./apps/cli/src/actions/copy.action.ts");
 const cross_checklist_action_1 = __webpack_require__(/*! ./actions/cross-checklist.action */ "./apps/cli/src/actions/cross-checklist.action.ts");
+const daily_progress_action_1 = __webpack_require__(/*! ./actions/daily-progress.action */ "./apps/cli/src/actions/daily-progress.action.ts");
 const dump_my_tasks_action_1 = __webpack_require__(/*! ./actions/dump-my-tasks.action */ "./apps/cli/src/actions/dump-my-tasks.action.ts");
 const end_action_1 = __webpack_require__(/*! ./actions/end.action */ "./apps/cli/src/actions/end.action.ts");
 const fetch_holiday_action_1 = __webpack_require__(/*! ./actions/fetch-holiday.action */ "./apps/cli/src/actions/fetch-holiday.action.ts");
@@ -1986,14 +2007,13 @@ const switch_action_1 = __webpack_require__(/*! ./actions/switch.action */ "./ap
 const time_action_1 = __webpack_require__(/*! ./actions/time.action */ "./apps/cli/src/actions/time.action.ts");
 const to_do_action_1 = __webpack_require__(/*! ./actions/to-do.action */ "./apps/cli/src/actions/to-do.action.ts");
 const track_action_1 = __webpack_require__(/*! ./actions/track.action */ "./apps/cli/src/actions/track.action.ts");
-const update_action_1 = __webpack_require__(/*! ./actions/update.action */ "./apps/cli/src/actions/update.action.ts");
 const watch_pipeline_action_1 = __webpack_require__(/*! ./actions/watch-pipeline.action */ "./apps/cli/src/actions/watch-pipeline.action.ts");
 const work_action_1 = __webpack_require__(/*! ./actions/work.action */ "./apps/cli/src/actions/work.action.ts");
 const actions = {
     start: start_action_1.startAction,
     open: open_action_1.openAction,
     switch: switch_action_1.switchAction,
-    update: update_action_1.updateAction,
+    dailyProgress: daily_progress_action_1.dailyProgressAction,
     track: track_action_1.trackAction,
     end: end_action_1.endAction,
     revertEnd: revert_end_action_1.revertEndAction,

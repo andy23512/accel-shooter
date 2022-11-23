@@ -7,6 +7,7 @@ import { closeAction } from './actions/close.action';
 import { commitAction } from './actions/commit.action';
 import { copyAction } from './actions/copy.action';
 import { crossChecklistAction } from './actions/cross-checklist.action';
+import { dailyProgressAction } from './actions/daily-progress.action';
 import { dumpMyTasksAction } from './actions/dump-my-tasks.action';
 import { endAction } from './actions/end.action';
 import { fetchHolidayAction } from './actions/fetch-holiday.action';
@@ -21,7 +22,6 @@ import { switchAction } from './actions/switch.action';
 import { timeAction } from './actions/time.action';
 import { toDoAction } from './actions/to-do.action';
 import { trackAction } from './actions/track.action';
-import { updateAction } from './actions/update.action';
 import { watchPipelineAction } from './actions/watch-pipeline.action';
 import { workAction } from './actions/work.action';
 
@@ -29,7 +29,7 @@ const actions: { [key: string]: () => Promise<void> } = {
   start: startAction,
   open: openAction,
   switch: switchAction,
-  update: updateAction,
+  dailyProgress: dailyProgressAction,
   track: trackAction,
   end: endAction,
   revertEnd: revertEndAction,
