@@ -7,6 +7,7 @@ import puppeteer from 'puppeteer';
 import { CONFIG, sleep } from '@accel-shooter/node-shared';
 
 import { Holiday } from '../classes/holiday.class';
+import { dailyProgressAction } from './daily-progress.action';
 
 export async function routineAction() {
   const ITEMS = [
@@ -39,9 +40,17 @@ export async function routineAction() {
       morningOnly: true,
     },
     {
-      name: 'dpcp',
-      type: 'confirm',
+      name: 'daily progress',
+      type: 'input',
       morningOnly: true,
+      async validate(input: string) {
+        if (input) {
+          await dailyProgressAction();
+          return true;
+        } else {
+          process.exit();
+        }
+      },
     },
     {
       name: 'send dp to slack',
