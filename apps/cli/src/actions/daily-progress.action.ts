@@ -5,9 +5,22 @@ import { ClickUp, getTaskIdFromBranchName, GitLab, Google } from '@accel-shooter
 
 import { DailyProgress } from '../classes/daily-progress.class';
 import { Holiday } from '../classes/holiday.class';
+import { CustomProgressLog } from '../classes/progress-log.class';
 import { Todo } from '../classes/todo.class';
 
 export async function dailyProgressAction() {
+  const p = new CustomProgressLog('Daily Progress', [
+    'Get Date',
+    'Get Pushed Events',
+    'Get Progressed Tasks',
+    'Get Todo Task',
+    'Get Processing Tasks',
+    'Get Reviewed Merge Requests',
+    'Get Meetings',
+    'Add Day Progress Entry',
+    'Copy Day Progress into Clipboard',
+  ]);
+  p.start(); // Get Date
   const today = new Date();
   const day =
     process.argv.length >= 4
@@ -20,6 +33,7 @@ export async function dailyProgressAction() {
   }
   const previousWorkDay = previousDay;
   console.log('Previous work day:', format(previousWorkDay, 'yyyy-MM-dd'));
+  p.next(); // Get Pushed Events
   const after = format(add(previousWorkDay, { days: -1 }), 'yyyy-MM-dd');
   const before = format(day, 'yyyy-MM-dd');
   const pushedEvents = await GitLab.getPushedEvents(after, before);
@@ -29,6 +43,7 @@ export async function dailyProgressAction() {
   const modifiedBranches = [
     ...new Set(pushedToEvents.map((e) => e.push_data.ref)),
   ];
+  p.next(); // Get Progressed Tasks
   let result = [];
   for (const b of modifiedBranches) {
     const taskId = getTaskIdFromBranchName(b);
@@ -37,6 +52,7 @@ export async function dailyProgressAction() {
       result.push('    ' + (await clickUp.getTaskString('dp')));
     }
   }
+  p.next(); // Get Todo Task
   let result2 = [];
   const todo = new Todo();
   const todoContent = todo.readFile();
@@ -56,6 +72,7 @@ export async function dailyProgressAction() {
   } else {
     throw Error('Todo File Broken');
   }
+  p.next(); // Get Processing Tasks
   matchResult = todoContent.match(/## Processing\n([\s\S]+)\n##/);
   if (matchResult) {
     const processingList = matchResult[1].split('\n');
@@ -80,6 +97,7 @@ export async function dailyProgressAction() {
   }
   result = [...new Set(result)];
   result2 = [...new Set(result2)];
+  p.next(); // Get Reviewed Merge Requests
   const approvedEvents = await GitLab.getApprovedEvents(after, before);
   if (approvedEvents.length > 0) {
     result.push('    * Review');
@@ -91,6 +109,7 @@ export async function dailyProgressAction() {
       result.push(`        * [${mergeRequest.title}](${mergeRequest.web_url})`);
     }
   }
+  p.next(); // Get Meetings
   const g = new Google();
   const previousDayMeeting = await g.listAttendingEvent(
     previousWorkDay.toISOString(),
@@ -112,6 +131,7 @@ export async function dailyProgressAction() {
       result2.push(`        * ${m.summary}`);
     }
   }
+  p.next(); // Add Day Progress Entry
   const dayDp = `### ${format(
     day,
     'yyyy/MM/dd'
@@ -120,6 +140,7 @@ export async function dailyProgressAction() {
   )}\n3. No blockers so far`;
   new DailyProgress().addDayProgress(dayDp);
 
+  p.next(); // Copy Day Progress into Clipboard
   let resultRecord = dayDp;
   resultRecord = resultRecord
     .replace(
@@ -141,4 +162,5 @@ export async function dailyProgressAction() {
   xargs printf "set the clipboard to {text:\\\" \\\", «class HTML»:«data HTML%s»}" |\
   osascript -
   `);
+  p.end(0);
 }

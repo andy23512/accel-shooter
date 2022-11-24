@@ -363,9 +363,22 @@ const date_fns_1 = __webpack_require__(/*! date-fns */ "date-fns");
 const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const daily_progress_class_1 = __webpack_require__(/*! ../classes/daily-progress.class */ "./apps/cli/src/classes/daily-progress.class.ts");
 const holiday_class_1 = __webpack_require__(/*! ../classes/holiday.class */ "./apps/cli/src/classes/holiday.class.ts");
+const progress_log_class_1 = __webpack_require__(/*! ../classes/progress-log.class */ "./apps/cli/src/classes/progress-log.class.ts");
 const todo_class_1 = __webpack_require__(/*! ../classes/todo.class */ "./apps/cli/src/classes/todo.class.ts");
 function dailyProgressAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const p = new progress_log_class_1.CustomProgressLog('Daily Progress', [
+            'Get Date',
+            'Get Pushed Events',
+            'Get Progressed Tasks',
+            'Get Todo Task',
+            'Get Processing Tasks',
+            'Get Reviewed Merge Requests',
+            'Get Meetings',
+            'Add Day Progress Entry',
+            'Copy Day Progress into Clipboard',
+        ]);
+        p.start(); // Get Date
         const today = new Date();
         const day = process.argv.length >= 4
             ? date_fns_1.parse(process.argv[3], 'yyyy/MM/dd', today)
@@ -377,6 +390,7 @@ function dailyProgressAction() {
         }
         const previousWorkDay = previousDay;
         console.log('Previous work day:', date_fns_1.format(previousWorkDay, 'yyyy-MM-dd'));
+        p.next(); // Get Pushed Events
         const after = date_fns_1.format(date_fns_1.add(previousWorkDay, { days: -1 }), 'yyyy-MM-dd');
         const before = date_fns_1.format(day, 'yyyy-MM-dd');
         const pushedEvents = yield node_shared_1.GitLab.getPushedEvents(after, before);
@@ -384,6 +398,7 @@ function dailyProgressAction() {
         const modifiedBranches = [
             ...new Set(pushedToEvents.map((e) => e.push_data.ref)),
         ];
+        p.next(); // Get Progressed Tasks
         let result = [];
         for (const b of modifiedBranches) {
             const taskId = node_shared_1.getTaskIdFromBranchName(b);
@@ -392,6 +407,7 @@ function dailyProgressAction() {
                 result.push('    ' + (yield clickUp.getTaskString('dp')));
             }
         }
+        p.next(); // Get Todo Task
         let result2 = [];
         const todo = new todo_class_1.Todo();
         const todoContent = todo.readFile();
@@ -413,6 +429,7 @@ function dailyProgressAction() {
         else {
             throw Error('Todo File Broken');
         }
+        p.next(); // Get Processing Tasks
         matchResult = todoContent.match(/## Processing\n([\s\S]+)\n##/);
         if (matchResult) {
             const processingList = matchResult[1].split('\n');
@@ -436,6 +453,7 @@ function dailyProgressAction() {
         }
         result = [...new Set(result)];
         result2 = [...new Set(result2)];
+        p.next(); // Get Reviewed Merge Requests
         const approvedEvents = yield node_shared_1.GitLab.getApprovedEvents(after, before);
         if (approvedEvents.length > 0) {
             result.push('    * Review');
@@ -447,6 +465,7 @@ function dailyProgressAction() {
                 result.push(`        * [${mergeRequest.title}](${mergeRequest.web_url})`);
             }
         }
+        p.next(); // Get Meetings
         const g = new node_shared_1.Google();
         const previousDayMeeting = yield g.listAttendingEvent(previousWorkDay.toISOString(), day.toISOString());
         const todayMeeting = yield g.listAttendingEvent(day.toISOString(), date_fns_1.add(day, { days: 1 }).toISOString());
@@ -462,8 +481,10 @@ function dailyProgressAction() {
                 result2.push(`        * ${m.summary}`);
             }
         }
+        p.next(); // Add Day Progress Entry
         const dayDp = `### ${date_fns_1.format(day, 'yyyy/MM/dd')}\n1. Previous Day\n${result.join('\n')}\n2. Today\n${result2.join('\n')}\n3. No blockers so far`;
         new daily_progress_class_1.DailyProgress().addDayProgress(dayDp);
+        p.next(); // Copy Day Progress into Clipboard
         let resultRecord = dayDp;
         resultRecord = resultRecord
             .replace(/\* (\([A-Za-z0-9 %]+\)) \[(.*?)\]\((https:\/\/app.clickup.com\/t\/\w+)\).*/g, '* $1 <a href="$3">$2</a>')
@@ -479,6 +500,7 @@ function dailyProgressAction() {
   xargs printf "set the clipboard to {text:\\\" \\\", «class HTML»:«data HTML%s»}" |\
   osascript -
   `);
+        p.end(0);
     });
 }
 exports.dailyProgressAction = dailyProgressAction;
