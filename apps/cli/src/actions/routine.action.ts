@@ -8,6 +8,7 @@ import { CONFIG, sleep } from '@accel-shooter/node-shared';
 
 import { Holiday } from '../classes/holiday.class';
 import { dailyProgressAction } from './daily-progress.action';
+import { dumpMyTasksAction } from './dump-my-tasks.action';
 
 export async function routineAction() {
   const ITEMS = [
@@ -28,6 +29,19 @@ export async function routineAction() {
       name: 'isa',
       type: 'confirm',
       morningOnly: true,
+    },
+    {
+      name: 'dump my tasks',
+      type: 'input',
+      morningOnly: true,
+      async validate(input: string) {
+        if (input) {
+          await dumpMyTasksAction();
+          return true;
+        } else {
+          process.exit();
+        }
+      },
     },
     {
       name: 'check tasks',

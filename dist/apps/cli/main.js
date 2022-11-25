@@ -720,6 +720,7 @@ const puppeteer_1 = tslib_1.__importDefault(__webpack_require__(/*! puppeteer */
 const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
 const holiday_class_1 = __webpack_require__(/*! ../classes/holiday.class */ "./apps/cli/src/classes/holiday.class.ts");
 const daily_progress_action_1 = __webpack_require__(/*! ./daily-progress.action */ "./apps/cli/src/actions/daily-progress.action.ts");
+const dump_my_tasks_action_1 = __webpack_require__(/*! ./dump-my-tasks.action */ "./apps/cli/src/actions/dump-my-tasks.action.ts");
 function routineAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const ITEMS = [
@@ -743,6 +744,22 @@ function routineAction() {
                 name: 'isa',
                 type: 'confirm',
                 morningOnly: true,
+            },
+            {
+                name: 'dump my tasks',
+                type: 'input',
+                morningOnly: true,
+                validate(input) {
+                    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+                        if (input) {
+                            yield dump_my_tasks_action_1.dumpMyTasksAction();
+                            return true;
+                        }
+                        else {
+                            process.exit();
+                        }
+                    });
+                },
             },
             {
                 name: 'check tasks',
