@@ -1,86 +1,36 @@
 import childProcess from 'child_process';
 import { format, parse } from 'date-fns';
 import fs from 'fs';
-import inquirer from 'inquirer';
 import puppeteer from 'puppeteer';
 
 import { CONFIG, sleep } from '@accel-shooter/node-shared';
 
+import readline from 'readline';
 import { Holiday } from '../classes/holiday.class';
 import { dailyProgressAction } from './daily-progress.action';
 import { dumpMyTasksAction } from './dump-my-tasks.action';
 
+export function confirm(question: string) {
+  return new Promise<void>((resolve, reject) => {
+    const prompt = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
+    prompt.question(question + ' (y/n) ', function (answer) {
+      if (answer === 'y' || answer === 'Y') {
+        prompt.close();
+        resolve();
+      } else {
+        reject();
+      }
+    });
+  });
+}
+
 export async function routineAction() {
-  const ITEMS = [
-    {
-      name: 'Punch',
-      type: 'input',
-      async validate(input: string) {
-        if (input) {
-          const result = await punch();
-          console.log(result);
-          return true;
-        } else {
-          process.exit();
-        }
-      },
-    },
-    {
-      name: 'isa',
-      type: 'confirm',
-      morningOnly: true,
-    },
-    {
-      name: 'dump my tasks',
-      type: 'input',
-      morningOnly: true,
-      async validate(input: string) {
-        if (input) {
-          await dumpMyTasksAction();
-          return true;
-        } else {
-          process.exit();
-        }
-      },
-    },
-    {
-      name: 'check tasks',
-      type: 'confirm',
-      morningOnly: true,
-    },
-    {
-      name: 'check todo',
-      type: 'confirm',
-      morningOnly: true,
-    },
-    {
-      name: 'daily progress',
-      type: 'input',
-      morningOnly: true,
-      async validate(input: string) {
-        if (input) {
-          await dailyProgressAction();
-          return true;
-        } else {
-          process.exit();
-        }
-      },
-    },
-    {
-      name: 'send dp to slack',
-      type: 'confirm',
-      morningOnly: true,
-    },
-    {
-      name: 'topgrade',
-      type: 'confirm',
-      morningOnly: true,
-    },
-  ];
   const today = new Date();
   const hour = today.getHours();
-  const items =
-    hour > 12 ? ITEMS.filter(({ morningOnly }) => !morningOnly) : ITEMS;
+  const isMorning = hour < 12;
   const day =
     process.argv.length >= 4
       ? parse(process.argv[3], 'yyyy/MM/dd', today)
@@ -98,7 +48,20 @@ export async function routineAction() {
     return;
   }
   console.log('Today is workday!');
-  await inquirer.prompt(items);
+  await confirm('run punch?');
+  const result = await punch();
+  console.log(result);
+  if (isMorning) {
+    await confirm('isa done?');
+    await confirm('run dump my tasks?');
+    await dumpMyTasksAction();
+    await confirm('check tasks done?');
+    await confirm('check todo done?');
+    await confirm('run daily progress?');
+    await dailyProgressAction();
+    await confirm('send dp to slack done?');
+    await confirm('topgrade done?');
+  }
   console.log('Complete');
 }
 

@@ -710,97 +710,40 @@ exports.revertEndAction = revertEndAction;
 "use strict";
 
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.punch = exports.routineAction = void 0;
+exports.punch = exports.routineAction = exports.confirm = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
 const child_process_1 = tslib_1.__importDefault(__webpack_require__(/*! child_process */ "child_process"));
 const date_fns_1 = __webpack_require__(/*! date-fns */ "date-fns");
 const fs_1 = tslib_1.__importDefault(__webpack_require__(/*! fs */ "fs"));
-const inquirer_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer */ "inquirer"));
 const puppeteer_1 = tslib_1.__importDefault(__webpack_require__(/*! puppeteer */ "puppeteer"));
 const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
+const readline_1 = tslib_1.__importDefault(__webpack_require__(/*! readline */ "readline"));
 const holiday_class_1 = __webpack_require__(/*! ../classes/holiday.class */ "./apps/cli/src/classes/holiday.class.ts");
 const daily_progress_action_1 = __webpack_require__(/*! ./daily-progress.action */ "./apps/cli/src/actions/daily-progress.action.ts");
 const dump_my_tasks_action_1 = __webpack_require__(/*! ./dump-my-tasks.action */ "./apps/cli/src/actions/dump-my-tasks.action.ts");
+function confirm(question) {
+    return new Promise((resolve, reject) => {
+        const prompt = readline_1.default.createInterface({
+            input: process.stdin,
+            output: process.stdout,
+        });
+        prompt.question(question + ' (y/n) ', function (answer) {
+            if (answer === 'y' || answer === 'Y') {
+                prompt.close();
+                resolve();
+            }
+            else {
+                reject();
+            }
+        });
+    });
+}
+exports.confirm = confirm;
 function routineAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const ITEMS = [
-            {
-                name: 'Punch',
-                type: 'input',
-                validate(input) {
-                    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-                        if (input) {
-                            const result = yield punch();
-                            console.log(result);
-                            return true;
-                        }
-                        else {
-                            process.exit();
-                        }
-                    });
-                },
-            },
-            {
-                name: 'isa',
-                type: 'confirm',
-                morningOnly: true,
-            },
-            {
-                name: 'dump my tasks',
-                type: 'input',
-                morningOnly: true,
-                validate(input) {
-                    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-                        if (input) {
-                            yield dump_my_tasks_action_1.dumpMyTasksAction();
-                            return true;
-                        }
-                        else {
-                            process.exit();
-                        }
-                    });
-                },
-            },
-            {
-                name: 'check tasks',
-                type: 'confirm',
-                morningOnly: true,
-            },
-            {
-                name: 'check todo',
-                type: 'confirm',
-                morningOnly: true,
-            },
-            {
-                name: 'daily progress',
-                type: 'input',
-                morningOnly: true,
-                validate(input) {
-                    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-                        if (input) {
-                            yield daily_progress_action_1.dailyProgressAction();
-                            return true;
-                        }
-                        else {
-                            process.exit();
-                        }
-                    });
-                },
-            },
-            {
-                name: 'send dp to slack',
-                type: 'confirm',
-                morningOnly: true,
-            },
-            {
-                name: 'topgrade',
-                type: 'confirm',
-                morningOnly: true,
-            },
-        ];
         const today = new Date();
         const hour = today.getHours();
-        const items = hour > 12 ? ITEMS.filter(({ morningOnly }) => !morningOnly) : ITEMS;
+        const isMorning = hour < 12;
         const day = process.argv.length >= 4
             ? date_fns_1.parse(process.argv[3], 'yyyy/MM/dd', today)
             : today;
@@ -815,7 +758,20 @@ function routineAction() {
             return;
         }
         console.log('Today is workday!');
-        yield inquirer_1.default.prompt(items);
+        yield confirm('run punch?');
+        const result = yield punch();
+        console.log(result);
+        if (isMorning) {
+            yield confirm('isa done?');
+            yield confirm('run dump my tasks?');
+            yield dump_my_tasks_action_1.dumpMyTasksAction();
+            yield confirm('check tasks done?');
+            yield confirm('check todo done?');
+            yield confirm('run daily progress?');
+            yield daily_progress_action_1.dailyProgressAction();
+            yield confirm('send dp to slack done?');
+            yield confirm('topgrade done?');
+        }
         console.log('Complete');
     });
 }
