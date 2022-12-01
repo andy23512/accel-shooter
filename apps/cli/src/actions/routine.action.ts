@@ -60,6 +60,7 @@ export async function routineAction() {
     await confirm('run daily progress?');
     await dailyProgressAction();
     await confirm('send dp to slack done?');
+    await confirm('macupdater done?');
     await confirm('topgrade done?');
   }
   console.log('Complete');
