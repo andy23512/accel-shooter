@@ -712,7 +712,6 @@ exports.revertEndAction = revertEndAction;
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.punch = exports.routineAction = exports.confirm = void 0;
 const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const child_process_1 = tslib_1.__importDefault(__webpack_require__(/*! child_process */ "child_process"));
 const date_fns_1 = __webpack_require__(/*! date-fns */ "date-fns");
 const fs_1 = tslib_1.__importDefault(__webpack_require__(/*! fs */ "fs"));
 const puppeteer_1 = tslib_1.__importDefault(__webpack_require__(/*! puppeteer */ "puppeteer"));
@@ -749,27 +748,24 @@ function routineAction() {
             : today;
         const holiday = new holiday_class_1.Holiday();
         const isWorkDay = holiday.checkIsWorkday(date_fns_1.format(day, 'yyyy/M/d'));
-        if (!isWorkDay) {
-            const message = 'Today is holiday!';
-            console.log(message);
-            child_process_1.default.execSync(`osascript -e 'display notification "${message
-                .replace(/"/g, '')
-                .replace(/'/g, '')}" with title "Accel Shooter"'`);
-            return;
+        const message = isWorkDay ? 'Today is workday!' : 'Today is holiday!';
+        console.log(message);
+        if (isWorkDay) {
+            yield confirm('run punch?');
+            const result = yield punch();
+            console.log(result);
         }
-        console.log('Today is workday!');
-        yield confirm('run punch?');
-        const result = yield punch();
-        console.log(result);
         if (isMorning) {
-            yield confirm('isa done?');
-            yield confirm('run dump my tasks?');
-            yield dump_my_tasks_action_1.dumpMyTasksAction();
-            yield confirm('check tasks done?');
-            yield confirm('check todo done?');
-            yield confirm('run daily progress?');
-            yield daily_progress_action_1.dailyProgressAction();
-            yield confirm('send dp to slack done?');
+            if (isWorkDay) {
+                yield confirm('isa done?');
+                yield confirm('run dump my tasks?');
+                yield dump_my_tasks_action_1.dumpMyTasksAction();
+                yield confirm('check tasks done?');
+                yield confirm('check todo done?');
+                yield confirm('run daily progress?');
+                yield daily_progress_action_1.dailyProgressAction();
+                yield confirm('send dp to slack done?');
+            }
             yield confirm('macupdater done?');
             yield confirm('topgrade done?');
         }

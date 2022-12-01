@@ -1,4 +1,3 @@
-import childProcess from 'child_process';
 import { format, parse } from 'date-fns';
 import fs from 'fs';
 import puppeteer from 'puppeteer';
@@ -37,29 +36,24 @@ export async function routineAction() {
       : today;
   const holiday = new Holiday();
   const isWorkDay = holiday.checkIsWorkday(format(day, 'yyyy/M/d'));
-  if (!isWorkDay) {
-    const message = 'Today is holiday!';
-    console.log(message);
-    childProcess.execSync(
-      `osascript -e 'display notification "${message
-        .replace(/"/g, '')
-        .replace(/'/g, '')}" with title "Accel Shooter"'`
-    );
-    return;
+  const message = isWorkDay ? 'Today is workday!' : 'Today is holiday!';
+  console.log(message);
+  if (isWorkDay) {
+    await confirm('run punch?');
+    const result = await punch();
+    console.log(result);
   }
-  console.log('Today is workday!');
-  await confirm('run punch?');
-  const result = await punch();
-  console.log(result);
   if (isMorning) {
-    await confirm('isa done?');
-    await confirm('run dump my tasks?');
-    await dumpMyTasksAction();
-    await confirm('check tasks done?');
-    await confirm('check todo done?');
-    await confirm('run daily progress?');
-    await dailyProgressAction();
-    await confirm('send dp to slack done?');
+    if (isWorkDay) {
+      await confirm('isa done?');
+      await confirm('run dump my tasks?');
+      await dumpMyTasksAction();
+      await confirm('check tasks done?');
+      await confirm('check todo done?');
+      await confirm('run daily progress?');
+      await dailyProgressAction();
+      await confirm('send dp to slack done?');
+    }
     await confirm('macupdater done?');
     await confirm('topgrade done?');
   }
