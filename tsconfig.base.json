@@ -16,9 +16,9 @@
     "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
+      "*": ["./src/@types/*"],
       "@accel-shooter/api-interfaces": ["libs/api-interfaces/src/index.ts"],
-      "@accel-shooter/node-shared": ["libs/node-shared/src/index.ts"],
-      "*": ["./src/@types/*"]
+      "@accel-shooter/node-shared": ["libs/node-shared/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]

@@ -1,104 +1,15 @@
-(function(e, a) { for(var i in a) e[i] = a[i]; }(exports, /******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// define __esModule on exports
-/******/ 	__webpack_require__.r = function(exports) {
-/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 		}
-/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 	};
-/******/
-/******/ 	// create a fake namespace object
-/******/ 	// mode & 1: value is a module id, require it
-/******/ 	// mode & 2: merge all properties of value into the ns
-/******/ 	// mode & 4: return value when already ns object
-/******/ 	// mode & 8|1: behave like require
-/******/ 	__webpack_require__.t = function(value, mode) {
-/******/ 		if(mode & 1) value = __webpack_require__(value);
-/******/ 		if(mode & 8) return value;
-/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
-/******/ 		var ns = Object.create(null);
-/******/ 		__webpack_require__.r(ns);
-/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
-/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
-/******/ 		return ns;
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-/******/
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
-/******/ })
-/************************************************************************/
-/******/ ({
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	var __webpack_modules__ = ({
 
 /***/ "./apps/cli/src/actions.ts":
-/*!*********************************!*\
-  !*** ./apps/cli/src/actions.ts ***!
-  \*********************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.configReadline = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const readline_1 = tslib_1.__importDefault(__webpack_require__(/*! readline */ "readline"));
+const tslib_1 = __webpack_require__("tslib");
+const readline_1 = tslib_1.__importDefault(__webpack_require__("readline"));
 function configReadline() {
     readline_1.default.emitKeypressEvents(process.stdin);
 }
@@ -108,24 +19,19 @@ exports.configReadline = configReadline;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/check.action.ts":
-/*!**********************************************!*\
-  !*** ./apps/cli/src/actions/check.action.ts ***!
-  \**********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.checkAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const checker_class_1 = __webpack_require__(/*! ../classes/checker.class */ "./apps/cli/src/classes/checker.class.ts");
-const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+const tslib_1 = __webpack_require__("tslib");
+const checker_class_1 = __webpack_require__("./apps/cli/src/classes/checker.class.ts");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 function checkAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const selectMode = process.argv.includes("-s") || process.argv.includes("--select");
         process.argv = process.argv.filter((a) => a !== "-s" && a !== "--select");
-        const { gitLabProject, mergeRequestIId } = yield utils_1.getInfoFromArgv();
+        const { gitLabProject, mergeRequestIId } = yield (0, utils_1.getInfoFromArgv)();
         const checker = new checker_class_1.Checker(gitLabProject, mergeRequestIId, selectMode);
         yield checker.start();
     });
@@ -136,23 +42,18 @@ exports.checkAction = checkAction;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/close.action.ts":
-/*!**********************************************!*\
-  !*** ./apps/cli/src/actions/close.action.ts ***!
-  \**********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.closeAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const progress_log_class_1 = __webpack_require__(/*! ../classes/progress-log.class */ "./apps/cli/src/classes/progress-log.class.ts");
-const todo_class_1 = __webpack_require__(/*! ../classes/todo.class */ "./apps/cli/src/classes/todo.class.ts");
-const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+const tslib_1 = __webpack_require__("tslib");
+const progress_log_class_1 = __webpack_require__("./apps/cli/src/classes/progress-log.class.ts");
+const todo_class_1 = __webpack_require__("./apps/cli/src/classes/todo.class.ts");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 function closeAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { gitLab, mergeRequest, clickUp, clickUpTaskId } = yield utils_1.getInfoFromArgv();
+        const { gitLab, mergeRequest, clickUp, clickUpTaskId } = yield (0, utils_1.getInfoFromArgv)();
         const p = new progress_log_class_1.CustomProgressLog('Close', [
             'Close GitLab Merge Request',
             'Update ClickUp Task Status',
@@ -164,7 +65,7 @@ function closeAction() {
         p.next(); // Update ClickUp Task Status
         yield clickUp.setTaskStatus('suspended');
         p.next(); // Close Tab Group
-        utils_1.openUrlsInTabGroup([], clickUpTaskId);
+        (0, utils_1.openUrlsInTabGroup)([], clickUpTaskId);
         p.next(); // Remove Todo
         const todo = new todo_class_1.Todo();
         todo.removeTodo(clickUpTaskId);
@@ -177,22 +78,17 @@ exports.closeAction = closeAction;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/commit.action.ts":
-/*!***********************************************!*\
-  !*** ./apps/cli/src/actions/commit.action.ts ***!
-  \***********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.commitAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const fuzzy_1 = tslib_1.__importDefault(__webpack_require__(/*! fuzzy */ "fuzzy"));
-const inquirer_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer */ "inquirer"));
-const inquirer_autocomplete_prompt_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer-autocomplete-prompt */ "inquirer-autocomplete-prompt"));
-const commit_scope_class_1 = __webpack_require__(/*! ../classes/commit-scope.class */ "./apps/cli/src/classes/commit-scope.class.ts");
-const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+const tslib_1 = __webpack_require__("tslib");
+const fuzzy_1 = tslib_1.__importDefault(__webpack_require__("fuzzy"));
+const inquirer_1 = tslib_1.__importDefault(__webpack_require__("inquirer"));
+const inquirer_autocomplete_prompt_1 = tslib_1.__importDefault(__webpack_require__("inquirer-autocomplete-prompt"));
+const commit_scope_class_1 = __webpack_require__("./apps/cli/src/classes/commit-scope.class.ts");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 const TYPES = [
     'feat',
     'fix',
@@ -208,7 +104,7 @@ const TYPES = [
 ];
 function commitAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { mergeRequest } = yield utils_1.getInfoFromArgv(false, true);
+        const { mergeRequest } = yield (0, utils_1.getInfoFromArgv)(false, true);
         if (mergeRequest) {
             const title = mergeRequest.title;
             if (!(title.startsWith('WIP: ') || title.startsWith('Draft: '))) {
@@ -216,12 +112,12 @@ function commitAction() {
                 return;
             }
         }
-        const dryRunResult = yield utils_1.promiseSpawn('git', ['commit', '--dry-run'], 'pipe');
+        const dryRunResult = yield (0, utils_1.promiseSpawn)('git', ['commit', '--dry-run'], 'pipe');
         if (dryRunResult.stdout.includes('nothing to commit, working tree clean')) {
             console.log('Nothing to commit.');
             return;
         }
-        const repoName = utils_1.getRepoName();
+        const repoName = (0, utils_1.getRepoName)();
         inquirer_1.default.registerPrompt('autocomplete', inquirer_autocomplete_prompt_1.default);
         const commitScope = new commit_scope_class_1.CommitScope();
         const commitScopeItems = commitScope.getItems(repoName);
@@ -251,7 +147,7 @@ function commitAction() {
         const { type, scope, subject } = answers;
         const finalScope = scope === 'empty' ? null : scope;
         const message = `${type}${finalScope ? '(' + finalScope + ')' : ''}: ${subject}`;
-        yield utils_1.promiseSpawn('git', ['commit', '-m', `"${message}"`], 'inherit');
+        yield (0, utils_1.promiseSpawn)('git', ['commit', '-m', `"${message}"`], 'inherit');
     });
 }
 exports.commitAction = commitAction;
@@ -260,22 +156,17 @@ exports.commitAction = commitAction;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/copy.action.ts":
-/*!*********************************************!*\
-  !*** ./apps/cli/src/actions/copy.action.ts ***!
-  \*********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.copyAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const clipboardy_1 = tslib_1.__importDefault(__webpack_require__(/*! clipboardy */ "clipboardy"));
-const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+const tslib_1 = __webpack_require__("tslib");
+const clipboardy_1 = tslib_1.__importDefault(__webpack_require__("clipboardy"));
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 function copyAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { clickUp } = yield utils_1.getInfoFromArgv(true);
+        const { clickUp } = yield (0, utils_1.getInfoFromArgv)(true);
         const string = yield clickUp.getTaskString('todo');
         clipboardy_1.default.writeSync(string);
         console.log('Copied!');
@@ -287,20 +178,15 @@ exports.copyAction = copyAction;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/cross-checklist.action.ts":
-/*!********************************************************!*\
-  !*** ./apps/cli/src/actions/cross-checklist.action.ts ***!
-  \********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.crossChecklistAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
-const clipboardy_1 = tslib_1.__importDefault(__webpack_require__(/*! clipboardy */ "clipboardy"));
-const inquirer_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer */ "inquirer"));
+const tslib_1 = __webpack_require__("tslib");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const clipboardy_1 = tslib_1.__importDefault(__webpack_require__("clipboardy"));
+const inquirer_1 = tslib_1.__importDefault(__webpack_require__("inquirer"));
 function crossChecklistAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const answers = yield inquirer_1.default.prompt([
@@ -347,24 +233,19 @@ exports.crossChecklistAction = crossChecklistAction;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/daily-progress.action.ts":
-/*!*******************************************************!*\
-  !*** ./apps/cli/src/actions/daily-progress.action.ts ***!
-  \*******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.dailyProgressAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const child_process_1 = __webpack_require__(/*! child_process */ "child_process");
-const date_fns_1 = __webpack_require__(/*! date-fns */ "date-fns");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
-const daily_progress_class_1 = __webpack_require__(/*! ../classes/daily-progress.class */ "./apps/cli/src/classes/daily-progress.class.ts");
-const holiday_class_1 = __webpack_require__(/*! ../classes/holiday.class */ "./apps/cli/src/classes/holiday.class.ts");
-const progress_log_class_1 = __webpack_require__(/*! ../classes/progress-log.class */ "./apps/cli/src/classes/progress-log.class.ts");
-const todo_class_1 = __webpack_require__(/*! ../classes/todo.class */ "./apps/cli/src/classes/todo.class.ts");
+const tslib_1 = __webpack_require__("tslib");
+const child_process_1 = __webpack_require__("child_process");
+const date_fns_1 = __webpack_require__("date-fns");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const daily_progress_class_1 = __webpack_require__("./apps/cli/src/classes/daily-progress.class.ts");
+const holiday_class_1 = __webpack_require__("./apps/cli/src/classes/holiday.class.ts");
+const progress_log_class_1 = __webpack_require__("./apps/cli/src/classes/progress-log.class.ts");
+const todo_class_1 = __webpack_require__("./apps/cli/src/classes/todo.class.ts");
 function dailyProgressAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const p = new progress_log_class_1.CustomProgressLog('Daily Progress', [
@@ -381,18 +262,18 @@ function dailyProgressAction() {
         p.start(); // Get Date
         const today = new Date();
         const day = process.argv.length >= 4
-            ? date_fns_1.parse(process.argv[3], 'yyyy/MM/dd', today)
+            ? (0, date_fns_1.parse)(process.argv[3], 'yyyy/MM/dd', today)
             : today;
-        let previousDay = date_fns_1.add(day, { days: -1 });
+        let previousDay = (0, date_fns_1.add)(day, { days: -1 });
         const holiday = new holiday_class_1.Holiday();
-        while (!holiday.checkIsWorkday(date_fns_1.format(previousDay, 'yyyy/M/d'))) {
-            previousDay = date_fns_1.add(previousDay, { days: -1 });
+        while (!holiday.checkIsWorkday((0, date_fns_1.format)(previousDay, 'yyyy/M/d'))) {
+            previousDay = (0, date_fns_1.add)(previousDay, { days: -1 });
         }
         const previousWorkDay = previousDay;
-        console.log('Previous work day:', date_fns_1.format(previousWorkDay, 'yyyy-MM-dd'));
+        console.log('Previous work day:', (0, date_fns_1.format)(previousWorkDay, 'yyyy-MM-dd'));
         p.next(); // Get Pushed Events
-        const after = date_fns_1.format(date_fns_1.add(previousWorkDay, { days: -1 }), 'yyyy-MM-dd');
-        const before = date_fns_1.format(day, 'yyyy-MM-dd');
+        const after = (0, date_fns_1.format)((0, date_fns_1.add)(previousWorkDay, { days: -1 }), 'yyyy-MM-dd');
+        const before = (0, date_fns_1.format)(day, 'yyyy-MM-dd');
         const pushedEvents = yield node_shared_1.GitLab.getPushedEvents(after, before);
         const pushedToEvents = pushedEvents.filter((e) => e.action_name === 'pushed to');
         const modifiedBranches = [
@@ -401,9 +282,9 @@ function dailyProgressAction() {
         p.next(); // Get Progressed Tasks
         let result = [];
         for (const b of modifiedBranches) {
-            const taskId = node_shared_1.getTaskIdFromBranchName(b);
+            const taskId = (0, node_shared_1.getTaskIdFromBranchName)(b);
             if (taskId) {
-                const clickUp = new node_shared_1.ClickUp(node_shared_1.getTaskIdFromBranchName(b));
+                const clickUp = new node_shared_1.ClickUp((0, node_shared_1.getTaskIdFromBranchName)(b));
                 result.push('    ' + (yield clickUp.getTaskString('dp')));
             }
         }
@@ -468,7 +349,7 @@ function dailyProgressAction() {
         p.next(); // Get Meetings
         const g = new node_shared_1.Google();
         const previousDayMeeting = yield g.listAttendingEvent(previousWorkDay.toISOString(), day.toISOString());
-        const todayMeeting = yield g.listAttendingEvent(day.toISOString(), date_fns_1.add(day, { days: 1 }).toISOString());
+        const todayMeeting = yield g.listAttendingEvent(day.toISOString(), (0, date_fns_1.add)(day, { days: 1 }).toISOString());
         if (previousDayMeeting.length > 0) {
             result.push('    * Meeting');
             for (const m of previousDayMeeting) {
@@ -482,7 +363,7 @@ function dailyProgressAction() {
             }
         }
         p.next(); // Add Day Progress Entry
-        const dayDp = `### ${date_fns_1.format(day, 'yyyy/MM/dd')}\n1. Previous Day\n${result.join('\n')}\n2. Today\n${result2.join('\n')}\n3. No blockers so far`;
+        const dayDp = `### ${(0, date_fns_1.format)(day, 'yyyy/MM/dd')}\n1. Previous Day\n${result.join('\n')}\n2. Today\n${result2.join('\n')}\n3. No blockers so far`;
         new daily_progress_class_1.DailyProgress().addDayProgress(dayDp);
         p.next(); // Copy Day Progress into Clipboard
         let resultRecord = dayDp;
@@ -494,7 +375,7 @@ function dailyProgressAction() {
             .replace(/ {4}\*/g, '&nbsp;&nbsp;&nbsp;&nbsp;*')
             .replace(/\n/g, '<br/>')
             .replace(/'/g, '');
-        child_process_1.execSync(`
+        (0, child_process_1.execSync)(`
   echo '${resultRecord}' |\
   hexdump -ve '1/1 "%.2x"' |\
   xargs printf "set the clipboard to {text:\\\" \\\", «class HTML»:«data HTML%s»}" |\
@@ -509,23 +390,18 @@ exports.dailyProgressAction = dailyProgressAction;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/dump-my-tasks.action.ts":
-/*!******************************************************!*\
-  !*** ./apps/cli/src/actions/dump-my-tasks.action.ts ***!
-  \******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.dumpMyTasksAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
-const fs_1 = __webpack_require__(/*! fs */ "fs");
+const tslib_1 = __webpack_require__("tslib");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const fs_1 = __webpack_require__("fs");
 function dumpMyTasksAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const mySummarizedTasks = yield node_shared_1.ClickUp.getMySummarizedTasks();
-        fs_1.writeFileSync(node_shared_1.CONFIG.MySummarizedTasksFile, JSON.stringify(mySummarizedTasks));
+        (0, fs_1.writeFileSync)(node_shared_1.CONFIG.MySummarizedTasksFile, JSON.stringify(mySummarizedTasks));
     });
 }
 exports.dumpMyTasksAction = dumpMyTasksAction;
@@ -534,24 +410,19 @@ exports.dumpMyTasksAction = dumpMyTasksAction;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/end.action.ts":
-/*!********************************************!*\
-  !*** ./apps/cli/src/actions/end.action.ts ***!
-  \********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.endAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
-const progress_log_class_1 = __webpack_require__(/*! ../classes/progress-log.class */ "./apps/cli/src/classes/progress-log.class.ts");
-const todo_class_1 = __webpack_require__(/*! ../classes/todo.class */ "./apps/cli/src/classes/todo.class.ts");
-const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+const tslib_1 = __webpack_require__("tslib");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const progress_log_class_1 = __webpack_require__("./apps/cli/src/classes/progress-log.class.ts");
+const todo_class_1 = __webpack_require__("./apps/cli/src/classes/todo.class.ts");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 function endAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { gitLab, mergeRequest, clickUp, clickUpTask, clickUpTaskId } = yield utils_1.getInfoFromArgv();
+        const { gitLab, mergeRequest, clickUp, clickUpTask, clickUpTaskId } = yield (0, utils_1.getInfoFromArgv)();
         const p = new progress_log_class_1.CustomProgressLog('End', [
             'Check Task is Completed or not',
             'Update GitLab Merge Request Ready Status and Assignee',
@@ -561,7 +432,7 @@ function endAction() {
         ]);
         p.next(); // Check Task is Completed or not
         const targetChecklist = clickUpTask.checklists.find((c) => c.name.toLowerCase().includes('synced checklist'));
-        const clickUpNormalizedChecklist = node_shared_1.normalizeClickUpChecklist(targetChecklist.items);
+        const clickUpNormalizedChecklist = (0, node_shared_1.normalizeClickUpChecklist)(targetChecklist.items);
         const fullCompleted = clickUpNormalizedChecklist.every((item) => item.checked);
         if (!fullCompleted) {
             console.log('This task has uncompleted todo(s).');
@@ -572,7 +443,7 @@ function endAction() {
         p.next(); // Update ClickUp Task Status
         yield clickUp.setTaskStatus('in review');
         p.next(); // Close Tab Group
-        utils_1.openUrlsInTabGroup([], clickUpTaskId);
+        (0, utils_1.openUrlsInTabGroup)([], clickUpTaskId);
         p.next(); // Remove Todo
         const todo = new todo_class_1.Todo();
         todo.removeTodo(clickUpTaskId);
@@ -586,26 +457,21 @@ exports.endAction = endAction;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/fetch-holiday.action.ts":
-/*!******************************************************!*\
-  !*** ./apps/cli/src/actions/fetch-holiday.action.ts ***!
-  \******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.fetchHolidayAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_fetch_1 = tslib_1.__importDefault(__webpack_require__(/*! node-fetch */ "node-fetch"));
-const holiday_class_1 = __webpack_require__(/*! ../classes/holiday.class */ "./apps/cli/src/classes/holiday.class.ts");
+const tslib_1 = __webpack_require__("tslib");
+const node_fetch_1 = tslib_1.__importDefault(__webpack_require__("node-fetch"));
+const holiday_class_1 = __webpack_require__("./apps/cli/src/classes/holiday.class.ts");
 function fetchHolidayAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         let page = 0;
         let holidays = [];
         let data = null;
         while (data === null || data.length !== 0) {
-            const response = yield node_fetch_1.default(`https://data.ntpc.gov.tw/api/datasets/308DCD75-6434-45BC-A95F-584DA4FED251/json?page=${page}&size=1000`);
+            const response = yield (0, node_fetch_1.default)(`https://data.ntpc.gov.tw/api/datasets/308DCD75-6434-45BC-A95F-584DA4FED251/json?page=${page}&size=1000`);
             data = yield response.json();
             holidays = [...holidays, ...data];
             page += 1;
@@ -619,21 +485,16 @@ exports.fetchHolidayAction = fetchHolidayAction;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/list.action.ts":
-/*!*********************************************!*\
-  !*** ./apps/cli/src/actions/list.action.ts ***!
-  \*********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.listAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+const tslib_1 = __webpack_require__("tslib");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 function listAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { clickUp } = yield utils_1.getInfoFromArgv();
+        const { clickUp } = yield (0, utils_1.getInfoFromArgv)();
         console.log(yield clickUp.getFullTaskName());
     });
 }
@@ -643,23 +504,18 @@ exports.listAction = listAction;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/open.action.ts":
-/*!*********************************************!*\
-  !*** ./apps/cli/src/actions/open.action.ts ***!
-  \*********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.openAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+const tslib_1 = __webpack_require__("tslib");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 function openAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { clickUpTaskId } = yield utils_1.getInfoFromArgv();
+        const { clickUpTaskId } = yield (0, utils_1.getInfoFromArgv)();
         const urls = [`localhost:8112/task/${clickUpTaskId}`];
-        utils_1.openUrlsInTabGroup(urls, clickUpTaskId);
+        (0, utils_1.openUrlsInTabGroup)(urls, clickUpTaskId);
     });
 }
 exports.openAction = openAction;
@@ -668,22 +524,17 @@ exports.openAction = openAction;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/revert-end.action.ts":
-/*!***************************************************!*\
-  !*** ./apps/cli/src/actions/revert-end.action.ts ***!
-  \***************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.revertEndAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const progress_log_class_1 = __webpack_require__(/*! ../classes/progress-log.class */ "./apps/cli/src/classes/progress-log.class.ts");
-const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+const tslib_1 = __webpack_require__("tslib");
+const progress_log_class_1 = __webpack_require__("./apps/cli/src/classes/progress-log.class.ts");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 function revertEndAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { gitLab, mergeRequest, clickUp } = yield utils_1.getInfoFromArgv();
+        const { gitLab, mergeRequest, clickUp } = yield (0, utils_1.getInfoFromArgv)();
         const p = new progress_log_class_1.CustomProgressLog("End", [
             "Update GitLab Merge Request Ready Status and Assignee",
             "Update ClickUp Task Status",
@@ -701,25 +552,20 @@ exports.revertEndAction = revertEndAction;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/routine.action.ts":
-/*!************************************************!*\
-  !*** ./apps/cli/src/actions/routine.action.ts ***!
-  \************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.punch = exports.routineAction = exports.confirm = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const date_fns_1 = __webpack_require__(/*! date-fns */ "date-fns");
-const fs_1 = tslib_1.__importDefault(__webpack_require__(/*! fs */ "fs"));
-const puppeteer_1 = tslib_1.__importDefault(__webpack_require__(/*! puppeteer */ "puppeteer"));
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
-const readline_1 = tslib_1.__importDefault(__webpack_require__(/*! readline */ "readline"));
-const holiday_class_1 = __webpack_require__(/*! ../classes/holiday.class */ "./apps/cli/src/classes/holiday.class.ts");
-const daily_progress_action_1 = __webpack_require__(/*! ./daily-progress.action */ "./apps/cli/src/actions/daily-progress.action.ts");
-const dump_my_tasks_action_1 = __webpack_require__(/*! ./dump-my-tasks.action */ "./apps/cli/src/actions/dump-my-tasks.action.ts");
+const tslib_1 = __webpack_require__("tslib");
+const date_fns_1 = __webpack_require__("date-fns");
+const fs_1 = tslib_1.__importDefault(__webpack_require__("fs"));
+const puppeteer_1 = tslib_1.__importDefault(__webpack_require__("puppeteer"));
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const readline_1 = tslib_1.__importDefault(__webpack_require__("readline"));
+const holiday_class_1 = __webpack_require__("./apps/cli/src/classes/holiday.class.ts");
+const daily_progress_action_1 = __webpack_require__("./apps/cli/src/actions/daily-progress.action.ts");
+const dump_my_tasks_action_1 = __webpack_require__("./apps/cli/src/actions/dump-my-tasks.action.ts");
 function confirm(question) {
     return new Promise((resolve, reject) => {
         const prompt = readline_1.default.createInterface({
@@ -744,10 +590,10 @@ function routineAction() {
         const hour = today.getHours();
         const isMorning = hour < 12;
         const day = process.argv.length >= 4
-            ? date_fns_1.parse(process.argv[3], 'yyyy/MM/dd', today)
+            ? (0, date_fns_1.parse)(process.argv[3], 'yyyy/MM/dd', today)
             : today;
         const holiday = new holiday_class_1.Holiday();
-        const isWorkDay = holiday.checkIsWorkday(date_fns_1.format(day, 'yyyy/M/d'));
+        const isWorkDay = holiday.checkIsWorkday((0, date_fns_1.format)(day, 'yyyy/M/d'));
         const message = isWorkDay ? 'Today is workday!' : 'Today is holiday!';
         console.log(message);
         if (isWorkDay) {
@@ -759,11 +605,11 @@ function routineAction() {
             if (isWorkDay) {
                 yield confirm('isa done?');
                 yield confirm('run dump my tasks?');
-                yield dump_my_tasks_action_1.dumpMyTasksAction();
+                yield (0, dump_my_tasks_action_1.dumpMyTasksAction)();
                 yield confirm('check tasks done?');
                 yield confirm('check todo done?');
                 yield confirm('run daily progress?');
-                yield daily_progress_action_1.dailyProgressAction();
+                yield (0, daily_progress_action_1.dailyProgressAction)();
                 yield confirm('send dp to slack done?');
             }
             yield confirm('macupdater done?');
@@ -835,7 +681,7 @@ function punch() {
             const end = punchTimes[1].textContent.replace(/[\s\n]/g, '');
             return [start, end];
         });
-        yield node_shared_1.sleep(3000);
+        yield (0, node_shared_1.sleep)(3000);
         yield browser.close();
         return result;
     });
@@ -846,18 +692,13 @@ exports.punch = punch;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/rtv-tasks.action.ts":
-/*!**************************************************!*\
-  !*** ./apps/cli/src/actions/rtv-tasks.action.ts ***!
-  \**************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.RTVTasksAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
+const tslib_1 = __webpack_require__("tslib");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 function RTVTasksAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const user = (yield node_shared_1.ClickUp.getCurrentUser()).user;
@@ -876,24 +717,19 @@ exports.RTVTasksAction = RTVTasksAction;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/show-diff.action.ts":
-/*!**************************************************!*\
-  !*** ./apps/cli/src/actions/show-diff.action.ts ***!
-  \**************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.showDiffAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+const tslib_1 = __webpack_require__("tslib");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 function showDiffAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const htmlOnly = process.argv.includes("-h") || process.argv.includes("--html");
         const pythonOnly = process.argv.includes("-p") || process.argv.includes("--python");
         process.argv = process.argv.filter((a) => !a.startsWith("-"));
-        const { gitLab, mergeRequest } = yield utils_1.getInfoFromArgv();
+        const { gitLab, mergeRequest } = yield (0, utils_1.getInfoFromArgv)();
         const mergeRequestChanges = yield gitLab.getMergeRequestChanges(mergeRequest.iid);
         const changes = mergeRequestChanges.changes;
         let filteredChanges = [];
@@ -921,32 +757,27 @@ exports.showDiffAction = showDiffAction;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/start.action.ts":
-/*!**********************************************!*\
-  !*** ./apps/cli/src/actions/start.action.ts ***!
-  \**********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.startAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const fs_1 = __webpack_require__(/*! fs */ "fs");
-const inquirer_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer */ "inquirer"));
-const mustache_1 = __webpack_require__(/*! mustache */ "mustache");
-const os_1 = tslib_1.__importDefault(__webpack_require__(/*! os */ "os"));
-const path_1 = __webpack_require__(/*! path */ "path");
-const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
-const progress_log_class_1 = __webpack_require__(/*! ../classes/progress-log.class */ "./apps/cli/src/classes/progress-log.class.ts");
-const todo_class_1 = __webpack_require__(/*! ../classes/todo.class */ "./apps/cli/src/classes/todo.class.ts");
-const tracker_class_1 = __webpack_require__(/*! ../classes/tracker.class */ "./apps/cli/src/classes/tracker.class.ts");
-const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
-const open_action_1 = __webpack_require__(/*! ./open.action */ "./apps/cli/src/actions/open.action.ts");
+const tslib_1 = __webpack_require__("tslib");
+const fs_1 = __webpack_require__("fs");
+const inquirer_1 = tslib_1.__importDefault(__webpack_require__("inquirer"));
+const mustache_1 = __webpack_require__("mustache");
+const os_1 = tslib_1.__importDefault(__webpack_require__("os"));
+const path_1 = __webpack_require__("path");
+const untildify_1 = tslib_1.__importDefault(__webpack_require__("untildify"));
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const progress_log_class_1 = __webpack_require__("./apps/cli/src/classes/progress-log.class.ts");
+const todo_class_1 = __webpack_require__("./apps/cli/src/classes/todo.class.ts");
+const tracker_class_1 = __webpack_require__("./apps/cli/src/classes/tracker.class.ts");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
+const open_action_1 = __webpack_require__("./apps/cli/src/actions/open.action.ts");
 function startAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const repoName = utils_1.getRepoName();
+        const repoName = (0, utils_1.getRepoName)();
         const index = node_shared_1.CONFIG.GitLabProjects.findIndex((p) => p.repo.endsWith(`/${repoName}`));
         const answers = yield inquirer_1.default.prompt([
             {
@@ -961,7 +792,7 @@ function startAction() {
                 filter(input) {
                     return tslib_1.__awaiter(this, void 0, void 0, function* () {
                         process.chdir(input.path.replace('~', os_1.default.homedir()));
-                        const isClean = yield utils_1.checkWorkingTreeClean();
+                        const isClean = yield (0, utils_1.checkWorkingTreeClean)();
                         if (!isClean) {
                             console.log('\nWorking tree is not clean or something is not pushed. Aborted.');
                             process.exit();
@@ -1021,7 +852,7 @@ function startAction() {
             'Do Git Fetch and Checkout',
         ]);
         process.chdir(answers.gitLabProject.path.replace('~', os_1.default.homedir()));
-        yield utils_1.checkWorkingTreeClean();
+        yield (0, utils_1.checkWorkingTreeClean)();
         const gitLab = new node_shared_1.GitLab(answers.gitLabProject.id);
         const clickUp = new node_shared_1.ClickUp(answers.clickUpTaskId);
         p.start(); // Get ClickUp Task
@@ -1036,16 +867,16 @@ function startAction() {
             todoConfigMap[c] = true;
         });
         todoConfigMap[answers.gitLabProject.name] = true;
-        const template = fs_1.readFileSync(untildify_1.default(node_shared_1.CONFIG.ToDoTemplate), {
+        const template = (0, fs_1.readFileSync)((0, untildify_1.default)(node_shared_1.CONFIG.ToDoTemplate), {
             encoding: 'utf-8',
         });
-        const endingTodo = mustache_1.render(template, todoConfigMap);
-        const path = path_1.join(node_shared_1.CONFIG.TaskTodoFolder, answers.clickUpTaskId + '.md');
-        fs_1.writeFileSync(path, endingTodo);
+        const endingTodo = (0, mustache_1.render)(template, todoConfigMap);
+        const path = (0, path_1.join)(node_shared_1.CONFIG.TaskTodoFolder, answers.clickUpTaskId + '.md');
+        (0, fs_1.writeFileSync)(path, endingTodo);
         p.next(); // Create GitLab Branch
         const gitLabBranch = yield gitLab.createBranch(`CU-${answers.clickUpTaskId}`);
         p.next(); // Create GitLab Merge Request
-        yield node_shared_1.sleep(2000); // prevent "branch restored" bug
+        yield (0, node_shared_1.sleep)(2000); // prevent "branch restored" bug
         const gitLabMergeRequest = yield gitLab.createMergeRequest(gitLabMergeRequestTitle + `__CU-${answers.clickUpTaskId}`, gitLabBranch.name, answers.gitLabProject.hasMergeRequestTemplate
             ? yield gitLab.getMergeRequestTemplate()
             : '');
@@ -1066,11 +897,11 @@ function startAction() {
         new tracker_class_1.Tracker().addItem(answers.clickUpTaskId);
         p.next(); // Do Git Fetch and Checkout
         process.chdir(answers.gitLabProject.path.replace('~', os_1.default.homedir()));
-        yield utils_1.promiseSpawn('git', ['fetch'], 'pipe');
-        yield node_shared_1.sleep(1000);
-        yield utils_1.promiseSpawn('git', ['checkout', gitLabBranch.name], 'pipe');
-        yield utils_1.promiseSpawn('git', ['submodule', 'update', '--init', '--recursive'], 'pipe');
-        yield open_action_1.openAction();
+        yield (0, utils_1.promiseSpawn)('git', ['fetch'], 'pipe');
+        yield (0, node_shared_1.sleep)(1000);
+        yield (0, utils_1.promiseSpawn)('git', ['checkout', gitLabBranch.name], 'pipe');
+        yield (0, utils_1.promiseSpawn)('git', ['submodule', 'update', '--init', '--recursive'], 'pipe');
+        yield (0, open_action_1.openAction)();
         p.end(0);
     });
 }
@@ -1080,42 +911,37 @@ exports.startAction = startAction;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/switch.action.ts":
-/*!***********************************************!*\
-  !*** ./apps/cli/src/actions/switch.action.ts ***!
-  \***********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.switchAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const child_process_1 = __webpack_require__(/*! child_process */ "child_process");
-const os_1 = tslib_1.__importDefault(__webpack_require__(/*! os */ "os"));
-const actions_1 = __webpack_require__(/*! ../actions */ "./apps/cli/src/actions.ts");
-const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
-const open_action_1 = __webpack_require__(/*! ./open.action */ "./apps/cli/src/actions/open.action.ts");
+const tslib_1 = __webpack_require__("tslib");
+const child_process_1 = __webpack_require__("child_process");
+const os_1 = tslib_1.__importDefault(__webpack_require__("os"));
+const actions_1 = __webpack_require__("./apps/cli/src/actions.ts");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
+const open_action_1 = __webpack_require__("./apps/cli/src/actions/open.action.ts");
 function switchAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        actions_1.configReadline();
-        const { gitLabProject, mergeRequest } = yield utils_1.getInfoFromArgv();
+        (0, actions_1.configReadline)();
+        const { gitLabProject, mergeRequest } = yield (0, utils_1.getInfoFromArgv)();
         if (mergeRequest.state === "merged") {
             console.log("This task is completed.");
             return;
         }
         process.chdir(gitLabProject.path.replace("~", os_1.default.homedir()));
-        const branchName = child_process_1.execSync("git branch --show-current", {
+        const branchName = (0, child_process_1.execSync)("git branch --show-current", {
             encoding: "utf-8",
         });
         if (branchName.trim() !== mergeRequest.source_branch) {
-            const isClean = yield utils_1.checkWorkingTreeClean();
+            const isClean = yield (0, utils_1.checkWorkingTreeClean)();
             if (!isClean) {
                 console.log("\nWorking tree is not clean or something is not pushed. Aborted.");
                 process.exit();
             }
-            yield utils_1.promiseSpawn("git", ["checkout", mergeRequest.source_branch], "pipe");
-            yield open_action_1.openAction();
+            yield (0, utils_1.promiseSpawn)("git", ["checkout", mergeRequest.source_branch], "pipe");
+            yield (0, open_action_1.openAction)();
         }
     });
 }
@@ -1125,22 +951,17 @@ exports.switchAction = switchAction;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/time.action.ts":
-/*!*********************************************!*\
-  !*** ./apps/cli/src/actions/time.action.ts ***!
-  \*********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.timeAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const clipboardy_1 = tslib_1.__importDefault(__webpack_require__(/*! clipboardy */ "clipboardy"));
-const date_fns_1 = __webpack_require__(/*! date-fns */ "date-fns");
+const tslib_1 = __webpack_require__("tslib");
+const clipboardy_1 = tslib_1.__importDefault(__webpack_require__("clipboardy"));
+const date_fns_1 = __webpack_require__("date-fns");
 function timeAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        clipboardy_1.default.writeSync(date_fns_1.format(new Date(), 'yyyyMMdd_HHmmss'));
+        clipboardy_1.default.writeSync((0, date_fns_1.format)(new Date(), 'yyyyMMdd_HHmmss'));
         console.log('Copied!');
     });
 }
@@ -1150,23 +971,18 @@ exports.timeAction = timeAction;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/to-do.action.ts":
-/*!**********************************************!*\
-  !*** ./apps/cli/src/actions/to-do.action.ts ***!
-  \**********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.toDoAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
-const clipboardy_1 = tslib_1.__importDefault(__webpack_require__(/*! clipboardy */ "clipboardy"));
-const fs_1 = __webpack_require__(/*! fs */ "fs");
-const inquirer_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer */ "inquirer"));
-const mustache_1 = __webpack_require__(/*! mustache */ "mustache");
-const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
+const tslib_1 = __webpack_require__("tslib");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const clipboardy_1 = tslib_1.__importDefault(__webpack_require__("clipboardy"));
+const fs_1 = __webpack_require__("fs");
+const inquirer_1 = tslib_1.__importDefault(__webpack_require__("inquirer"));
+const mustache_1 = __webpack_require__("mustache");
+const untildify_1 = tslib_1.__importDefault(__webpack_require__("untildify"));
 function toDoAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const answers = yield inquirer_1.default.prompt([
@@ -1191,10 +1007,10 @@ function toDoAction() {
             todoConfigMap[c] = true;
         });
         todoConfigMap[answers.gitLabProject.name] = true;
-        const template = fs_1.readFileSync(untildify_1.default(node_shared_1.CONFIG.ToDoTemplate), {
+        const template = (0, fs_1.readFileSync)((0, untildify_1.default)(node_shared_1.CONFIG.ToDoTemplate), {
             encoding: "utf-8",
         });
-        const endingTodo = mustache_1.render(template, todoConfigMap);
+        const endingTodo = (0, mustache_1.render)(template, todoConfigMap);
         clipboardy_1.default.writeSync(endingTodo);
         console.log(endingTodo);
         console.log("Copied!");
@@ -1206,19 +1022,14 @@ exports.toDoAction = toDoAction;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/track.action.ts":
-/*!**********************************************!*\
-  !*** ./apps/cli/src/actions/track.action.ts ***!
-  \**********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.trackAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const single_instance_lock_1 = __webpack_require__(/*! single-instance-lock */ "single-instance-lock");
-const tracker_class_1 = __webpack_require__(/*! ../classes/tracker.class */ "./apps/cli/src/classes/tracker.class.ts");
+const tslib_1 = __webpack_require__("tslib");
+const single_instance_lock_1 = __webpack_require__("single-instance-lock");
+const tracker_class_1 = __webpack_require__("./apps/cli/src/classes/tracker.class.ts");
 const locker = new single_instance_lock_1.SingleInstanceLock('accel-shooter');
 function trackAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -1238,25 +1049,20 @@ exports.trackAction = trackAction;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/watch-pipeline.action.ts":
-/*!*******************************************************!*\
-  !*** ./apps/cli/src/actions/watch-pipeline.action.ts ***!
-  \*******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.watchPipelineAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
-const child_process_1 = tslib_1.__importDefault(__webpack_require__(/*! child_process */ "child_process"));
-const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+const tslib_1 = __webpack_require__("tslib");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const child_process_1 = tslib_1.__importDefault(__webpack_require__("child_process"));
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 function watchPipelineAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const projectName = process.argv[3];
         const mergeRequestIId = process.argv[4];
-        const gitLabProject = utils_1.getGitLabProjectConfigByName(projectName);
+        const gitLabProject = (0, utils_1.getGitLabProjectConfigByName)(projectName);
         const gitLab = new node_shared_1.GitLab(gitLabProject.id);
         function getAndPrintPipelineStatus() {
             var _a;
@@ -1283,21 +1089,16 @@ exports.watchPipelineAction = watchPipelineAction;
 /***/ }),
 
 /***/ "./apps/cli/src/actions/work.action.ts":
-/*!*********************************************!*\
-  !*** ./apps/cli/src/actions/work.action.ts ***!
-  \*********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.workAction = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
-const kexec_1 = tslib_1.__importDefault(__webpack_require__(/*! @jcoreio/kexec */ "@jcoreio/kexec"));
-const todo_class_1 = __webpack_require__(/*! ../classes/todo.class */ "./apps/cli/src/classes/todo.class.ts");
-const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+const tslib_1 = __webpack_require__("tslib");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const kexec_1 = tslib_1.__importDefault(__webpack_require__("@jcoreio/kexec"));
+const todo_class_1 = __webpack_require__("./apps/cli/src/classes/todo.class.ts");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 function workAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const todo = new todo_class_1.Todo();
@@ -1317,11 +1118,11 @@ function workAction() {
         const { gitLabProject } = yield clickUp.getGitLabProjectAndMergeRequestIId();
         // Open Task Page
         const urls = [`localhost:8112/task/${clickUpTaskId}`];
-        utils_1.openUrlsInTabGroup(urls, clickUpTaskId);
+        (0, utils_1.openUrlsInTabGroup)(urls, clickUpTaskId);
         // Open tmux
         const folder = gitLabProject.path;
         const shortName = gitLabProject.shortName;
-        kexec_1.default(`cd ${folder}; tmux new -A -d -s ${shortName} -c ${folder}; tmux new -A -D -s ${shortName}`);
+        (0, kexec_1.default)(`cd ${folder}; tmux new -A -d -s ${shortName} -c ${folder}; tmux new -A -D -s ${shortName}`);
     });
 }
 exports.workAction = workAction;
@@ -1330,23 +1131,18 @@ exports.workAction = workAction;
 /***/ }),
 
 /***/ "./apps/cli/src/classes/base-file-ref.class.ts":
-/*!*****************************************************!*\
-  !*** ./apps/cli/src/classes/base-file-ref.class.ts ***!
-  \*****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.BaseFileRef = void 0;
-const fs_1 = __webpack_require__(/*! fs */ "fs");
+const fs_1 = __webpack_require__("fs");
 class BaseFileRef {
     readFile() {
-        return fs_1.readFileSync(this.path, { encoding: 'utf-8' });
+        return (0, fs_1.readFileSync)(this.path, { encoding: 'utf-8' });
     }
     writeFile(content) {
-        fs_1.writeFileSync(this.path, content);
+        (0, fs_1.writeFileSync)(this.path, content);
     }
 }
 exports.BaseFileRef = BaseFileRef;
@@ -1355,20 +1151,15 @@ exports.BaseFileRef = BaseFileRef;
 /***/ }),
 
 /***/ "./apps/cli/src/classes/check-item.class.ts":
-/*!**************************************************!*\
-  !*** ./apps/cli/src/classes/check-item.class.ts ***!
-  \**************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CheckItem = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const rxjs_1 = __webpack_require__(/*! rxjs */ "rxjs");
-const operators_1 = __webpack_require__(/*! rxjs/operators */ "rxjs/operators");
-const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+const tslib_1 = __webpack_require__("tslib");
+const rxjs_1 = __webpack_require__("rxjs");
+const operators_1 = __webpack_require__("rxjs/operators");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 class CheckItem {
     constructor(group, name, defaultChecked, run, stdoutReducer) {
         this.group = group;
@@ -1380,17 +1171,17 @@ class CheckItem {
     }
     static fromProjectCheckItem({ group, name, command, args, }) {
         return new CheckItem(group, name, false, () => tslib_1.__awaiter(this, void 0, void 0, function* () {
-            return utils_1.promiseSpawn(command, args, "pipe");
+            return (0, utils_1.promiseSpawn)(command, args, "pipe");
         }));
     }
     getObs(context) {
-        return rxjs_1.concat(rxjs_1.of({
+        return (0, rxjs_1.concat)((0, rxjs_1.of)({
             group: this.group,
             name: this.name,
             code: -1,
             stdout: "",
             stderr: "",
-        }), rxjs_1.defer(() => this.run(context)).pipe(operators_1.map((d) => {
+        }), (0, rxjs_1.defer)(() => this.run(context)).pipe((0, operators_1.map)((d) => {
             const result = d;
             result.group = this.group;
             result.name = this.name;
@@ -1407,26 +1198,21 @@ exports.CheckItem = CheckItem;
 /***/ }),
 
 /***/ "./apps/cli/src/classes/checker.class.ts":
-/*!***********************************************!*\
-  !*** ./apps/cli/src/classes/checker.class.ts ***!
-  \***********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Checker = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
-const fs_1 = __webpack_require__(/*! fs */ "fs");
-const inquirer_1 = tslib_1.__importDefault(__webpack_require__(/*! inquirer */ "inquirer"));
-const os_1 = tslib_1.__importDefault(__webpack_require__(/*! os */ "os"));
-const rxjs_1 = __webpack_require__(/*! rxjs */ "rxjs");
-const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
-const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
-const check_items_const_1 = __webpack_require__(/*! ./../consts/check-items.const */ "./apps/cli/src/consts/check-items.const.ts");
-const check_item_class_1 = __webpack_require__(/*! ./check-item.class */ "./apps/cli/src/classes/check-item.class.ts");
+const tslib_1 = __webpack_require__("tslib");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const fs_1 = __webpack_require__("fs");
+const inquirer_1 = tslib_1.__importDefault(__webpack_require__("inquirer"));
+const os_1 = tslib_1.__importDefault(__webpack_require__("os"));
+const rxjs_1 = __webpack_require__("rxjs");
+const untildify_1 = tslib_1.__importDefault(__webpack_require__("untildify"));
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
+const check_items_const_1 = __webpack_require__("./apps/cli/src/consts/check-items.const.ts");
+const check_item_class_1 = __webpack_require__("./apps/cli/src/classes/check-item.class.ts");
 const SPINNER = [
     "🕛",
     "🕐",
@@ -1454,7 +1240,7 @@ class Checker {
             const mergeRequest = yield this.gitLab.getMergeRequest(this.mergeRequestIId);
             const mergeRequestChanges = yield this.gitLab.getMergeRequestChanges(this.mergeRequestIId);
             process.chdir(this.gitLabProject.path.replace("~", os_1.default.homedir()));
-            yield utils_1.promiseSpawn("git", ["checkout", mergeRequest.source_branch], "pipe");
+            yield (0, utils_1.promiseSpawn)("git", ["checkout", mergeRequest.source_branch], "pipe");
             const changes = mergeRequestChanges.changes;
             let frontendChanges = [];
             let backendChanges = [];
@@ -1498,9 +1284,9 @@ class Checker {
                 backendChanges,
             };
             const obss = runningItems.map((r) => r.getObs(context));
-            const checkStream = rxjs_1.combineLatest(obss);
+            const checkStream = (0, rxjs_1.combineLatest)(obss);
             process.stdout.write(runningItems.map(() => "").join("\n"));
-            const stream = rxjs_1.combineLatest([rxjs_1.interval(60), checkStream]).subscribe(([count, statusList]) => {
+            const stream = (0, rxjs_1.combineLatest)([(0, rxjs_1.interval)(60), checkStream]).subscribe(([count, statusList]) => {
                 process.stdout.moveCursor(0, -statusList.length + 1);
                 process.stdout.cursorTo(0);
                 process.stdout.clearScreenDown();
@@ -1527,7 +1313,7 @@ class Checker {
                     stream.unsubscribe();
                     const nonSuccessStatusList = statusList.filter((s) => s.code !== 0);
                     if (nonSuccessStatusList.length > 0) {
-                        fs_1.writeFile(untildify_1.default("~/ac-checker-log"), nonSuccessStatusList
+                        (0, fs_1.writeFile)((0, untildify_1.default)("~/ac-checker-log"), nonSuccessStatusList
                             .map((s) => `###### [${s.group}] ${s.name} ${s.code}\n${s.stdout}\n${s.stderr}`)
                             .join("\n\n"), () => { });
                     }
@@ -1543,24 +1329,19 @@ exports.Checker = Checker;
 /***/ }),
 
 /***/ "./apps/cli/src/classes/commit-scope.class.ts":
-/*!****************************************************!*\
-  !*** ./apps/cli/src/classes/commit-scope.class.ts ***!
-  \****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CommitScope = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
-const js_yaml_1 = tslib_1.__importDefault(__webpack_require__(/*! js-yaml */ "js-yaml"));
-const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
-const base_file_ref_class_1 = __webpack_require__(/*! ./base-file-ref.class */ "./apps/cli/src/classes/base-file-ref.class.ts");
+const tslib_1 = __webpack_require__("tslib");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const js_yaml_1 = tslib_1.__importDefault(__webpack_require__("js-yaml"));
+const untildify_1 = tslib_1.__importDefault(__webpack_require__("untildify"));
+const base_file_ref_class_1 = __webpack_require__("./apps/cli/src/classes/base-file-ref.class.ts");
 class CommitScope extends base_file_ref_class_1.BaseFileRef {
     get path() {
-        return untildify_1.default(node_shared_1.CONFIG.CommitScopeFile);
+        return (0, untildify_1.default)(node_shared_1.CONFIG.CommitScopeFile);
     }
     getItems(repoName) {
         const commitScopeDict = js_yaml_1.default.load(this.readFile());
@@ -1575,23 +1356,18 @@ exports.CommitScope = CommitScope;
 /***/ }),
 
 /***/ "./apps/cli/src/classes/daily-progress.class.ts":
-/*!******************************************************!*\
-  !*** ./apps/cli/src/classes/daily-progress.class.ts ***!
-  \******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.DailyProgress = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
-const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
-const base_file_ref_class_1 = __webpack_require__(/*! ./base-file-ref.class */ "./apps/cli/src/classes/base-file-ref.class.ts");
+const tslib_1 = __webpack_require__("tslib");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const untildify_1 = tslib_1.__importDefault(__webpack_require__("untildify"));
+const base_file_ref_class_1 = __webpack_require__("./apps/cli/src/classes/base-file-ref.class.ts");
 class DailyProgress extends base_file_ref_class_1.BaseFileRef {
     get path() {
-        return untildify_1.default(node_shared_1.CONFIG.DailyProgressFile);
+        return (0, untildify_1.default)(node_shared_1.CONFIG.DailyProgressFile);
     }
     addProgressToBuffer(dailyProgressString) {
         const content = this.readFile();
@@ -1636,23 +1412,18 @@ exports.DailyProgress = DailyProgress;
 /***/ }),
 
 /***/ "./apps/cli/src/classes/holiday.class.ts":
-/*!***********************************************!*\
-  !*** ./apps/cli/src/classes/holiday.class.ts ***!
-  \***********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Holiday = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
-const base_file_ref_class_1 = __webpack_require__(/*! ./base-file-ref.class */ "./apps/cli/src/classes/base-file-ref.class.ts");
+const tslib_1 = __webpack_require__("tslib");
+const untildify_1 = tslib_1.__importDefault(__webpack_require__("untildify"));
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const base_file_ref_class_1 = __webpack_require__("./apps/cli/src/classes/base-file-ref.class.ts");
 class Holiday extends base_file_ref_class_1.BaseFileRef {
     get path() {
-        return untildify_1.default(node_shared_1.CONFIG.HolidayFile);
+        return (0, untildify_1.default)(node_shared_1.CONFIG.HolidayFile);
     }
     checkIsWorkday(day) {
         const holidayData = JSON.parse(this.readFile());
@@ -1670,18 +1441,13 @@ exports.Holiday = Holiday;
 /***/ }),
 
 /***/ "./apps/cli/src/classes/progress-log.class.ts":
-/*!****************************************************!*\
-  !*** ./apps/cli/src/classes/progress-log.class.ts ***!
-  \****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CustomProgressLog = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const progress_logs_1 = tslib_1.__importDefault(__webpack_require__(/*! progress-logs */ "progress-logs"));
+const tslib_1 = __webpack_require__("tslib");
+const progress_logs_1 = tslib_1.__importDefault(__webpack_require__("progress-logs"));
 var StopExitCode;
 (function (StopExitCode) {
     StopExitCode[StopExitCode["success"] = 0] = "success";
@@ -1715,29 +1481,24 @@ exports.CustomProgressLog = CustomProgressLog;
 /***/ }),
 
 /***/ "./apps/cli/src/classes/todo.class.ts":
-/*!********************************************!*\
-  !*** ./apps/cli/src/classes/todo.class.ts ***!
-  \********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Todo = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const fs_1 = __webpack_require__(/*! fs */ "fs");
-const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
-const uuid_1 = __webpack_require__(/*! uuid */ "uuid");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
-const base_file_ref_class_1 = __webpack_require__(/*! ./base-file-ref.class */ "./apps/cli/src/classes/base-file-ref.class.ts");
+const tslib_1 = __webpack_require__("tslib");
+const fs_1 = __webpack_require__("fs");
+const untildify_1 = tslib_1.__importDefault(__webpack_require__("untildify"));
+const uuid_1 = __webpack_require__("uuid");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const base_file_ref_class_1 = __webpack_require__("./apps/cli/src/classes/base-file-ref.class.ts");
 class Todo extends base_file_ref_class_1.BaseFileRef {
     get path() {
-        return untildify_1.default(node_shared_1.CONFIG.TodoFile);
+        return (0, untildify_1.default)(node_shared_1.CONFIG.TodoFile);
     }
     writeFile(content) {
         super.writeFile(content);
-        fs_1.writeFileSync(untildify_1.default(node_shared_1.CONFIG.TodoChangeNotificationFile), uuid_1.v4());
+        (0, fs_1.writeFileSync)((0, untildify_1.default)(node_shared_1.CONFIG.TodoChangeNotificationFile), (0, uuid_1.v4)());
     }
     addTodoToBuffer(todoString) {
         const content = this.readFile();
@@ -1764,25 +1525,20 @@ exports.Todo = Todo;
 /***/ }),
 
 /***/ "./apps/cli/src/classes/tracker.class.ts":
-/*!***********************************************!*\
-  !*** ./apps/cli/src/classes/tracker.class.ts ***!
-  \***********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Tracker = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
-const child_process_1 = tslib_1.__importDefault(__webpack_require__(/*! child_process */ "child_process"));
-const fs_1 = __webpack_require__(/*! fs */ "fs");
-const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
-const base_file_ref_class_1 = __webpack_require__(/*! ./base-file-ref.class */ "./apps/cli/src/classes/base-file-ref.class.ts");
+const tslib_1 = __webpack_require__("tslib");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const child_process_1 = tslib_1.__importDefault(__webpack_require__("child_process"));
+const fs_1 = __webpack_require__("fs");
+const untildify_1 = tslib_1.__importDefault(__webpack_require__("untildify"));
+const base_file_ref_class_1 = __webpack_require__("./apps/cli/src/classes/base-file-ref.class.ts");
 class Tracker extends base_file_ref_class_1.BaseFileRef {
     get path() {
-        return untildify_1.default(node_shared_1.CONFIG.TrackListFile);
+        return (0, untildify_1.default)(node_shared_1.CONFIG.TrackListFile);
     }
     startSync() {
         this.trackTask();
@@ -1791,7 +1547,7 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
         }, node_shared_1.CONFIG.TrackIntervalInMinutes * 60 * 1000);
     }
     addItem(clickUpTaskId) {
-        fs_1.appendFileSync(this.path, `\n${clickUpTaskId}`);
+        (0, fs_1.appendFileSync)(this.path, `\n${clickUpTaskId}`);
     }
     getItems() {
         const content = this.readFile();
@@ -1832,7 +1588,7 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
                         stagingStatus = 'done';
                         yield clickUp.setTaskStatus(stagingStatus);
                     }
-                    const message = `${yield clickUp.getFullTaskName()} (${clickUpTaskId}): In Review -> ${node_shared_1.titleCase(stagingStatus)}`;
+                    const message = `${yield clickUp.getFullTaskName()} (${clickUpTaskId}): In Review -> ${(0, node_shared_1.titleCase)(stagingStatus)}`;
                     child_process_1.default.execSync(`osascript -e 'display notification "${message
                         .replace(/"/g, '')
                         .replace(/'/g, '')}" with title "Accel Shooter"'`);
@@ -1857,21 +1613,16 @@ exports.Tracker = Tracker;
 /***/ }),
 
 /***/ "./apps/cli/src/consts/check-items.const.ts":
-/*!**************************************************!*\
-  !*** ./apps/cli/src/consts/check-items.const.ts ***!
-  \**************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.checkItemsMap = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const check_item_class_1 = __webpack_require__(/*! ../classes/check-item.class */ "./apps/cli/src/classes/check-item.class.ts");
-const utils_1 = __webpack_require__(/*! ../utils */ "./apps/cli/src/utils.ts");
+const tslib_1 = __webpack_require__("tslib");
+const check_item_class_1 = __webpack_require__("./apps/cli/src/classes/check-item.class.ts");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 const checkNonPushedChanges = new check_item_class_1.CheckItem("Global", "Check Non-Pushed Changes", true, () => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
-    const result = yield utils_1.promiseSpawn("git", ["status"], "pipe");
+    const result = yield (0, utils_1.promiseSpawn)("git", ["status"], "pipe");
     result.code =
         result.stdout.includes("Your branch is up to date with") &&
             result.stdout.includes("nothing to commit, working tree clean")
@@ -1978,116 +1729,17 @@ exports.checkItemsMap = {
 
 /***/ }),
 
-/***/ "./apps/cli/src/main.ts":
-/*!******************************!*\
-  !*** ./apps/cli/src/main.ts ***!
-  \******************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-Object.defineProperty(exports, "__esModule", { value: true });
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const promises_1 = tslib_1.__importDefault(__webpack_require__(/*! fs/promises */ "fs/promises"));
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
-const check_action_1 = __webpack_require__(/*! ./actions/check.action */ "./apps/cli/src/actions/check.action.ts");
-const close_action_1 = __webpack_require__(/*! ./actions/close.action */ "./apps/cli/src/actions/close.action.ts");
-const commit_action_1 = __webpack_require__(/*! ./actions/commit.action */ "./apps/cli/src/actions/commit.action.ts");
-const copy_action_1 = __webpack_require__(/*! ./actions/copy.action */ "./apps/cli/src/actions/copy.action.ts");
-const cross_checklist_action_1 = __webpack_require__(/*! ./actions/cross-checklist.action */ "./apps/cli/src/actions/cross-checklist.action.ts");
-const daily_progress_action_1 = __webpack_require__(/*! ./actions/daily-progress.action */ "./apps/cli/src/actions/daily-progress.action.ts");
-const dump_my_tasks_action_1 = __webpack_require__(/*! ./actions/dump-my-tasks.action */ "./apps/cli/src/actions/dump-my-tasks.action.ts");
-const end_action_1 = __webpack_require__(/*! ./actions/end.action */ "./apps/cli/src/actions/end.action.ts");
-const fetch_holiday_action_1 = __webpack_require__(/*! ./actions/fetch-holiday.action */ "./apps/cli/src/actions/fetch-holiday.action.ts");
-const list_action_1 = __webpack_require__(/*! ./actions/list.action */ "./apps/cli/src/actions/list.action.ts");
-const open_action_1 = __webpack_require__(/*! ./actions/open.action */ "./apps/cli/src/actions/open.action.ts");
-const revert_end_action_1 = __webpack_require__(/*! ./actions/revert-end.action */ "./apps/cli/src/actions/revert-end.action.ts");
-const routine_action_1 = __webpack_require__(/*! ./actions/routine.action */ "./apps/cli/src/actions/routine.action.ts");
-const rtv_tasks_action_1 = __webpack_require__(/*! ./actions/rtv-tasks.action */ "./apps/cli/src/actions/rtv-tasks.action.ts");
-const show_diff_action_1 = __webpack_require__(/*! ./actions/show-diff.action */ "./apps/cli/src/actions/show-diff.action.ts");
-const start_action_1 = __webpack_require__(/*! ./actions/start.action */ "./apps/cli/src/actions/start.action.ts");
-const switch_action_1 = __webpack_require__(/*! ./actions/switch.action */ "./apps/cli/src/actions/switch.action.ts");
-const time_action_1 = __webpack_require__(/*! ./actions/time.action */ "./apps/cli/src/actions/time.action.ts");
-const to_do_action_1 = __webpack_require__(/*! ./actions/to-do.action */ "./apps/cli/src/actions/to-do.action.ts");
-const track_action_1 = __webpack_require__(/*! ./actions/track.action */ "./apps/cli/src/actions/track.action.ts");
-const watch_pipeline_action_1 = __webpack_require__(/*! ./actions/watch-pipeline.action */ "./apps/cli/src/actions/watch-pipeline.action.ts");
-const work_action_1 = __webpack_require__(/*! ./actions/work.action */ "./apps/cli/src/actions/work.action.ts");
-const actions = {
-    start: start_action_1.startAction,
-    open: open_action_1.openAction,
-    switch: switch_action_1.switchAction,
-    dailyProgress: daily_progress_action_1.dailyProgressAction,
-    track: track_action_1.trackAction,
-    end: end_action_1.endAction,
-    revertEnd: revert_end_action_1.revertEndAction,
-    crossChecklist: cross_checklist_action_1.crossChecklistAction,
-    RTVTasks: rtv_tasks_action_1.RTVTasksAction,
-    check: check_action_1.checkAction,
-    dumpMyTasks: dump_my_tasks_action_1.dumpMyTasksAction,
-    list: list_action_1.listAction,
-    toDo: to_do_action_1.toDoAction,
-    copy: copy_action_1.copyAction,
-    showDiff: show_diff_action_1.showDiffAction,
-    time: time_action_1.timeAction,
-    fetchHoliday: fetch_holiday_action_1.fetchHolidayAction,
-    watchPipeline: watch_pipeline_action_1.watchPipelineAction,
-    commit: commit_action_1.commitAction,
-    close: close_action_1.closeAction,
-    work: work_action_1.workAction,
-    routine: routine_action_1.routineAction,
-    test: () => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
-        const itemListJson = yield promises_1.default.readFile('./dp-analysis', 'utf-8');
-        const itemList = JSON.parse(itemListJson);
-        const outputItem = [];
-        for (const item of itemList) {
-            const taskId = item.url.match(/https:\/\/app.clickup.com\/t\/(\w+)/)[1];
-            const clickUp = new node_shared_1.ClickUp(taskId);
-            const task = yield clickUp.getTask();
-            const product = yield node_shared_1.ClickUp.getProduct(task);
-            const gitLabInfo = yield clickUp.getGitLabProjectAndMergeRequestIId();
-            let mergeRequestLink = null;
-            if (gitLabInfo) {
-                const { gitLabProject, mergeRequestIId } = gitLabInfo;
-                const gitLab = new node_shared_1.GitLab(gitLabProject.id);
-                const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
-                mergeRequestLink = mergeRequest.web_url;
-            }
-            outputItem.push(Object.assign(Object.assign({}, item), { product,
-                mergeRequestLink }));
-        }
-        yield promises_1.default.writeFile('./output-final.json', JSON.stringify(outputItem, null, 2));
-    }),
-};
-(() => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
-    const action = process.argv[2];
-    if (actions[action]) {
-        yield actions[action]();
-    }
-    else {
-        throw Error(`Action ${action} is not supported.`);
-    }
-}))();
-
-
-/***/ }),
-
 /***/ "./apps/cli/src/utils.ts":
-/*!*******************************!*\
-  !*** ./apps/cli/src/utils.ts ***!
-  \*******************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getRepoName = exports.openUrlsInTabGroup = exports.checkWorkingTreeClean = exports.getInfoFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabMergeRequest = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const child_process_1 = tslib_1.__importStar(__webpack_require__(/*! child_process */ "child_process"));
-const open_1 = tslib_1.__importDefault(__webpack_require__(/*! open */ "open"));
-const qs_1 = tslib_1.__importDefault(__webpack_require__(/*! qs */ "qs"));
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
+const tslib_1 = __webpack_require__("tslib");
+const child_process_1 = tslib_1.__importStar(__webpack_require__("child_process"));
+const open_1 = tslib_1.__importDefault(__webpack_require__("open"));
+const qs_1 = tslib_1.__importDefault(__webpack_require__("qs"));
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 function promiseSpawn(command, args, stdio = 'inherit') {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
@@ -2147,8 +1799,8 @@ function updateTaskStatusInDp(dp) {
             const task = yield clickUp.getTask();
             const progress = clickUp.getTaskProgress();
             const updatedFull = full.replace(/\* \([A-Za-z0-9 %]+\)/, task.status.status === 'in progress' && progress
-                ? `* (${node_shared_1.titleCase(task.status.status)} ${progress})`
-                : `* (${node_shared_1.titleCase(task.status.status)})`);
+                ? `* (${(0, node_shared_1.titleCase)(task.status.status)} ${progress})`
+                : `* (${(0, node_shared_1.titleCase)(task.status.status)})`);
             resultDp = resultDp.replace(full, updatedFull);
         }
         return resultDp;
@@ -2159,7 +1811,7 @@ function getInfoFromArgv(clickUpOnly, allowEmptyInfo) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         let clickUpTaskId = null;
         if (process.argv.length === 3) {
-            const branchName = child_process_1.execSync('git branch --show-current', {
+            const branchName = (0, child_process_1.execSync)('git branch --show-current', {
                 encoding: 'utf-8',
             });
             const match = branchName.match(/CU-([a-z0-9]+)/);
@@ -2216,7 +1868,7 @@ function checkWorkingTreeClean() {
 }
 exports.checkWorkingTreeClean = checkWorkingTreeClean;
 function openUrlsInTabGroup(urls, group) {
-    open_1.default('http://localhost:8315/accel-shooter/?' +
+    (0, open_1.default)('http://localhost:8315/accel-shooter/?' +
         qs_1.default.stringify({
             urls: JSON.stringify(urls),
             group,
@@ -2224,7 +1876,7 @@ function openUrlsInTabGroup(urls, group) {
 }
 exports.openUrlsInTabGroup = openUrlsInTabGroup;
 function getRepoName() {
-    return child_process_1.execSync('basename -s .git `git config --get remote.origin.url`')
+    return (0, child_process_1.execSync)('basename -s .git `git config --get remote.origin.url`')
         .toString()
         .trim();
 }
@@ -2234,41 +1886,31 @@ exports.getRepoName = getRepoName;
 /***/ }),
 
 /***/ "./libs/node-shared/src/index.ts":
-/*!***************************************!*\
-  !*** ./libs/node-shared/src/index.ts ***!
-  \***************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-tslib_1.__exportStar(__webpack_require__(/*! ./lib/node-shared */ "./libs/node-shared/src/lib/node-shared.ts"), exports);
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__("tslib");
+tslib_1.__exportStar(__webpack_require__("./libs/node-shared/src/lib/node-shared.ts"), exports);
 
 
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/classes/clickup.class.ts":
-/*!***********************************************************!*\
-  !*** ./libs/node-shared/src/lib/classes/clickup.class.ts ***!
-  \***********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ClickUp = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const cli_progress_1 = __webpack_require__(/*! cli-progress */ "cli-progress");
-const fs_1 = __webpack_require__(/*! fs */ "fs");
-const path_1 = __webpack_require__(/*! path */ "path");
-const config_1 = __webpack_require__(/*! ../config */ "./libs/node-shared/src/lib/config.ts");
-const api_utils_1 = __webpack_require__(/*! ../utils/api.utils */ "./libs/node-shared/src/lib/utils/api.utils.ts");
-const case_utils_1 = __webpack_require__(/*! ../utils/case.utils */ "./libs/node-shared/src/lib/utils/case.utils.ts");
-const checklist_utils_1 = __webpack_require__(/*! ../utils/checklist.utils */ "./libs/node-shared/src/lib/utils/checklist.utils.ts");
-const callApi = api_utils_1.callApiFactory('ClickUp');
+const tslib_1 = __webpack_require__("tslib");
+const cli_progress_1 = __webpack_require__("cli-progress");
+const fs_1 = __webpack_require__("fs");
+const path_1 = __webpack_require__("path");
+const config_1 = __webpack_require__("./libs/node-shared/src/lib/config.ts");
+const api_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/api.utils.ts");
+const case_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/case.utils.ts");
+const checklist_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/checklist.utils.ts");
+const callApi = (0, api_utils_1.callApiFactory)('ClickUp');
 class ClickUp {
     constructor(taskId) {
         this.taskId = taskId;
@@ -2436,16 +2078,16 @@ class ClickUp {
                     return `- [ ] ${link}`;
                 case 'dp':
                     return task.status.status === 'in progress' && progress
-                        ? `* (${case_utils_1.titleCase(task.status.status)} ${progress}) ${link}`
-                        : `* (${case_utils_1.titleCase(task.status.status)}) ${link}`;
+                        ? `* (${(0, case_utils_1.titleCase)(task.status.status)} ${progress}) ${link}`
+                        : `* (${(0, case_utils_1.titleCase)(task.status.status)}) ${link}`;
             }
         });
     }
     getTaskProgress() {
-        const path = path_1.join(config_1.CONFIG.TaskTodoFolder, this.taskId + '.md');
-        if (fs_1.existsSync(path)) {
-            const content = fs_1.readFileSync(path, { encoding: 'utf-8' });
-            const checklist = checklist_utils_1.normalizeMarkdownChecklist(content);
+        const path = (0, path_1.join)(config_1.CONFIG.TaskTodoFolder, this.taskId + '.md');
+        if ((0, fs_1.existsSync)(path)) {
+            const content = (0, fs_1.readFileSync)(path, { encoding: 'utf-8' });
+            const checklist = (0, checklist_utils_1.normalizeMarkdownChecklist)(content);
             const total = checklist.length;
             const done = checklist.filter((c) => c.checked).length;
             return `${Math.round((done / total) * 100)}%`;
@@ -2516,9 +2158,9 @@ class ClickUp {
     }
     updateChecklist(clickUpChecklist, markdownChecklistString) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const markdownNormalizedChecklist = checklist_utils_1.normalizeMarkdownChecklist(markdownChecklistString, true);
-            const clickUpNormalizedChecklist = checklist_utils_1.normalizeClickUpChecklist(clickUpChecklist.items);
-            const actions = checklist_utils_1.getSyncChecklistActions(clickUpNormalizedChecklist, markdownNormalizedChecklist);
+            const markdownNormalizedChecklist = (0, checklist_utils_1.normalizeMarkdownChecklist)(markdownChecklistString, true);
+            const clickUpNormalizedChecklist = (0, checklist_utils_1.normalizeClickUpChecklist)(clickUpChecklist.items);
+            const actions = (0, checklist_utils_1.getSyncChecklistActions)(clickUpNormalizedChecklist, markdownNormalizedChecklist);
             if (actions.update.length + actions.create.length + actions.delete.length ===
                 0) {
                 return;
@@ -2541,20 +2183,15 @@ exports.ClickUp = ClickUp;
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/classes/gitlab.class.ts":
-/*!**********************************************************!*\
-  !*** ./libs/node-shared/src/lib/classes/gitlab.class.ts ***!
-  \**********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GitLab = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const config_1 = __webpack_require__(/*! ../config */ "./libs/node-shared/src/lib/config.ts");
-const api_utils_1 = __webpack_require__(/*! ../utils/api.utils */ "./libs/node-shared/src/lib/utils/api.utils.ts");
-const callApi = api_utils_1.callApiFactory('GitLab');
+const tslib_1 = __webpack_require__("tslib");
+const config_1 = __webpack_require__("./libs/node-shared/src/lib/config.ts");
+const api_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/api.utils.ts");
+const callApi = (0, api_utils_1.callApiFactory)('GitLab');
 class GitLab {
     constructor(projectId) {
         this.projectId = projectId;
@@ -2714,21 +2351,16 @@ exports.GitLab = GitLab;
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/classes/google.class.ts":
-/*!**********************************************************!*\
-  !*** ./libs/node-shared/src/lib/classes/google.class.ts ***!
-  \**********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Google = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const fs_1 = tslib_1.__importDefault(__webpack_require__(/*! fs */ "fs"));
-const googleapis_1 = __webpack_require__(/*! googleapis */ "googleapis");
-const local_auth_1 = __webpack_require__(/*! @google-cloud/local-auth */ "@google-cloud/local-auth");
-const config_1 = __webpack_require__(/*! ../config */ "./libs/node-shared/src/lib/config.ts");
+const tslib_1 = __webpack_require__("tslib");
+const fs_1 = tslib_1.__importDefault(__webpack_require__("fs"));
+const googleapis_1 = __webpack_require__("googleapis");
+const local_auth_1 = __webpack_require__("@google-cloud/local-auth");
+const config_1 = __webpack_require__("./libs/node-shared/src/lib/config.ts");
 class Google {
     constructor() {
         this.scopes = [
@@ -2769,7 +2401,7 @@ class Google {
             if (client) {
                 return client;
             }
-            client = (yield local_auth_1.authenticate({
+            client = (yield (0, local_auth_1.authenticate)({
                 scopes: this.scopes,
                 keyfilePath: this.credentialsFile,
             }));
@@ -2808,23 +2440,18 @@ exports.Google = Google;
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/config.ts":
-/*!********************************************!*\
-  !*** ./libs/node-shared/src/lib/config.ts ***!
-  \********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CONFIG = exports.getConfig = exports.getConfigPath = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const fs_1 = __webpack_require__(/*! fs */ "fs");
-const js_yaml_1 = tslib_1.__importDefault(__webpack_require__(/*! js-yaml */ "js-yaml"));
-const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
+const tslib_1 = __webpack_require__("tslib");
+const fs_1 = __webpack_require__("fs");
+const js_yaml_1 = tslib_1.__importDefault(__webpack_require__("js-yaml"));
+const untildify_1 = tslib_1.__importDefault(__webpack_require__("untildify"));
 function getConfigPath() {
     if (process.env.ACCEL_SHOOTER_CONFIG_FILE) {
-        return untildify_1.default(process.env.ACCEL_SHOOTER_CONFIG_FILE);
+        return (0, untildify_1.default)(process.env.ACCEL_SHOOTER_CONFIG_FILE);
     }
     else {
         throw Error('environment variable ACCEL_SHOOTER_CONFIG_FILE not found');
@@ -2836,8 +2463,8 @@ function getConfig() {
     if (!fs_1.existsSync) {
         throw Error('config file does not exist');
     }
-    const config = js_yaml_1.default.load(fs_1.readFileSync(configPath, { encoding: 'utf-8' }));
-    config.GitLabProjects = config.GitLabProjects.map((p) => (Object.assign(Object.assign({}, p), { path: untildify_1.default(p.path) })));
+    const config = js_yaml_1.default.load((0, fs_1.readFileSync)(configPath, { encoding: 'utf-8' }));
+    config.GitLabProjects = config.GitLabProjects.map((p) => (Object.assign(Object.assign({}, p), { path: (0, untildify_1.default)(p.path) })));
     const filePathKeys = [
         'TaskTodoFolder',
         'TodoFile',
@@ -2851,7 +2478,7 @@ function getConfig() {
         'PunchInfoFile',
     ];
     filePathKeys.forEach((key) => {
-        config[key] = untildify_1.default(config[key]);
+        config[key] = (0, untildify_1.default)(config[key]);
     });
     return config;
 }
@@ -2862,155 +2489,115 @@ exports.CONFIG = getConfig();
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/models/clickup/checklist.models.ts":
-/*!*********************************************************************!*\
-  !*** ./libs/node-shared/src/lib/models/clickup/checklist.models.ts ***!
-  \*********************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/models/clickup/space.models.ts":
-/*!*****************************************************************!*\
-  !*** ./libs/node-shared/src/lib/models/clickup/space.models.ts ***!
-  \*****************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/models/clickup/task.models.ts":
-/*!****************************************************************!*\
-  !*** ./libs/node-shared/src/lib/models/clickup/task.models.ts ***!
-  \****************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/models/gitlab/job.models.ts":
-/*!**************************************************************!*\
-  !*** ./libs/node-shared/src/lib/models/gitlab/job.models.ts ***!
-  \**************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/models/gitlab/merge-request.models.ts":
-/*!************************************************************************!*\
-  !*** ./libs/node-shared/src/lib/models/gitlab/merge-request.models.ts ***!
-  \************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/models/models.ts":
-/*!***************************************************!*\
-  !*** ./libs/node-shared/src/lib/models/models.ts ***!
-  \***************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/node-shared.ts":
-/*!*************************************************!*\
-  !*** ./libs/node-shared/src/lib/node-shared.ts ***!
-  \*************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sleep = exports.getTaskIdFromBranchName = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.titleCase = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.IHoliday = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Task = exports.Space = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.Google = exports.GitLab = exports.ClickUp = void 0;
-var clickup_class_1 = __webpack_require__(/*! ./classes/clickup.class */ "./libs/node-shared/src/lib/classes/clickup.class.ts");
-Object.defineProperty(exports, "ClickUp", { enumerable: true, get: function () { return clickup_class_1.ClickUp; } });
-var gitlab_class_1 = __webpack_require__(/*! ./classes/gitlab.class */ "./libs/node-shared/src/lib/classes/gitlab.class.ts");
-Object.defineProperty(exports, "GitLab", { enumerable: true, get: function () { return gitlab_class_1.GitLab; } });
-var google_class_1 = __webpack_require__(/*! ./classes/google.class */ "./libs/node-shared/src/lib/classes/google.class.ts");
-Object.defineProperty(exports, "Google", { enumerable: true, get: function () { return google_class_1.Google; } });
-var config_1 = __webpack_require__(/*! ./config */ "./libs/node-shared/src/lib/config.ts");
-Object.defineProperty(exports, "CONFIG", { enumerable: true, get: function () { return config_1.CONFIG; } });
-Object.defineProperty(exports, "getConfig", { enumerable: true, get: function () { return config_1.getConfig; } });
-var checklist_models_1 = __webpack_require__(/*! ./models/clickup/checklist.models */ "./libs/node-shared/src/lib/models/clickup/checklist.models.ts");
-Object.defineProperty(exports, "ChecklistItem", { enumerable: true, get: function () { return checklist_models_1.ChecklistItem; } });
-var space_models_1 = __webpack_require__(/*! ./models/clickup/space.models */ "./libs/node-shared/src/lib/models/clickup/space.models.ts");
-Object.defineProperty(exports, "Space", { enumerable: true, get: function () { return space_models_1.Space; } });
-var task_models_1 = __webpack_require__(/*! ./models/clickup/task.models */ "./libs/node-shared/src/lib/models/clickup/task.models.ts");
-Object.defineProperty(exports, "Task", { enumerable: true, get: function () { return task_models_1.Task; } });
-var job_models_1 = __webpack_require__(/*! ./models/gitlab/job.models */ "./libs/node-shared/src/lib/models/gitlab/job.models.ts");
-Object.defineProperty(exports, "Job", { enumerable: true, get: function () { return job_models_1.Job; } });
-var merge_request_models_1 = __webpack_require__(/*! ./models/gitlab/merge-request.models */ "./libs/node-shared/src/lib/models/gitlab/merge-request.models.ts");
-Object.defineProperty(exports, "Change", { enumerable: true, get: function () { return merge_request_models_1.Change; } });
-Object.defineProperty(exports, "FullMergeRequest", { enumerable: true, get: function () { return merge_request_models_1.FullMergeRequest; } });
-var models_1 = __webpack_require__(/*! ./models/models */ "./libs/node-shared/src/lib/models/models.ts");
-Object.defineProperty(exports, "GitLabProject", { enumerable: true, get: function () { return models_1.GitLabProject; } });
-Object.defineProperty(exports, "IHoliday", { enumerable: true, get: function () { return models_1.IHoliday; } });
-Object.defineProperty(exports, "NormalizedChecklist", { enumerable: true, get: function () { return models_1.NormalizedChecklist; } });
-Object.defineProperty(exports, "ProjectCheckItem", { enumerable: true, get: function () { return models_1.ProjectCheckItem; } });
-var case_utils_1 = __webpack_require__(/*! ./utils/case.utils */ "./libs/node-shared/src/lib/utils/case.utils.ts");
-Object.defineProperty(exports, "titleCase", { enumerable: true, get: function () { return case_utils_1.titleCase; } });
-var checklist_utils_1 = __webpack_require__(/*! ./utils/checklist.utils */ "./libs/node-shared/src/lib/utils/checklist.utils.ts");
-Object.defineProperty(exports, "getSyncChecklistActions", { enumerable: true, get: function () { return checklist_utils_1.getSyncChecklistActions; } });
-Object.defineProperty(exports, "normalizeClickUpChecklist", { enumerable: true, get: function () { return checklist_utils_1.normalizeClickUpChecklist; } });
-Object.defineProperty(exports, "normalizeMarkdownChecklist", { enumerable: true, get: function () { return checklist_utils_1.normalizeMarkdownChecklist; } });
-var clickup_utils_1 = __webpack_require__(/*! ./utils/clickup.utils */ "./libs/node-shared/src/lib/utils/clickup.utils.ts");
-Object.defineProperty(exports, "getTaskIdFromBranchName", { enumerable: true, get: function () { return clickup_utils_1.getTaskIdFromBranchName; } });
-var sleep_utils_1 = __webpack_require__(/*! ./utils/sleep.utils */ "./libs/node-shared/src/lib/utils/sleep.utils.ts");
-Object.defineProperty(exports, "sleep", { enumerable: true, get: function () { return sleep_utils_1.sleep; } });
+var clickup_class_1 = __webpack_require__("./libs/node-shared/src/lib/classes/clickup.class.ts");
+Object.defineProperty(exports, "ClickUp", ({ enumerable: true, get: function () { return clickup_class_1.ClickUp; } }));
+var gitlab_class_1 = __webpack_require__("./libs/node-shared/src/lib/classes/gitlab.class.ts");
+Object.defineProperty(exports, "GitLab", ({ enumerable: true, get: function () { return gitlab_class_1.GitLab; } }));
+var google_class_1 = __webpack_require__("./libs/node-shared/src/lib/classes/google.class.ts");
+Object.defineProperty(exports, "Google", ({ enumerable: true, get: function () { return google_class_1.Google; } }));
+var config_1 = __webpack_require__("./libs/node-shared/src/lib/config.ts");
+Object.defineProperty(exports, "CONFIG", ({ enumerable: true, get: function () { return config_1.CONFIG; } }));
+Object.defineProperty(exports, "getConfig", ({ enumerable: true, get: function () { return config_1.getConfig; } }));
+var checklist_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/checklist.models.ts");
+Object.defineProperty(exports, "ChecklistItem", ({ enumerable: true, get: function () { return checklist_models_1.ChecklistItem; } }));
+var space_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/space.models.ts");
+Object.defineProperty(exports, "Space", ({ enumerable: true, get: function () { return space_models_1.Space; } }));
+var task_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/task.models.ts");
+Object.defineProperty(exports, "Task", ({ enumerable: true, get: function () { return task_models_1.Task; } }));
+var job_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/gitlab/job.models.ts");
+Object.defineProperty(exports, "Job", ({ enumerable: true, get: function () { return job_models_1.Job; } }));
+var merge_request_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/gitlab/merge-request.models.ts");
+Object.defineProperty(exports, "Change", ({ enumerable: true, get: function () { return merge_request_models_1.Change; } }));
+Object.defineProperty(exports, "FullMergeRequest", ({ enumerable: true, get: function () { return merge_request_models_1.FullMergeRequest; } }));
+var models_1 = __webpack_require__("./libs/node-shared/src/lib/models/models.ts");
+Object.defineProperty(exports, "GitLabProject", ({ enumerable: true, get: function () { return models_1.GitLabProject; } }));
+Object.defineProperty(exports, "IHoliday", ({ enumerable: true, get: function () { return models_1.IHoliday; } }));
+Object.defineProperty(exports, "NormalizedChecklist", ({ enumerable: true, get: function () { return models_1.NormalizedChecklist; } }));
+Object.defineProperty(exports, "ProjectCheckItem", ({ enumerable: true, get: function () { return models_1.ProjectCheckItem; } }));
+var case_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/case.utils.ts");
+Object.defineProperty(exports, "titleCase", ({ enumerable: true, get: function () { return case_utils_1.titleCase; } }));
+var checklist_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/checklist.utils.ts");
+Object.defineProperty(exports, "getSyncChecklistActions", ({ enumerable: true, get: function () { return checklist_utils_1.getSyncChecklistActions; } }));
+Object.defineProperty(exports, "normalizeClickUpChecklist", ({ enumerable: true, get: function () { return checklist_utils_1.normalizeClickUpChecklist; } }));
+Object.defineProperty(exports, "normalizeMarkdownChecklist", ({ enumerable: true, get: function () { return checklist_utils_1.normalizeMarkdownChecklist; } }));
+var clickup_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/clickup.utils.ts");
+Object.defineProperty(exports, "getTaskIdFromBranchName", ({ enumerable: true, get: function () { return clickup_utils_1.getTaskIdFromBranchName; } }));
+var sleep_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/sleep.utils.ts");
+Object.defineProperty(exports, "sleep", ({ enumerable: true, get: function () { return sleep_utils_1.sleep; } }));
 
 
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/utils/api.utils.ts":
-/*!*****************************************************!*\
-  !*** ./libs/node-shared/src/lib/utils/api.utils.ts ***!
-  \*****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.callApiFactory = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_fetch_1 = tslib_1.__importDefault(__webpack_require__(/*! node-fetch */ "node-fetch"));
-const qs_1 = tslib_1.__importDefault(__webpack_require__(/*! qs */ "qs"));
-const config_1 = __webpack_require__(/*! ../config */ "./libs/node-shared/src/lib/config.ts");
-const sleep_utils_1 = __webpack_require__(/*! ./sleep.utils */ "./libs/node-shared/src/lib/utils/sleep.utils.ts");
+const tslib_1 = __webpack_require__("tslib");
+const node_fetch_1 = tslib_1.__importDefault(__webpack_require__("node-fetch"));
+const qs_1 = tslib_1.__importDefault(__webpack_require__("qs"));
+const config_1 = __webpack_require__("./libs/node-shared/src/lib/config.ts");
+const sleep_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/sleep.utils.ts");
 const RETRY_SETTING = {
     retry: 5,
     pause: 12 * 1000,
@@ -3020,7 +2607,7 @@ function fetchRetry(url, opts) {
         let retry = (opts && opts.retry) || 3;
         while (retry > 0) {
             try {
-                return yield node_fetch_1.default(url, opts).then(checkStatus);
+                return yield (0, node_fetch_1.default)(url, opts).then(checkStatus);
             }
             catch (e) {
                 if (opts === null || opts === void 0 ? void 0 : opts.callback) {
@@ -3031,7 +2618,7 @@ function fetchRetry(url, opts) {
                     throw e;
                 }
                 if (opts === null || opts === void 0 ? void 0 : opts.pause) {
-                    yield sleep_utils_1.sleep(opts.pause);
+                    yield (0, sleep_utils_1.sleep)(opts.pause);
                 }
             }
         }
@@ -3096,15 +2683,10 @@ exports.callApiFactory = callApiFactory;
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/utils/case.utils.ts":
-/*!******************************************************!*\
-  !*** ./libs/node-shared/src/lib/utils/case.utils.ts ***!
-  \******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.titleCase = void 0;
 const KEEP_LOWERCASE_WORD_LIST = [
     'and',
@@ -3153,15 +2735,10 @@ exports.titleCase = titleCase;
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/utils/checklist.utils.ts":
-/*!***********************************************************!*\
-  !*** ./libs/node-shared/src/lib/utils/checklist.utils.ts ***!
-  \***********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getSyncChecklistActions = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = void 0;
 function normalizeClickUpChecklist(checklist) {
     return checklist
@@ -3218,15 +2795,10 @@ exports.getSyncChecklistActions = getSyncChecklistActions;
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/utils/clickup.utils.ts":
-/*!*********************************************************!*\
-  !*** ./libs/node-shared/src/lib/utils/clickup.utils.ts ***!
-  \*********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getTaskIdFromBranchName = void 0;
 function getTaskIdFromBranchName(branchName) {
     const result = branchName.match(/CU-([a-z0-9]+)/);
@@ -3238,15 +2810,10 @@ exports.getTaskIdFromBranchName = getTaskIdFromBranchName;
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/utils/sleep.utils.ts":
-/*!*******************************************************!*\
-  !*** ./libs/node-shared/src/lib/utils/sleep.utils.ts ***!
-  \*******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sleep = void 0;
 function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -3256,325 +2823,321 @@ exports.sleep = sleep;
 
 /***/ }),
 
-/***/ 0:
-/*!************************************!*\
-  !*** multi ./apps/cli/src/main.ts ***!
-  \************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(/*! /Users/nanoha/git/accel-shooter/apps/cli/src/main.ts */"./apps/cli/src/main.ts");
-
-
-/***/ }),
-
 /***/ "@google-cloud/local-auth":
-/*!*******************************************!*\
-  !*** external "@google-cloud/local-auth" ***!
-  \*******************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("@google-cloud/local-auth");
 
 /***/ }),
 
 /***/ "@jcoreio/kexec":
-/*!*********************************!*\
-  !*** external "@jcoreio/kexec" ***!
-  \*********************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("@jcoreio/kexec");
 
 /***/ }),
 
-/***/ "child_process":
-/*!********************************!*\
-  !*** external "child_process" ***!
-  \********************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("child_process");
-
-/***/ }),
-
 /***/ "cli-progress":
-/*!*******************************!*\
-  !*** external "cli-progress" ***!
-  \*******************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("cli-progress");
 
 /***/ }),
 
 /***/ "clipboardy":
-/*!*****************************!*\
-  !*** external "clipboardy" ***!
-  \*****************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("clipboardy");
 
 /***/ }),
 
 /***/ "date-fns":
-/*!***************************!*\
-  !*** external "date-fns" ***!
-  \***************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("date-fns");
 
 /***/ }),
 
 /***/ "fs":
-/*!*********************!*\
-  !*** external "fs" ***!
-  \*********************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("fs");
 
 /***/ }),
 
 /***/ "fs/promises":
-/*!******************************!*\
-  !*** external "fs/promises" ***!
-  \******************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("fs/promises");
 
 /***/ }),
 
 /***/ "fuzzy":
-/*!************************!*\
-  !*** external "fuzzy" ***!
-  \************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("fuzzy");
 
 /***/ }),
 
 /***/ "googleapis":
-/*!*****************************!*\
-  !*** external "googleapis" ***!
-  \*****************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("googleapis");
 
 /***/ }),
 
 /***/ "inquirer":
-/*!***************************!*\
-  !*** external "inquirer" ***!
-  \***************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("inquirer");
 
 /***/ }),
 
 /***/ "inquirer-autocomplete-prompt":
-/*!***********************************************!*\
-  !*** external "inquirer-autocomplete-prompt" ***!
-  \***********************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("inquirer-autocomplete-prompt");
 
 /***/ }),
 
 /***/ "js-yaml":
-/*!**************************!*\
-  !*** external "js-yaml" ***!
-  \**************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("js-yaml");
 
 /***/ }),
 
 /***/ "mustache":
-/*!***************************!*\
-  !*** external "mustache" ***!
-  \***************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("mustache");
 
 /***/ }),
 
 /***/ "node-fetch":
-/*!*****************************!*\
-  !*** external "node-fetch" ***!
-  \*****************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("node-fetch");
 
 /***/ }),
 
 /***/ "open":
-/*!***********************!*\
-  !*** external "open" ***!
-  \***********************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("open");
 
 /***/ }),
 
-/***/ "os":
-/*!*********************!*\
-  !*** external "os" ***!
-  \*********************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("os");
-
-/***/ }),
-
-/***/ "path":
-/*!***********************!*\
-  !*** external "path" ***!
-  \***********************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("path");
-
-/***/ }),
-
 /***/ "progress-logs":
-/*!********************************!*\
-  !*** external "progress-logs" ***!
-  \********************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("progress-logs");
 
 /***/ }),
 
 /***/ "puppeteer":
-/*!****************************!*\
-  !*** external "puppeteer" ***!
-  \****************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("puppeteer");
 
 /***/ }),
 
 /***/ "qs":
-/*!*********************!*\
-  !*** external "qs" ***!
-  \*********************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("qs");
 
 /***/ }),
 
-/***/ "readline":
-/*!***************************!*\
-  !*** external "readline" ***!
-  \***************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("readline");
-
-/***/ }),
-
 /***/ "rxjs":
-/*!***********************!*\
-  !*** external "rxjs" ***!
-  \***********************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("rxjs");
 
 /***/ }),
 
 /***/ "rxjs/operators":
-/*!*********************************!*\
-  !*** external "rxjs/operators" ***!
-  \*********************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("rxjs/operators");
 
 /***/ }),
 
 /***/ "single-instance-lock":
-/*!***************************************!*\
-  !*** external "single-instance-lock" ***!
-  \***************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("single-instance-lock");
 
 /***/ }),
 
 /***/ "tslib":
-/*!************************!*\
-  !*** external "tslib" ***!
-  \************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("tslib");
 
 /***/ }),
 
 /***/ "untildify":
-/*!****************************!*\
-  !*** external "untildify" ***!
-  \****************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("untildify");
 
 /***/ }),
 
 /***/ "uuid":
-/*!***********************!*\
-  !*** external "uuid" ***!
-  \***********************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("uuid");
 
+/***/ }),
+
+/***/ "child_process":
+/***/ ((module) => {
+
+module.exports = require("child_process");
+
+/***/ }),
+
+/***/ "os":
+/***/ ((module) => {
+
+module.exports = require("os");
+
+/***/ }),
+
+/***/ "path":
+/***/ ((module) => {
+
+module.exports = require("path");
+
+/***/ }),
+
+/***/ "readline":
+/***/ ((module) => {
+
+module.exports = require("readline");
+
 /***/ })
 
-/******/ })));
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+(() => {
+var exports = __webpack_exports__;
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__("tslib");
+const promises_1 = tslib_1.__importDefault(__webpack_require__("fs/promises"));
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const check_action_1 = __webpack_require__("./apps/cli/src/actions/check.action.ts");
+const close_action_1 = __webpack_require__("./apps/cli/src/actions/close.action.ts");
+const commit_action_1 = __webpack_require__("./apps/cli/src/actions/commit.action.ts");
+const copy_action_1 = __webpack_require__("./apps/cli/src/actions/copy.action.ts");
+const cross_checklist_action_1 = __webpack_require__("./apps/cli/src/actions/cross-checklist.action.ts");
+const daily_progress_action_1 = __webpack_require__("./apps/cli/src/actions/daily-progress.action.ts");
+const dump_my_tasks_action_1 = __webpack_require__("./apps/cli/src/actions/dump-my-tasks.action.ts");
+const end_action_1 = __webpack_require__("./apps/cli/src/actions/end.action.ts");
+const fetch_holiday_action_1 = __webpack_require__("./apps/cli/src/actions/fetch-holiday.action.ts");
+const list_action_1 = __webpack_require__("./apps/cli/src/actions/list.action.ts");
+const open_action_1 = __webpack_require__("./apps/cli/src/actions/open.action.ts");
+const revert_end_action_1 = __webpack_require__("./apps/cli/src/actions/revert-end.action.ts");
+const routine_action_1 = __webpack_require__("./apps/cli/src/actions/routine.action.ts");
+const rtv_tasks_action_1 = __webpack_require__("./apps/cli/src/actions/rtv-tasks.action.ts");
+const show_diff_action_1 = __webpack_require__("./apps/cli/src/actions/show-diff.action.ts");
+const start_action_1 = __webpack_require__("./apps/cli/src/actions/start.action.ts");
+const switch_action_1 = __webpack_require__("./apps/cli/src/actions/switch.action.ts");
+const time_action_1 = __webpack_require__("./apps/cli/src/actions/time.action.ts");
+const to_do_action_1 = __webpack_require__("./apps/cli/src/actions/to-do.action.ts");
+const track_action_1 = __webpack_require__("./apps/cli/src/actions/track.action.ts");
+const watch_pipeline_action_1 = __webpack_require__("./apps/cli/src/actions/watch-pipeline.action.ts");
+const work_action_1 = __webpack_require__("./apps/cli/src/actions/work.action.ts");
+const actions = {
+    start: start_action_1.startAction,
+    open: open_action_1.openAction,
+    switch: switch_action_1.switchAction,
+    dailyProgress: daily_progress_action_1.dailyProgressAction,
+    track: track_action_1.trackAction,
+    end: end_action_1.endAction,
+    revertEnd: revert_end_action_1.revertEndAction,
+    crossChecklist: cross_checklist_action_1.crossChecklistAction,
+    RTVTasks: rtv_tasks_action_1.RTVTasksAction,
+    check: check_action_1.checkAction,
+    dumpMyTasks: dump_my_tasks_action_1.dumpMyTasksAction,
+    list: list_action_1.listAction,
+    toDo: to_do_action_1.toDoAction,
+    copy: copy_action_1.copyAction,
+    showDiff: show_diff_action_1.showDiffAction,
+    time: time_action_1.timeAction,
+    fetchHoliday: fetch_holiday_action_1.fetchHolidayAction,
+    watchPipeline: watch_pipeline_action_1.watchPipelineAction,
+    commit: commit_action_1.commitAction,
+    close: close_action_1.closeAction,
+    work: work_action_1.workAction,
+    routine: routine_action_1.routineAction,
+    test: () => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
+        const itemListJson = yield promises_1.default.readFile('./dp-analysis', 'utf-8');
+        const itemList = JSON.parse(itemListJson);
+        const outputItem = [];
+        for (const item of itemList) {
+            const taskId = item.url.match(/https:\/\/app.clickup.com\/t\/(\w+)/)[1];
+            const clickUp = new node_shared_1.ClickUp(taskId);
+            const task = yield clickUp.getTask();
+            const product = yield node_shared_1.ClickUp.getProduct(task);
+            const gitLabInfo = yield clickUp.getGitLabProjectAndMergeRequestIId();
+            let mergeRequestLink = null;
+            if (gitLabInfo) {
+                const { gitLabProject, mergeRequestIId } = gitLabInfo;
+                const gitLab = new node_shared_1.GitLab(gitLabProject.id);
+                const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
+                mergeRequestLink = mergeRequest.web_url;
+            }
+            outputItem.push(Object.assign(Object.assign({}, item), { product,
+                mergeRequestLink }));
+        }
+        yield promises_1.default.writeFile('./output-final.json', JSON.stringify(outputItem, null, 2));
+    }),
+};
+(() => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
+    const action = process.argv[2];
+    if (actions[action]) {
+        yield actions[action]();
+    }
+    else {
+        throw Error(`Action ${action} is not supported.`);
+    }
+}))();
+
+})();
+
+var __webpack_export_target__ = exports;
+for(var i in __webpack_exports__) __webpack_export_target__[i] = __webpack_exports__[i];
+if(__webpack_exports__.__esModule) Object.defineProperty(__webpack_export_target__, "__esModule", { value: true });
+/******/ })()
+;
 //# sourceMappingURL=main.js.map

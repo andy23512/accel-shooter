@@ -40,8 +40,8 @@ export class TaskPageComponent implements OnInit {
   public frameUrl = '';
   public fullTaskName = '';
   public mrPipelineStatus = '';
-  public changeSubject = new Subject();
-  public saveSubject = new Subject();
+  public changeSubject = new Subject<void>();
+  public saveSubject = new Subject<void>();
 
   constructor(
     private route: ActivatedRoute,

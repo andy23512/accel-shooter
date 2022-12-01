@@ -16,8 +16,8 @@ import { PageTitleService } from './../page-title.service';
 export class MarkdownPageComponent implements OnInit {
   public markdownId = '';
   public markdownContent = '';
-  public changeSubject = new Subject();
-  public saveSubject = new Subject();
+  public changeSubject = new Subject<void>();
+  public saveSubject = new Subject<void>();
   public lastChangedTime!: Moment;
   constructor(
     private http: HttpClient,

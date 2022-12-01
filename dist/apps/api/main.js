@@ -1,112 +1,23 @@
-(function(e, a) { for(var i in a) e[i] = a[i]; }(exports, /******/ (function(modules) { // webpackBootstrap
-/******/ 	// The module cache
-/******/ 	var installedModules = {};
-/******/
-/******/ 	// The require function
-/******/ 	function __webpack_require__(moduleId) {
-/******/
-/******/ 		// Check if module is in cache
-/******/ 		if(installedModules[moduleId]) {
-/******/ 			return installedModules[moduleId].exports;
-/******/ 		}
-/******/ 		// Create a new module (and put it into the cache)
-/******/ 		var module = installedModules[moduleId] = {
-/******/ 			i: moduleId,
-/******/ 			l: false,
-/******/ 			exports: {}
-/******/ 		};
-/******/
-/******/ 		// Execute the module function
-/******/ 		modules[moduleId].call(module.exports, module, module.exports, __webpack_require__);
-/******/
-/******/ 		// Flag the module as loaded
-/******/ 		module.l = true;
-/******/
-/******/ 		// Return the exports of the module
-/******/ 		return module.exports;
-/******/ 	}
-/******/
-/******/
-/******/ 	// expose the modules object (__webpack_modules__)
-/******/ 	__webpack_require__.m = modules;
-/******/
-/******/ 	// expose the module cache
-/******/ 	__webpack_require__.c = installedModules;
-/******/
-/******/ 	// define getter function for harmony exports
-/******/ 	__webpack_require__.d = function(exports, name, getter) {
-/******/ 		if(!__webpack_require__.o(exports, name)) {
-/******/ 			Object.defineProperty(exports, name, { enumerable: true, get: getter });
-/******/ 		}
-/******/ 	};
-/******/
-/******/ 	// define __esModule on exports
-/******/ 	__webpack_require__.r = function(exports) {
-/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 		}
-/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 	};
-/******/
-/******/ 	// create a fake namespace object
-/******/ 	// mode & 1: value is a module id, require it
-/******/ 	// mode & 2: merge all properties of value into the ns
-/******/ 	// mode & 4: return value when already ns object
-/******/ 	// mode & 8|1: behave like require
-/******/ 	__webpack_require__.t = function(value, mode) {
-/******/ 		if(mode & 1) value = __webpack_require__(value);
-/******/ 		if(mode & 8) return value;
-/******/ 		if((mode & 4) && typeof value === 'object' && value && value.__esModule) return value;
-/******/ 		var ns = Object.create(null);
-/******/ 		__webpack_require__.r(ns);
-/******/ 		Object.defineProperty(ns, 'default', { enumerable: true, value: value });
-/******/ 		if(mode & 2 && typeof value != 'string') for(var key in value) __webpack_require__.d(ns, key, function(key) { return value[key]; }.bind(null, key));
-/******/ 		return ns;
-/******/ 	};
-/******/
-/******/ 	// getDefaultExport function for compatibility with non-harmony modules
-/******/ 	__webpack_require__.n = function(module) {
-/******/ 		var getter = module && module.__esModule ?
-/******/ 			function getDefault() { return module['default']; } :
-/******/ 			function getModuleExports() { return module; };
-/******/ 		__webpack_require__.d(getter, 'a', getter);
-/******/ 		return getter;
-/******/ 	};
-/******/
-/******/ 	// Object.prototype.hasOwnProperty.call
-/******/ 	__webpack_require__.o = function(object, property) { return Object.prototype.hasOwnProperty.call(object, property); };
-/******/
-/******/ 	// __webpack_public_path__
-/******/ 	__webpack_require__.p = "";
-/******/
-/******/
-/******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
-/******/ })
-/************************************************************************/
-/******/ ({
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	var __webpack_modules__ = ({
 
 /***/ "./apps/api/src/app/app.controller.ts":
-/*!********************************************!*\
-  !*** ./apps/api/src/app/app.controller.ts ***!
-  \********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
 var _a, _b, _c, _d, _e, _f, _g;
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AppController = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-const config_1 = __webpack_require__(/*! @nestjs/config */ "@nestjs/config");
-const fs_1 = __webpack_require__(/*! fs */ "fs");
-const path_1 = __webpack_require__(/*! path */ "path");
-const rxjs_1 = __webpack_require__(/*! rxjs */ "rxjs");
-const operators_1 = __webpack_require__(/*! rxjs/operators */ "rxjs/operators");
-const watch_rx_1 = __webpack_require__(/*! watch-rx */ "watch-rx");
+const tslib_1 = __webpack_require__("tslib");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const common_1 = __webpack_require__("@nestjs/common");
+const config_1 = __webpack_require__("@nestjs/config");
+const fs_1 = __webpack_require__("fs");
+const path_1 = __webpack_require__("path");
+const rxjs_1 = __webpack_require__("rxjs");
+const operators_1 = __webpack_require__("rxjs/operators");
+const watch_rx_1 = __webpack_require__("watch-rx");
 const CONFIG_KEY_MAP = {
     todo: 'TodoFile',
     work_note: 'WorkNoteFile',
@@ -118,7 +29,7 @@ let AppController = class AppController {
     getTasks() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const path = this.configService.get('MySummarizedTasksFile');
-            const tasks = JSON.parse(fs_1.readFileSync(path, { encoding: 'utf-8' }));
+            const tasks = JSON.parse((0, fs_1.readFileSync)(path, { encoding: 'utf-8' }));
             return { tasks };
         });
     }
@@ -129,7 +40,7 @@ let AppController = class AppController {
                 throw new common_1.NotFoundException();
             }
             const path = this.configService.get(configKey);
-            const content = fs_1.readFileSync(path, { encoding: 'utf-8' });
+            const content = (0, fs_1.readFileSync)(path, { encoding: 'utf-8' });
             return { content };
         });
     }
@@ -140,7 +51,7 @@ let AppController = class AppController {
                 throw new common_1.NotFoundException();
             }
             const path = this.configService.get(configKey);
-            fs_1.writeFileSync(path, content);
+            (0, fs_1.writeFileSync)(path, content);
         });
     }
     getChecklist(taskId) {
@@ -153,8 +64,8 @@ let AppController = class AppController {
             const gitLab = new node_shared_1.GitLab(gitLabProject.id);
             const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
             const folderPath = this.configService.get('TaskTodoFolder');
-            const path = path_1.join(folderPath, taskId + '.md');
-            const content = fs_1.readFileSync(path, { encoding: 'utf-8' });
+            const path = (0, path_1.join)(folderPath, taskId + '.md');
+            const content = (0, fs_1.readFileSync)(path, { encoding: 'utf-8' });
             return {
                 mergeRequestLink: mergeRequest.web_url,
                 taskLink: task.url,
@@ -167,7 +78,7 @@ let AppController = class AppController {
     putChecklist(taskId, checklist) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const folderPath = this.configService.get('TaskTodoFolder');
-            fs_1.writeFileSync(path_1.join(folderPath, taskId + '.md'), checklist);
+            (0, fs_1.writeFileSync)((0, path_1.join)(folderPath, taskId + '.md'), checklist);
             const clickUp = new node_shared_1.ClickUp(taskId);
             const task = yield clickUp.getTask();
             const clickUpChecklist = task.checklists.find((c) => c.name.toLowerCase().includes('synced checklist'));
@@ -205,75 +116,75 @@ let AppController = class AppController {
         });
     }
     todoSse() {
-        return watch_rx_1.watchRx(node_shared_1.CONFIG.TodoChangeNotificationFile).pipe(operators_1.map(() => fs_1.readFileSync(node_shared_1.CONFIG.TodoFile, { encoding: 'utf-8' })));
+        return (0, watch_rx_1.watchRx)(node_shared_1.CONFIG.TodoChangeNotificationFile).pipe((0, operators_1.map)(() => (0, fs_1.readFileSync)(node_shared_1.CONFIG.TodoFile, { encoding: 'utf-8' })));
     }
 };
 tslib_1.__decorate([
-    common_1.Get('tasks'),
+    (0, common_1.Get)('tasks'),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", []),
     tslib_1.__metadata("design:returntype", typeof (_a = typeof Promise !== "undefined" && Promise) === "function" ? _a : Object)
 ], AppController.prototype, "getTasks", null);
 tslib_1.__decorate([
-    common_1.Get('markdown/:id'),
-    tslib_1.__param(0, common_1.Param('id')),
+    (0, common_1.Get)('markdown/:id'),
+    tslib_1.__param(0, (0, common_1.Param)('id')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String]),
     tslib_1.__metadata("design:returntype", typeof (_b = typeof Promise !== "undefined" && Promise) === "function" ? _b : Object)
 ], AppController.prototype, "getMarkdown", null);
 tslib_1.__decorate([
-    common_1.Put('markdown/:id'),
-    tslib_1.__param(0, common_1.Param('id')),
-    tslib_1.__param(1, common_1.Body('content')),
+    (0, common_1.Put)('markdown/:id'),
+    tslib_1.__param(0, (0, common_1.Param)('id')),
+    tslib_1.__param(1, (0, common_1.Body)('content')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String, String]),
     tslib_1.__metadata("design:returntype", Promise)
 ], AppController.prototype, "putMarkdown", null);
 tslib_1.__decorate([
-    common_1.Get('task/:id/checklist'),
-    tslib_1.__param(0, common_1.Param('id')),
+    (0, common_1.Get)('task/:id/checklist'),
+    tslib_1.__param(0, (0, common_1.Param)('id')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String]),
     tslib_1.__metadata("design:returntype", typeof (_c = typeof Promise !== "undefined" && Promise) === "function" ? _c : Object)
 ], AppController.prototype, "getChecklist", null);
 tslib_1.__decorate([
-    common_1.Put('task/:id/checklist'),
-    tslib_1.__param(0, common_1.Param('id')),
-    tslib_1.__param(1, common_1.Body('checklist')),
+    (0, common_1.Put)('task/:id/checklist'),
+    tslib_1.__param(0, (0, common_1.Param)('id')),
+    tslib_1.__param(1, (0, common_1.Body)('checklist')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String, String]),
     tslib_1.__metadata("design:returntype", Promise)
 ], AppController.prototype, "putChecklist", null);
 tslib_1.__decorate([
-    common_1.Get('task/:id/mr_description'),
-    tslib_1.__param(0, common_1.Param('id')),
+    (0, common_1.Get)('task/:id/mr_description'),
+    tslib_1.__param(0, (0, common_1.Param)('id')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String]),
     tslib_1.__metadata("design:returntype", typeof (_d = typeof Promise !== "undefined" && Promise) === "function" ? _d : Object)
 ], AppController.prototype, "getMRDescription", null);
 tslib_1.__decorate([
-    common_1.Put('task/:id/mr_description'),
-    tslib_1.__param(0, common_1.Param('id')),
-    tslib_1.__param(1, common_1.Body('content')),
+    (0, common_1.Put)('task/:id/mr_description'),
+    tslib_1.__param(0, (0, common_1.Param)('id')),
+    tslib_1.__param(1, (0, common_1.Body)('content')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String, String]),
     tslib_1.__metadata("design:returntype", Promise)
 ], AppController.prototype, "putMRDescription", null);
 tslib_1.__decorate([
-    common_1.Get('task/:id/mr_pipeline_status'),
-    tslib_1.__param(0, common_1.Param('id')),
+    (0, common_1.Get)('task/:id/mr_pipeline_status'),
+    tslib_1.__param(0, (0, common_1.Param)('id')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String]),
     tslib_1.__metadata("design:returntype", typeof (_e = typeof Promise !== "undefined" && Promise) === "function" ? _e : Object)
 ], AppController.prototype, "getMRPipelineStatus", null);
 tslib_1.__decorate([
-    common_1.Sse('todo-sse'),
+    (0, common_1.Sse)('todo-sse'),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", []),
     tslib_1.__metadata("design:returntype", typeof (_f = typeof rxjs_1.Observable !== "undefined" && rxjs_1.Observable) === "function" ? _f : Object)
 ], AppController.prototype, "todoSse", null);
 AppController = tslib_1.__decorate([
-    common_1.Controller(),
+    (0, common_1.Controller)(),
     tslib_1.__metadata("design:paramtypes", [typeof (_g = typeof config_1.ConfigService !== "undefined" && config_1.ConfigService) === "function" ? _g : Object])
 ], AppController);
 exports.AppController = AppController;
@@ -282,32 +193,27 @@ exports.AppController = AppController;
 /***/ }),
 
 /***/ "./apps/api/src/app/app.module.ts":
-/*!****************************************!*\
-  !*** ./apps/api/src/app/app.module.ts ***!
-  \****************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AppModule = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_shared_1 = __webpack_require__(/*! @accel-shooter/node-shared */ "./libs/node-shared/src/index.ts");
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-const config_1 = __webpack_require__(/*! @nestjs/config */ "@nestjs/config");
-const serve_static_1 = __webpack_require__(/*! @nestjs/serve-static */ "@nestjs/serve-static");
-const path_1 = __webpack_require__(/*! path */ "path");
-const app_controller_1 = __webpack_require__(/*! ./app.controller */ "./apps/api/src/app/app.controller.ts");
-const app_service_1 = __webpack_require__(/*! ./app.service */ "./apps/api/src/app/app.service.ts");
+const tslib_1 = __webpack_require__("tslib");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const common_1 = __webpack_require__("@nestjs/common");
+const config_1 = __webpack_require__("@nestjs/config");
+const serve_static_1 = __webpack_require__("@nestjs/serve-static");
+const path_1 = __webpack_require__("path");
+const app_controller_1 = __webpack_require__("./apps/api/src/app/app.controller.ts");
+const app_service_1 = __webpack_require__("./apps/api/src/app/app.service.ts");
 let AppModule = class AppModule {
 };
 AppModule = tslib_1.__decorate([
-    common_1.Module({
+    (0, common_1.Module)({
         imports: [
             config_1.ConfigModule.forRoot({ isGlobal: true, load: [node_shared_1.getConfig] }),
             serve_static_1.ServeStaticModule.forRoot({
-                rootPath: path_1.join(__dirname, '..', 'frontend'),
+                rootPath: (0, path_1.join)(__dirname, '..', 'frontend'),
                 serveStaticOptions: { cacheControl: false },
             }),
         ],
@@ -321,98 +227,49 @@ exports.AppModule = AppModule;
 /***/ }),
 
 /***/ "./apps/api/src/app/app.service.ts":
-/*!*****************************************!*\
-  !*** ./apps/api/src/app/app.service.ts ***!
-  \*****************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AppService = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
+const tslib_1 = __webpack_require__("tslib");
+const common_1 = __webpack_require__("@nestjs/common");
 let AppService = class AppService {
 };
 AppService = tslib_1.__decorate([
-    common_1.Injectable()
+    (0, common_1.Injectable)()
 ], AppService);
 exports.AppService = AppService;
 
 
 /***/ }),
 
-/***/ "./apps/api/src/main.ts":
-/*!******************************!*\
-  !*** ./apps/api/src/main.ts ***!
-  \******************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-Object.defineProperty(exports, "__esModule", { value: true });
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const common_1 = __webpack_require__(/*! @nestjs/common */ "@nestjs/common");
-const core_1 = __webpack_require__(/*! @nestjs/core */ "@nestjs/core");
-const app_module_1 = __webpack_require__(/*! ./app/app.module */ "./apps/api/src/app/app.module.ts");
-function bootstrap() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const app = yield core_1.NestFactory.create(app_module_1.AppModule);
-        const globalPrefix = 'api';
-        app.setGlobalPrefix(globalPrefix);
-        const port = process.env.PORT || 8112;
-        yield app.listen(port, () => {
-            common_1.Logger.log('Listening at http://localhost:' + port + '/' + globalPrefix);
-        });
-    });
-}
-bootstrap();
-
-
-/***/ }),
-
 /***/ "./libs/node-shared/src/index.ts":
-/*!***************************************!*\
-  !*** ./libs/node-shared/src/index.ts ***!
-  \***************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-tslib_1.__exportStar(__webpack_require__(/*! ./lib/node-shared */ "./libs/node-shared/src/lib/node-shared.ts"), exports);
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__("tslib");
+tslib_1.__exportStar(__webpack_require__("./libs/node-shared/src/lib/node-shared.ts"), exports);
 
 
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/classes/clickup.class.ts":
-/*!***********************************************************!*\
-  !*** ./libs/node-shared/src/lib/classes/clickup.class.ts ***!
-  \***********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.ClickUp = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const cli_progress_1 = __webpack_require__(/*! cli-progress */ "cli-progress");
-const fs_1 = __webpack_require__(/*! fs */ "fs");
-const path_1 = __webpack_require__(/*! path */ "path");
-const config_1 = __webpack_require__(/*! ../config */ "./libs/node-shared/src/lib/config.ts");
-const api_utils_1 = __webpack_require__(/*! ../utils/api.utils */ "./libs/node-shared/src/lib/utils/api.utils.ts");
-const case_utils_1 = __webpack_require__(/*! ../utils/case.utils */ "./libs/node-shared/src/lib/utils/case.utils.ts");
-const checklist_utils_1 = __webpack_require__(/*! ../utils/checklist.utils */ "./libs/node-shared/src/lib/utils/checklist.utils.ts");
-const callApi = api_utils_1.callApiFactory('ClickUp');
+const tslib_1 = __webpack_require__("tslib");
+const cli_progress_1 = __webpack_require__("cli-progress");
+const fs_1 = __webpack_require__("fs");
+const path_1 = __webpack_require__("path");
+const config_1 = __webpack_require__("./libs/node-shared/src/lib/config.ts");
+const api_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/api.utils.ts");
+const case_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/case.utils.ts");
+const checklist_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/checklist.utils.ts");
+const callApi = (0, api_utils_1.callApiFactory)('ClickUp');
 class ClickUp {
     constructor(taskId) {
         this.taskId = taskId;
@@ -580,16 +437,16 @@ class ClickUp {
                     return `- [ ] ${link}`;
                 case 'dp':
                     return task.status.status === 'in progress' && progress
-                        ? `* (${case_utils_1.titleCase(task.status.status)} ${progress}) ${link}`
-                        : `* (${case_utils_1.titleCase(task.status.status)}) ${link}`;
+                        ? `* (${(0, case_utils_1.titleCase)(task.status.status)} ${progress}) ${link}`
+                        : `* (${(0, case_utils_1.titleCase)(task.status.status)}) ${link}`;
             }
         });
     }
     getTaskProgress() {
-        const path = path_1.join(config_1.CONFIG.TaskTodoFolder, this.taskId + '.md');
-        if (fs_1.existsSync(path)) {
-            const content = fs_1.readFileSync(path, { encoding: 'utf-8' });
-            const checklist = checklist_utils_1.normalizeMarkdownChecklist(content);
+        const path = (0, path_1.join)(config_1.CONFIG.TaskTodoFolder, this.taskId + '.md');
+        if ((0, fs_1.existsSync)(path)) {
+            const content = (0, fs_1.readFileSync)(path, { encoding: 'utf-8' });
+            const checklist = (0, checklist_utils_1.normalizeMarkdownChecklist)(content);
             const total = checklist.length;
             const done = checklist.filter((c) => c.checked).length;
             return `${Math.round((done / total) * 100)}%`;
@@ -660,9 +517,9 @@ class ClickUp {
     }
     updateChecklist(clickUpChecklist, markdownChecklistString) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const markdownNormalizedChecklist = checklist_utils_1.normalizeMarkdownChecklist(markdownChecklistString, true);
-            const clickUpNormalizedChecklist = checklist_utils_1.normalizeClickUpChecklist(clickUpChecklist.items);
-            const actions = checklist_utils_1.getSyncChecklistActions(clickUpNormalizedChecklist, markdownNormalizedChecklist);
+            const markdownNormalizedChecklist = (0, checklist_utils_1.normalizeMarkdownChecklist)(markdownChecklistString, true);
+            const clickUpNormalizedChecklist = (0, checklist_utils_1.normalizeClickUpChecklist)(clickUpChecklist.items);
+            const actions = (0, checklist_utils_1.getSyncChecklistActions)(clickUpNormalizedChecklist, markdownNormalizedChecklist);
             if (actions.update.length + actions.create.length + actions.delete.length ===
                 0) {
                 return;
@@ -685,20 +542,15 @@ exports.ClickUp = ClickUp;
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/classes/gitlab.class.ts":
-/*!**********************************************************!*\
-  !*** ./libs/node-shared/src/lib/classes/gitlab.class.ts ***!
-  \**********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GitLab = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const config_1 = __webpack_require__(/*! ../config */ "./libs/node-shared/src/lib/config.ts");
-const api_utils_1 = __webpack_require__(/*! ../utils/api.utils */ "./libs/node-shared/src/lib/utils/api.utils.ts");
-const callApi = api_utils_1.callApiFactory('GitLab');
+const tslib_1 = __webpack_require__("tslib");
+const config_1 = __webpack_require__("./libs/node-shared/src/lib/config.ts");
+const api_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/api.utils.ts");
+const callApi = (0, api_utils_1.callApiFactory)('GitLab');
 class GitLab {
     constructor(projectId) {
         this.projectId = projectId;
@@ -858,21 +710,16 @@ exports.GitLab = GitLab;
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/classes/google.class.ts":
-/*!**********************************************************!*\
-  !*** ./libs/node-shared/src/lib/classes/google.class.ts ***!
-  \**********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Google = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const fs_1 = tslib_1.__importDefault(__webpack_require__(/*! fs */ "fs"));
-const googleapis_1 = __webpack_require__(/*! googleapis */ "googleapis");
-const local_auth_1 = __webpack_require__(/*! @google-cloud/local-auth */ "@google-cloud/local-auth");
-const config_1 = __webpack_require__(/*! ../config */ "./libs/node-shared/src/lib/config.ts");
+const tslib_1 = __webpack_require__("tslib");
+const fs_1 = tslib_1.__importDefault(__webpack_require__("fs"));
+const googleapis_1 = __webpack_require__("googleapis");
+const local_auth_1 = __webpack_require__("@google-cloud/local-auth");
+const config_1 = __webpack_require__("./libs/node-shared/src/lib/config.ts");
 class Google {
     constructor() {
         this.scopes = [
@@ -913,7 +760,7 @@ class Google {
             if (client) {
                 return client;
             }
-            client = (yield local_auth_1.authenticate({
+            client = (yield (0, local_auth_1.authenticate)({
                 scopes: this.scopes,
                 keyfilePath: this.credentialsFile,
             }));
@@ -952,23 +799,18 @@ exports.Google = Google;
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/config.ts":
-/*!********************************************!*\
-  !*** ./libs/node-shared/src/lib/config.ts ***!
-  \********************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CONFIG = exports.getConfig = exports.getConfigPath = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const fs_1 = __webpack_require__(/*! fs */ "fs");
-const js_yaml_1 = tslib_1.__importDefault(__webpack_require__(/*! js-yaml */ "js-yaml"));
-const untildify_1 = tslib_1.__importDefault(__webpack_require__(/*! untildify */ "untildify"));
+const tslib_1 = __webpack_require__("tslib");
+const fs_1 = __webpack_require__("fs");
+const js_yaml_1 = tslib_1.__importDefault(__webpack_require__("js-yaml"));
+const untildify_1 = tslib_1.__importDefault(__webpack_require__("untildify"));
 function getConfigPath() {
     if (process.env.ACCEL_SHOOTER_CONFIG_FILE) {
-        return untildify_1.default(process.env.ACCEL_SHOOTER_CONFIG_FILE);
+        return (0, untildify_1.default)(process.env.ACCEL_SHOOTER_CONFIG_FILE);
     }
     else {
         throw Error('environment variable ACCEL_SHOOTER_CONFIG_FILE not found');
@@ -980,8 +822,8 @@ function getConfig() {
     if (!fs_1.existsSync) {
         throw Error('config file does not exist');
     }
-    const config = js_yaml_1.default.load(fs_1.readFileSync(configPath, { encoding: 'utf-8' }));
-    config.GitLabProjects = config.GitLabProjects.map((p) => (Object.assign(Object.assign({}, p), { path: untildify_1.default(p.path) })));
+    const config = js_yaml_1.default.load((0, fs_1.readFileSync)(configPath, { encoding: 'utf-8' }));
+    config.GitLabProjects = config.GitLabProjects.map((p) => (Object.assign(Object.assign({}, p), { path: (0, untildify_1.default)(p.path) })));
     const filePathKeys = [
         'TaskTodoFolder',
         'TodoFile',
@@ -995,7 +837,7 @@ function getConfig() {
         'PunchInfoFile',
     ];
     filePathKeys.forEach((key) => {
-        config[key] = untildify_1.default(config[key]);
+        config[key] = (0, untildify_1.default)(config[key]);
     });
     return config;
 }
@@ -1006,155 +848,115 @@ exports.CONFIG = getConfig();
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/models/clickup/checklist.models.ts":
-/*!*********************************************************************!*\
-  !*** ./libs/node-shared/src/lib/models/clickup/checklist.models.ts ***!
-  \*********************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/models/clickup/space.models.ts":
-/*!*****************************************************************!*\
-  !*** ./libs/node-shared/src/lib/models/clickup/space.models.ts ***!
-  \*****************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/models/clickup/task.models.ts":
-/*!****************************************************************!*\
-  !*** ./libs/node-shared/src/lib/models/clickup/task.models.ts ***!
-  \****************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/models/gitlab/job.models.ts":
-/*!**************************************************************!*\
-  !*** ./libs/node-shared/src/lib/models/gitlab/job.models.ts ***!
-  \**************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/models/gitlab/merge-request.models.ts":
-/*!************************************************************************!*\
-  !*** ./libs/node-shared/src/lib/models/gitlab/merge-request.models.ts ***!
-  \************************************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/models/models.ts":
-/*!***************************************************!*\
-  !*** ./libs/node-shared/src/lib/models/models.ts ***!
-  \***************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/node-shared.ts":
-/*!*************************************************!*\
-  !*** ./libs/node-shared/src/lib/node-shared.ts ***!
-  \*************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sleep = exports.getTaskIdFromBranchName = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.titleCase = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.IHoliday = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Task = exports.Space = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.Google = exports.GitLab = exports.ClickUp = void 0;
-var clickup_class_1 = __webpack_require__(/*! ./classes/clickup.class */ "./libs/node-shared/src/lib/classes/clickup.class.ts");
-Object.defineProperty(exports, "ClickUp", { enumerable: true, get: function () { return clickup_class_1.ClickUp; } });
-var gitlab_class_1 = __webpack_require__(/*! ./classes/gitlab.class */ "./libs/node-shared/src/lib/classes/gitlab.class.ts");
-Object.defineProperty(exports, "GitLab", { enumerable: true, get: function () { return gitlab_class_1.GitLab; } });
-var google_class_1 = __webpack_require__(/*! ./classes/google.class */ "./libs/node-shared/src/lib/classes/google.class.ts");
-Object.defineProperty(exports, "Google", { enumerable: true, get: function () { return google_class_1.Google; } });
-var config_1 = __webpack_require__(/*! ./config */ "./libs/node-shared/src/lib/config.ts");
-Object.defineProperty(exports, "CONFIG", { enumerable: true, get: function () { return config_1.CONFIG; } });
-Object.defineProperty(exports, "getConfig", { enumerable: true, get: function () { return config_1.getConfig; } });
-var checklist_models_1 = __webpack_require__(/*! ./models/clickup/checklist.models */ "./libs/node-shared/src/lib/models/clickup/checklist.models.ts");
-Object.defineProperty(exports, "ChecklistItem", { enumerable: true, get: function () { return checklist_models_1.ChecklistItem; } });
-var space_models_1 = __webpack_require__(/*! ./models/clickup/space.models */ "./libs/node-shared/src/lib/models/clickup/space.models.ts");
-Object.defineProperty(exports, "Space", { enumerable: true, get: function () { return space_models_1.Space; } });
-var task_models_1 = __webpack_require__(/*! ./models/clickup/task.models */ "./libs/node-shared/src/lib/models/clickup/task.models.ts");
-Object.defineProperty(exports, "Task", { enumerable: true, get: function () { return task_models_1.Task; } });
-var job_models_1 = __webpack_require__(/*! ./models/gitlab/job.models */ "./libs/node-shared/src/lib/models/gitlab/job.models.ts");
-Object.defineProperty(exports, "Job", { enumerable: true, get: function () { return job_models_1.Job; } });
-var merge_request_models_1 = __webpack_require__(/*! ./models/gitlab/merge-request.models */ "./libs/node-shared/src/lib/models/gitlab/merge-request.models.ts");
-Object.defineProperty(exports, "Change", { enumerable: true, get: function () { return merge_request_models_1.Change; } });
-Object.defineProperty(exports, "FullMergeRequest", { enumerable: true, get: function () { return merge_request_models_1.FullMergeRequest; } });
-var models_1 = __webpack_require__(/*! ./models/models */ "./libs/node-shared/src/lib/models/models.ts");
-Object.defineProperty(exports, "GitLabProject", { enumerable: true, get: function () { return models_1.GitLabProject; } });
-Object.defineProperty(exports, "IHoliday", { enumerable: true, get: function () { return models_1.IHoliday; } });
-Object.defineProperty(exports, "NormalizedChecklist", { enumerable: true, get: function () { return models_1.NormalizedChecklist; } });
-Object.defineProperty(exports, "ProjectCheckItem", { enumerable: true, get: function () { return models_1.ProjectCheckItem; } });
-var case_utils_1 = __webpack_require__(/*! ./utils/case.utils */ "./libs/node-shared/src/lib/utils/case.utils.ts");
-Object.defineProperty(exports, "titleCase", { enumerable: true, get: function () { return case_utils_1.titleCase; } });
-var checklist_utils_1 = __webpack_require__(/*! ./utils/checklist.utils */ "./libs/node-shared/src/lib/utils/checklist.utils.ts");
-Object.defineProperty(exports, "getSyncChecklistActions", { enumerable: true, get: function () { return checklist_utils_1.getSyncChecklistActions; } });
-Object.defineProperty(exports, "normalizeClickUpChecklist", { enumerable: true, get: function () { return checklist_utils_1.normalizeClickUpChecklist; } });
-Object.defineProperty(exports, "normalizeMarkdownChecklist", { enumerable: true, get: function () { return checklist_utils_1.normalizeMarkdownChecklist; } });
-var clickup_utils_1 = __webpack_require__(/*! ./utils/clickup.utils */ "./libs/node-shared/src/lib/utils/clickup.utils.ts");
-Object.defineProperty(exports, "getTaskIdFromBranchName", { enumerable: true, get: function () { return clickup_utils_1.getTaskIdFromBranchName; } });
-var sleep_utils_1 = __webpack_require__(/*! ./utils/sleep.utils */ "./libs/node-shared/src/lib/utils/sleep.utils.ts");
-Object.defineProperty(exports, "sleep", { enumerable: true, get: function () { return sleep_utils_1.sleep; } });
+var clickup_class_1 = __webpack_require__("./libs/node-shared/src/lib/classes/clickup.class.ts");
+Object.defineProperty(exports, "ClickUp", ({ enumerable: true, get: function () { return clickup_class_1.ClickUp; } }));
+var gitlab_class_1 = __webpack_require__("./libs/node-shared/src/lib/classes/gitlab.class.ts");
+Object.defineProperty(exports, "GitLab", ({ enumerable: true, get: function () { return gitlab_class_1.GitLab; } }));
+var google_class_1 = __webpack_require__("./libs/node-shared/src/lib/classes/google.class.ts");
+Object.defineProperty(exports, "Google", ({ enumerable: true, get: function () { return google_class_1.Google; } }));
+var config_1 = __webpack_require__("./libs/node-shared/src/lib/config.ts");
+Object.defineProperty(exports, "CONFIG", ({ enumerable: true, get: function () { return config_1.CONFIG; } }));
+Object.defineProperty(exports, "getConfig", ({ enumerable: true, get: function () { return config_1.getConfig; } }));
+var checklist_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/checklist.models.ts");
+Object.defineProperty(exports, "ChecklistItem", ({ enumerable: true, get: function () { return checklist_models_1.ChecklistItem; } }));
+var space_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/space.models.ts");
+Object.defineProperty(exports, "Space", ({ enumerable: true, get: function () { return space_models_1.Space; } }));
+var task_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/task.models.ts");
+Object.defineProperty(exports, "Task", ({ enumerable: true, get: function () { return task_models_1.Task; } }));
+var job_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/gitlab/job.models.ts");
+Object.defineProperty(exports, "Job", ({ enumerable: true, get: function () { return job_models_1.Job; } }));
+var merge_request_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/gitlab/merge-request.models.ts");
+Object.defineProperty(exports, "Change", ({ enumerable: true, get: function () { return merge_request_models_1.Change; } }));
+Object.defineProperty(exports, "FullMergeRequest", ({ enumerable: true, get: function () { return merge_request_models_1.FullMergeRequest; } }));
+var models_1 = __webpack_require__("./libs/node-shared/src/lib/models/models.ts");
+Object.defineProperty(exports, "GitLabProject", ({ enumerable: true, get: function () { return models_1.GitLabProject; } }));
+Object.defineProperty(exports, "IHoliday", ({ enumerable: true, get: function () { return models_1.IHoliday; } }));
+Object.defineProperty(exports, "NormalizedChecklist", ({ enumerable: true, get: function () { return models_1.NormalizedChecklist; } }));
+Object.defineProperty(exports, "ProjectCheckItem", ({ enumerable: true, get: function () { return models_1.ProjectCheckItem; } }));
+var case_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/case.utils.ts");
+Object.defineProperty(exports, "titleCase", ({ enumerable: true, get: function () { return case_utils_1.titleCase; } }));
+var checklist_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/checklist.utils.ts");
+Object.defineProperty(exports, "getSyncChecklistActions", ({ enumerable: true, get: function () { return checklist_utils_1.getSyncChecklistActions; } }));
+Object.defineProperty(exports, "normalizeClickUpChecklist", ({ enumerable: true, get: function () { return checklist_utils_1.normalizeClickUpChecklist; } }));
+Object.defineProperty(exports, "normalizeMarkdownChecklist", ({ enumerable: true, get: function () { return checklist_utils_1.normalizeMarkdownChecklist; } }));
+var clickup_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/clickup.utils.ts");
+Object.defineProperty(exports, "getTaskIdFromBranchName", ({ enumerable: true, get: function () { return clickup_utils_1.getTaskIdFromBranchName; } }));
+var sleep_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/sleep.utils.ts");
+Object.defineProperty(exports, "sleep", ({ enumerable: true, get: function () { return sleep_utils_1.sleep; } }));
 
 
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/utils/api.utils.ts":
-/*!*****************************************************!*\
-  !*** ./libs/node-shared/src/lib/utils/api.utils.ts ***!
-  \*****************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.callApiFactory = void 0;
-const tslib_1 = __webpack_require__(/*! tslib */ "tslib");
-const node_fetch_1 = tslib_1.__importDefault(__webpack_require__(/*! node-fetch */ "node-fetch"));
-const qs_1 = tslib_1.__importDefault(__webpack_require__(/*! qs */ "qs"));
-const config_1 = __webpack_require__(/*! ../config */ "./libs/node-shared/src/lib/config.ts");
-const sleep_utils_1 = __webpack_require__(/*! ./sleep.utils */ "./libs/node-shared/src/lib/utils/sleep.utils.ts");
+const tslib_1 = __webpack_require__("tslib");
+const node_fetch_1 = tslib_1.__importDefault(__webpack_require__("node-fetch"));
+const qs_1 = tslib_1.__importDefault(__webpack_require__("qs"));
+const config_1 = __webpack_require__("./libs/node-shared/src/lib/config.ts");
+const sleep_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/sleep.utils.ts");
 const RETRY_SETTING = {
     retry: 5,
     pause: 12 * 1000,
@@ -1164,7 +966,7 @@ function fetchRetry(url, opts) {
         let retry = (opts && opts.retry) || 3;
         while (retry > 0) {
             try {
-                return yield node_fetch_1.default(url, opts).then(checkStatus);
+                return yield (0, node_fetch_1.default)(url, opts).then(checkStatus);
             }
             catch (e) {
                 if (opts === null || opts === void 0 ? void 0 : opts.callback) {
@@ -1175,7 +977,7 @@ function fetchRetry(url, opts) {
                     throw e;
                 }
                 if (opts === null || opts === void 0 ? void 0 : opts.pause) {
-                    yield sleep_utils_1.sleep(opts.pause);
+                    yield (0, sleep_utils_1.sleep)(opts.pause);
                 }
             }
         }
@@ -1240,15 +1042,10 @@ exports.callApiFactory = callApiFactory;
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/utils/case.utils.ts":
-/*!******************************************************!*\
-  !*** ./libs/node-shared/src/lib/utils/case.utils.ts ***!
-  \******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.titleCase = void 0;
 const KEEP_LOWERCASE_WORD_LIST = [
     'and',
@@ -1297,15 +1094,10 @@ exports.titleCase = titleCase;
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/utils/checklist.utils.ts":
-/*!***********************************************************!*\
-  !*** ./libs/node-shared/src/lib/utils/checklist.utils.ts ***!
-  \***********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getSyncChecklistActions = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = void 0;
 function normalizeClickUpChecklist(checklist) {
     return checklist
@@ -1362,15 +1154,10 @@ exports.getSyncChecklistActions = getSyncChecklistActions;
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/utils/clickup.utils.ts":
-/*!*********************************************************!*\
-  !*** ./libs/node-shared/src/lib/utils/clickup.utils.ts ***!
-  \*********************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.getTaskIdFromBranchName = void 0;
 function getTaskIdFromBranchName(branchName) {
     const result = branchName.match(/CU-([a-z0-9]+)/);
@@ -1382,15 +1169,10 @@ exports.getTaskIdFromBranchName = getTaskIdFromBranchName;
 /***/ }),
 
 /***/ "./libs/node-shared/src/lib/utils/sleep.utils.ts":
-/*!*******************************************************!*\
-  !*** ./libs/node-shared/src/lib/utils/sleep.utils.ts ***!
-  \*******************************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ ((__unused_webpack_module, exports) => {
 
-"use strict";
 
-Object.defineProperty(exports, "__esModule", { value: true });
+Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sleep = void 0;
 function sleep(ms) {
     return new Promise((resolve) => setTimeout(resolve, ms));
@@ -1400,204 +1182,184 @@ exports.sleep = sleep;
 
 /***/ }),
 
-/***/ 0:
-/*!************************************!*\
-  !*** multi ./apps/api/src/main.ts ***!
-  \************************************/
-/*! no static exports found */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports = __webpack_require__(/*! /Users/nanoha/git/accel-shooter/apps/api/src/main.ts */"./apps/api/src/main.ts");
-
-
-/***/ }),
-
 /***/ "@google-cloud/local-auth":
-/*!*******************************************!*\
-  !*** external "@google-cloud/local-auth" ***!
-  \*******************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("@google-cloud/local-auth");
 
 /***/ }),
 
 /***/ "@nestjs/common":
-/*!*********************************!*\
-  !*** external "@nestjs/common" ***!
-  \*********************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("@nestjs/common");
 
 /***/ }),
 
 /***/ "@nestjs/config":
-/*!*********************************!*\
-  !*** external "@nestjs/config" ***!
-  \*********************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("@nestjs/config");
 
 /***/ }),
 
 /***/ "@nestjs/core":
-/*!*******************************!*\
-  !*** external "@nestjs/core" ***!
-  \*******************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("@nestjs/core");
 
 /***/ }),
 
 /***/ "@nestjs/serve-static":
-/*!***************************************!*\
-  !*** external "@nestjs/serve-static" ***!
-  \***************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("@nestjs/serve-static");
 
 /***/ }),
 
 /***/ "cli-progress":
-/*!*******************************!*\
-  !*** external "cli-progress" ***!
-  \*******************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("cli-progress");
 
 /***/ }),
 
 /***/ "fs":
-/*!*********************!*\
-  !*** external "fs" ***!
-  \*********************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("fs");
 
 /***/ }),
 
 /***/ "googleapis":
-/*!*****************************!*\
-  !*** external "googleapis" ***!
-  \*****************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("googleapis");
 
 /***/ }),
 
 /***/ "js-yaml":
-/*!**************************!*\
-  !*** external "js-yaml" ***!
-  \**************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("js-yaml");
 
 /***/ }),
 
 /***/ "node-fetch":
-/*!*****************************!*\
-  !*** external "node-fetch" ***!
-  \*****************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("node-fetch");
 
 /***/ }),
 
-/***/ "path":
-/*!***********************!*\
-  !*** external "path" ***!
-  \***********************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-module.exports = require("path");
-
-/***/ }),
-
 /***/ "qs":
-/*!*********************!*\
-  !*** external "qs" ***!
-  \*********************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("qs");
 
 /***/ }),
 
 /***/ "rxjs":
-/*!***********************!*\
-  !*** external "rxjs" ***!
-  \***********************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("rxjs");
 
 /***/ }),
 
 /***/ "rxjs/operators":
-/*!*********************************!*\
-  !*** external "rxjs/operators" ***!
-  \*********************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("rxjs/operators");
 
 /***/ }),
 
 /***/ "tslib":
-/*!************************!*\
-  !*** external "tslib" ***!
-  \************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("tslib");
 
 /***/ }),
 
 /***/ "untildify":
-/*!****************************!*\
-  !*** external "untildify" ***!
-  \****************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("untildify");
 
 /***/ }),
 
 /***/ "watch-rx":
-/*!***************************!*\
-  !*** external "watch-rx" ***!
-  \***************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
+/***/ ((module) => {
 
 module.exports = require("watch-rx");
 
+/***/ }),
+
+/***/ "path":
+/***/ ((module) => {
+
+module.exports = require("path");
+
 /***/ })
 
-/******/ })));
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// This entry need to be wrapped in an IIFE because it need to be isolated against other modules in the chunk.
+(() => {
+var exports = __webpack_exports__;
+
+/**
+ * This is not a production server yet!
+ * This is only a minimal backend to get started.
+ */
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__("tslib");
+const common_1 = __webpack_require__("@nestjs/common");
+const core_1 = __webpack_require__("@nestjs/core");
+const app_module_1 = __webpack_require__("./apps/api/src/app/app.module.ts");
+function bootstrap() {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const app = yield core_1.NestFactory.create(app_module_1.AppModule);
+        const globalPrefix = 'api';
+        app.setGlobalPrefix(globalPrefix);
+        const port = process.env.PORT || 8112;
+        yield app.listen(port, () => {
+            common_1.Logger.log('Listening at http://localhost:' + port + '/' + globalPrefix);
+        });
+    });
+}
+bootstrap();
+
+})();
+
+var __webpack_export_target__ = exports;
+for(var i in __webpack_exports__) __webpack_export_target__[i] = __webpack_exports__[i];
+if(__webpack_exports__.__esModule) Object.defineProperty(__webpack_export_target__, "__esModule", { value: true });
+/******/ })()
+;
 //# sourceMappingURL=main.js.map

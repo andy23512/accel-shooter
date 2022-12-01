@@ -14,8 +14,8 @@ import { PageTitleService } from '../page-title.service';
 export class MergeRequestDescriptionPageComponent implements OnInit {
   public taskId = '';
   public mergeRequestDescriptionContent = '';
-  public changeSubject = new Subject();
-  public saveSubject = new Subject();
+  public changeSubject = new Subject<void>();
+  public saveSubject = new Subject<void>();
 
   constructor(
     private route: ActivatedRoute,
