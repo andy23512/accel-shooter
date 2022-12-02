@@ -7,13 +7,15 @@
       "projectType": "application",
       "architect": {
         "build": {
-          "builder": "@nrwl/node:webpack",
+          "builder": "@nrwl/webpack:webpack",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/apps/api",
             "main": "apps/api/src/main.ts",
             "tsConfig": "apps/api/tsconfig.app.json",
-            "assets": ["apps/api/src/assets"]
+            "assets": ["apps/api/src/assets"],
+            "target": "node",
+            "compiler": "tsc"
           },
           "configurations": {
             "production": {
@@ -46,7 +48,7 @@
           "builder": "@nrwl/jest:jest",
           "outputs": ["coverage/apps/api"],
           "options": {
-            "jestConfig": "apps/api/jest.config.js",
+            "jestConfig": "apps/api/jest.config.ts",
             "passWithNoTests": true
           }
         }
@@ -74,13 +76,15 @@
       "projectType": "application",
       "architect": {
         "build": {
-          "builder": "@nrwl/node:webpack",
+          "builder": "@nrwl/webpack:webpack",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/apps/cli",
             "main": "apps/cli/src/main.ts",
             "tsConfig": "apps/cli/tsconfig.app.json",
-            "assets": ["apps/cli/src/assets"]
+            "assets": ["apps/cli/src/assets"],
+            "target": "node",
+            "compiler": "tsc"
           },
           "configurations": {
             "production": {
@@ -113,7 +117,7 @@
           "builder": "@nrwl/jest:jest",
           "outputs": ["coverage/apps/cli"],
           "options": {
-            "jestConfig": "apps/cli/jest.config.js",
+            "jestConfig": "apps/cli/jest.config.ts",
             "passWithNoTests": true
           }
         }
@@ -126,7 +130,7 @@
       "sourceRoot": "apps/extension/src",
       "architect": {
         "build": {
-          "builder": "@nrwl/web:webpack",
+          "builder": "@nrwl/webpack:webpack",
           "outputs": ["{options.outputPath}"],
           "options": {
             "outputPath": "dist/apps/extension",
@@ -166,7 +170,7 @@
           }
         },
         "serve": {
-          "builder": "@nrwl/web:dev-server",
+          "builder": "@nrwl/webpack:dev-server",
           "options": {
             "buildTarget": "extension:build"
           },
@@ -314,7 +318,7 @@
           "builder": "@nrwl/jest:jest",
           "outputs": ["coverage/apps/frontend"],
           "options": {
-            "jestConfig": "apps/frontend/jest.config.js",
+            "jestConfig": "apps/frontend/jest.config.ts",
             "passWithNoTests": true
           }
         }
@@ -366,7 +370,7 @@
           "builder": "@nrwl/jest:jest",
           "outputs": ["coverage/libs/node-shared"],
           "options": {
-            "jestConfig": "libs/node-shared/jest.config.js",
+            "jestConfig": "libs/node-shared/jest.config.ts",
             "passWithNoTests": true
           }
         }

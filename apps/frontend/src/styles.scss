@@ -37,7 +37,7 @@ $frontend-theme: mat.define-light-theme(
 @import 'ag-grid-community/dist/styles/ag-grid.css';
 @import 'ag-grid-community/dist/styles/ag-theme-balham-dark.css';
 
-@import '~codemirror/lib/codemirror';
+@import 'codemirror/lib/codemirror';
 @import './one-dark';
 
 html,
