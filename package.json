@@ -78,7 +78,7 @@
     "open": "^8.2.0",
     "progress-logs": "^0.0.2",
     "puppeteer": "^19.2.2",
-    "qs": "^6.10.1",
+    "qs": "^6.10.3",
     "reflect-metadata": "^0.1.13",
     "regenerator-runtime": "0.13.7",
     "rxjs": "~7.5.0",
