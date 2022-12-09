@@ -40,7 +40,7 @@ function biWeeklyProgressAction() {
         const holiday = new holiday_class_1.Holiday();
         const fetchDays = [];
         while ((0, date_fns_1.compareAsc)(startDay, fetchDay) != 0) {
-            if (holiday.checkIsWorkday((0, date_fns_1.format)(fetchDay, 'yyyy/M/d'))) {
+            if (holiday.checkIsWorkday(fetchDay)) {
                 fetchDays.push(fetchDay);
             }
             fetchDay = (0, date_fns_1.add)(fetchDay, { days: -1 });
@@ -49,7 +49,7 @@ function biWeeklyProgressAction() {
         const data = {};
         for (const d of fetchDays) {
             let previousDay = (0, date_fns_1.add)(d, { days: -1 });
-            while (!holiday.checkIsWorkday((0, date_fns_1.format)(previousDay, 'yyyy/M/d'))) {
+            while (!holiday.checkIsWorkday(previousDay)) {
                 previousDay = (0, date_fns_1.add)(previousDay, { days: -1 });
             }
             const previousWorkDay = (0, date_fns_1.format)(previousDay, 'yyyy/MM/dd');
@@ -85,7 +85,7 @@ function biWeeklyProgressAction() {
         finalData.sort((a, b) => a.endDay.localeCompare(b.endDay));
         const groupedRecords = (0, ramda_1.groupBy)((0, ramda_1.prop)('product'), finalData);
         let previousDay = (0, date_fns_1.add)(today, { days: -1 });
-        while (!holiday.checkIsWorkday((0, date_fns_1.format)(previousDay, 'yyyy/M/d'))) {
+        while (!holiday.checkIsWorkday(previousDay)) {
             previousDay = (0, date_fns_1.add)(previousDay, { days: -1 });
         }
         const previousWorkDayOfToday = (0, date_fns_1.format)(previousDay, 'yyyy/MM/dd');
@@ -367,7 +367,7 @@ function dailyProgressAction() {
             : today;
         let previousDay = (0, date_fns_1.add)(day, { days: -1 });
         const holiday = new holiday_class_1.Holiday();
-        while (!holiday.checkIsWorkday((0, date_fns_1.format)(previousDay, 'yyyy/M/d'))) {
+        while (!holiday.checkIsWorkday(previousDay)) {
             previousDay = (0, date_fns_1.add)(previousDay, { days: -1 });
         }
         const previousWorkDay = previousDay;
@@ -694,7 +694,7 @@ function routineAction() {
             ? (0, date_fns_1.parse)(process.argv[3], 'yyyy/MM/dd', today)
             : today;
         const holiday = new holiday_class_1.Holiday();
-        const isWorkDay = holiday.checkIsWorkday((0, date_fns_1.format)(day, 'yyyy/M/d'));
+        const isWorkDay = holiday.checkIsWorkday(day);
         const message = isWorkDay ? 'Today is workday!' : 'Today is holiday!';
         console.log(message);
         if (isWorkDay) {
@@ -1521,14 +1521,16 @@ exports.Holiday = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const untildify_1 = tslib_1.__importDefault(__webpack_require__("untildify"));
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const date_fns_1 = __webpack_require__("date-fns");
 const base_file_ref_class_1 = __webpack_require__("./apps/cli/src/classes/base-file-ref.class.ts");
 class Holiday extends base_file_ref_class_1.BaseFileRef {
     get path() {
         return (0, untildify_1.default)(node_shared_1.CONFIG.HolidayFile);
     }
     checkIsWorkday(day) {
+        const dayString = (0, date_fns_1.format)(day, 'yyyy/M/d');
         const holidayData = JSON.parse(this.readFile());
-        const h = holidayData.find((d) => d.date === day);
+        const h = holidayData.find((d) => d.date === dayString);
         if (!h) {
             return true;
         }

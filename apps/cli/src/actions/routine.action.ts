@@ -1,4 +1,4 @@
-import { format, parse } from 'date-fns';
+import { parse } from 'date-fns';
 import fs from 'fs';
 import puppeteer from 'puppeteer';
 
@@ -35,7 +35,7 @@ export async function routineAction() {
       ? parse(process.argv[3], 'yyyy/MM/dd', today)
       : today;
   const holiday = new Holiday();
-  const isWorkDay = holiday.checkIsWorkday(format(day, 'yyyy/M/d'));
+  const isWorkDay = holiday.checkIsWorkday(day);
   const message = isWorkDay ? 'Today is workday!' : 'Today is holiday!';
   console.log(message);
   if (isWorkDay) {

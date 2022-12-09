@@ -33,7 +33,7 @@ export async function dailyProgressAction() {
       : today;
   let previousDay = add(day, { days: -1 });
   const holiday = new Holiday();
-  while (!holiday.checkIsWorkday(format(previousDay, 'yyyy/M/d'))) {
+  while (!holiday.checkIsWorkday(previousDay)) {
     previousDay = add(previousDay, { days: -1 });
   }
   const previousWorkDay = previousDay;

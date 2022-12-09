@@ -14,7 +14,7 @@ export async function biWeeklyProgressAction() {
   const holiday = new Holiday();
   const fetchDays: Date[] = [];
   while (compareAsc(startDay, fetchDay) != 0) {
-    if (holiday.checkIsWorkday(format(fetchDay, 'yyyy/M/d'))) {
+    if (holiday.checkIsWorkday(fetchDay)) {
       fetchDays.push(fetchDay);
     }
     fetchDay = add(fetchDay, { days: -1 });
@@ -23,7 +23,7 @@ export async function biWeeklyProgressAction() {
   const data: Record<string, Item> = {};
   for (const d of fetchDays) {
     let previousDay = add(d, { days: -1 });
-    while (!holiday.checkIsWorkday(format(previousDay, 'yyyy/M/d'))) {
+    while (!holiday.checkIsWorkday(previousDay)) {
       previousDay = add(previousDay, { days: -1 });
     }
     const previousWorkDay = format(previousDay, 'yyyy/MM/dd');
@@ -65,7 +65,7 @@ export async function biWeeklyProgressAction() {
   finalData.sort((a, b) => a.endDay.localeCompare(b.endDay));
   const groupedRecords = groupBy(prop('product'), finalData);
   let previousDay = add(today, { days: -1 });
-  while (!holiday.checkIsWorkday(format(previousDay, 'yyyy/M/d'))) {
+  while (!holiday.checkIsWorkday(previousDay)) {
     previousDay = add(previousDay, { days: -1 });
   }
   const previousWorkDayOfToday = format(previousDay, 'yyyy/MM/dd');
