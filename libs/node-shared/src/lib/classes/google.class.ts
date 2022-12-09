@@ -1,6 +1,6 @@
 import fs from 'fs';
 import { JSONClient } from 'google-auth-library/build/src/auth/googleauth';
-import { google } from 'googleapis';
+import { calendar_v3, google } from 'googleapis';
 
 import { authenticate } from '@google-cloud/local-auth';
 
@@ -51,26 +51,39 @@ export class Google {
     return client;
   }
 
-  public async listAttendingEvent(timeMin: string, timeMax: string) {
-    const auth = await this.authorize();
-    const calendar = google.calendar({ version: 'v3', auth });
-    const res = await calendar.events.list({
-      calendarId: 'primary',
-      timeMin,
-      timeMax,
-      maxResults: 10,
-      singleEvents: true,
-      orderBy: 'startTime',
-    });
-    const events = res.data.items;
-    return (
-      events?.filter((event) => {
-        if (!event.attendees) {
-          return true;
-        }
-        const self = event.attendees.find((a) => a.self);
-        return !self || self.responseStatus !== 'declined';
-      }) || []
-    );
+  public async listAttendingEvent(
+    timeMin: string,
+    timeMax: string
+  ): Promise<calendar_v3.Schema$Event[]> {
+    try {
+      const auth = await this.authorize();
+      const calendar = google.calendar({ version: 'v3', auth });
+      const res = await calendar.events.list({
+        calendarId: 'primary',
+        timeMin,
+        timeMax,
+        maxResults: 10,
+        singleEvents: true,
+        orderBy: 'startTime',
+      });
+      const events = res.data.items;
+      return (
+        events?.filter((event) => {
+          if (!event.attendees) {
+            return true;
+          }
+          const self = event.attendees.find((a) => a.self);
+          return !self || self.responseStatus !== 'declined';
+        }) || []
+      );
+    } catch (e: any) {
+      if (e.response.data.error === 'invalid_grant') {
+        console.log('Invalid Grant!');
+        fs.unlinkSync(this.tokenFile);
+        return this.listAttendingEvent(timeMin, timeMax);
+      } else {
+        throw e;
+      }
+    }
   }
 }

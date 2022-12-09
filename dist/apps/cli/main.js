@@ -18,6 +18,107 @@ exports.configReadline = configReadline;
 
 /***/ }),
 
+/***/ "./apps/cli/src/actions/bi-weekly-progress.action.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.biWeeklyProgressAction = void 0;
+const tslib_1 = __webpack_require__("tslib");
+const clipboardy_1 = tslib_1.__importDefault(__webpack_require__("clipboardy"));
+const date_fns_1 = __webpack_require__("date-fns");
+const ramda_1 = __webpack_require__("ramda");
+const daily_progress_class_1 = __webpack_require__("./apps/cli/src/classes/daily-progress.class.ts");
+const holiday_class_1 = __webpack_require__("./apps/cli/src/classes/holiday.class.ts");
+function biWeeklyProgressAction() {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const today = new Date();
+        const startDay = process.argv.length >= 4
+            ? (0, date_fns_1.parse)(process.argv[3], 'yyyy/MM/dd', today)
+            : (0, date_fns_1.add)(today, { weeks: -2 });
+        let fetchDay = new Date(today.valueOf());
+        const holiday = new holiday_class_1.Holiday();
+        const fetchDays = [];
+        while ((0, date_fns_1.compareAsc)(startDay, fetchDay) != 0) {
+            if (holiday.checkIsWorkday((0, date_fns_1.format)(fetchDay, 'yyyy/M/d'))) {
+                fetchDays.push(fetchDay);
+            }
+            fetchDay = (0, date_fns_1.add)(fetchDay, { days: -1 });
+        }
+        const dpContent = new daily_progress_class_1.DailyProgress().readFile();
+        const data = {};
+        for (const d of fetchDays) {
+            let previousDay = (0, date_fns_1.add)(d, { days: -1 });
+            while (!holiday.checkIsWorkday((0, date_fns_1.format)(previousDay, 'yyyy/M/d'))) {
+                previousDay = (0, date_fns_1.add)(previousDay, { days: -1 });
+            }
+            const previousWorkDay = (0, date_fns_1.format)(previousDay, 'yyyy/MM/dd');
+            const dString = (0, date_fns_1.format)(d, 'yyyy/MM/dd');
+            const matchResult = dpContent.match(new RegExp(`### ${dString}\n1\. Previous Day\n(.*?)\n2\. Today`, 's'));
+            if (matchResult) {
+                const record = matchResult[1];
+                const lines = record.split('\n').filter(Boolean);
+                for (const line of lines) {
+                    const matchItem = line.match(/(\([A-Za-z0-9 %]+\)) \[(.*?)\]\((https:\/\/app.clickup.com\/t\/\w+)\)/);
+                    if (matchItem) {
+                        const name = matchItem[2];
+                        const url = matchItem[3];
+                        if (data[url]) {
+                            data[url].days.push(previousWorkDay);
+                        }
+                        else {
+                            data[url] = {
+                                url,
+                                name,
+                                product: name.split(':')[0],
+                                days: [previousWorkDay],
+                            };
+                        }
+                    }
+                }
+            }
+            else {
+                console.log('No Result!');
+            }
+        }
+        const finalData = Object.values(data).map((item) => (Object.assign(Object.assign({}, item), { startDay: item.days[item.days.length - 1], endDay: item.days[0] })));
+        finalData.sort((a, b) => a.endDay.localeCompare(b.endDay));
+        const groupedRecords = (0, ramda_1.groupBy)((0, ramda_1.prop)('product'), finalData);
+        let previousDay = (0, date_fns_1.add)(today, { days: -1 });
+        while (!holiday.checkIsWorkday((0, date_fns_1.format)(previousDay, 'yyyy/M/d'))) {
+            previousDay = (0, date_fns_1.add)(previousDay, { days: -1 });
+        }
+        const previousWorkDayOfToday = (0, date_fns_1.format)(previousDay, 'yyyy/MM/dd');
+        let result = `## ${(0, date_fns_1.format)(startDay, 'yyyy/MM/dd')}~${previousWorkDayOfToday}`;
+        Object.entries(groupedRecords).forEach(([product, records]) => {
+            result += `\n- ${product}`;
+            records.forEach(({ name, url, startDay, endDay }) => {
+                if (startDay === endDay) {
+                    result += `\n  - ${startDay} [${name}](${url})`;
+                }
+                else {
+                    result += `\n  - ${startDay}~${subtractCommon(endDay, startDay)} [${name}](${url})`;
+                }
+            });
+        });
+        clipboardy_1.default.writeSync(result);
+        console.log('Copied!');
+    });
+}
+exports.biWeeklyProgressAction = biWeeklyProgressAction;
+function subtractCommon(a, b) {
+    const ar = a.split('/');
+    const br = b.split('/');
+    let i = 0;
+    while (i < ar.length && ar[i] === br[i]) {
+        i++;
+    }
+    return ar.slice(i).join('/');
+}
+
+
+/***/ }),
+
 /***/ "./apps/cli/src/actions/check.action.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -2413,24 +2514,36 @@ class Google {
     }
     listAttendingEvent(timeMin, timeMax) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const auth = yield this.authorize();
-            const calendar = googleapis_1.google.calendar({ version: 'v3', auth });
-            const res = yield calendar.events.list({
-                calendarId: 'primary',
-                timeMin,
-                timeMax,
-                maxResults: 10,
-                singleEvents: true,
-                orderBy: 'startTime',
-            });
-            const events = res.data.items;
-            return ((events === null || events === void 0 ? void 0 : events.filter((event) => {
-                if (!event.attendees) {
-                    return true;
+            try {
+                const auth = yield this.authorize();
+                const calendar = googleapis_1.google.calendar({ version: 'v3', auth });
+                const res = yield calendar.events.list({
+                    calendarId: 'primary',
+                    timeMin,
+                    timeMax,
+                    maxResults: 10,
+                    singleEvents: true,
+                    orderBy: 'startTime',
+                });
+                const events = res.data.items;
+                return ((events === null || events === void 0 ? void 0 : events.filter((event) => {
+                    if (!event.attendees) {
+                        return true;
+                    }
+                    const self = event.attendees.find((a) => a.self);
+                    return !self || self.responseStatus !== 'declined';
+                })) || []);
+            }
+            catch (e) {
+                if (e.response.data.error === 'invalid_grant') {
+                    console.log('Invalid Grant!');
+                    fs_1.default.unlinkSync(this.tokenFile);
+                    return this.listAttendingEvent(timeMin, timeMax);
                 }
-                const self = event.attendees.find((a) => a.self);
-                return !self || self.responseStatus !== 'declined';
-            })) || []);
+                else {
+                    throw e;
+                }
+            }
         });
     }
 }
@@ -2865,13 +2978,6 @@ module.exports = require("fs");
 
 /***/ }),
 
-/***/ "fs/promises":
-/***/ ((module) => {
-
-module.exports = require("fs/promises");
-
-/***/ }),
-
 /***/ "fuzzy":
 /***/ ((module) => {
 
@@ -2946,6 +3052,13 @@ module.exports = require("puppeteer");
 /***/ ((module) => {
 
 module.exports = require("qs");
+
+/***/ }),
+
+/***/ "ramda":
+/***/ ((module) => {
+
+module.exports = require("ramda");
 
 /***/ }),
 
@@ -3053,8 +3166,7 @@ var exports = __webpack_exports__;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__("tslib");
-const promises_1 = tslib_1.__importDefault(__webpack_require__("fs/promises"));
-const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const bi_weekly_progress_action_1 = __webpack_require__("./apps/cli/src/actions/bi-weekly-progress.action.ts");
 const check_action_1 = __webpack_require__("./apps/cli/src/actions/check.action.ts");
 const close_action_1 = __webpack_require__("./apps/cli/src/actions/close.action.ts");
 const commit_action_1 = __webpack_require__("./apps/cli/src/actions/commit.action.ts");
@@ -3100,28 +3212,7 @@ const actions = {
     close: close_action_1.closeAction,
     work: work_action_1.workAction,
     routine: routine_action_1.routineAction,
-    test: () => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
-        const itemListJson = yield promises_1.default.readFile('./dp-analysis', 'utf-8');
-        const itemList = JSON.parse(itemListJson);
-        const outputItem = [];
-        for (const item of itemList) {
-            const taskId = item.url.match(/https:\/\/app.clickup.com\/t\/(\w+)/)[1];
-            const clickUp = new node_shared_1.ClickUp(taskId);
-            const task = yield clickUp.getTask();
-            const product = yield node_shared_1.ClickUp.getProduct(task);
-            const gitLabInfo = yield clickUp.getGitLabProjectAndMergeRequestIId();
-            let mergeRequestLink = null;
-            if (gitLabInfo) {
-                const { gitLabProject, mergeRequestIId } = gitLabInfo;
-                const gitLab = new node_shared_1.GitLab(gitLabProject.id);
-                const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
-                mergeRequestLink = mergeRequest.web_url;
-            }
-            outputItem.push(Object.assign(Object.assign({}, item), { product,
-                mergeRequestLink }));
-        }
-        yield promises_1.default.writeFile('./output-final.json', JSON.stringify(outputItem, null, 2));
-    }),
+    biWeeklyProgress: bi_weekly_progress_action_1.biWeeklyProgressAction,
 };
 (() => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     const action = process.argv[2];

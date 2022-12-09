@@ -772,24 +772,36 @@ class Google {
     }
     listAttendingEvent(timeMin, timeMax) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const auth = yield this.authorize();
-            const calendar = googleapis_1.google.calendar({ version: 'v3', auth });
-            const res = yield calendar.events.list({
-                calendarId: 'primary',
-                timeMin,
-                timeMax,
-                maxResults: 10,
-                singleEvents: true,
-                orderBy: 'startTime',
-            });
-            const events = res.data.items;
-            return ((events === null || events === void 0 ? void 0 : events.filter((event) => {
-                if (!event.attendees) {
-                    return true;
+            try {
+                const auth = yield this.authorize();
+                const calendar = googleapis_1.google.calendar({ version: 'v3', auth });
+                const res = yield calendar.events.list({
+                    calendarId: 'primary',
+                    timeMin,
+                    timeMax,
+                    maxResults: 10,
+                    singleEvents: true,
+                    orderBy: 'startTime',
+                });
+                const events = res.data.items;
+                return ((events === null || events === void 0 ? void 0 : events.filter((event) => {
+                    if (!event.attendees) {
+                        return true;
+                    }
+                    const self = event.attendees.find((a) => a.self);
+                    return !self || self.responseStatus !== 'declined';
+                })) || []);
+            }
+            catch (e) {
+                if (e.response.data.error === 'invalid_grant') {
+                    console.log('Invalid Grant!');
+                    fs_1.default.unlinkSync(this.tokenFile);
+                    return this.listAttendingEvent(timeMin, timeMax);
                 }
-                const self = event.attendees.find((a) => a.self);
-                return !self || self.responseStatus !== 'declined';
-            })) || []);
+                else {
+                    throw e;
+                }
+            }
         });
     }
 }

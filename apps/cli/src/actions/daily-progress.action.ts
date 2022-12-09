@@ -1,7 +1,12 @@
 import { execSync } from 'child_process';
 import { add, format, parse } from 'date-fns';
 
-import { ClickUp, getTaskIdFromBranchName, GitLab, Google } from '@accel-shooter/node-shared';
+import {
+  ClickUp,
+  getTaskIdFromBranchName,
+  GitLab,
+  Google,
+} from '@accel-shooter/node-shared';
 
 import { DailyProgress } from '../classes/daily-progress.class';
 import { Holiday } from '../classes/holiday.class';
