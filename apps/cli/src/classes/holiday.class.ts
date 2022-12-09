@@ -2,7 +2,7 @@ import untildify from 'untildify';
 
 import { CONFIG, IHoliday } from '@accel-shooter/node-shared';
 
-import { format } from 'date-fns';
+import { add, format } from 'date-fns';
 import { BaseFileRef } from './base-file-ref.class';
 
 export class Holiday extends BaseFileRef {
@@ -25,5 +25,13 @@ export class Holiday extends BaseFileRef {
       (h.isHoliday === '否' && h.name !== '勞動節') ||
       (h.name === '軍人節' && h.holidayCategory === '特定節日')
     );
+  }
+
+  public getPreviousWorkday(day: Date): Date {
+    let previousDay = add(day, { days: -1 });
+    while (!this.checkIsWorkday(previousDay)) {
+      previousDay = add(previousDay, { days: -1 });
+    }
+    return previousDay;
   }
 }

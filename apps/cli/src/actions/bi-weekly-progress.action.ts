@@ -22,11 +22,10 @@ export async function biWeeklyProgressAction() {
   const dpContent = new DailyProgress().readFile();
   const data: Record<string, Item> = {};
   for (const d of fetchDays) {
-    let previousDay = add(d, { days: -1 });
-    while (!holiday.checkIsWorkday(previousDay)) {
-      previousDay = add(previousDay, { days: -1 });
-    }
-    const previousWorkDay = format(previousDay, 'yyyy/MM/dd');
+    const previousWorkDayString = format(
+      holiday.getPreviousWorkday(d),
+      'yyyy/MM/dd'
+    );
     const dString = format(d, 'yyyy/MM/dd');
     const matchResult = dpContent.match(
       new RegExp(`### ${dString}\n1\. Previous Day\n(.*?)\n2\. Today`, 's')
@@ -42,13 +41,13 @@ export async function biWeeklyProgressAction() {
           const name = matchItem[2];
           const url = matchItem[3];
           if (data[url]) {
-            data[url].days.push(previousWorkDay);
+            data[url].days.push(previousWorkDayString);
           } else {
             data[url] = {
               url,
               name,
               product: name.split(':')[0],
-              days: [previousWorkDay],
+              days: [previousWorkDayString],
             };
           }
         }
@@ -64,12 +63,11 @@ export async function biWeeklyProgressAction() {
   }));
   finalData.sort((a, b) => a.endDay.localeCompare(b.endDay));
   const groupedRecords = groupBy(prop('product'), finalData);
-  let previousDay = add(today, { days: -1 });
-  while (!holiday.checkIsWorkday(previousDay)) {
-    previousDay = add(previousDay, { days: -1 });
-  }
-  const previousWorkDayOfToday = format(previousDay, 'yyyy/MM/dd');
-  let result = `## ${format(startDay, 'yyyy/MM/dd')}~${previousWorkDayOfToday}`;
+  const previousWorkDayOfToday = holiday.getPreviousWorkday(today);
+  let result = `## ${format(startDay, 'yyyy/MM/dd')}~${format(
+    previousWorkDayOfToday,
+    'yyyy/MM/dd'
+  )}`;
   Object.entries(groupedRecords).forEach(([product, records]) => {
     result += `\n- ${product}`;
     records.forEach(({ name, url, startDay, endDay }) => {

@@ -48,11 +48,7 @@ function biWeeklyProgressAction() {
         const dpContent = new daily_progress_class_1.DailyProgress().readFile();
         const data = {};
         for (const d of fetchDays) {
-            let previousDay = (0, date_fns_1.add)(d, { days: -1 });
-            while (!holiday.checkIsWorkday(previousDay)) {
-                previousDay = (0, date_fns_1.add)(previousDay, { days: -1 });
-            }
-            const previousWorkDay = (0, date_fns_1.format)(previousDay, 'yyyy/MM/dd');
+            const previousWorkDayString = (0, date_fns_1.format)(holiday.getPreviousWorkday(d), 'yyyy/MM/dd');
             const dString = (0, date_fns_1.format)(d, 'yyyy/MM/dd');
             const matchResult = dpContent.match(new RegExp(`### ${dString}\n1\. Previous Day\n(.*?)\n2\. Today`, 's'));
             if (matchResult) {
@@ -64,14 +60,14 @@ function biWeeklyProgressAction() {
                         const name = matchItem[2];
                         const url = matchItem[3];
                         if (data[url]) {
-                            data[url].days.push(previousWorkDay);
+                            data[url].days.push(previousWorkDayString);
                         }
                         else {
                             data[url] = {
                                 url,
                                 name,
                                 product: name.split(':')[0],
-                                days: [previousWorkDay],
+                                days: [previousWorkDayString],
                             };
                         }
                     }
@@ -84,12 +80,8 @@ function biWeeklyProgressAction() {
         const finalData = Object.values(data).map((item) => (Object.assign(Object.assign({}, item), { startDay: item.days[item.days.length - 1], endDay: item.days[0] })));
         finalData.sort((a, b) => a.endDay.localeCompare(b.endDay));
         const groupedRecords = (0, ramda_1.groupBy)((0, ramda_1.prop)('product'), finalData);
-        let previousDay = (0, date_fns_1.add)(today, { days: -1 });
-        while (!holiday.checkIsWorkday(previousDay)) {
-            previousDay = (0, date_fns_1.add)(previousDay, { days: -1 });
-        }
-        const previousWorkDayOfToday = (0, date_fns_1.format)(previousDay, 'yyyy/MM/dd');
-        let result = `## ${(0, date_fns_1.format)(startDay, 'yyyy/MM/dd')}~${previousWorkDayOfToday}`;
+        const previousWorkDayOfToday = holiday.getPreviousWorkday(today);
+        let result = `## ${(0, date_fns_1.format)(startDay, 'yyyy/MM/dd')}~${(0, date_fns_1.format)(previousWorkDayOfToday, 'yyyy/MM/dd')}`;
         Object.entries(groupedRecords).forEach(([product, records]) => {
             result += `\n- ${product}`;
             records.forEach(({ name, url, startDay, endDay }) => {
@@ -365,12 +357,8 @@ function dailyProgressAction() {
         const day = process.argv.length >= 4
             ? (0, date_fns_1.parse)(process.argv[3], 'yyyy/MM/dd', today)
             : today;
-        let previousDay = (0, date_fns_1.add)(day, { days: -1 });
         const holiday = new holiday_class_1.Holiday();
-        while (!holiday.checkIsWorkday(previousDay)) {
-            previousDay = (0, date_fns_1.add)(previousDay, { days: -1 });
-        }
-        const previousWorkDay = previousDay;
+        const previousWorkDay = holiday.getPreviousWorkday(day);
         console.log('Previous work day:', (0, date_fns_1.format)(previousWorkDay, 'yyyy-MM-dd'));
         p.next(); // Get Pushed Events
         const after = (0, date_fns_1.format)((0, date_fns_1.add)(previousWorkDay, { days: -1 }), 'yyyy-MM-dd');
@@ -1537,6 +1525,13 @@ class Holiday extends base_file_ref_class_1.BaseFileRef {
         return (!h ||
             (h.isHoliday === '否' && h.name !== '勞動節') ||
             (h.name === '軍人節' && h.holidayCategory === '特定節日'));
+    }
+    getPreviousWorkday(day) {
+        let previousDay = (0, date_fns_1.add)(day, { days: -1 });
+        while (!this.checkIsWorkday(previousDay)) {
+            previousDay = (0, date_fns_1.add)(previousDay, { days: -1 });
+        }
+        return previousDay;
     }
 }
 exports.Holiday = Holiday;

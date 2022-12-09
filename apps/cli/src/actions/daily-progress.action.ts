@@ -31,12 +31,8 @@ export async function dailyProgressAction() {
     process.argv.length >= 4
       ? parse(process.argv[3], 'yyyy/MM/dd', today)
       : today;
-  let previousDay = add(day, { days: -1 });
   const holiday = new Holiday();
-  while (!holiday.checkIsWorkday(previousDay)) {
-    previousDay = add(previousDay, { days: -1 });
-  }
-  const previousWorkDay = previousDay;
+  const previousWorkDay = holiday.getPreviousWorkday(day);
   console.log('Previous work day:', format(previousWorkDay, 'yyyy-MM-dd'));
   p.next(); // Get Pushed Events
   const after = format(add(previousWorkDay, { days: -1 }), 'yyyy-MM-dd');
