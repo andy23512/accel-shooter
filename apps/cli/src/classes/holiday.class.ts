@@ -2,7 +2,8 @@ import untildify from 'untildify';
 
 import { CONFIG, IHoliday } from '@accel-shooter/node-shared';
 
-import { add, format } from 'date-fns';
+import { add } from 'date-fns';
+import { DateFormat, formatDate } from '../format-date';
 import { BaseFileRef } from './base-file-ref.class';
 
 export class Holiday extends BaseFileRef {
@@ -18,7 +19,7 @@ export class Holiday extends BaseFileRef {
   }
 
   public checkIsWorkday(day: Date) {
-    const dayString = format(day, 'yyyy/M/d');
+    const dayString = formatDate(day, DateFormat.HOLIDAY);
     const h = this.data.find((d) => d.date === dayString);
     return (
       !h ||

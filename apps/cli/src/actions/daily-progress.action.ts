@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import { add, format, parse } from 'date-fns';
+import { add, parse } from 'date-fns';
 
 import {
   ClickUp,
@@ -12,6 +12,7 @@ import { DailyProgress } from '../classes/daily-progress.class';
 import { Holiday } from '../classes/holiday.class';
 import { CustomProgressLog } from '../classes/progress-log.class';
 import { Todo } from '../classes/todo.class';
+import { DateFormat, formatDate } from '../format-date';
 
 export async function dailyProgressAction() {
   const p = new CustomProgressLog('Daily Progress', [
@@ -33,10 +34,13 @@ export async function dailyProgressAction() {
       : today;
   const holiday = new Holiday();
   const previousWorkDay = holiday.getPreviousWorkday(day);
-  console.log('Previous work day:', format(previousWorkDay, 'yyyy-MM-dd'));
+  console.log('Previous work day:', formatDate(previousWorkDay));
   p.next(); // Get Pushed Events
-  const after = format(add(previousWorkDay, { days: -1 }), 'yyyy-MM-dd');
-  const before = format(day, 'yyyy-MM-dd');
+  const after = formatDate(
+    add(previousWorkDay, { days: -1 }),
+    DateFormat.GITLAB
+  );
+  const before = formatDate(day, DateFormat.GITLAB);
   const pushedEvents = await GitLab.getPushedEvents(after, before);
   const pushedToEvents = pushedEvents.filter(
     (e) => e.action_name === 'pushed to'
@@ -133,12 +137,9 @@ export async function dailyProgressAction() {
     }
   }
   p.next(); // Add Day Progress Entry
-  const dayDp = `### ${format(
-    day,
-    'yyyy/MM/dd'
-  )}\n1. Previous Day\n${result.join('\n')}\n2. Today\n${result2.join(
+  const dayDp = `### ${formatDate(day)}\n1. Previous Day\n${result.join(
     '\n'
-  )}\n3. No blockers so far`;
+  )}\n2. Today\n${result2.join('\n')}\n3. No blockers so far`;
   new DailyProgress().addDayProgress(dayDp);
 
   p.next(); // Copy Day Progress into Clipboard

@@ -30,6 +30,7 @@ const date_fns_1 = __webpack_require__("date-fns");
 const ramda_1 = __webpack_require__("ramda");
 const daily_progress_class_1 = __webpack_require__("./apps/cli/src/classes/daily-progress.class.ts");
 const holiday_class_1 = __webpack_require__("./apps/cli/src/classes/holiday.class.ts");
+const format_date_1 = __webpack_require__("./apps/cli/src/format-date.ts");
 function biWeeklyProgressAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const today = new Date();
@@ -48,8 +49,8 @@ function biWeeklyProgressAction() {
         const dpContent = new daily_progress_class_1.DailyProgress().readFile();
         const data = {};
         for (const d of fetchDays) {
-            const previousWorkDayString = (0, date_fns_1.format)(holiday.getPreviousWorkday(d), 'yyyy/MM/dd');
-            const dString = (0, date_fns_1.format)(d, 'yyyy/MM/dd');
+            const previousWorkDayString = (0, format_date_1.formatDate)(holiday.getPreviousWorkday(d));
+            const dString = (0, format_date_1.formatDate)(d);
             const matchResult = dpContent.match(new RegExp(`### ${dString}\n1\. Previous Day\n(.*?)\n2\. Today`, 's'));
             if (matchResult) {
                 const record = matchResult[1];
@@ -81,7 +82,7 @@ function biWeeklyProgressAction() {
         finalData.sort((a, b) => a.endDay.localeCompare(b.endDay));
         const groupedRecords = (0, ramda_1.groupBy)((0, ramda_1.prop)('product'), finalData);
         const previousWorkDayOfToday = holiday.getPreviousWorkday(today);
-        let result = `## ${(0, date_fns_1.format)(startDay, 'yyyy/MM/dd')}~${(0, date_fns_1.format)(previousWorkDayOfToday, 'yyyy/MM/dd')}`;
+        let result = `## ${(0, format_date_1.formatDate)(startDay)}~${(0, format_date_1.formatDate)(previousWorkDayOfToday)}`;
         Object.entries(groupedRecords).forEach(([product, records]) => {
             result += `\n- ${product}`;
             records.forEach(({ name, url, startDay, endDay }) => {
@@ -339,6 +340,7 @@ const daily_progress_class_1 = __webpack_require__("./apps/cli/src/classes/daily
 const holiday_class_1 = __webpack_require__("./apps/cli/src/classes/holiday.class.ts");
 const progress_log_class_1 = __webpack_require__("./apps/cli/src/classes/progress-log.class.ts");
 const todo_class_1 = __webpack_require__("./apps/cli/src/classes/todo.class.ts");
+const format_date_1 = __webpack_require__("./apps/cli/src/format-date.ts");
 function dailyProgressAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const p = new progress_log_class_1.CustomProgressLog('Daily Progress', [
@@ -359,10 +361,10 @@ function dailyProgressAction() {
             : today;
         const holiday = new holiday_class_1.Holiday();
         const previousWorkDay = holiday.getPreviousWorkday(day);
-        console.log('Previous work day:', (0, date_fns_1.format)(previousWorkDay, 'yyyy-MM-dd'));
+        console.log('Previous work day:', (0, format_date_1.formatDate)(previousWorkDay));
         p.next(); // Get Pushed Events
-        const after = (0, date_fns_1.format)((0, date_fns_1.add)(previousWorkDay, { days: -1 }), 'yyyy-MM-dd');
-        const before = (0, date_fns_1.format)(day, 'yyyy-MM-dd');
+        const after = (0, format_date_1.formatDate)((0, date_fns_1.add)(previousWorkDay, { days: -1 }), format_date_1.DateFormat.GITLAB);
+        const before = (0, format_date_1.formatDate)(day, format_date_1.DateFormat.GITLAB);
         const pushedEvents = yield node_shared_1.GitLab.getPushedEvents(after, before);
         const pushedToEvents = pushedEvents.filter((e) => e.action_name === 'pushed to');
         const modifiedBranches = [
@@ -452,7 +454,7 @@ function dailyProgressAction() {
             }
         }
         p.next(); // Add Day Progress Entry
-        const dayDp = `### ${(0, date_fns_1.format)(day, 'yyyy/MM/dd')}\n1. Previous Day\n${result.join('\n')}\n2. Today\n${result2.join('\n')}\n3. No blockers so far`;
+        const dayDp = `### ${(0, format_date_1.formatDate)(day)}\n1. Previous Day\n${result.join('\n')}\n2. Today\n${result2.join('\n')}\n3. No blockers so far`;
         new daily_progress_class_1.DailyProgress().addDayProgress(dayDp);
         p.next(); // Copy Day Progress into Clipboard
         let resultRecord = dayDp;
@@ -1510,6 +1512,7 @@ const tslib_1 = __webpack_require__("tslib");
 const untildify_1 = tslib_1.__importDefault(__webpack_require__("untildify"));
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const date_fns_1 = __webpack_require__("date-fns");
+const format_date_1 = __webpack_require__("./apps/cli/src/format-date.ts");
 const base_file_ref_class_1 = __webpack_require__("./apps/cli/src/classes/base-file-ref.class.ts");
 class Holiday extends base_file_ref_class_1.BaseFileRef {
     constructor() {
@@ -1520,7 +1523,7 @@ class Holiday extends base_file_ref_class_1.BaseFileRef {
         return (0, untildify_1.default)(node_shared_1.CONFIG.HolidayFile);
     }
     checkIsWorkday(day) {
-        const dayString = (0, date_fns_1.format)(day, 'yyyy/M/d');
+        const dayString = (0, format_date_1.formatDate)(day, format_date_1.DateFormat.HOLIDAY);
         const h = this.data.find((d) => d.date === dayString);
         return (!h ||
             (h.isHoliday === '否' && h.name !== '勞動節') ||
@@ -1824,6 +1827,27 @@ exports.checkItemsMap = {
     frontend: frontendProjectCheckItems,
     other: otherProjectCheckItems,
 };
+
+
+/***/ }),
+
+/***/ "./apps/cli/src/format-date.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.formatDate = exports.DateFormat = void 0;
+const date_fns_1 = __webpack_require__("date-fns");
+var DateFormat;
+(function (DateFormat) {
+    DateFormat["STANDARD"] = "yyyy/MM/dd";
+    DateFormat["GITLAB"] = "yyyy-MM-dd";
+    DateFormat["HOLIDAY"] = "yyyy/M/d";
+})(DateFormat = exports.DateFormat || (exports.DateFormat = {}));
+function formatDate(day, dateFormat = DateFormat.STANDARD) {
+    return (0, date_fns_1.format)(day, dateFormat);
+}
+exports.formatDate = formatDate;
 
 
 /***/ }),

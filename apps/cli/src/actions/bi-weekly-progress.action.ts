@@ -1,8 +1,9 @@
 import clipboardy from 'clipboardy';
-import { add, compareAsc, format, parse } from 'date-fns';
+import { add, compareAsc, parse } from 'date-fns';
 import { groupBy, prop } from 'ramda';
 import { DailyProgress } from '../classes/daily-progress.class';
 import { Holiday } from '../classes/holiday.class';
+import { formatDate } from '../format-date';
 
 export async function biWeeklyProgressAction() {
   const today = new Date();
@@ -22,11 +23,8 @@ export async function biWeeklyProgressAction() {
   const dpContent = new DailyProgress().readFile();
   const data: Record<string, Item> = {};
   for (const d of fetchDays) {
-    const previousWorkDayString = format(
-      holiday.getPreviousWorkday(d),
-      'yyyy/MM/dd'
-    );
-    const dString = format(d, 'yyyy/MM/dd');
+    const previousWorkDayString = formatDate(holiday.getPreviousWorkday(d));
+    const dString = formatDate(d);
     const matchResult = dpContent.match(
       new RegExp(`### ${dString}\n1\. Previous Day\n(.*?)\n2\. Today`, 's')
     );
@@ -64,9 +62,8 @@ export async function biWeeklyProgressAction() {
   finalData.sort((a, b) => a.endDay.localeCompare(b.endDay));
   const groupedRecords = groupBy(prop('product'), finalData);
   const previousWorkDayOfToday = holiday.getPreviousWorkday(today);
-  let result = `## ${format(startDay, 'yyyy/MM/dd')}~${format(
-    previousWorkDayOfToday,
-    'yyyy/MM/dd'
+  let result = `## ${formatDate(startDay)}~${formatDate(
+    previousWorkDayOfToday
   )}`;
   Object.entries(groupedRecords).forEach(([product, records]) => {
     result += `\n- ${product}`;
