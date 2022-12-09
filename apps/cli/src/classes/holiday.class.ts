@@ -10,14 +10,18 @@ export class Holiday extends BaseFileRef {
     return untildify(CONFIG.HolidayFile);
   }
 
+  private data: IHoliday[];
+
+  constructor() {
+    super();
+    this.data = JSON.parse(this.readFile());
+  }
+
   public checkIsWorkday(day: Date) {
     const dayString = format(day, 'yyyy/M/d');
-    const holidayData: IHoliday[] = JSON.parse(this.readFile());
-    const h = holidayData.find((d) => d.date === dayString);
-    if (!h) {
-      return true;
-    }
+    const h = this.data.find((d) => d.date === dayString);
     return (
+      !h ||
       (h.isHoliday === '否' && h.name !== '勞動節') ||
       (h.name === '軍人節' && h.holidayCategory === '特定節日')
     );

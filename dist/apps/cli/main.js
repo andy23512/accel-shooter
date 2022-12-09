@@ -1524,17 +1524,18 @@ const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const date_fns_1 = __webpack_require__("date-fns");
 const base_file_ref_class_1 = __webpack_require__("./apps/cli/src/classes/base-file-ref.class.ts");
 class Holiday extends base_file_ref_class_1.BaseFileRef {
+    constructor() {
+        super();
+        this.data = JSON.parse(this.readFile());
+    }
     get path() {
         return (0, untildify_1.default)(node_shared_1.CONFIG.HolidayFile);
     }
     checkIsWorkday(day) {
         const dayString = (0, date_fns_1.format)(day, 'yyyy/M/d');
-        const holidayData = JSON.parse(this.readFile());
-        const h = holidayData.find((d) => d.date === dayString);
-        if (!h) {
-            return true;
-        }
-        return ((h.isHoliday === '否' && h.name !== '勞動節') ||
+        const h = this.data.find((d) => d.date === dayString);
+        return (!h ||
+            (h.isHoliday === '否' && h.name !== '勞動節') ||
             (h.name === '軍人節' && h.holidayCategory === '特定節日'));
     }
 }
