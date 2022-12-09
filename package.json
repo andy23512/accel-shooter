@@ -79,6 +79,7 @@
     "progress-logs": "^0.0.2",
     "puppeteer": "^19.2.2",
     "qs": "^6.10.3",
+    "ramda": "^0.28.0",
     "reflect-metadata": "^0.1.13",
     "regenerator-runtime": "0.13.7",
     "rxjs": "~7.5.0",
