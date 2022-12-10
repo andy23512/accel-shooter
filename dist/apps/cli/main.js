@@ -25,12 +25,12 @@ exports.configReadline = configReadline;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.biWeeklyProgressAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const clipboardy_1 = tslib_1.__importDefault(__webpack_require__("clipboardy"));
 const date_fns_1 = __webpack_require__("date-fns");
 const ramda_1 = __webpack_require__("ramda");
 const daily_progress_class_1 = __webpack_require__("./apps/cli/src/classes/daily-progress.class.ts");
 const holiday_class_1 = __webpack_require__("./apps/cli/src/classes/holiday.class.ts");
-const format_date_1 = __webpack_require__("./apps/cli/src/format-date.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 function biWeeklyProgressAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -48,8 +48,8 @@ function biWeeklyProgressAction() {
         const dpContent = new daily_progress_class_1.DailyProgress().readFile();
         const data = {};
         for (const d of fetchDays) {
-            const previousWorkDayString = (0, format_date_1.formatDate)(holiday.getPreviousWorkday(d));
-            const dString = (0, format_date_1.formatDate)(d);
+            const previousWorkDayString = (0, node_shared_1.formatDate)(holiday.getPreviousWorkday(d));
+            const dString = (0, node_shared_1.formatDate)(d);
             const matchResult = dpContent.match(new RegExp(`### ${dString}\n1\. Previous Day\n(.*?)\n2\. Today`, 's'));
             if (matchResult) {
                 const record = matchResult[1];
@@ -81,7 +81,7 @@ function biWeeklyProgressAction() {
         finalData.sort((a, b) => a.endDay.localeCompare(b.endDay));
         const groupedRecords = (0, ramda_1.groupBy)((0, ramda_1.prop)('product'), finalData);
         const previousWorkDayOfToday = holiday.getPreviousWorkday(today);
-        let result = `## ${(0, format_date_1.formatDate)(startDay)}~${(0, format_date_1.formatDate)(previousWorkDayOfToday)}`;
+        let result = `## ${(0, node_shared_1.formatDate)(startDay)}~${(0, node_shared_1.formatDate)(previousWorkDayOfToday)}`;
         Object.entries(groupedRecords).forEach(([product, records]) => {
             result += `\n- ${product}`;
             records.forEach(({ name, url, startDay, endDay }) => {
@@ -284,7 +284,6 @@ const daily_progress_class_1 = __webpack_require__("./apps/cli/src/classes/daily
 const holiday_class_1 = __webpack_require__("./apps/cli/src/classes/holiday.class.ts");
 const progress_log_class_1 = __webpack_require__("./apps/cli/src/classes/progress-log.class.ts");
 const todo_class_1 = __webpack_require__("./apps/cli/src/classes/todo.class.ts");
-const format_date_1 = __webpack_require__("./apps/cli/src/format-date.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 function dailyProgressAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -303,10 +302,10 @@ function dailyProgressAction() {
         const day = (0, utils_1.getDayFromArgv)();
         const holiday = new holiday_class_1.Holiday();
         const previousWorkDay = holiday.getPreviousWorkday(day);
-        console.log('Previous work day:', (0, format_date_1.formatDate)(previousWorkDay));
+        console.log('Previous work day:', (0, node_shared_1.formatDate)(previousWorkDay));
         p.next(); // Get Pushed Events
-        const after = (0, format_date_1.formatDate)((0, date_fns_1.add)(previousWorkDay, { days: -1 }), format_date_1.DateFormat.GITLAB);
-        const before = (0, format_date_1.formatDate)(day, format_date_1.DateFormat.GITLAB);
+        const after = (0, date_fns_1.add)(previousWorkDay, { days: -1 });
+        const before = day;
         const pushedEvents = yield node_shared_1.GitLab.getPushedEvents(after, before);
         const pushedToEvents = pushedEvents.filter((e) => e.action_name === 'pushed to');
         const modifiedBranches = [
@@ -396,7 +395,7 @@ function dailyProgressAction() {
             }
         }
         p.next(); // Add Day Progress Entry
-        const dayDp = `### ${(0, format_date_1.formatDate)(day)}\n1. Previous Day\n${result.join('\n')}\n2. Today\n${result2.join('\n')}\n3. No blockers so far`;
+        const dayDp = `### ${(0, node_shared_1.formatDate)(day)}\n1. Previous Day\n${result.join('\n')}\n2. Today\n${result2.join('\n')}\n3. No blockers so far`;
         new daily_progress_class_1.DailyProgress().addDayProgress(dayDp);
         p.next(); // Copy Day Progress into Clipboard
         let resultRecord = dayDp;
@@ -1451,7 +1450,6 @@ const tslib_1 = __webpack_require__("tslib");
 const untildify_1 = tslib_1.__importDefault(__webpack_require__("untildify"));
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const date_fns_1 = __webpack_require__("date-fns");
-const format_date_1 = __webpack_require__("./apps/cli/src/format-date.ts");
 const base_file_ref_class_1 = __webpack_require__("./apps/cli/src/classes/base-file-ref.class.ts");
 class Holiday extends base_file_ref_class_1.BaseFileRef {
     constructor() {
@@ -1462,7 +1460,7 @@ class Holiday extends base_file_ref_class_1.BaseFileRef {
         return (0, untildify_1.default)(node_shared_1.CONFIG.HolidayFile);
     }
     checkIsWorkday(day) {
-        const dayString = (0, format_date_1.formatDate)(day, format_date_1.DateFormat.HOLIDAY);
+        const dayString = (0, node_shared_1.formatDate)(day, node_shared_1.DateFormat.HOLIDAY);
         const h = this.data.find((d) => d.date === dayString);
         return (!h ||
             (h.isHoliday === '否' && h.name !== '勞動節') ||
@@ -1770,27 +1768,6 @@ exports.checkItemsMap = {
 
 /***/ }),
 
-/***/ "./apps/cli/src/format-date.ts":
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.formatDate = exports.DateFormat = void 0;
-const date_fns_1 = __webpack_require__("date-fns");
-var DateFormat;
-(function (DateFormat) {
-    DateFormat["STANDARD"] = "yyyy/MM/dd";
-    DateFormat["GITLAB"] = "yyyy-MM-dd";
-    DateFormat["HOLIDAY"] = "yyyy/M/d";
-})(DateFormat = exports.DateFormat || (exports.DateFormat = {}));
-function formatDate(day, dateFormat = DateFormat.STANDARD) {
-    return (0, date_fns_1.format)(day, dateFormat);
-}
-exports.formatDate = formatDate;
-
-
-/***/ }),
-
 /***/ "./apps/cli/src/utils.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -1803,7 +1780,6 @@ const open_1 = tslib_1.__importDefault(__webpack_require__("open"));
 const qs_1 = tslib_1.__importDefault(__webpack_require__("qs"));
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const date_fns_1 = __webpack_require__("date-fns");
-const format_date_1 = __webpack_require__("./apps/cli/src/format-date.ts");
 function promiseSpawn(command, args, stdio = 'inherit') {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
@@ -1948,7 +1924,7 @@ exports.getRepoName = getRepoName;
 function getDayFromArgv(dft) {
     const today = new Date();
     return process.argv.length >= 4
-        ? (0, date_fns_1.parse)(process.argv[3], format_date_1.DateFormat.STANDARD, today)
+        ? (0, date_fns_1.parse)(process.argv[3], node_shared_1.DateFormat.STANDARD, today)
         : dft
             ? new Date(dft.valueOf())
             : today;
@@ -2264,6 +2240,7 @@ exports.GitLab = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const config_1 = __webpack_require__("./libs/node-shared/src/lib/config.ts");
 const api_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/api.utils.ts");
+const date_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/date.utils.ts");
 const callApi = (0, api_utils_1.callApiFactory)('GitLab');
 class GitLab {
     constructor(projectId) {
@@ -2379,8 +2356,8 @@ class GitLab {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return callApi('get', '/events', {
                 action: 'pushed',
-                before,
-                after,
+                before: (0, date_utils_1.formatDate)(before, date_utils_1.DateFormat.GITLAB),
+                after: (0, date_utils_1.formatDate)(after, date_utils_1.DateFormat.GITLAB),
                 sort: 'asc',
                 per_page: 100,
             });
@@ -2390,8 +2367,8 @@ class GitLab {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return callApi('get', '/events', {
                 action: 'approved',
-                before,
-                after,
+                before: (0, date_utils_1.formatDate)(before, date_utils_1.DateFormat.GITLAB),
+                after: (0, date_utils_1.formatDate)(after, date_utils_1.DateFormat.GITLAB),
                 sort: 'asc',
                 per_page: 100,
             });
@@ -2632,7 +2609,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sleep = exports.getTaskIdFromBranchName = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.titleCase = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.IHoliday = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Task = exports.Space = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.Google = exports.GitLab = exports.ClickUp = void 0;
+exports.sleep = exports.formatDate = exports.DateFormat = exports.getTaskIdFromBranchName = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.titleCase = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.IHoliday = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Task = exports.Space = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.Google = exports.GitLab = exports.ClickUp = void 0;
 var clickup_class_1 = __webpack_require__("./libs/node-shared/src/lib/classes/clickup.class.ts");
 Object.defineProperty(exports, "ClickUp", ({ enumerable: true, get: function () { return clickup_class_1.ClickUp; } }));
 var gitlab_class_1 = __webpack_require__("./libs/node-shared/src/lib/classes/gitlab.class.ts");
@@ -2666,6 +2643,9 @@ Object.defineProperty(exports, "normalizeClickUpChecklist", ({ enumerable: true,
 Object.defineProperty(exports, "normalizeMarkdownChecklist", ({ enumerable: true, get: function () { return checklist_utils_1.normalizeMarkdownChecklist; } }));
 var clickup_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/clickup.utils.ts");
 Object.defineProperty(exports, "getTaskIdFromBranchName", ({ enumerable: true, get: function () { return clickup_utils_1.getTaskIdFromBranchName; } }));
+var date_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/date.utils.ts");
+Object.defineProperty(exports, "DateFormat", ({ enumerable: true, get: function () { return date_utils_1.DateFormat; } }));
+Object.defineProperty(exports, "formatDate", ({ enumerable: true, get: function () { return date_utils_1.formatDate; } }));
 var sleep_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/sleep.utils.ts");
 Object.defineProperty(exports, "sleep", ({ enumerable: true, get: function () { return sleep_utils_1.sleep; } }));
 
@@ -2890,6 +2870,27 @@ function getTaskIdFromBranchName(branchName) {
     return result ? result[1] : null;
 }
 exports.getTaskIdFromBranchName = getTaskIdFromBranchName;
+
+
+/***/ }),
+
+/***/ "./libs/node-shared/src/lib/utils/date.utils.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.formatDate = exports.DateFormat = void 0;
+const date_fns_1 = __webpack_require__("date-fns");
+var DateFormat;
+(function (DateFormat) {
+    DateFormat["STANDARD"] = "yyyy/MM/dd";
+    DateFormat["GITLAB"] = "yyyy-MM-dd";
+    DateFormat["HOLIDAY"] = "yyyy/M/d";
+})(DateFormat = exports.DateFormat || (exports.DateFormat = {}));
+function formatDate(day, dateFormat = DateFormat.STANDARD) {
+    return (0, date_fns_1.format)(day, dateFormat);
+}
+exports.formatDate = formatDate;
 
 
 /***/ }),

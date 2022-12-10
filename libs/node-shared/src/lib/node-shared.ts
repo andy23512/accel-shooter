@@ -20,4 +20,5 @@ export {
   normalizeMarkdownChecklist,
 } from './utils/checklist.utils';
 export { getTaskIdFromBranchName } from './utils/clickup.utils';
+export { DateFormat, formatDate } from './utils/date.utils';
 export { sleep } from './utils/sleep.utils';

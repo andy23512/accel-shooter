@@ -1,9 +1,9 @@
+import { formatDate } from '@accel-shooter/node-shared';
 import clipboardy from 'clipboardy';
 import { add, compareAsc } from 'date-fns';
 import { groupBy, prop } from 'ramda';
 import { DailyProgress } from '../classes/daily-progress.class';
 import { Holiday } from '../classes/holiday.class';
-import { formatDate } from '../format-date';
 import { getDayFromArgv } from '../utils';
 
 export async function biWeeklyProgressAction() {

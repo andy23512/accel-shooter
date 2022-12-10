@@ -1,9 +1,13 @@
 import untildify from 'untildify';
 
-import { CONFIG, IHoliday } from '@accel-shooter/node-shared';
+import {
+  CONFIG,
+  DateFormat,
+  formatDate,
+  IHoliday,
+} from '@accel-shooter/node-shared';
 
 import { add } from 'date-fns';
-import { DateFormat, formatDate } from '../format-date';
 import { BaseFileRef } from './base-file-ref.class';
 
 export class Holiday extends BaseFileRef {

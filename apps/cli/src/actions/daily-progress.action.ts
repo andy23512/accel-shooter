@@ -3,6 +3,7 @@ import { add } from 'date-fns';
 
 import {
   ClickUp,
+  formatDate,
   getTaskIdFromBranchName,
   GitLab,
   Google,
@@ -12,7 +13,6 @@ import { DailyProgress } from '../classes/daily-progress.class';
 import { Holiday } from '../classes/holiday.class';
 import { CustomProgressLog } from '../classes/progress-log.class';
 import { Todo } from '../classes/todo.class';
-import { DateFormat, formatDate } from '../format-date';
 import { getDayFromArgv } from '../utils';
 
 export async function dailyProgressAction() {
@@ -33,11 +33,8 @@ export async function dailyProgressAction() {
   const previousWorkDay = holiday.getPreviousWorkday(day);
   console.log('Previous work day:', formatDate(previousWorkDay));
   p.next(); // Get Pushed Events
-  const after = formatDate(
-    add(previousWorkDay, { days: -1 }),
-    DateFormat.GITLAB
-  );
-  const before = formatDate(day, DateFormat.GITLAB);
+  const after = add(previousWorkDay, { days: -1 });
+  const before = day;
   const pushedEvents = await GitLab.getPushedEvents(after, before);
   const pushedToEvents = pushedEvents.filter(
     (e) => e.action_name === 'pushed to'

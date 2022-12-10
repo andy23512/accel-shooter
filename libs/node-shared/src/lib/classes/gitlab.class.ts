@@ -4,9 +4,13 @@ import { Commit } from '../models/gitlab/commit.models';
 import { Compare } from '../models/gitlab/compare.models';
 import { Event } from '../models/gitlab/event.models';
 import { Job } from '../models/gitlab/job.models';
-import { FullMergeRequest, MergeRequestChanges } from '../models/gitlab/merge-request.models';
+import {
+  FullMergeRequest,
+  MergeRequestChanges,
+} from '../models/gitlab/merge-request.models';
 import { Pipeline } from '../models/gitlab/pipeline.models';
 import { callApiFactory } from '../utils/api.utils';
+import { DateFormat, formatDate } from '../utils/date.utils';
 
 const callApi = callApiFactory('GitLab');
 
@@ -201,21 +205,21 @@ export class GitLab {
     );
   }
 
-  public static async getPushedEvents(after: string, before: string) {
+  public static async getPushedEvents(after: Date, before: Date) {
     return callApi<Event[]>('get', '/events', {
       action: 'pushed',
-      before,
-      after,
+      before: formatDate(before, DateFormat.GITLAB),
+      after: formatDate(after, DateFormat.GITLAB),
       sort: 'asc',
       per_page: 100,
     });
   }
 
-  public static async getApprovedEvents(after: string, before: string) {
+  public static async getApprovedEvents(after: Date, before: Date) {
     return callApi<Event[]>('get', '/events', {
       action: 'approved',
-      before,
-      after,
+      before: formatDate(before, DateFormat.GITLAB),
+      after: formatDate(after, DateFormat.GITLAB),
       sort: 'asc',
       per_page: 100,
     });

@@ -550,6 +550,7 @@ exports.GitLab = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const config_1 = __webpack_require__("./libs/node-shared/src/lib/config.ts");
 const api_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/api.utils.ts");
+const date_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/date.utils.ts");
 const callApi = (0, api_utils_1.callApiFactory)('GitLab');
 class GitLab {
     constructor(projectId) {
@@ -665,8 +666,8 @@ class GitLab {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return callApi('get', '/events', {
                 action: 'pushed',
-                before,
-                after,
+                before: (0, date_utils_1.formatDate)(before, date_utils_1.DateFormat.GITLAB),
+                after: (0, date_utils_1.formatDate)(after, date_utils_1.DateFormat.GITLAB),
                 sort: 'asc',
                 per_page: 100,
             });
@@ -676,8 +677,8 @@ class GitLab {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return callApi('get', '/events', {
                 action: 'approved',
-                before,
-                after,
+                before: (0, date_utils_1.formatDate)(before, date_utils_1.DateFormat.GITLAB),
+                after: (0, date_utils_1.formatDate)(after, date_utils_1.DateFormat.GITLAB),
                 sort: 'asc',
                 per_page: 100,
             });
@@ -918,7 +919,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sleep = exports.getTaskIdFromBranchName = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.titleCase = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.IHoliday = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Task = exports.Space = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.Google = exports.GitLab = exports.ClickUp = void 0;
+exports.sleep = exports.formatDate = exports.DateFormat = exports.getTaskIdFromBranchName = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.titleCase = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.IHoliday = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Task = exports.Space = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.Google = exports.GitLab = exports.ClickUp = void 0;
 var clickup_class_1 = __webpack_require__("./libs/node-shared/src/lib/classes/clickup.class.ts");
 Object.defineProperty(exports, "ClickUp", ({ enumerable: true, get: function () { return clickup_class_1.ClickUp; } }));
 var gitlab_class_1 = __webpack_require__("./libs/node-shared/src/lib/classes/gitlab.class.ts");
@@ -952,6 +953,9 @@ Object.defineProperty(exports, "normalizeClickUpChecklist", ({ enumerable: true,
 Object.defineProperty(exports, "normalizeMarkdownChecklist", ({ enumerable: true, get: function () { return checklist_utils_1.normalizeMarkdownChecklist; } }));
 var clickup_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/clickup.utils.ts");
 Object.defineProperty(exports, "getTaskIdFromBranchName", ({ enumerable: true, get: function () { return clickup_utils_1.getTaskIdFromBranchName; } }));
+var date_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/date.utils.ts");
+Object.defineProperty(exports, "DateFormat", ({ enumerable: true, get: function () { return date_utils_1.DateFormat; } }));
+Object.defineProperty(exports, "formatDate", ({ enumerable: true, get: function () { return date_utils_1.formatDate; } }));
 var sleep_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/sleep.utils.ts");
 Object.defineProperty(exports, "sleep", ({ enumerable: true, get: function () { return sleep_utils_1.sleep; } }));
 
@@ -1180,6 +1184,27 @@ exports.getTaskIdFromBranchName = getTaskIdFromBranchName;
 
 /***/ }),
 
+/***/ "./libs/node-shared/src/lib/utils/date.utils.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.formatDate = exports.DateFormat = void 0;
+const date_fns_1 = __webpack_require__("date-fns");
+var DateFormat;
+(function (DateFormat) {
+    DateFormat["STANDARD"] = "yyyy/MM/dd";
+    DateFormat["GITLAB"] = "yyyy-MM-dd";
+    DateFormat["HOLIDAY"] = "yyyy/M/d";
+})(DateFormat = exports.DateFormat || (exports.DateFormat = {}));
+function formatDate(day, dateFormat = DateFormat.STANDARD) {
+    return (0, date_fns_1.format)(day, dateFormat);
+}
+exports.formatDate = formatDate;
+
+
+/***/ }),
+
 /***/ "./libs/node-shared/src/lib/utils/sleep.utils.ts":
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -1233,6 +1258,13 @@ module.exports = require("@nestjs/serve-static");
 /***/ ((module) => {
 
 module.exports = require("cli-progress");
+
+/***/ }),
+
+/***/ "date-fns":
+/***/ ((module) => {
+
+module.exports = require("date-fns");
 
 /***/ }),
 

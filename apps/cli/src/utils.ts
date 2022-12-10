@@ -5,12 +5,12 @@ import qs from 'qs';
 import {
   ClickUp,
   CONFIG,
+  DateFormat,
   FullMergeRequest,
   GitLab,
   titleCase,
 } from '@accel-shooter/node-shared';
 import { parse } from 'date-fns';
-import { DateFormat } from './format-date';
 
 export async function promiseSpawn(
   command: string,
