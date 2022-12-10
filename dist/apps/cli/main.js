@@ -31,12 +31,11 @@ const ramda_1 = __webpack_require__("ramda");
 const daily_progress_class_1 = __webpack_require__("./apps/cli/src/classes/daily-progress.class.ts");
 const holiday_class_1 = __webpack_require__("./apps/cli/src/classes/holiday.class.ts");
 const format_date_1 = __webpack_require__("./apps/cli/src/format-date.ts");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 function biWeeklyProgressAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const today = new Date();
-        const startDay = process.argv.length >= 4
-            ? (0, date_fns_1.parse)(process.argv[3], 'yyyy/MM/dd', today)
-            : (0, date_fns_1.add)(today, { weeks: -2 });
+        const startDay = (0, utils_1.getDayFromArgv)((0, date_fns_1.add)(today, { weeks: -2 }));
         let fetchDay = new Date(today.valueOf());
         const holiday = new holiday_class_1.Holiday();
         const fetchDays = [];
@@ -286,6 +285,7 @@ const holiday_class_1 = __webpack_require__("./apps/cli/src/classes/holiday.clas
 const progress_log_class_1 = __webpack_require__("./apps/cli/src/classes/progress-log.class.ts");
 const todo_class_1 = __webpack_require__("./apps/cli/src/classes/todo.class.ts");
 const format_date_1 = __webpack_require__("./apps/cli/src/format-date.ts");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 function dailyProgressAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const p = new progress_log_class_1.CustomProgressLog('Daily Progress', [
@@ -300,10 +300,7 @@ function dailyProgressAction() {
             'Copy Day Progress into Clipboard',
         ]);
         p.start(); // Get Date
-        const today = new Date();
-        const day = process.argv.length >= 4
-            ? (0, date_fns_1.parse)(process.argv[3], 'yyyy/MM/dd', today)
-            : today;
+        const day = (0, utils_1.getDayFromArgv)();
         const holiday = new holiday_class_1.Holiday();
         const previousWorkDay = holiday.getPreviousWorkday(day);
         console.log('Previous work day:', (0, format_date_1.formatDate)(previousWorkDay));
@@ -594,12 +591,12 @@ exports.revertEndAction = revertEndAction;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.punch = exports.routineAction = exports.confirm = void 0;
 const tslib_1 = __webpack_require__("tslib");
-const date_fns_1 = __webpack_require__("date-fns");
 const fs_1 = tslib_1.__importDefault(__webpack_require__("fs"));
 const puppeteer_1 = tslib_1.__importDefault(__webpack_require__("puppeteer"));
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const readline_1 = tslib_1.__importDefault(__webpack_require__("readline"));
 const holiday_class_1 = __webpack_require__("./apps/cli/src/classes/holiday.class.ts");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 const daily_progress_action_1 = __webpack_require__("./apps/cli/src/actions/daily-progress.action.ts");
 const dump_my_tasks_action_1 = __webpack_require__("./apps/cli/src/actions/dump-my-tasks.action.ts");
 function confirm(question) {
@@ -622,12 +619,9 @@ function confirm(question) {
 exports.confirm = confirm;
 function routineAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const today = new Date();
-        const hour = today.getHours();
+        const day = (0, utils_1.getDayFromArgv)();
+        const hour = day.getHours();
         const isMorning = hour < 12;
-        const day = process.argv.length >= 4
-            ? (0, date_fns_1.parse)(process.argv[3], 'yyyy/MM/dd', today)
-            : today;
         const holiday = new holiday_class_1.Holiday();
         const isWorkDay = holiday.checkIsWorkday(day);
         const message = isWorkDay ? 'Today is workday!' : 'Today is holiday!';
@@ -1802,12 +1796,14 @@ exports.formatDate = formatDate;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getRepoName = exports.openUrlsInTabGroup = exports.checkWorkingTreeClean = exports.getInfoFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabMergeRequest = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = void 0;
+exports.getDayFromArgv = exports.getRepoName = exports.openUrlsInTabGroup = exports.checkWorkingTreeClean = exports.getInfoFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabMergeRequest = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const child_process_1 = tslib_1.__importStar(__webpack_require__("child_process"));
 const open_1 = tslib_1.__importDefault(__webpack_require__("open"));
 const qs_1 = tslib_1.__importDefault(__webpack_require__("qs"));
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const date_fns_1 = __webpack_require__("date-fns");
+const format_date_1 = __webpack_require__("./apps/cli/src/format-date.ts");
 function promiseSpawn(command, args, stdio = 'inherit') {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
@@ -1949,6 +1945,15 @@ function getRepoName() {
         .trim();
 }
 exports.getRepoName = getRepoName;
+function getDayFromArgv(dft) {
+    const today = new Date();
+    return process.argv.length >= 4
+        ? (0, date_fns_1.parse)(process.argv[3], format_date_1.DateFormat.STANDARD, today)
+        : dft
+            ? new Date(dft.valueOf())
+            : today;
+}
+exports.getDayFromArgv = getDayFromArgv;
 
 
 /***/ }),

@@ -1,16 +1,14 @@
 import clipboardy from 'clipboardy';
-import { add, compareAsc, parse } from 'date-fns';
+import { add, compareAsc } from 'date-fns';
 import { groupBy, prop } from 'ramda';
 import { DailyProgress } from '../classes/daily-progress.class';
 import { Holiday } from '../classes/holiday.class';
 import { formatDate } from '../format-date';
+import { getDayFromArgv } from '../utils';
 
 export async function biWeeklyProgressAction() {
   const today = new Date();
-  const startDay =
-    process.argv.length >= 4
-      ? parse(process.argv[3], 'yyyy/MM/dd', today)
-      : add(today, { weeks: -2 });
+  const startDay = getDayFromArgv(add(today, { weeks: -2 }));
   let fetchDay = new Date(today.valueOf());
   const holiday = new Holiday();
   const fetchDays: Date[] = [];

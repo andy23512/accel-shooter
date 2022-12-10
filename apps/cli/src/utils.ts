@@ -2,7 +2,15 @@ import childProcess, { execSync, StdioOptions } from 'child_process';
 import open from 'open';
 import qs from 'qs';
 
-import { ClickUp, CONFIG, FullMergeRequest, GitLab, titleCase } from '@accel-shooter/node-shared';
+import {
+  ClickUp,
+  CONFIG,
+  FullMergeRequest,
+  GitLab,
+  titleCase,
+} from '@accel-shooter/node-shared';
+import { parse } from 'date-fns';
+import { DateFormat } from './format-date';
 
 export async function promiseSpawn(
   command: string,
@@ -161,4 +169,13 @@ export function getRepoName() {
   return execSync('basename -s .git `git config --get remote.origin.url`')
     .toString()
     .trim();
+}
+
+export function getDayFromArgv(dft?: Date) {
+  const today = new Date();
+  return process.argv.length >= 4
+    ? parse(process.argv[3], DateFormat.STANDARD, today)
+    : dft
+    ? new Date(dft.valueOf())
+    : today;
 }

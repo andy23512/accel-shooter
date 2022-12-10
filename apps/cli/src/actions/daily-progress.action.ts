@@ -1,5 +1,5 @@
 import { execSync } from 'child_process';
-import { add, parse } from 'date-fns';
+import { add } from 'date-fns';
 
 import {
   ClickUp,
@@ -13,6 +13,7 @@ import { Holiday } from '../classes/holiday.class';
 import { CustomProgressLog } from '../classes/progress-log.class';
 import { Todo } from '../classes/todo.class';
 import { DateFormat, formatDate } from '../format-date';
+import { getDayFromArgv } from '../utils';
 
 export async function dailyProgressAction() {
   const p = new CustomProgressLog('Daily Progress', [
@@ -27,11 +28,7 @@ export async function dailyProgressAction() {
     'Copy Day Progress into Clipboard',
   ]);
   p.start(); // Get Date
-  const today = new Date();
-  const day =
-    process.argv.length >= 4
-      ? parse(process.argv[3], 'yyyy/MM/dd', today)
-      : today;
+  const day = getDayFromArgv();
   const holiday = new Holiday();
   const previousWorkDay = holiday.getPreviousWorkday(day);
   console.log('Previous work day:', formatDate(previousWorkDay));

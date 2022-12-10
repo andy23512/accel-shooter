@@ -1,4 +1,3 @@
-import { parse } from 'date-fns';
 import fs from 'fs';
 import puppeteer from 'puppeteer';
 
@@ -6,6 +5,7 @@ import { CONFIG, sleep } from '@accel-shooter/node-shared';
 
 import readline from 'readline';
 import { Holiday } from '../classes/holiday.class';
+import { getDayFromArgv } from '../utils';
 import { dailyProgressAction } from './daily-progress.action';
 import { dumpMyTasksAction } from './dump-my-tasks.action';
 
@@ -27,13 +27,9 @@ export function confirm(question: string) {
 }
 
 export async function routineAction() {
-  const today = new Date();
-  const hour = today.getHours();
+  const day = getDayFromArgv();
+  const hour = day.getHours();
   const isMorning = hour < 12;
-  const day =
-    process.argv.length >= 4
-      ? parse(process.argv[3], 'yyyy/MM/dd', today)
-      : today;
   const holiday = new Holiday();
   const isWorkDay = holiday.checkIsWorkday(day);
   const message = isWorkDay ? 'Today is workday!' : 'Today is holiday!';
