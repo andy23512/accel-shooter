@@ -7,7 +7,7 @@ import { openUrlsInTabGroup } from '../utils';
 export async function workAction() {
   const todo = new Todo();
   const todoContent = todo.readFile();
-  let matchResult = todoContent.match(/## Todos\n([\s\S]+)\n##/);
+  let matchResult = todoContent.match(/## Todo\n([\s\S]+)\n##/);
   if (!matchResult) {
     throw Error('Todo File Broken');
   }

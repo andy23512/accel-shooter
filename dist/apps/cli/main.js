@@ -306,25 +306,23 @@ function dailyProgressAction() {
         p.next(); // Get Pushed Events
         const after = (0, date_fns_1.add)(previousWorkDay, { days: -1 });
         const before = day;
-        const pushedEvents = yield node_shared_1.GitLab.getPushedEvents(after, before);
-        const pushedToEvents = pushedEvents.filter((e) => e.action_name === 'pushed to');
+        const pushedToEvents = (yield node_shared_1.GitLab.getPushedEvents(after, before)).filter((e) => e.action_name === 'pushed to');
         const modifiedBranches = [
             ...new Set(pushedToEvents.map((e) => e.push_data.ref)),
         ];
         p.next(); // Get Progressed Tasks
-        let result = [];
+        let previousDayItems = [];
         for (const b of modifiedBranches) {
             const taskId = (0, node_shared_1.getTaskIdFromBranchName)(b);
             if (taskId) {
-                const clickUp = new node_shared_1.ClickUp((0, node_shared_1.getTaskIdFromBranchName)(b));
-                result.push('    ' + (yield clickUp.getTaskString('dp')));
+                previousDayItems.push('    ' + (yield new node_shared_1.ClickUp(taskId).getTaskString('dp')));
             }
         }
         p.next(); // Get Todo Task
-        let result2 = [];
+        let todayItems = [];
         const todo = new todo_class_1.Todo();
         const todoContent = todo.readFile();
-        let matchResult = todoContent.match(/## Todos\n([\s\S]+)\n##/);
+        let matchResult = todoContent.match(/## Todo\n([\s\S]+)\n##/);
         if (matchResult) {
             const todoList = matchResult[1].split('\n');
             const firstTodo = todoList[0];
@@ -333,10 +331,10 @@ function dailyProgressAction() {
                 const taskId = matchResult[1];
                 const clickUp = new node_shared_1.ClickUp(taskId);
                 const taskString = yield clickUp.getTaskString('dp');
-                result2.push('    ' + taskString);
+                todayItems.push('    ' + taskString);
             }
             else {
-                result2.push('    ' + firstTodo.replace('- [ ]', '*'));
+                todayItems.push('    ' + firstTodo.replace('- [ ]', '*'));
             }
         }
         else {
@@ -352,30 +350,30 @@ function dailyProgressAction() {
                 const taskId = matchResult[1];
                 const clickUp = new node_shared_1.ClickUp(taskId);
                 const taskString = yield clickUp.getTaskString('dp');
-                result.push('    ' + taskString);
-                result2.push('    ' + (yield clickUp.getTaskString('dp')));
+                previousDayItems.push('    ' + taskString);
+                todayItems.push('    ' + (yield clickUp.getTaskString('dp')));
             }
             else if (firstProcessingItem.includes('- [ ]')) {
-                result.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
-                result2.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
+                previousDayItems.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
+                todayItems.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
             }
         }
-        if (result2.length === 0) {
+        if (todayItems.length === 0) {
             console.log('Todo of today is empty!');
             process.exit();
         }
-        result = [...new Set(result)];
-        result2 = [...new Set(result2)];
+        previousDayItems = [...new Set(previousDayItems)];
+        todayItems = [...new Set(todayItems)];
         p.next(); // Get Reviewed Merge Requests
         const approvedEvents = yield node_shared_1.GitLab.getApprovedEvents(after, before);
         if (approvedEvents.length > 0) {
-            result.push('    * Review');
+            previousDayItems.push('    * Review');
             for (const approvedEvent of approvedEvents) {
                 const projectId = approvedEvent.project_id;
                 const mergeRequestIId = approvedEvent.target_iid;
                 const gitLab = new node_shared_1.GitLab(projectId.toString());
                 const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
-                result.push(`        * [${mergeRequest.title}](${mergeRequest.web_url})`);
+                previousDayItems.push(`        * [${mergeRequest.title}](${mergeRequest.web_url})`);
             }
         }
         p.next(); // Get Meetings
@@ -383,19 +381,19 @@ function dailyProgressAction() {
         const previousDayMeeting = yield g.listAttendingEvent(previousWorkDay.toISOString(), day.toISOString());
         const todayMeeting = yield g.listAttendingEvent(day.toISOString(), (0, date_fns_1.add)(day, { days: 1 }).toISOString());
         if (previousDayMeeting.length > 0) {
-            result.push('    * Meeting');
+            previousDayItems.push('    * Meeting');
             for (const m of previousDayMeeting) {
-                result.push(`        * ${m.summary}`);
+                previousDayItems.push(`        * ${m.summary}`);
             }
         }
         if (todayMeeting.length > 0) {
-            result2.push('    * Meeting');
+            todayItems.push('    * Meeting');
             for (const m of todayMeeting) {
-                result2.push(`        * ${m.summary}`);
+                todayItems.push(`        * ${m.summary}`);
             }
         }
         p.next(); // Add Day Progress Entry
-        const dayDp = `### ${(0, node_shared_1.formatDate)(day)}\n1. Previous Day\n${result.join('\n')}\n2. Today\n${result2.join('\n')}\n3. No blockers so far`;
+        const dayDp = `### ${(0, node_shared_1.formatDate)(day)}\n1. Previous Day\n${previousDayItems.join('\n')}\n2. Today\n${todayItems.join('\n')}\n3. No blockers so far`;
         new daily_progress_class_1.DailyProgress().addDayProgress(dayDp);
         p.next(); // Copy Day Progress into Clipboard
         let resultRecord = dayDp;
@@ -1132,7 +1130,7 @@ function workAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const todo = new todo_class_1.Todo();
         const todoContent = todo.readFile();
-        let matchResult = todoContent.match(/## Todos\n([\s\S]+)\n##/);
+        let matchResult = todoContent.match(/## Todo\n([\s\S]+)\n##/);
         if (!matchResult) {
             throw Error('Todo File Broken');
         }
@@ -1541,12 +1539,12 @@ class Todo extends base_file_ref_class_1.BaseFileRef {
     }
     addTodoToBuffer(todoString) {
         const content = this.readFile();
-        const updatedTodoContent = content.replace('## Todos', `## Todos\n${todoString}`);
+        const updatedTodoContent = content.replace('## Todo', `## Todo\n${todoString}`);
         this.writeFile(updatedTodoContent);
     }
     removeTodo(clickUpTaskId) {
         const todoContent = this.readFile();
-        const matchResult = todoContent.match(/## Todos\n([\s\S]+)## Processing/);
+        const matchResult = todoContent.match(/## Todo\n([\s\S]+)## Processing/);
         if (matchResult) {
             const todoList = matchResult[1].split('\n');
             const newTodoList = todoList.filter((t) => t && !t.includes(clickUpTaskId));

@@ -19,15 +19,15 @@ export class Todo extends BaseFileRef {
   public addTodoToBuffer(todoString: string) {
     const content = this.readFile();
     const updatedTodoContent = content.replace(
-      '## Todos',
-      `## Todos\n${todoString}`
+      '## Todo',
+      `## Todo\n${todoString}`
     );
     this.writeFile(updatedTodoContent);
   }
 
   public removeTodo(clickUpTaskId: string) {
     const todoContent = this.readFile();
-    const matchResult = todoContent.match(/## Todos\n([\s\S]+)## Processing/);
+    const matchResult = todoContent.match(/## Todo\n([\s\S]+)## Processing/);
     if (matchResult) {
       const todoList = matchResult[1].split('\n');
       const newTodoList = todoList.filter(
