@@ -16,7 +16,7 @@ export class Todo extends BaseFileRef {
     writeFileSync(untildify(CONFIG.TodoChangeNotificationFile), uuidv4());
   }
 
-  public addTodoToBuffer(todoString: string) {
+  public addTodo(todoString: string) {
     const content = this.readFile();
     const updatedTodoContent = content.replace(
       '## Todo',

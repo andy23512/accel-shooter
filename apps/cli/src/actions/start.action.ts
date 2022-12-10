@@ -5,7 +5,13 @@ import os from 'os';
 import { join } from 'path';
 import untildify from 'untildify';
 
-import { ClickUp, CONFIG, GitLab, GitLabProject, sleep } from '@accel-shooter/node-shared';
+import {
+  ClickUp,
+  CONFIG,
+  GitLab,
+  GitLabProject,
+  sleep,
+} from '@accel-shooter/node-shared';
 
 import { CustomProgressLog } from '../classes/progress-log.class';
 import { Todo } from '../classes/todo.class';
@@ -146,7 +152,7 @@ export async function startAction() {
   }
   p.next(); // Add Todo Entry
   const todoString = await clickUp.getTaskString('todo');
-  new Todo().addTodoToBuffer(todoString);
+  new Todo().addTodo(todoString);
   p.next(); // Add Tracker Item
   new Tracker().addItem(answers.clickUpTaskId);
   p.next(); // Do Git Fetch and Checkout

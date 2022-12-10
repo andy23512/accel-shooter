@@ -919,7 +919,7 @@ function startAction() {
         }
         p.next(); // Add Todo Entry
         const todoString = yield clickUp.getTaskString('todo');
-        new todo_class_1.Todo().addTodoToBuffer(todoString);
+        new todo_class_1.Todo().addTodo(todoString);
         p.next(); // Add Tracker Item
         new tracker_class_1.Tracker().addItem(answers.clickUpTaskId);
         p.next(); // Do Git Fetch and Checkout
@@ -1537,7 +1537,7 @@ class Todo extends base_file_ref_class_1.BaseFileRef {
         super.writeFile(content);
         (0, fs_1.writeFileSync)((0, untildify_1.default)(node_shared_1.CONFIG.TodoChangeNotificationFile), (0, uuid_1.v4)());
     }
-    addTodoToBuffer(todoString) {
+    addTodo(todoString) {
         const content = this.readFile();
         const updatedTodoContent = content.replace('## Todo', `## Todo\n${todoString}`);
         this.writeFile(updatedTodoContent);
