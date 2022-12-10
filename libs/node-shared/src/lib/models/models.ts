@@ -29,7 +29,6 @@ export interface Config {
   EndingAssignee: string;
   SyncIntervalInMinutes: number;
   TrackIntervalInMinutes: number;
-  CrossChecklistDefaultSecondLevel: string[];
   ClickUpTeam: string;
   TaskTodoFolder: string;
   TodoFile: string;

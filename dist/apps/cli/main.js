@@ -271,61 +271,6 @@ exports.copyAction = copyAction;
 
 /***/ }),
 
-/***/ "./apps/cli/src/actions/cross-checklist.action.ts":
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.crossChecklistAction = void 0;
-const tslib_1 = __webpack_require__("tslib");
-const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
-const clipboardy_1 = tslib_1.__importDefault(__webpack_require__("clipboardy"));
-const inquirer_1 = tslib_1.__importDefault(__webpack_require__("inquirer"));
-function crossChecklistAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const answers = yield inquirer_1.default.prompt([
-            {
-                name: "initialSpaces",
-                message: "Enter prefix spaces",
-                type: "input",
-            },
-            {
-                name: "firstLevel",
-                message: "Enter first level items",
-                type: "editor",
-            },
-            {
-                name: "secondLevel",
-                message: "Enter second level items",
-                type: "editor",
-                default: node_shared_1.CONFIG.CrossChecklistDefaultSecondLevel.join("\n"),
-            },
-        ]);
-        const firstLevelItems = answers.firstLevel
-            .split("\n")
-            .filter(Boolean);
-        const secondLevelItems = answers.secondLevel
-            .split("\n")
-            .filter(Boolean);
-        const result = firstLevelItems
-            .map((e) => answers.initialSpaces +
-            "  - [ ] " +
-            e +
-            "\n" +
-            secondLevelItems
-                .map((f) => `${answers.initialSpaces}    - [ ] ${f}`)
-                .join("\n"))
-            .join("\n");
-        clipboardy_1.default.writeSync(result);
-        console.log(result);
-        console.log("Copied!");
-    });
-}
-exports.crossChecklistAction = crossChecklistAction;
-
-
-/***/ }),
-
 /***/ "./apps/cli/src/actions/daily-progress.action.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -3193,7 +3138,6 @@ const check_action_1 = __webpack_require__("./apps/cli/src/actions/check.action.
 const close_action_1 = __webpack_require__("./apps/cli/src/actions/close.action.ts");
 const commit_action_1 = __webpack_require__("./apps/cli/src/actions/commit.action.ts");
 const copy_action_1 = __webpack_require__("./apps/cli/src/actions/copy.action.ts");
-const cross_checklist_action_1 = __webpack_require__("./apps/cli/src/actions/cross-checklist.action.ts");
 const daily_progress_action_1 = __webpack_require__("./apps/cli/src/actions/daily-progress.action.ts");
 const dump_my_tasks_action_1 = __webpack_require__("./apps/cli/src/actions/dump-my-tasks.action.ts");
 const end_action_1 = __webpack_require__("./apps/cli/src/actions/end.action.ts");
@@ -3219,7 +3163,6 @@ const actions = {
     track: track_action_1.trackAction,
     end: end_action_1.endAction,
     revertEnd: revert_end_action_1.revertEndAction,
-    crossChecklist: cross_checklist_action_1.crossChecklistAction,
     RTVTasks: rtv_tasks_action_1.RTVTasksAction,
     check: check_action_1.checkAction,
     dumpMyTasks: dump_my_tasks_action_1.dumpMyTasksAction,

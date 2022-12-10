@@ -3,7 +3,6 @@ import { checkAction } from './actions/check.action';
 import { closeAction } from './actions/close.action';
 import { commitAction } from './actions/commit.action';
 import { copyAction } from './actions/copy.action';
-import { crossChecklistAction } from './actions/cross-checklist.action';
 import { dailyProgressAction } from './actions/daily-progress.action';
 import { dumpMyTasksAction } from './actions/dump-my-tasks.action';
 import { endAction } from './actions/end.action';
@@ -30,7 +29,6 @@ const actions: { [key: string]: () => Promise<void> } = {
   track: trackAction,
   end: endAction,
   revertEnd: revertEndAction,
-  crossChecklist: crossChecklistAction,
   RTVTasks: RTVTasksAction,
   check: checkAction,
   dumpMyTasks: dumpMyTasksAction,
