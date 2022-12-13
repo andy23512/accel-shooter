@@ -16,7 +16,9 @@ import { User } from '../models/clickup/user.models';
 import { callApiFactory } from '../utils/api.utils';
 import { titleCase } from '../utils/case.utils';
 import {
-    getSyncChecklistActions, normalizeClickUpChecklist, normalizeMarkdownChecklist
+  getSyncChecklistActions,
+  normalizeClickUpChecklist,
+  normalizeMarkdownChecklist,
 } from '../utils/checklist.utils';
 
 const callApi = callApiFactory('ClickUp');
@@ -195,9 +197,9 @@ export class ClickUp {
     return frameUrls;
   }
 
-  public async getGitLabProjectAndMergeRequestIId() {
-    const task = await this.getTask();
-    const clickUpChecklist = task.checklists.find((c) =>
+  public async getGitLabProjectAndMergeRequestIId(task?: Task) {
+    const t = task || (await this.getTask());
+    const clickUpChecklist = t.checklists.find((c) =>
       c.name.toLowerCase().includes('synced checklist')
     );
     if (clickUpChecklist) {
@@ -228,7 +230,9 @@ export class ClickUp {
     const task = await this.getTask();
     const name = await this.getFullTaskName(task);
     const progress = this.getTaskProgress();
-    const product = await ClickUp.getProduct(task);
+    const gitLabInfo = await this.getGitLabProjectAndMergeRequestIId(task);
+    const product =
+      gitLabInfo?.gitLabProject?.name || (await ClickUp.getProduct(task));
     const link = `[${product}: ${name}](${task.url})`;
     switch (mode) {
       case 'todo':

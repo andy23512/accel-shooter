@@ -398,10 +398,10 @@ class ClickUp {
             return frameUrls;
         });
     }
-    getGitLabProjectAndMergeRequestIId() {
+    getGitLabProjectAndMergeRequestIId(task) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const task = yield this.getTask();
-            const clickUpChecklist = task.checklists.find((c) => c.name.toLowerCase().includes('synced checklist'));
+            const t = task || (yield this.getTask());
+            const clickUpChecklist = t.checklists.find((c) => c.name.toLowerCase().includes('synced checklist'));
             if (clickUpChecklist) {
                 const match = clickUpChecklist.name.match(/\[(.*?) !([\d]+)\]/);
                 if (match) {
@@ -426,11 +426,13 @@ class ClickUp {
         });
     }
     getTaskString(mode) {
+        var _a;
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const task = yield this.getTask();
             const name = yield this.getFullTaskName(task);
             const progress = this.getTaskProgress();
-            const product = yield ClickUp.getProduct(task);
+            const gitLabInfo = yield this.getGitLabProjectAndMergeRequestIId(task);
+            const product = ((_a = gitLabInfo === null || gitLabInfo === void 0 ? void 0 : gitLabInfo.gitLabProject) === null || _a === void 0 ? void 0 : _a.name) || (yield ClickUp.getProduct(task));
             const link = `[${product}: ${name}](${task.url})`;
             switch (mode) {
                 case 'todo':
