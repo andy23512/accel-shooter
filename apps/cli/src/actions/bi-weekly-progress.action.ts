@@ -1,4 +1,4 @@
-import { formatDate } from '@accel-shooter/node-shared';
+import { ClickUp, formatDate } from '@accel-shooter/node-shared';
 import clipboardy from 'clipboardy';
 import { add, compareAsc } from 'date-fns';
 import { groupBy, prop } from 'ramda';
@@ -31,18 +31,22 @@ export async function biWeeklyProgressAction() {
       const lines = record.split('\n').filter(Boolean);
       for (const line of lines) {
         const matchItem = line.match(
-          /(\([A-Za-z0-9 %]+\)) \[(.*?)\]\((https:\/\/app.clickup.com\/t\/\w+)\)/
+          /(\([A-Za-z0-9 %]+\)) \[(.*?)\]\((https:\/\/app.clickup.com\/t\/(\w+))\)/
         );
         if (matchItem) {
           const name = matchItem[2];
           const url = matchItem[3];
+          const taskId = matchItem[4];
           if (data[url]) {
             data[url].days.push(previousWorkDayString);
           } else {
+            const { gitLabProject } = await new ClickUp(
+              taskId
+            ).getGitLabProjectAndMergeRequestIId();
             data[url] = {
               url,
               name,
-              product: name.split(':')[0],
+              project: gitLabProject.name,
               days: [previousWorkDayString],
             };
           }
@@ -58,13 +62,13 @@ export async function biWeeklyProgressAction() {
     endDay: item.days[0],
   }));
   finalData.sort((a, b) => a.endDay.localeCompare(b.endDay));
-  const groupedRecords = groupBy(prop('product'), finalData);
+  const groupedRecords = groupBy(prop('project'), finalData);
   const previousWorkDayOfToday = holiday.getPreviousWorkday(today);
   let result = `## ${formatDate(startDay)}~${formatDate(
     previousWorkDayOfToday
   )}`;
-  Object.entries(groupedRecords).forEach(([product, records]) => {
-    result += `\n- ${product}`;
+  Object.entries(groupedRecords).forEach(([project, records]) => {
+    result += `\n- ${project}`;
     records.forEach(({ name, url, startDay, endDay }) => {
       if (startDay === endDay) {
         result += `\n  - ${startDay} [${name}](${url})`;
@@ -93,5 +97,5 @@ interface Item {
   url: string;
   name: string;
   days: string[];
-  product: string;
+  project: string;
 }

@@ -55,18 +55,20 @@ function biWeeklyProgressAction() {
                 const record = matchResult[1];
                 const lines = record.split('\n').filter(Boolean);
                 for (const line of lines) {
-                    const matchItem = line.match(/(\([A-Za-z0-9 %]+\)) \[(.*?)\]\((https:\/\/app.clickup.com\/t\/\w+)\)/);
+                    const matchItem = line.match(/(\([A-Za-z0-9 %]+\)) \[(.*?)\]\((https:\/\/app.clickup.com\/t\/(\w+))\)/);
                     if (matchItem) {
                         const name = matchItem[2];
                         const url = matchItem[3];
+                        const taskId = matchItem[4];
                         if (data[url]) {
                             data[url].days.push(previousWorkDayString);
                         }
                         else {
+                            const { gitLabProject } = yield new node_shared_1.ClickUp(taskId).getGitLabProjectAndMergeRequestIId();
                             data[url] = {
                                 url,
                                 name,
-                                product: name.split(':')[0],
+                                project: gitLabProject.name,
                                 days: [previousWorkDayString],
                             };
                         }
@@ -79,11 +81,11 @@ function biWeeklyProgressAction() {
         }
         const finalData = Object.values(data).map((item) => (Object.assign(Object.assign({}, item), { startDay: item.days[item.days.length - 1], endDay: item.days[0] })));
         finalData.sort((a, b) => a.endDay.localeCompare(b.endDay));
-        const groupedRecords = (0, ramda_1.groupBy)((0, ramda_1.prop)('product'), finalData);
+        const groupedRecords = (0, ramda_1.groupBy)((0, ramda_1.prop)('project'), finalData);
         const previousWorkDayOfToday = holiday.getPreviousWorkday(today);
         let result = `## ${(0, node_shared_1.formatDate)(startDay)}~${(0, node_shared_1.formatDate)(previousWorkDayOfToday)}`;
-        Object.entries(groupedRecords).forEach(([product, records]) => {
-            result += `\n- ${product}`;
+        Object.entries(groupedRecords).forEach(([project, records]) => {
+            result += `\n- ${project}`;
             records.forEach(({ name, url, startDay, endDay }) => {
                 if (startDay === endDay) {
                     result += `\n  - ${startDay} [${name}](${url})`;
