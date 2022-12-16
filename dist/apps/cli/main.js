@@ -473,7 +473,12 @@ function endAction() {
         p.next(); // Update GitLab Merge Request Ready Status and Assignee
         yield gitLab.markMergeRequestAsReadyAndAddAssignee(mergeRequest);
         p.next(); // Update ClickUp Task Status
-        yield clickUp.setTaskStatus('in review');
+        try {
+            yield clickUp.setTaskStatus('in review');
+        }
+        catch (_a) {
+            yield clickUp.setTaskStatus('review');
+        }
         p.next(); // Close Tab Group
         (0, utils_1.openUrlsInTabGroup)([], clickUpTaskId);
         p.next(); // Remove Todo

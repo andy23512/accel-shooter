@@ -31,7 +31,11 @@ export async function endAction() {
   p.next(); // Update GitLab Merge Request Ready Status and Assignee
   await gitLab.markMergeRequestAsReadyAndAddAssignee(mergeRequest);
   p.next(); // Update ClickUp Task Status
-  await clickUp.setTaskStatus('in review');
+  try {
+    await clickUp.setTaskStatus('in review');
+  } catch {
+    await clickUp.setTaskStatus('review');
+  }
   p.next(); // Close Tab Group
   openUrlsInTabGroup([], clickUpTaskId);
   p.next(); // Remove Todo
