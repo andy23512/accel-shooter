@@ -1628,9 +1628,13 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
                     if (list.statuses.find((s) => s.status.toLowerCase() === stagingStatus)) {
                         yield clickUp.setTaskStatus(stagingStatus);
                     }
-                    else {
+                    else if (list.statuses.find((s) => s.status.toLowerCase() === 'done')) {
                         stagingStatus = 'done';
-                        yield clickUp.setTaskStatus(stagingStatus);
+                        yield clickUp.setTaskStatus('done');
+                    }
+                    else {
+                        stagingStatus = 'closed';
+                        yield clickUp.setTaskStatus('closed');
                     }
                     const message = `${yield clickUp.getFullTaskName()} (${clickUpTaskId}): In Review -> ${(0, node_shared_1.titleCase)(stagingStatus)}`;
                     child_process_1.default.execSync(`osascript -e 'display notification "${message

@@ -63,9 +63,14 @@ export class Tracker extends BaseFileRef {
           list.statuses.find((s) => s.status.toLowerCase() === stagingStatus)
         ) {
           await clickUp.setTaskStatus(stagingStatus);
-        } else {
+        } else if (
+          list.statuses.find((s) => s.status.toLowerCase() === 'done')
+        ) {
           stagingStatus = 'done';
-          await clickUp.setTaskStatus(stagingStatus);
+          await clickUp.setTaskStatus('done');
+        } else {
+          stagingStatus = 'closed';
+          await clickUp.setTaskStatus('closed');
         }
         const message = `${await clickUp.getFullTaskName()} (${clickUpTaskId}): In Review -> ${titleCase(
           stagingStatus
