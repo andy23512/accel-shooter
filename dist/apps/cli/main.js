@@ -646,8 +646,6 @@ function routineAction() {
                 yield (0, daily_progress_action_1.dailyProgressAction)();
                 yield confirm('send dp to slack done?');
             }
-            yield confirm('macupdater done?');
-            yield confirm('topgrade done?');
         }
         console.log('Complete');
     });
