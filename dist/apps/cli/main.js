@@ -521,6 +521,31 @@ exports.fetchHolidayAction = fetchHolidayAction;
 
 /***/ }),
 
+/***/ "./apps/cli/src/actions/list-dc.action.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.listDCAction = void 0;
+const tslib_1 = __webpack_require__("tslib");
+const child_process_1 = __webpack_require__("child_process");
+function listDCAction() {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const result = (0, child_process_1.execSync)(`for c in \`docker ps -q\`; do docker inspect $c --format '{{ index .Config.Labels "com.docker.compose.project.working_dir"}} ' ; done`, { encoding: 'utf-8' });
+        const workDirs = [
+            ...new Set(result
+                .trim()
+                .split('\n')
+                .map((s) => s.trim())),
+        ];
+        console.log(workDirs);
+    });
+}
+exports.listDCAction = listDCAction;
+
+
+/***/ }),
+
 /***/ "./apps/cli/src/actions/list.action.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -3157,6 +3182,7 @@ const daily_progress_action_1 = __webpack_require__("./apps/cli/src/actions/dail
 const dump_my_tasks_action_1 = __webpack_require__("./apps/cli/src/actions/dump-my-tasks.action.ts");
 const end_action_1 = __webpack_require__("./apps/cli/src/actions/end.action.ts");
 const fetch_holiday_action_1 = __webpack_require__("./apps/cli/src/actions/fetch-holiday.action.ts");
+const list_dc_action_1 = __webpack_require__("./apps/cli/src/actions/list-dc.action.ts");
 const list_action_1 = __webpack_require__("./apps/cli/src/actions/list.action.ts");
 const open_action_1 = __webpack_require__("./apps/cli/src/actions/open.action.ts");
 const revert_end_action_1 = __webpack_require__("./apps/cli/src/actions/revert-end.action.ts");
@@ -3193,6 +3219,7 @@ const actions = {
     work: work_action_1.workAction,
     routine: routine_action_1.routineAction,
     biWeeklyProgress: bi_weekly_progress_action_1.biWeeklyProgressAction,
+    listDC: list_dc_action_1.listDCAction,
 };
 (() => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     const action = process.argv[2];

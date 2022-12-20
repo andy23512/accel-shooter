@@ -7,6 +7,7 @@ import { dailyProgressAction } from './actions/daily-progress.action';
 import { dumpMyTasksAction } from './actions/dump-my-tasks.action';
 import { endAction } from './actions/end.action';
 import { fetchHolidayAction } from './actions/fetch-holiday.action';
+import { listDCAction } from './actions/list-dc.action';
 import { listAction } from './actions/list.action';
 import { openAction } from './actions/open.action';
 import { revertEndAction } from './actions/revert-end.action';
@@ -44,6 +45,7 @@ const actions: { [key: string]: () => Promise<void> } = {
   work: workAction,
   routine: routineAction,
   biWeeklyProgress: biWeeklyProgressAction,
+  listDC: listDCAction,
 };
 
 (async () => {
