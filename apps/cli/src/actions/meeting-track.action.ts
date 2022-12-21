@@ -29,7 +29,7 @@ export async function meetingTrackAction() {
           'Pp'
         )}" with title "Accel Shooter"'`
       );
-      open(m.hangoutLink);
+      open(m.hangoutLink + '?authuser=1');
     });
     job.start();
   });

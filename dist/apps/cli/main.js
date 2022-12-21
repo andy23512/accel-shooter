@@ -595,7 +595,7 @@ function meetingTrackAction() {
             }
             const job = new cron_1.CronJob(openTime, () => {
                 (0, child_process_1.execSync)(`osascript -e 'display notification "Meeting: ${m.summary} at ${(0, date_fns_1.format)((0, date_fns_1.parseISO)(m.start.dateTime), 'Pp')}" with title "Accel Shooter"'`);
-                open(m.hangoutLink);
+                open(m.hangoutLink + '?authuser=1');
             });
             job.start();
         });
