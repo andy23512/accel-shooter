@@ -1312,18 +1312,18 @@ const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 const check_items_const_1 = __webpack_require__("./apps/cli/src/consts/check-items.const.ts");
 const check_item_class_1 = __webpack_require__("./apps/cli/src/classes/check-item.class.ts");
 const SPINNER = [
-    "🕛",
-    "🕐",
-    "🕑",
-    "🕒",
-    "🕓",
-    "🕔",
-    "🕕",
-    "🕖",
-    "🕗",
-    "🕘",
-    "🕙",
-    "🕚",
+    '🕛',
+    '🕐',
+    '🕑',
+    '🕒',
+    '🕓',
+    '🕔',
+    '🕕',
+    '🕖',
+    '🕗',
+    '🕘',
+    '🕙',
+    '🕚',
 ];
 class Checker {
     constructor(gitLabProject, mergeRequestIId, selectMode) {
@@ -1337,17 +1337,17 @@ class Checker {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const mergeRequest = yield this.gitLab.getMergeRequest(this.mergeRequestIId);
             const mergeRequestChanges = yield this.gitLab.getMergeRequestChanges(this.mergeRequestIId);
-            process.chdir(this.gitLabProject.path.replace("~", os_1.default.homedir()));
-            yield (0, utils_1.promiseSpawn)("git", ["checkout", mergeRequest.source_branch], "pipe");
+            process.chdir(this.gitLabProject.path.replace('~', os_1.default.homedir()));
+            yield (0, utils_1.promiseSpawn)('git', ['checkout', mergeRequest.source_branch], 'pipe');
             const changes = mergeRequestChanges.changes;
             let frontendChanges = [];
             let backendChanges = [];
             switch (this.gitLabProject.projectType) {
-                case "full":
-                    frontendChanges = changes.filter((c) => c.new_path.startsWith("frontend"));
-                    backendChanges = changes.filter((c) => c.new_path.startsWith("backend"));
+                case 'full':
+                    frontendChanges = changes.filter((c) => c.new_path.startsWith('frontend'));
+                    backendChanges = changes.filter((c) => c.new_path.startsWith('backend'));
                     break;
-                case "frontend":
+                case 'frontend':
                     frontendChanges = changes;
                     break;
             }
@@ -1355,17 +1355,17 @@ class Checker {
             const projectCheckItems = (this.gitLabProject.checkItems || []).map(check_item_class_1.CheckItem.fromProjectCheckItem);
             let runningItems = [...checkItems, ...projectCheckItems];
             if (frontendChanges.length === 0) {
-                runningItems = runningItems.filter((item) => item.group !== "Frontend");
+                runningItems = runningItems.filter((item) => item.group !== 'Frontend');
             }
             if (backendChanges.length === 0) {
-                runningItems = runningItems.filter((item) => item.group !== "Backend");
+                runningItems = runningItems.filter((item) => item.group !== 'Backend');
             }
             if (this.selectMode) {
                 const answers = yield inquirer_1.default.prompt([
                     {
-                        name: "selectedCheckItems",
-                        message: "Choose Check Items to Run",
-                        type: "checkbox",
+                        name: 'selectedCheckItems',
+                        message: 'Choose Check Items to Run',
+                        type: 'checkbox',
                         choices: runningItems.map((r) => ({
                             name: r.displayName,
                             checked: r.defaultChecked,
@@ -1383,39 +1383,39 @@ class Checker {
             };
             const obss = runningItems.map((r) => r.getObs(context));
             const checkStream = (0, rxjs_1.combineLatest)(obss);
-            process.stdout.write(runningItems.map(() => "").join("\n"));
+            process.stdout.write(runningItems.map(() => '').join('\n'));
             const stream = (0, rxjs_1.combineLatest)([(0, rxjs_1.interval)(60), checkStream]).subscribe(([count, statusList]) => {
                 process.stdout.moveCursor(0, -statusList.length + 1);
                 process.stdout.cursorTo(0);
                 process.stdout.clearScreenDown();
                 process.stdout.write(statusList
-                    .map((s, index) => {
-                    let emoji = "";
+                    .map((s) => {
+                    let emoji = '';
                     switch (s.code) {
                         case -1:
                             emoji = SPINNER[count % SPINNER.length];
                             break;
                         case 0:
-                            emoji = index % 2 === 0 ? "🐰" : "🥕";
+                            emoji = '✅';
                             break;
                         case 1:
-                            emoji = "❌";
+                            emoji = '❌';
                             break;
                         default:
-                            emoji = "🔴";
+                            emoji = '🔴';
                     }
                     return `${emoji} [${s.group}] ${s.name}`;
                 })
-                    .join("\n"));
+                    .join('\n'));
                 if (statusList.every((s) => s.code !== -1)) {
                     stream.unsubscribe();
                     const nonSuccessStatusList = statusList.filter((s) => s.code !== 0);
                     if (nonSuccessStatusList.length > 0) {
-                        (0, fs_1.writeFile)((0, untildify_1.default)("~/ac-checker-log"), nonSuccessStatusList
+                        (0, fs_1.writeFile)((0, untildify_1.default)('~/ac-checker-log'), nonSuccessStatusList
                             .map((s) => `###### [${s.group}] ${s.name} ${s.code}\n${s.stdout}\n${s.stderr}`)
-                            .join("\n\n"), () => { });
+                            .join('\n\n'), () => { });
                     }
-                    console.log("");
+                    console.log('');
                 }
             });
         });
