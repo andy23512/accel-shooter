@@ -584,6 +584,9 @@ function meetingTrackAction() {
         const day = (0, utils_1.getDayFromArgv)();
         const g = new node_shared_1.Google();
         const todayMeetings = yield g.listAttendingEvent(day.toISOString(), (0, date_fns_1.add)(day, { days: 1 }).toISOString());
+        if (todayMeetings.length === 0) {
+            console.log('No meetings today!');
+        }
         // print today meetings and times and meeting link
         for (const m of todayMeetings) {
             console.log(`- ${(0, date_fns_1.format)((0, date_fns_1.parseISO)(m.start.dateTime), 'Pp')}: ${m.summary}`);

@@ -13,6 +13,9 @@ export async function meetingTrackAction() {
     day.toISOString(),
     add(day, { days: 1 }).toISOString()
   );
+  if (todayMeetings.length === 0) {
+    console.log('No meetings today!');
+  }
   // print today meetings and times and meeting link
   for (const m of todayMeetings) {
     console.log(`- ${format(parseISO(m.start.dateTime), 'Pp')}: ${m.summary}`);
