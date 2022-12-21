@@ -9,6 +9,7 @@ import { endAction } from './actions/end.action';
 import { fetchHolidayAction } from './actions/fetch-holiday.action';
 import { listDCAction } from './actions/list-dc.action';
 import { listAction } from './actions/list.action';
+import { meetingTrackAction } from './actions/meeting-track.action';
 import { openAction } from './actions/open.action';
 import { revertEndAction } from './actions/revert-end.action';
 import { routineAction } from './actions/routine.action';
@@ -46,6 +47,7 @@ const actions: { [key: string]: () => Promise<void> } = {
   routine: routineAction,
   biWeeklyProgress: biWeeklyProgressAction,
   listDC: listDCAction,
+  meetingTrack: meetingTrackAction,
 };
 
 (async () => {

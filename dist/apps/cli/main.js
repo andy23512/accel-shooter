@@ -565,6 +565,47 @@ exports.listAction = listAction;
 
 /***/ }),
 
+/***/ "./apps/cli/src/actions/meeting-track.action.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.meetingTrackAction = void 0;
+const tslib_1 = __webpack_require__("tslib");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const child_process_1 = __webpack_require__("child_process");
+const cron_1 = __webpack_require__("cron");
+const date_fns_1 = __webpack_require__("date-fns");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
+function meetingTrackAction() {
+    return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        // get today meetings
+        const day = (0, utils_1.getDayFromArgv)();
+        const g = new node_shared_1.Google();
+        const todayMeetings = yield g.listAttendingEvent(day.toISOString(), (0, date_fns_1.add)(day, { days: 1 }).toISOString());
+        // print today meetings and times and meeting link
+        for (const m of todayMeetings) {
+            console.log(`- ${(0, date_fns_1.format)((0, date_fns_1.parseISO)(m.start.dateTime), 'Pp')}: ${m.summary}`);
+        }
+        // setup cron job for opening meeting link
+        todayMeetings.forEach((m) => {
+            const openTime = (0, date_fns_1.add)((0, date_fns_1.parseISO)(m.start.dateTime), { minutes: -5 });
+            if ((0, date_fns_1.isBefore)(openTime, day)) {
+                return;
+            }
+            const job = new cron_1.CronJob(openTime, () => {
+                (0, child_process_1.execSync)(`osascript -e 'display notification "Meeting: ${m.summary} at ${(0, date_fns_1.format)((0, date_fns_1.parseISO)(m.start.dateTime), 'Pp')}" with title "Accel Shooter"'`);
+                open(m.hangoutLink);
+            });
+            job.start();
+        });
+    });
+}
+exports.meetingTrackAction = meetingTrackAction;
+
+
+/***/ }),
+
 /***/ "./apps/cli/src/actions/open.action.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -2971,6 +3012,13 @@ module.exports = require("clipboardy");
 
 /***/ }),
 
+/***/ "cron":
+/***/ ((module) => {
+
+module.exports = require("cron");
+
+/***/ }),
+
 /***/ "date-fns":
 /***/ ((module) => {
 
@@ -3184,6 +3232,7 @@ const end_action_1 = __webpack_require__("./apps/cli/src/actions/end.action.ts")
 const fetch_holiday_action_1 = __webpack_require__("./apps/cli/src/actions/fetch-holiday.action.ts");
 const list_dc_action_1 = __webpack_require__("./apps/cli/src/actions/list-dc.action.ts");
 const list_action_1 = __webpack_require__("./apps/cli/src/actions/list.action.ts");
+const meeting_track_action_1 = __webpack_require__("./apps/cli/src/actions/meeting-track.action.ts");
 const open_action_1 = __webpack_require__("./apps/cli/src/actions/open.action.ts");
 const revert_end_action_1 = __webpack_require__("./apps/cli/src/actions/revert-end.action.ts");
 const routine_action_1 = __webpack_require__("./apps/cli/src/actions/routine.action.ts");
@@ -3220,6 +3269,7 @@ const actions = {
     routine: routine_action_1.routineAction,
     biWeeklyProgress: bi_weekly_progress_action_1.biWeeklyProgressAction,
     listDC: list_dc_action_1.listDCAction,
+    meetingTrack: meeting_track_action_1.meetingTrackAction,
 };
 (() => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     const action = process.argv[2];
