@@ -576,6 +576,7 @@ const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const child_process_1 = __webpack_require__("child_process");
 const cron_1 = __webpack_require__("cron");
 const date_fns_1 = __webpack_require__("date-fns");
+const open_1 = tslib_1.__importDefault(__webpack_require__("open"));
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 function meetingTrackAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -595,7 +596,7 @@ function meetingTrackAction() {
             }
             const job = new cron_1.CronJob(openTime, () => {
                 (0, child_process_1.execSync)(`osascript -e 'display notification "Meeting: ${m.summary} at ${(0, date_fns_1.format)((0, date_fns_1.parseISO)(m.start.dateTime), 'Pp')}" with title "Accel Shooter"'`);
-                open(m.hangoutLink + '?authuser=1');
+                (0, open_1.default)(m.hangoutLink + '?authuser=1');
             });
             job.start();
         });

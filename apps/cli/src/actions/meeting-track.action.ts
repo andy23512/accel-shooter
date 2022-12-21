@@ -2,6 +2,7 @@ import { Google } from '@accel-shooter/node-shared';
 import { execSync } from 'child_process';
 import { CronJob } from 'cron';
 import { add, format, isBefore, parseISO } from 'date-fns';
+import open from 'open';
 import { getDayFromArgv } from '../utils';
 
 export async function meetingTrackAction() {
