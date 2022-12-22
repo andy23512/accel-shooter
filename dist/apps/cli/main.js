@@ -1569,15 +1569,14 @@ class CustomProgressLog extends progress_logs_1.default {
     constructor(title, titles) {
         super({ title, loadingEffect: 18 });
         this.setGlobalLogColor({
-            success: "green",
+            success: 'green',
         });
         this.setGlobalLogEmoji({
-            fail: "x",
+            fail: 'x',
+            success: 'o',
         });
-        titles.forEach((title, index) => {
-            this.add(title, undefined, {
-                emoji: { success: index % 2 === 0 ? "rabbit" : "carrot" },
-            });
+        titles.forEach((title) => {
+            this.add(title);
         });
     }
     next(exitCode = StopExitCode.success) {

@@ -1,4 +1,4 @@
-import ProgressLog from "progress-logs";
+import ProgressLog from 'progress-logs';
 
 enum StopExitCode {
   success = 0,
@@ -10,15 +10,14 @@ export class CustomProgressLog extends ProgressLog {
   constructor(title: string, titles: string[]) {
     super({ title, loadingEffect: 18 });
     this.setGlobalLogColor({
-      success: "green",
+      success: 'green',
     });
     this.setGlobalLogEmoji({
-      fail: "x",
+      fail: 'x',
+      success: 'o',
     });
-    titles.forEach((title, index) => {
-      this.add(title, undefined, {
-        emoji: { success: index % 2 === 0 ? "rabbit" : "carrot" },
-      });
+    titles.forEach((title) => {
+      this.add(title);
     });
   }
 
