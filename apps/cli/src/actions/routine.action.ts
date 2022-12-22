@@ -41,7 +41,6 @@ export async function routineAction() {
   }
   if (isMorning) {
     if (isWorkDay) {
-      await confirm('isa done?');
       await confirm('run dump my tasks?');
       await dumpMyTasksAction();
       await confirm('check tasks done?');

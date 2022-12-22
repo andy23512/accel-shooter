@@ -707,7 +707,6 @@ function routineAction() {
         }
         if (isMorning) {
             if (isWorkDay) {
-                yield confirm('isa done?');
                 yield confirm('run dump my tasks?');
                 yield (0, dump_my_tasks_action_1.dumpMyTasksAction)();
                 yield confirm('check tasks done?');
