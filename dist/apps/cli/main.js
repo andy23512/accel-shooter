@@ -1399,7 +1399,7 @@ class Checker {
                             emoji = SPINNER[count % SPINNER.length];
                             break;
                         case 0:
-                            emoji = '✅';
+                            emoji = '⭕';
                             break;
                         case 1:
                             emoji = '❌';
