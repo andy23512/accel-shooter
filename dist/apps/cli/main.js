@@ -709,8 +709,8 @@ function routineAction() {
             if (isWorkDay) {
                 yield confirm('run dump my tasks?');
                 yield (0, dump_my_tasks_action_1.dumpMyTasksAction)();
-                yield confirm('check tasks done?');
-                yield confirm('check todo done?');
+                (0, utils_1.openUrlsInTabGroup)(['localhost:8112/tasks', 'localhost:8112/markdown/todo'], 'accel');
+                yield confirm('check tasks and todo done?');
                 yield confirm('run daily progress?');
                 yield (0, daily_progress_action_1.dailyProgressAction)();
                 yield confirm('send dp to slack done?');

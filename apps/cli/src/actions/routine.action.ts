@@ -5,7 +5,7 @@ import { CONFIG, sleep } from '@accel-shooter/node-shared';
 
 import readline from 'readline';
 import { Holiday } from '../classes/holiday.class';
-import { getDayFromArgv } from '../utils';
+import { getDayFromArgv, openUrlsInTabGroup } from '../utils';
 import { dailyProgressAction } from './daily-progress.action';
 import { dumpMyTasksAction } from './dump-my-tasks.action';
 
@@ -43,8 +43,11 @@ export async function routineAction() {
     if (isWorkDay) {
       await confirm('run dump my tasks?');
       await dumpMyTasksAction();
-      await confirm('check tasks done?');
-      await confirm('check todo done?');
+      openUrlsInTabGroup(
+        ['localhost:8112/tasks', 'localhost:8112/markdown/todo'],
+        'accel'
+      );
+      await confirm('check tasks and todo done?');
       await confirm('run daily progress?');
       await dailyProgressAction();
       await confirm('send dp to slack done?');
