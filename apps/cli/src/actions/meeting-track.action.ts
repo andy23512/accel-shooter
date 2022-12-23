@@ -28,7 +28,9 @@ export async function meetingTrackAction() {
     }
     const job = new CronJob(openTime, () => {
       execSync(
-        `osascript -e 'display notification "Meeting: ${m.summary} at ${format(
+        `osascript -e 'display notification "Meeting: ${m.summary
+          .replace(/"/g, '')
+          .replace(/'/g, '')} at ${format(
           parseISO(m.start.dateTime),
           'Pp'
         )}" with title "Accel Shooter"'`
