@@ -68,12 +68,12 @@ export async function biWeeklyProgressAction() {
     previousWorkDayOfToday
   )}`;
   Object.entries(groupedRecords).forEach(([project, records]) => {
-    result += `\n- ${project}`;
+    result += `\n### ${project}`;
     records.forEach(({ name, url, startDay, endDay }) => {
       if (startDay === endDay) {
-        result += `\n  - ${startDay} [${name}](${url})`;
+        result += `\n- ${startDay} [${name}](${url})`;
       } else {
-        result += `\n  - ${startDay}~${subtractCommon(
+        result += `\n- ${startDay}~${subtractCommon(
           endDay,
           startDay
         )} [${name}](${url})`;
