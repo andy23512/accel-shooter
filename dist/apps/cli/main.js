@@ -573,7 +573,6 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.meetingTrackAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
-const child_process_1 = __webpack_require__("child_process");
 const cron_1 = __webpack_require__("cron");
 const date_fns_1 = __webpack_require__("date-fns");
 const open_1 = tslib_1.__importDefault(__webpack_require__("open"));
@@ -598,9 +597,7 @@ function meetingTrackAction() {
                 return;
             }
             const job = new cron_1.CronJob(openTime, () => {
-                (0, child_process_1.execSync)(`osascript -e 'display notification "Meeting: ${m.summary
-                    .replace(/"/g, '')
-                    .replace(/'/g, '')} at ${(0, date_fns_1.format)((0, date_fns_1.parseISO)(m.start.dateTime), 'Pp')}" with title "Accel Shooter"'`);
+                (0, utils_1.displayNotification)(`${m.summary} at ${(0, date_fns_1.format)((0, date_fns_1.parseISO)(m.start.dateTime), 'Pp')}`);
                 (0, open_1.default)(m.hangoutLink + '?authuser=1');
             });
             job.start();
@@ -1159,7 +1156,6 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.watchPipelineAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
-const child_process_1 = tslib_1.__importDefault(__webpack_require__("child_process"));
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 function watchPipelineAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -1174,10 +1170,7 @@ function watchPipelineAction() {
                 const status = ((_a = mergeRequest.head_pipeline) === null || _a === void 0 ? void 0 : _a.status) || 'none';
                 console.log(status);
                 if (status !== 'running' && status !== 'none') {
-                    const message = `Pipeline of ${projectName} !${mergeRequestIId} status: ${status}`;
-                    child_process_1.default.execSync(`osascript -e 'display notification "${message
-                        .replace(/"/g, '')
-                        .replace(/'/g, '')}" with title "Accel Shooter"'`);
+                    (0, utils_1.displayNotification)(`Pipeline of ${projectName} !${mergeRequestIId} status: ${status}`);
                     process.exit();
                 }
             });
@@ -1644,9 +1637,9 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.Tracker = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
-const child_process_1 = tslib_1.__importDefault(__webpack_require__("child_process"));
 const fs_1 = __webpack_require__("fs");
 const untildify_1 = tslib_1.__importDefault(__webpack_require__("untildify"));
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 const base_file_ref_class_1 = __webpack_require__("./apps/cli/src/classes/base-file-ref.class.ts");
 class Tracker extends base_file_ref_class_1.BaseFileRef {
     get path() {
@@ -1705,9 +1698,7 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
                         yield clickUp.setTaskStatus('closed');
                     }
                     const message = `${yield clickUp.getFullTaskName()} (${clickUpTaskId}): In Review -> ${(0, node_shared_1.titleCase)(stagingStatus)}`;
-                    child_process_1.default.execSync(`osascript -e 'display notification "${message
-                        .replace(/"/g, '')
-                        .replace(/'/g, '')}" with title "Accel Shooter"'`);
+                    (0, utils_1.displayNotification)(message);
                     console.log(message);
                     this.closeItem(clickUpTaskId);
                 }
@@ -1850,7 +1841,7 @@ exports.checkItemsMap = {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.getDayFromArgv = exports.getRepoName = exports.openUrlsInTabGroup = exports.checkWorkingTreeClean = exports.getInfoFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabMergeRequest = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = void 0;
+exports.displayNotification = exports.getDayFromArgv = exports.getRepoName = exports.openUrlsInTabGroup = exports.checkWorkingTreeClean = exports.getInfoFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabMergeRequest = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const child_process_1 = tslib_1.__importStar(__webpack_require__("child_process"));
 const open_1 = tslib_1.__importDefault(__webpack_require__("open"));
@@ -2007,6 +1998,12 @@ function getDayFromArgv(dft) {
             : today;
 }
 exports.getDayFromArgv = getDayFromArgv;
+function displayNotification(message) {
+    (0, child_process_1.execSync)(`osascript -e 'display notification "${message
+        .replace(/"/g, '')
+        .replace(/'/g, '')}" with title "Accel Shooter"'`);
+}
+exports.displayNotification = displayNotification;
 
 
 /***/ }),

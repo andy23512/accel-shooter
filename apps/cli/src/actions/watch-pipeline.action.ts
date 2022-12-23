@@ -1,6 +1,5 @@
 import { GitLab } from '@accel-shooter/node-shared';
-import childProcess from 'child_process';
-import { getGitLabProjectConfigByName } from '../utils';
+import { displayNotification, getGitLabProjectConfigByName } from '../utils';
 
 export async function watchPipelineAction() {
   const projectName = process.argv[3];
@@ -12,11 +11,8 @@ export async function watchPipelineAction() {
     const status = mergeRequest.head_pipeline?.status || 'none';
     console.log(status);
     if (status !== 'running' && status !== 'none') {
-      const message = `Pipeline of ${projectName} !${mergeRequestIId} status: ${status}`;
-      childProcess.execSync(
-        `osascript -e 'display notification "${message
-          .replace(/"/g, '')
-          .replace(/'/g, '')}" with title "Accel Shooter"'`
+      displayNotification(
+        `Pipeline of ${projectName} !${mergeRequestIId} status: ${status}`
       );
       process.exit();
     }

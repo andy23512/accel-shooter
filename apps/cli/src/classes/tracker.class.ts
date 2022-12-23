@@ -1,7 +1,7 @@
 import { ClickUp, CONFIG, GitLab, titleCase } from '@accel-shooter/node-shared';
-import childProcess from 'child_process';
 import { appendFileSync } from 'fs';
 import untildify from 'untildify';
+import { displayNotification } from '../utils';
 import { BaseFileRef } from './base-file-ref.class';
 
 export class Tracker extends BaseFileRef {
@@ -75,11 +75,7 @@ export class Tracker extends BaseFileRef {
         const message = `${await clickUp.getFullTaskName()} (${clickUpTaskId}): In Review -> ${titleCase(
           stagingStatus
         )}`;
-        childProcess.execSync(
-          `osascript -e 'display notification "${message
-            .replace(/"/g, '')
-            .replace(/'/g, '')}" with title "Accel Shooter"'`
-        );
+        displayNotification(message);
         console.log(message);
         this.closeItem(clickUpTaskId);
       }

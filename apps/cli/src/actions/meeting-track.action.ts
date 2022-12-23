@@ -1,9 +1,8 @@
 import { Google } from '@accel-shooter/node-shared';
-import { execSync } from 'child_process';
 import { CronJob } from 'cron';
 import { add, format, isBefore, parseISO } from 'date-fns';
 import open from 'open';
-import { getDayFromArgv } from '../utils';
+import { displayNotification, getDayFromArgv } from '../utils';
 
 export async function meetingTrackAction() {
   // get today meetings
@@ -27,13 +26,8 @@ export async function meetingTrackAction() {
       return;
     }
     const job = new CronJob(openTime, () => {
-      execSync(
-        `osascript -e 'display notification "Meeting: ${m.summary
-          .replace(/"/g, '')
-          .replace(/'/g, '')} at ${format(
-          parseISO(m.start.dateTime),
-          'Pp'
-        )}" with title "Accel Shooter"'`
+      displayNotification(
+        `${m.summary} at ${format(parseISO(m.start.dateTime), 'Pp')}`
       );
       open(m.hangoutLink + '?authuser=1');
     });

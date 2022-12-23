@@ -179,3 +179,11 @@ export function getDayFromArgv(dft?: Date) {
     ? new Date(dft.valueOf())
     : today;
 }
+
+export function displayNotification(message: string) {
+  execSync(
+    `osascript -e 'display notification "${message
+      .replace(/"/g, '')
+      .replace(/'/g, '')}" with title "Accel Shooter"'`
+  );
+}
