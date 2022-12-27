@@ -208,8 +208,11 @@ function commitAction() {
                 return;
             }
         }
-        const dryRunResult = yield (0, utils_1.promiseSpawn)('git', ['commit', '--dry-run'], 'pipe');
-        if (dryRunResult.stdout.includes('nothing to commit, working tree clean')) {
+        const stagedFiles = (yield (0, utils_1.promiseSpawn)('git', ['diff', '--name-only', '--cached'], 'pipe')).stdout
+            .trim()
+            .split('\n')
+            .map((f) => f.replace(/\/libs\//g, '/'));
+        if (stagedFiles.length === 0) {
             console.log('Nothing to commit.');
             return;
         }
@@ -217,9 +220,6 @@ function commitAction() {
         inquirer_1.default.registerPrompt('autocomplete', inquirer_autocomplete_prompt_1.default);
         const commitScope = new commit_scope_class_1.CommitScope();
         const commitScopeItems = commitScope.getItems(repoName);
-        const stagedFiles = (yield (0, utils_1.promiseSpawn)('git', ['diff', '--name-only', '--cached'], 'pipe')).stdout
-            .trim()
-            .split('\n');
         const str = stagedFiles.length === 1 ? stagedFiles[0] : getCommon(stagedFiles);
         const bestMatchRatings = (0, string_similarity_1.findBestMatch)(str, commitScopeItems).ratings;
         bestMatchRatings.sort((a, b) => b.rating - a.rating);

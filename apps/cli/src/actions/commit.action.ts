@@ -29,12 +29,13 @@ export async function commitAction() {
       return;
     }
   }
-  const dryRunResult = await promiseSpawn(
-    'git',
-    ['commit', '--dry-run'],
-    'pipe'
-  );
-  if (dryRunResult.stdout.includes('nothing to commit, working tree clean')) {
+  const stagedFiles = (
+    await promiseSpawn('git', ['diff', '--name-only', '--cached'], 'pipe')
+  ).stdout
+    .trim()
+    .split('\n')
+    .map((f) => f.replace(/\/libs\//g, '/'));
+  if (stagedFiles.length === 0) {
     console.log('Nothing to commit.');
     return;
   }
@@ -42,11 +43,6 @@ export async function commitAction() {
   inquirer.registerPrompt('autocomplete', inquirerAutoCompletePrompt);
   const commitScope = new CommitScope();
   const commitScopeItems = commitScope.getItems(repoName);
-  const stagedFiles = (
-    await promiseSpawn('git', ['diff', '--name-only', '--cached'], 'pipe')
-  ).stdout
-    .trim()
-    .split('\n');
   const str =
     stagedFiles.length === 1 ? stagedFiles[0] : getCommon(stagedFiles);
   const bestMatchRatings = findBestMatch(str, commitScopeItems).ratings;
