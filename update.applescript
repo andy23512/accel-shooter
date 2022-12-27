@@ -54,6 +54,6 @@ on run argv
 		end tell
 	end tell
 
-	send_text("/Applications/MacUpdater.app/Contents/Resources/macupdater_client scan; /Applications/MacUpdater.app/Contents/Resources/macupdater_client update; topgrade")
+	send_text("/Applications/MacUpdater.app/Contents/Resources/macupdater_client scan && /Applications/MacUpdater.app/Contents/Resources/macupdater_client update && topgrade && exit")
 	call_forward()
 end run
