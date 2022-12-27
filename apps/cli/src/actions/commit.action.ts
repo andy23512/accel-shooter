@@ -2,6 +2,7 @@ import fuzzy from 'fuzzy';
 import inquirer from 'inquirer';
 import inquirerAutoCompletePrompt from 'inquirer-autocomplete-prompt';
 
+import { findBestMatch } from 'string-similarity';
 import { CommitScope } from '../classes/commit-scope.class';
 import { getInfoFromArgv, getRepoName, promiseSpawn } from '../utils';
 
@@ -41,6 +42,16 @@ export async function commitAction() {
   inquirer.registerPrompt('autocomplete', inquirerAutoCompletePrompt);
   const commitScope = new CommitScope();
   const commitScopeItems = commitScope.getItems(repoName);
+  const stagedFiles = (
+    await promiseSpawn('git', ['diff', '--name-only', '--cached'], 'pipe')
+  ).stdout
+    .trim()
+    .split('\n');
+  const str =
+    stagedFiles.length === 1 ? stagedFiles[0] : getCommon(stagedFiles);
+  const bestMatchRatings = findBestMatch(str, commitScopeItems).ratings;
+  bestMatchRatings.sort((a, b) => b.rating - a.rating);
+  const presortedCommitScopeItems = bestMatchRatings.map((r) => r.target);
   const answers = await inquirer.prompt([
     {
       name: 'type',
@@ -58,7 +69,7 @@ export async function commitAction() {
       type: 'autocomplete',
       source: (_: unknown, input = '') => {
         return Promise.resolve(
-          fuzzy.filter(input, commitScopeItems).map((t) => t.original)
+          fuzzy.filter(input, presortedCommitScopeItems).map((t) => t.original)
         );
       },
     },
@@ -74,4 +85,17 @@ export async function commitAction() {
     finalScope ? '(' + finalScope + ')' : ''
   }: ${subject}`;
   await promiseSpawn('git', ['commit', '-m', `"${message}"`], 'inherit');
+}
+
+function getCommon(pathList: string[]) {
+  const pathArrayList = pathList.map((p) => p.split('/'));
+  pathArrayList.sort((a, b) => a.length - b.length);
+  let i = 0;
+  while (
+    i < pathArrayList[0].length &&
+    pathArrayList.every((pa) => pa[i] === pathArrayList[0][i])
+  ) {
+    i++;
+  }
+  return pathArrayList.slice(undefined, i).join('/');
 }

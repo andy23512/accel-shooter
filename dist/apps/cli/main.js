@@ -182,6 +182,7 @@ const tslib_1 = __webpack_require__("tslib");
 const fuzzy_1 = tslib_1.__importDefault(__webpack_require__("fuzzy"));
 const inquirer_1 = tslib_1.__importDefault(__webpack_require__("inquirer"));
 const inquirer_autocomplete_prompt_1 = tslib_1.__importDefault(__webpack_require__("inquirer-autocomplete-prompt"));
+const string_similarity_1 = __webpack_require__("string-similarity");
 const commit_scope_class_1 = __webpack_require__("./apps/cli/src/classes/commit-scope.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 const TYPES = [
@@ -216,6 +217,13 @@ function commitAction() {
         inquirer_1.default.registerPrompt('autocomplete', inquirer_autocomplete_prompt_1.default);
         const commitScope = new commit_scope_class_1.CommitScope();
         const commitScopeItems = commitScope.getItems(repoName);
+        const stagedFiles = (yield (0, utils_1.promiseSpawn)('git', ['diff', '--name-only', '--cached'], 'pipe')).stdout
+            .trim()
+            .split('\n');
+        const str = stagedFiles.length === 1 ? stagedFiles[0] : getCommon(stagedFiles);
+        const bestMatchRatings = (0, string_similarity_1.findBestMatch)(str, commitScopeItems).ratings;
+        bestMatchRatings.sort((a, b) => b.rating - a.rating);
+        const presortedCommitScopeItems = bestMatchRatings.map((r) => r.target);
         const answers = yield inquirer_1.default.prompt([
             {
                 name: 'type',
@@ -230,7 +238,7 @@ function commitAction() {
                 message: 'Enter commit scope',
                 type: 'autocomplete',
                 source: (_, input = '') => {
-                    return Promise.resolve(fuzzy_1.default.filter(input, commitScopeItems).map((t) => t.original));
+                    return Promise.resolve(fuzzy_1.default.filter(input, presortedCommitScopeItems).map((t) => t.original));
                 },
             },
             {
@@ -246,6 +254,16 @@ function commitAction() {
     });
 }
 exports.commitAction = commitAction;
+function getCommon(pathList) {
+    const pathArrayList = pathList.map((p) => p.split('/'));
+    pathArrayList.sort((a, b) => a.length - b.length);
+    let i = 0;
+    while (i < pathArrayList[0].length &&
+        pathArrayList.every((pa) => pa[i] === pathArrayList[0][i])) {
+        i++;
+    }
+    return pathArrayList.slice(undefined, i).join('/');
+}
 
 
 /***/ }),
@@ -3136,6 +3154,13 @@ module.exports = require("rxjs/operators");
 /***/ ((module) => {
 
 module.exports = require("single-instance-lock");
+
+/***/ }),
+
+/***/ "string-similarity":
+/***/ ((module) => {
+
+module.exports = require("string-similarity");
 
 /***/ }),
 
