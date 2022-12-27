@@ -198,6 +198,13 @@ const TYPES = [
     'chore',
     'revert',
 ];
+function preprocess(path) {
+    const match = path.match(/frontend\/libs\/(.*?)\//);
+    if (match) {
+        return `frontend/${match[1]}`;
+    }
+    return path;
+}
 function commitAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const { mergeRequest } = yield (0, utils_1.getInfoFromArgv)(false, true);
@@ -211,7 +218,7 @@ function commitAction() {
         const stagedFiles = (yield (0, utils_1.promiseSpawn)('git', ['diff', '--name-only', '--cached'], 'pipe')).stdout
             .trim()
             .split('\n')
-            .map((f) => f.replace(/\/libs\//g, '/'));
+            .map(preprocess);
         if (stagedFiles.length === 0) {
             console.log('Nothing to commit.');
             return;

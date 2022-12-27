@@ -20,6 +20,14 @@ const TYPES = [
   'revert',
 ];
 
+function preprocess(path: string) {
+  const match = path.match(/frontend\/libs\/(.*?)\//);
+  if (match) {
+    return `frontend/${match[1]}`;
+  }
+  return path;
+}
+
 export async function commitAction() {
   const { mergeRequest } = await getInfoFromArgv(false, true);
   if (mergeRequest) {
@@ -34,7 +42,7 @@ export async function commitAction() {
   ).stdout
     .trim()
     .split('\n')
-    .map((f) => f.replace(/\/libs\//g, '/'));
+    .map(preprocess);
   if (stagedFiles.length === 0) {
     console.log('Nothing to commit.');
     return;
