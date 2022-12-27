@@ -101,5 +101,5 @@ function getCommon(pathList: string[]) {
   ) {
     i++;
   }
-  return pathArrayList.slice(undefined, i).join('/');
+  return pathArrayList[0].slice(undefined, i).join('/');
 }

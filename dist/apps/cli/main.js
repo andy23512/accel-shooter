@@ -269,7 +269,7 @@ function getCommon(pathList) {
         pathArrayList.every((pa) => pa[i] === pathArrayList[0][i])) {
         i++;
     }
-    return pathArrayList.slice(undefined, i).join('/');
+    return pathArrayList[0].slice(undefined, i).join('/');
 }
 
 
