@@ -1,24 +1,24 @@
-import { GitLabProject } from "@accel-shooter/node-shared";
-import { CheckItem } from "../classes/check-item.class";
-import { promiseSpawn } from "../utils";
+import { GitLabProject } from '@accel-shooter/node-shared';
+import { CheckItem } from '../classes/check-item.class';
+import { promiseSpawn } from '../utils';
 
 const checkNonPushedChanges = new CheckItem(
-  "Global",
-  "Check Non-Pushed Changes",
+  'Global',
+  'Check Non-Pushed Changes',
   true,
   async () => {
-    const result = await promiseSpawn("git", ["status"], "pipe");
+    const result = await promiseSpawn('git', ['status'], 'pipe');
     result.code =
-      result.stdout.includes("Your branch is up to date with") &&
-      result.stdout.includes("nothing to commit, working tree clean")
+      result.stdout.includes('Your branch is up to date with') &&
+      result.stdout.includes('nothing to commit, working tree clean')
         ? 0
         : 1;
     return result;
   }
 );
 const checkConflict = new CheckItem(
-  "Global",
-  "Check Conflict",
+  'Global',
+  'Check Conflict',
   true,
   async ({ mergeRequest, gitLab }) => {
     const fullMergeRequest = await gitLab.getMergeRequest(mergeRequest.iid);
@@ -27,18 +27,18 @@ const checkConflict = new CheckItem(
   }
 );
 const checkFrontendConsoleLog = new CheckItem(
-  "Frontend",
-  "Check console.log",
+  'Frontend',
+  'Check console.log',
   true,
   async ({ frontendChanges }) => {
     return {
       code: frontendChanges.some(
         (c) =>
-          c.new_path.endsWith(".ts") &&
+          c.new_path.endsWith('.ts') &&
           c.diff
-            .split("\n")
+            .split('\n')
             .some(
-              (line) => !line.startsWith("-") && line.includes("console.log")
+              (line) => !line.startsWith('-') && line.includes('console.log')
             )
       )
         ? 1
@@ -47,18 +47,18 @@ const checkFrontendConsoleLog = new CheckItem(
   }
 );
 const checkFrontendLongImport = new CheckItem(
-  "Frontend",
-  "Check long import",
+  'Frontend',
+  'Check long import',
   true,
   async ({ frontendChanges }) => {
     return {
       code: frontendChanges.some(
         (c) =>
-          c.new_path.endsWith(".ts") &&
+          c.new_path.endsWith('.ts') &&
           c.diff
-            .split("\n")
+            .split('\n')
             .some(
-              (line) => !line.startsWith("-") && line.includes("../../lib/")
+              (line) => !line.startsWith('-') && line.includes('../../lib/')
             )
       )
         ? 1
@@ -67,17 +67,17 @@ const checkFrontendLongImport = new CheckItem(
   }
 );
 const checkBackendPrint = new CheckItem(
-  "Backend",
-  "Check Print",
+  'Backend',
+  'Check Print',
   true,
   async ({ backendChanges }) => {
     return {
       code: backendChanges.some(
         (c) =>
-          c.new_path.endsWith(".py") &&
+          c.new_path.endsWith('.py') &&
           c.diff
-            .split("\n")
-            .some((line) => !line.startsWith("-") && line.includes("print("))
+            .split('\n')
+            .some((line) => !line.startsWith('-') && line.includes('print('))
       )
         ? 1
         : 0,
@@ -85,17 +85,20 @@ const checkBackendPrint = new CheckItem(
   }
 );
 const checkBackendDoubleQuotes = new CheckItem(
-  "Backend",
-  "Check Double Quotes",
+  'Backend',
+  'Check Double Quotes',
   true,
   async ({ backendChanges }) => {
     return {
       code: backendChanges.some(
         (c) =>
-          c.new_path.endsWith(".py") &&
+          c.new_path.endsWith('.py') &&
           c.diff
-            .split("\n")
-            .some((line) => !line.startsWith("-") && line.includes('"'))
+            .split('\n')
+            .some(
+              (line) =>
+                !line.startsWith('-') && line.replace(/"""/g, '').includes('"')
+            )
       )
         ? 1
         : 0,
@@ -103,25 +106,25 @@ const checkBackendDoubleQuotes = new CheckItem(
   }
 );
 const checkBackendMigrationConflict = new CheckItem(
-  "Backend",
-  "Check Migration Conflict",
+  'Backend',
+  'Check Migration Conflict',
   true,
   async ({ mergeRequest, backendChanges, gitLab }) => {
-    if (!backendChanges.some((c) => c.new_path.includes("migrations"))) {
+    if (!backendChanges.some((c) => c.new_path.includes('migrations'))) {
       return { code: 0 };
     }
     const branchName = mergeRequest.source_branch;
     const defaultBranch = await gitLab.getDefaultBranchName();
     const compare = await gitLab.getCompare(defaultBranch, branchName);
     const migrationDiffs = compare.diffs.filter(
-      (d) => (d.new_file || d.deleted_file) && d.new_path.includes("migration")
+      (d) => (d.new_file || d.deleted_file) && d.new_path.includes('migration')
     );
     const plusFiles = new Set(
       migrationDiffs
         .filter((d) => d.new_file)
         .map((d) => {
           const match = d.new_path.match(/backend\/(\w+)\/migrations\/(\d+)/);
-          return match ? match[1] + "_" + match[2] : null;
+          return match ? match[1] + '_' + match[2] : null;
         })
         .filter(Boolean)
     );
@@ -130,7 +133,7 @@ const checkBackendMigrationConflict = new CheckItem(
         .filter((d) => d.deleted_file)
         .map((d) => {
           const match = d.new_path.match(/backend\/(\w+)\/migrations\/(\d+)/);
-          return match ? match[1] + "_" + match[2] : null;
+          return match ? match[1] + '_' + match[2] : null;
         })
         .filter(Boolean)
     );
@@ -162,7 +165,7 @@ const otherProjectCheckItems: CheckItem[] = [
   checkConflict,
 ];
 
-export const checkItemsMap: Record<GitLabProject["projectType"], CheckItem[]> =
+export const checkItemsMap: Record<GitLabProject['projectType'], CheckItem[]> =
   {
     full: fullProjectCheckItems,
     frontend: frontendProjectCheckItems,
