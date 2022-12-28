@@ -203,6 +203,10 @@ function preprocess(path) {
     if (match) {
         return `frontend/${match[1]}`;
     }
+    const match2 = path.match(/libs\/pheno\/(.*?)\//);
+    if (match2) {
+        return `phe-${match2[1]}`;
+    }
     return path;
 }
 function commitAction() {
@@ -968,6 +972,7 @@ function startAction() {
         const p = new progress_log_class_1.CustomProgressLog('Start', [
             'Get ClickUp Task',
             'Set ClickUp Task Status',
+            'Set ClickUp Task Start Date to Today',
             'Render Todo List',
             'Create GitLab Branch',
             'Create GitLab Merge Request',
@@ -986,6 +991,8 @@ function startAction() {
         const gitLabMergeRequestTitle = answers.mergeRequestTitle;
         p.next(); // Set ClickUp Task Status
         yield clickUp.setTaskStatus('in progress');
+        p.next(); // Set ClickUp Task Start Date to Today
+        yield clickUp.setTaskStartDateToToday();
         p.next(); // Render Todo List
         const todoConfigMap = {};
         answers.todoConfig.forEach((c) => {
@@ -2126,6 +2133,11 @@ class ClickUp {
     }
     setTaskStatus(status) {
         return callApi('put', `/task/${this.taskId}`, null, { status });
+    }
+    setTaskStartDateToToday() {
+        return callApi('put', `/task/${this.taskId}`, null, {
+            start_date: new Date().valueOf(),
+        });
     }
     createChecklist(name) {
         return callApi('post', `/task/${this.taskId}/checklist`, null, { name });

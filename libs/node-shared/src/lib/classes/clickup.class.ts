@@ -105,6 +105,12 @@ export class ClickUp {
     return callApi<Task>('put', `/task/${this.taskId}`, null, { status });
   }
 
+  public setTaskStartDateToToday() {
+    return callApi<Task>('put', `/task/${this.taskId}`, null, {
+      start_date: new Date().valueOf(),
+    });
+  }
+
   public createChecklist(name: string) {
     return callApi<ChecklistResponse>(
       'post',

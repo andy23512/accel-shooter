@@ -338,6 +338,11 @@ class ClickUp {
     setTaskStatus(status) {
         return callApi('put', `/task/${this.taskId}`, null, { status });
     }
+    setTaskStartDateToToday() {
+        return callApi('put', `/task/${this.taskId}`, null, {
+            start_date: new Date().valueOf(),
+        });
+    }
     createChecklist(name) {
         return callApi('post', `/task/${this.taskId}/checklist`, null, { name });
     }

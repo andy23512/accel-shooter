@@ -91,6 +91,7 @@ export async function startAction() {
   const p = new CustomProgressLog('Start', [
     'Get ClickUp Task',
     'Set ClickUp Task Status',
+    'Set ClickUp Task Start Date to Today',
     'Render Todo List',
     'Create GitLab Branch',
     'Create GitLab Merge Request',
@@ -109,6 +110,8 @@ export async function startAction() {
   const gitLabMergeRequestTitle = answers.mergeRequestTitle;
   p.next(); // Set ClickUp Task Status
   await clickUp.setTaskStatus('in progress');
+  p.next(); // Set ClickUp Task Start Date to Today
+  await clickUp.setTaskStartDateToToday();
   p.next(); // Render Todo List
   const todoConfigMap: Record<string, boolean> = {};
   answers.todoConfig.forEach((c: string) => {

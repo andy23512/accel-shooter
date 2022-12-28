@@ -25,6 +25,10 @@ function preprocess(path: string) {
   if (match) {
     return `frontend/${match[1]}`;
   }
+  const match2 = path.match(/libs\/pheno\/(.*?)\//);
+  if (match2) {
+    return `phe-${match2[1]}`;
+  }
   return path;
 }
 
