@@ -1729,7 +1729,11 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
                         stagingStatus = 'closed';
                         yield clickUp.setTaskStatus('closed');
                     }
-                    const message = `${yield clickUp.getFullTaskName()} (${clickUpTaskId}): In Review -> ${(0, node_shared_1.titleCase)(stagingStatus)}`;
+                    let message = `${yield clickUp.getFullTaskName()} (${clickUpTaskId}): In Review -> ${(0, node_shared_1.titleCase)(stagingStatus)}`;
+                    if (!clickUpTask.due_date) {
+                        yield clickUp.setTaskDueDateToToday();
+                        message += '; due date was set';
+                    }
                     (0, utils_1.displayNotification)(message);
                     console.log(message);
                     this.closeItem(clickUpTaskId);
@@ -2137,6 +2141,11 @@ class ClickUp {
     setTaskStartDateToToday() {
         return callApi('put', `/task/${this.taskId}`, null, {
             start_date: new Date().valueOf(),
+        });
+    }
+    setTaskDueDateToToday() {
+        return callApi('put', `/task/${this.taskId}`, null, {
+            due_date: new Date().valueOf(),
         });
     }
     createChecklist(name) {

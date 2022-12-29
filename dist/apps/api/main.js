@@ -343,6 +343,11 @@ class ClickUp {
             start_date: new Date().valueOf(),
         });
     }
+    setTaskDueDateToToday() {
+        return callApi('put', `/task/${this.taskId}`, null, {
+            due_date: new Date().valueOf(),
+        });
+    }
     createChecklist(name) {
         return callApi('post', `/task/${this.taskId}/checklist`, null, { name });
     }

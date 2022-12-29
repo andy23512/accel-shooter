@@ -111,6 +111,12 @@ export class ClickUp {
     });
   }
 
+  public setTaskDueDateToToday() {
+    return callApi<Task>('put', `/task/${this.taskId}`, null, {
+      due_date: new Date().valueOf(),
+    });
+  }
+
   public createChecklist(name: string) {
     return callApi<ChecklistResponse>(
       'post',

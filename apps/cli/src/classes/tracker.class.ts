@@ -72,9 +72,13 @@ export class Tracker extends BaseFileRef {
           stagingStatus = 'closed';
           await clickUp.setTaskStatus('closed');
         }
-        const message = `${await clickUp.getFullTaskName()} (${clickUpTaskId}): In Review -> ${titleCase(
+        let message = `${await clickUp.getFullTaskName()} (${clickUpTaskId}): In Review -> ${titleCase(
           stagingStatus
         )}`;
+        if (!clickUpTask.due_date) {
+          await clickUp.setTaskDueDateToToday();
+          message += '; due date was set';
+        }
         displayNotification(message);
         console.log(message);
         this.closeItem(clickUpTaskId);
