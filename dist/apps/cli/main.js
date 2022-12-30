@@ -721,6 +721,8 @@ function confirm(question) {
 exports.confirm = confirm;
 function routineAction() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
+        const skipPunch = process.argv.includes('-s');
+        process.argv = process.argv.filter((a) => !a.startsWith('-'));
         const day = (0, utils_1.getDayFromArgv)();
         const hour = day.getHours();
         const isMorning = hour < 12;
@@ -728,7 +730,7 @@ function routineAction() {
         const isWorkDay = holiday.checkIsWorkday(day);
         const message = isWorkDay ? 'Today is workday!' : 'Today is holiday!';
         console.log(message);
-        if (isWorkDay) {
+        if (isWorkDay && !skipPunch) {
             yield confirm('run punch?');
             const result = yield punch();
             console.log(result);

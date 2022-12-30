@@ -27,6 +27,8 @@ export function confirm(question: string) {
 }
 
 export async function routineAction() {
+  const skipPunch = process.argv.includes('-s');
+  process.argv = process.argv.filter((a) => !a.startsWith('-'));
   const day = getDayFromArgv();
   const hour = day.getHours();
   const isMorning = hour < 12;
@@ -34,7 +36,7 @@ export async function routineAction() {
   const isWorkDay = holiday.checkIsWorkday(day);
   const message = isWorkDay ? 'Today is workday!' : 'Today is holiday!';
   console.log(message);
-  if (isWorkDay) {
+  if (isWorkDay && !skipPunch) {
     await confirm('run punch?');
     const result = await punch();
     console.log(result);
