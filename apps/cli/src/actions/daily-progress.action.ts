@@ -123,13 +123,15 @@ export async function dailyProgressAction() {
   if (previousDayMeeting.length > 0) {
     previousDayItems.push('    * Meeting');
     for (const m of previousDayMeeting) {
-      previousDayItems.push(`        * ${m.summary}`);
+      previousDayItems.push(
+        `        * ${m.summary.replace(/\(.*?\)/g, '').trim()}`
+      );
     }
   }
   if (todayMeeting.length > 0) {
     todayItems.push('    * Meeting');
     for (const m of todayMeeting) {
-      todayItems.push(`        * ${m.summary}`);
+      todayItems.push(`        * ${m.summary.replace(/\(.*?\)/g, '').trim()}`);
     }
   }
   p.next(); // Add Day Progress Entry
