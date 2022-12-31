@@ -54,6 +54,6 @@ on run argv
 		end tell
 	end tell
 
-	send_text("accel-shooter routine && exit")
+	send_text("accel-shooter routine")
 	call_forward()
 end run

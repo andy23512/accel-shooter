@@ -1,4 +1,5 @@
 import childProcess, { execSync, StdioOptions } from 'child_process';
+import notifier from 'node-notifier';
 import open from 'open';
 import qs from 'qs';
 
@@ -181,9 +182,8 @@ export function getDayFromArgv(dft?: Date) {
 }
 
 export function displayNotification(message: string) {
-  execSync(
-    `osascript -e 'display notification "${message
-      .replace(/"/g, '')
-      .replace(/'/g, '')}" with title "Accel Shooter"'`
-  );
+  notifier.notify({
+    title: 'Accel Shooter',
+    message,
+  });
 }

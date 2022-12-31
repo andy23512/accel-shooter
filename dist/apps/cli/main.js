@@ -1882,6 +1882,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.displayNotification = exports.getDayFromArgv = exports.getRepoName = exports.openUrlsInTabGroup = exports.checkWorkingTreeClean = exports.getInfoFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabMergeRequest = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const child_process_1 = tslib_1.__importStar(__webpack_require__("child_process"));
+const node_notifier_1 = tslib_1.__importDefault(__webpack_require__("node-notifier"));
 const open_1 = tslib_1.__importDefault(__webpack_require__("open"));
 const qs_1 = tslib_1.__importDefault(__webpack_require__("qs"));
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
@@ -2037,9 +2038,10 @@ function getDayFromArgv(dft) {
 }
 exports.getDayFromArgv = getDayFromArgv;
 function displayNotification(message) {
-    (0, child_process_1.execSync)(`osascript -e 'display notification "${message
-        .replace(/"/g, '')
-        .replace(/'/g, '')}" with title "Accel Shooter"'`);
+    node_notifier_1.default.notify({
+        title: 'Accel Shooter',
+        message,
+    });
 }
 exports.displayNotification = displayNotification;
 
@@ -3128,6 +3130,13 @@ module.exports = require("mustache");
 /***/ ((module) => {
 
 module.exports = require("node-fetch");
+
+/***/ }),
+
+/***/ "node-notifier":
+/***/ ((module) => {
+
+module.exports = require("node-notifier");
 
 /***/ }),
 
