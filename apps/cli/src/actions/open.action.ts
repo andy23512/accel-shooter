@@ -1,7 +1,15 @@
-import { getInfoFromArgv, openUrlsInTabGroup } from "../utils";
+import { Action } from '../classes/action.class';
+import { getInfoFromArgument, openUrlsInTabGroup } from '../utils';
 
-export async function openAction() {
-  const { clickUpTaskId } = await getInfoFromArgv();
-  const urls = [`localhost:8112/task/${clickUpTaskId}`];
-  openUrlsInTabGroup(urls, clickUpTaskId);
+export class OpenAction extends Action {
+  public command = 'open';
+  public description = 'open task todo page of current or specified task';
+  public arguments = [
+    { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
+  ];
+  public async run(clickUpTaskIdArg: string) {
+    const { clickUpTaskId } = await getInfoFromArgument(clickUpTaskIdArg);
+    const urls = [`localhost:8112/task/${clickUpTaskId}`];
+    openUrlsInTabGroup(urls, clickUpTaskId);
+  }
 }

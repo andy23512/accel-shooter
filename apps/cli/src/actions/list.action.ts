@@ -1,6 +1,14 @@
-import { getInfoFromArgv } from "../utils";
+import { Action } from '../classes/action.class';
+import { getInfoFromArgument } from '../utils';
 
-export async function listAction() {
-  const { clickUp } = await getInfoFromArgv();
-  console.log(await clickUp.getFullTaskName());
+export class ListAction extends Action {
+  public command = 'list';
+  public description = 'show current or specified task name';
+  public arguments = [
+    { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
+  ];
+  public async run(clickUpTaskIdArg: string) {
+    const { clickUp } = await getInfoFromArgument(clickUpTaskIdArg);
+    console.log(await clickUp.getFullTaskName());
+  }
 }

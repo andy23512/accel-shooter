@@ -1,7 +1,12 @@
 import clipboardy from 'clipboardy';
 import { format } from 'date-fns';
+import { Action } from '../classes/action.class';
 
-export async function timeAction() {
-  clipboardy.writeSync(format(new Date(), 'yyyyMMdd_HHmmss'));
-  console.log('Copied!');
+export class TimeAction extends Action {
+  public command = 'time';
+  public description = 'copy current time';
+  public async run() {
+    clipboardy.writeSync(format(new Date(), 'yyyyMMdd_HHmmss'));
+    console.log('Copied!');
+  }
 }

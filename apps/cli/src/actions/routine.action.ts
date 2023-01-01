@@ -1,13 +1,14 @@
 import fs from 'fs';
 import puppeteer from 'puppeteer';
 
-import { CONFIG, sleep } from '@accel-shooter/node-shared';
+import { CONFIG, formatDate, sleep } from '@accel-shooter/node-shared';
 
 import readline from 'readline';
+import { Action } from '../classes/action.class';
 import { Holiday } from '../classes/holiday.class';
-import { getDayFromArgv, openUrlsInTabGroup } from '../utils';
-import { dailyProgressAction } from './daily-progress.action';
-import { dumpMyTasksAction } from './dump-my-tasks.action';
+import { getDayFromArgument, openUrlsInTabGroup } from '../utils';
+import { DailyProgressAction } from './daily-progress.action';
+import { DumpMyTasksAction } from './dump-my-tasks.action';
 
 export function confirm(question: string) {
   return new Promise<void>((resolve, reject) => {
@@ -26,36 +27,42 @@ export function confirm(question: string) {
   });
 }
 
-export async function routineAction() {
-  const skipPunch = process.argv.includes('-s');
-  process.argv = process.argv.filter((a) => !a.startsWith('-'));
-  const day = getDayFromArgv();
-  const hour = day.getHours();
-  const isMorning = hour < 12;
-  const holiday = new Holiday();
-  const isWorkDay = holiday.checkIsWorkday(day);
-  const message = isWorkDay ? 'Today is workday!' : 'Today is holiday!';
-  console.log(message);
-  if (isWorkDay && !skipPunch) {
-    await confirm('run punch?');
-    const result = await punch();
-    console.log(result);
-  }
-  if (isMorning) {
-    if (isWorkDay) {
-      await confirm('run dump my tasks?');
-      await dumpMyTasksAction();
-      openUrlsInTabGroup(
-        ['localhost:8112/tasks', 'localhost:8112/markdown/todo'],
-        'accel'
-      );
-      await confirm('check tasks and todo done?');
-      await confirm('run daily progress?');
-      await dailyProgressAction();
-      await confirm('send dp to slack done?');
+export class RoutineAction extends Action {
+  public command = 'routine';
+  public description = 'daily routine list';
+  public arguments = [{ name: '[day]', description: 'optional day' }];
+  public options = [
+    { flags: '-s, --skip-punch', description: 'skip punch item' },
+  ];
+  public async run(dayArg: string, { skipPunch }: { skipPunch: boolean }) {
+    const day = getDayFromArgument(dayArg);
+    const hour = day.getHours();
+    const isMorning = hour < 12;
+    const holiday = new Holiday();
+    const isWorkDay = holiday.checkIsWorkday(day);
+    const message = isWorkDay ? 'Today is workday!' : 'Today is holiday!';
+    console.log(message);
+    if (isWorkDay && !skipPunch) {
+      await confirm('run punch?');
+      const result = await punch();
+      console.log(result);
     }
+    if (isMorning) {
+      if (isWorkDay) {
+        await confirm('run dump my tasks?');
+        await new DumpMyTasksAction().run();
+        openUrlsInTabGroup(
+          ['localhost:8112/tasks', 'localhost:8112/markdown/todo'],
+          'accel'
+        );
+        await confirm('check tasks and todo done?');
+        await confirm('run daily progress?');
+        await new DailyProgressAction().run(formatDate(day));
+        await confirm('send dp to slack done?');
+      }
+    }
+    console.log('Complete');
   }
-  console.log('Complete');
 }
 
 export async function punch() {

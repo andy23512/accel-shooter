@@ -1,11 +1,24 @@
-import { Checker } from "../classes/checker.class";
-import { getInfoFromArgv } from "../utils";
+import { Action } from '../classes/action.class';
+import { Checker } from '../classes/checker.class';
+import { getInfoFromArgument } from '../utils';
 
-export async function checkAction() {
-  const selectMode =
-    process.argv.includes("-s") || process.argv.includes("--select");
-  process.argv = process.argv.filter((a) => a !== "-s" && a !== "--select");
-  const { gitLabProject, mergeRequestIId } = await getInfoFromArgv();
-  const checker = new Checker(gitLabProject, mergeRequestIId, selectMode);
-  await checker.start();
+export class CheckAction extends Action {
+  public command = 'check';
+  public description = 'do automate checking for current or specified task';
+  public arguments = [
+    { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
+  ];
+  public options = [
+    {
+      flags: '-s, --select',
+      description: 'show select menu for selecting check items to run',
+    },
+  ];
+  public async run(clickUpTaskIdArg: string, { select }: { select: boolean }) {
+    const { gitLabProject, mergeRequestIId } = await getInfoFromArgument(
+      clickUpTaskIdArg
+    );
+    const checker = new Checker(gitLabProject, mergeRequestIId, select);
+    await checker.start();
+  }
 }

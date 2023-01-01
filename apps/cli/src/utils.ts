@@ -7,9 +7,7 @@ import {
   ClickUp,
   CONFIG,
   DateFormat,
-  FullMergeRequest,
   GitLab,
-  titleCase,
 } from '@accel-shooter/node-shared';
 import { parse } from 'date-fns';
 
@@ -60,48 +58,13 @@ export function getGitLabProjectConfigByName(n: string) {
   return CONFIG.GitLabProjects.find(({ name }) => name === n);
 }
 
-export function getGitLabProjectConfigById(inputId: string) {
-  return CONFIG.GitLabProjects.find(({ id }) => id === inputId);
-}
-
-export function getClickUpTaskIdFromGitLabMergeRequest(
-  mergeRequest: FullMergeRequest
-) {
-  const branchName = mergeRequest.source_branch;
-  const result = branchName.match(/CU-([a-z0-9]+)/);
-  return result ? result[1] : null;
-}
-
-const dpItemRegex =
-  /\* \([A-Za-z0-9 %]+\) \[.*?\]\(https:\/\/app.clickup.com\/t\/(\w+)\)/g;
-
-export async function updateTaskStatusInDp(dp: string) {
-  let match: RegExpExecArray | null = null;
-  let resultDp = dp;
-
-  while ((match = dpItemRegex.exec(dp))) {
-    const full = match[0];
-    const clickUpTaskId = match[1];
-    const clickUp = new ClickUp(clickUpTaskId);
-    const task = await clickUp.getTask();
-    const progress = clickUp.getTaskProgress();
-    const updatedFull = full.replace(
-      /\* \([A-Za-z0-9 %]+\)/,
-      task.status.status === 'in progress' && progress
-        ? `* (${titleCase(task.status.status)} ${progress})`
-        : `* (${titleCase(task.status.status)})`
-    );
-    resultDp = resultDp.replace(full, updatedFull);
-  }
-  return resultDp;
-}
-
-export async function getInfoFromArgv(
+export async function getInfoFromArgument(
+  argument: string,
   clickUpOnly?: boolean,
   allowEmptyInfo?: boolean
 ) {
-  let clickUpTaskId = null;
-  if (process.argv.length === 3) {
+  let clickUpTaskId = argument;
+  if (!clickUpTaskId) {
     const branchName = execSync('git branch --show-current', {
       encoding: 'utf-8',
     });
@@ -121,8 +84,6 @@ export async function getInfoFromArgv(
       throw Error('Cannot get task number from branch');
     }
     clickUpTaskId = match[1];
-  } else {
-    clickUpTaskId = process.argv[3];
   }
   if (clickUpTaskId) {
     const clickUp = new ClickUp(clickUpTaskId);
@@ -172,10 +133,10 @@ export function getRepoName() {
     .trim();
 }
 
-export function getDayFromArgv(dft?: Date) {
+export function getDayFromArgument(argument: any, dft?: Date) {
   const today = new Date();
-  return process.argv.length >= 4
-    ? parse(process.argv[3], DateFormat.STANDARD, today)
+  return argument
+    ? parse(argument, DateFormat.STANDARD, today)
     : dft
     ? new Date(dft.valueOf())
     : today;

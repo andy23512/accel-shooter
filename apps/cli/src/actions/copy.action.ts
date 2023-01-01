@@ -1,10 +1,18 @@
 import clipboardy from 'clipboardy';
+import { Action } from '../classes/action.class';
 
-import { getInfoFromArgv } from '../utils';
+import { getInfoFromArgument } from '../utils';
 
-export async function copyAction() {
-  const { clickUp } = await getInfoFromArgv(true);
-  const string = await clickUp.getTaskString('todo');
-  clipboardy.writeSync(string);
-  console.log('Copied!');
+export class CopyAction extends Action {
+  public command = 'copy';
+  public description = 'copy a task in todo string format';
+  public arguments = [
+    { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
+  ];
+  public async run(clickUpTaskIdArg: string) {
+    const { clickUp } = await getInfoFromArgument(clickUpTaskIdArg, true);
+    const string = await clickUp.getTaskString('todo');
+    clipboardy.writeSync(string);
+    console.log('Copied!');
+  }
 }

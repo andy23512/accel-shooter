@@ -62,6 +62,7 @@
     "@nestjs/serve-static": "^2.2.2",
     "cli-progress": "^3.10.0",
     "clipboardy": "^2.3.0",
+    "commander": "^9.4.1",
     "core-js": "^3.6.5",
     "cron": "^2.1.0",
     "csv-parser": "^3.0.0",

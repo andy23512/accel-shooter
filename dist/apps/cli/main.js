@@ -23,83 +23,94 @@ exports.configReadline = configReadline;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.biWeeklyProgressAction = void 0;
+exports.BiWeeklyProgressAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const clipboardy_1 = tslib_1.__importDefault(__webpack_require__("clipboardy"));
 const date_fns_1 = __webpack_require__("date-fns");
 const ramda_1 = __webpack_require__("ramda");
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const daily_progress_class_1 = __webpack_require__("./apps/cli/src/classes/daily-progress.class.ts");
 const holiday_class_1 = __webpack_require__("./apps/cli/src/classes/holiday.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
-function biWeeklyProgressAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const today = new Date();
-        const startDay = (0, utils_1.getDayFromArgv)((0, date_fns_1.add)(today, { weeks: -2 }));
-        let fetchDay = new Date(today.valueOf());
-        const holiday = new holiday_class_1.Holiday();
-        const fetchDays = [];
-        while ((0, date_fns_1.compareAsc)(startDay, fetchDay) != 0) {
-            if (holiday.checkIsWorkday(fetchDay)) {
-                fetchDays.push(fetchDay);
+class BiWeeklyProgressAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'biWeeklyProgress';
+        this.description = 'generate bi-weekly progress report and copy it to clipboard';
+        this.arguments = [
+            { name: '[startDay]', description: 'optional start day of date range' },
+        ];
+    }
+    run(startDayArg) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const today = new Date();
+            const startDay = (0, utils_1.getDayFromArgument)(startDayArg, (0, date_fns_1.add)(today, { weeks: -2 }));
+            let fetchDay = new Date(today.valueOf());
+            const holiday = new holiday_class_1.Holiday();
+            const fetchDays = [];
+            while ((0, date_fns_1.compareAsc)(startDay, fetchDay) <= 0) {
+                if (holiday.checkIsWorkday(fetchDay)) {
+                    fetchDays.push(fetchDay);
+                }
+                fetchDay = (0, date_fns_1.add)(fetchDay, { days: -1 });
             }
-            fetchDay = (0, date_fns_1.add)(fetchDay, { days: -1 });
-        }
-        const dpContent = new daily_progress_class_1.DailyProgress().readFile();
-        const data = {};
-        for (const d of fetchDays) {
-            const previousWorkDayString = (0, node_shared_1.formatDate)(holiday.getPreviousWorkday(d));
-            const dString = (0, node_shared_1.formatDate)(d);
-            const matchResult = dpContent.match(new RegExp(`### ${dString}\n1\. Previous Day\n(.*?)\n2\. Today`, 's'));
-            if (matchResult) {
-                const record = matchResult[1];
-                const lines = record.split('\n').filter(Boolean);
-                for (const line of lines) {
-                    const matchItem = line.match(/(\([A-Za-z0-9 %]+\)) \[(.*?)\]\((https:\/\/app.clickup.com\/t\/(\w+))\)/);
-                    if (matchItem) {
-                        const name = matchItem[2];
-                        const url = matchItem[3];
-                        const taskId = matchItem[4];
-                        if (data[url]) {
-                            data[url].days.push(previousWorkDayString);
-                        }
-                        else {
-                            const { gitLabProject } = yield new node_shared_1.ClickUp(taskId).getGitLabProjectAndMergeRequestIId();
-                            data[url] = {
-                                url,
-                                name,
-                                project: gitLabProject.name,
-                                days: [previousWorkDayString],
-                            };
+            const dpContent = new daily_progress_class_1.DailyProgress().readFile();
+            const data = {};
+            for (const d of fetchDays) {
+                const previousWorkDayString = (0, node_shared_1.formatDate)(holiday.getPreviousWorkday(d));
+                const dString = (0, node_shared_1.formatDate)(d);
+                const matchResult = dpContent.match(new RegExp(`### ${dString}\n1\\. Previous Day\n(.*?)\n2\\. Today`, 's'));
+                if (matchResult) {
+                    const record = matchResult[1];
+                    const lines = record.split('\n').filter(Boolean);
+                    for (const line of lines) {
+                        const matchItem = line.match(/(\([A-Za-z0-9 %]+\)) \[(.*?)\]\((https:\/\/app.clickup.com\/t\/(\w+))\)/);
+                        if (matchItem) {
+                            const name = matchItem[2];
+                            const url = matchItem[3];
+                            const taskId = matchItem[4];
+                            if (data[url]) {
+                                data[url].days.push(previousWorkDayString);
+                            }
+                            else {
+                                const { gitLabProject } = yield new node_shared_1.ClickUp(taskId).getGitLabProjectAndMergeRequestIId();
+                                data[url] = {
+                                    url,
+                                    name,
+                                    project: gitLabProject.name,
+                                    days: [previousWorkDayString],
+                                };
+                            }
                         }
                     }
                 }
-            }
-            else {
-                console.log('No Result!');
-            }
-        }
-        const finalData = Object.values(data).map((item) => (Object.assign(Object.assign({}, item), { startDay: item.days[item.days.length - 1], endDay: item.days[0] })));
-        finalData.sort((a, b) => a.endDay.localeCompare(b.endDay));
-        const groupedRecords = (0, ramda_1.groupBy)((0, ramda_1.prop)('project'), finalData);
-        const previousWorkDayOfToday = holiday.getPreviousWorkday(today);
-        let result = `## ${(0, node_shared_1.formatDate)(startDay)}~${(0, node_shared_1.formatDate)(previousWorkDayOfToday)}`;
-        Object.entries(groupedRecords).forEach(([project, records]) => {
-            result += `\n### ${project}`;
-            records.forEach(({ name, url, startDay, endDay }) => {
-                if (startDay === endDay) {
-                    result += `\n- ${startDay} [${name}](${url})`;
-                }
                 else {
-                    result += `\n- ${startDay}~${subtractCommon(endDay, startDay)} [${name}](${url})`;
+                    console.log('No Result!');
                 }
+            }
+            const finalData = Object.values(data).map((item) => (Object.assign(Object.assign({}, item), { startDay: item.days[item.days.length - 1], endDay: item.days[0] })));
+            finalData.sort((a, b) => a.endDay.localeCompare(b.endDay));
+            const groupedRecords = (0, ramda_1.groupBy)((0, ramda_1.prop)('project'), finalData);
+            const previousWorkDayOfToday = holiday.getPreviousWorkday(today);
+            let result = `## ${(0, node_shared_1.formatDate)(startDay)}~${(0, node_shared_1.formatDate)(previousWorkDayOfToday)}`;
+            Object.entries(groupedRecords).forEach(([project, records]) => {
+                result += `\n### ${project}`;
+                records.forEach(({ name, url, startDay, endDay }) => {
+                    if (startDay === endDay) {
+                        result += `\n- ${startDay} [${name}](${url})`;
+                    }
+                    else {
+                        result += `\n- ${startDay}~${subtractCommon(endDay, startDay)} [${name}](${url})`;
+                    }
+                });
             });
+            clipboardy_1.default.writeSync(result);
+            console.log('Copied!');
         });
-        clipboardy_1.default.writeSync(result);
-        console.log('Copied!');
-    });
+    }
 }
-exports.biWeeklyProgressAction = biWeeklyProgressAction;
+exports.BiWeeklyProgressAction = BiWeeklyProgressAction;
 function subtractCommon(a, b) {
     const ar = a.split('/');
     const br = b.split('/');
@@ -118,20 +129,35 @@ function subtractCommon(a, b) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.checkAction = void 0;
+exports.CheckAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const checker_class_1 = __webpack_require__("./apps/cli/src/classes/checker.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
-function checkAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const selectMode = process.argv.includes("-s") || process.argv.includes("--select");
-        process.argv = process.argv.filter((a) => a !== "-s" && a !== "--select");
-        const { gitLabProject, mergeRequestIId } = yield (0, utils_1.getInfoFromArgv)();
-        const checker = new checker_class_1.Checker(gitLabProject, mergeRequestIId, selectMode);
-        yield checker.start();
-    });
+class CheckAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'check';
+        this.description = 'do automate checking for current or specified task';
+        this.arguments = [
+            { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
+        ];
+        this.options = [
+            {
+                flags: '-s, --select',
+                description: 'show select menu for selecting check items to run',
+            },
+        ];
+    }
+    run(clickUpTaskIdArg, { select }) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const { gitLabProject, mergeRequestIId } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
+            const checker = new checker_class_1.Checker(gitLabProject, mergeRequestIId, select);
+            yield checker.start();
+        });
+    }
 }
-exports.checkAction = checkAction;
+exports.CheckAction = CheckAction;
 
 
 /***/ }),
@@ -141,33 +167,44 @@ exports.checkAction = checkAction;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.closeAction = void 0;
+exports.CloseAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const progress_log_class_1 = __webpack_require__("./apps/cli/src/classes/progress-log.class.ts");
 const todo_class_1 = __webpack_require__("./apps/cli/src/classes/todo.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
-function closeAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { gitLab, mergeRequest, clickUp, clickUpTaskId } = yield (0, utils_1.getInfoFromArgv)();
-        const p = new progress_log_class_1.CustomProgressLog('Close', [
-            'Close GitLab Merge Request',
-            'Update ClickUp Task Status',
-            'Close Tab Group',
-            'Remove Todo',
-        ]);
-        p.next(); // Close GitLab Merge Request
-        yield gitLab.closeMergeRequest(mergeRequest);
-        p.next(); // Update ClickUp Task Status
-        yield clickUp.setTaskStatus('suspended');
-        p.next(); // Close Tab Group
-        (0, utils_1.openUrlsInTabGroup)([], clickUpTaskId);
-        p.next(); // Remove Todo
-        const todo = new todo_class_1.Todo();
-        todo.removeTodo(clickUpTaskId);
-        p.end(0);
-    });
+class CloseAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'close';
+        this.description = 'close current or specified task';
+        this.arguments = [
+            { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
+        ];
+    }
+    run(clickUpTaskIdArg) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const { gitLab, mergeRequest, clickUp, clickUpTaskId } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
+            const p = new progress_log_class_1.CustomProgressLog('Close', [
+                'Close GitLab Merge Request',
+                'Update ClickUp Task Status',
+                'Close Tab Group',
+                'Remove Todo',
+            ]);
+            p.next(); // Close GitLab Merge Request
+            yield gitLab.closeMergeRequest(mergeRequest);
+            p.next(); // Update ClickUp Task Status
+            yield clickUp.setTaskStatus('suspended');
+            p.next(); // Close Tab Group
+            (0, utils_1.openUrlsInTabGroup)([], clickUpTaskId);
+            p.next(); // Remove Todo
+            const todo = new todo_class_1.Todo();
+            todo.removeTodo(clickUpTaskId);
+            p.end(0);
+        });
+    }
 }
-exports.closeAction = closeAction;
+exports.CloseAction = CloseAction;
 
 
 /***/ }),
@@ -177,12 +214,13 @@ exports.closeAction = closeAction;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.commitAction = void 0;
+exports.CommitAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const fuzzy_1 = tslib_1.__importDefault(__webpack_require__("fuzzy"));
 const inquirer_1 = tslib_1.__importDefault(__webpack_require__("inquirer"));
 const inquirer_autocomplete_prompt_1 = tslib_1.__importDefault(__webpack_require__("inquirer-autocomplete-prompt"));
 const string_similarity_1 = __webpack_require__("string-similarity");
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const commit_scope_class_1 = __webpack_require__("./apps/cli/src/classes/commit-scope.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 const TYPES = [
@@ -209,62 +247,74 @@ function preprocess(path) {
     }
     return path;
 }
-function commitAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { mergeRequest } = yield (0, utils_1.getInfoFromArgv)(false, true);
-        if (mergeRequest) {
-            const title = mergeRequest.title;
-            if (!(title.startsWith('WIP: ') || title.startsWith('Draft: '))) {
-                console.log('Merge request is ready. Cannot commit.');
+class CommitAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'commit';
+        this.description = 'commit in convention';
+        this.arguments = [
+            { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
+        ];
+    }
+    run(clickUpTaskIdArg) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const { mergeRequest } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg, false, true);
+            if (mergeRequest) {
+                const title = mergeRequest.title;
+                if (!(title.startsWith('WIP: ') || title.startsWith('Draft: '))) {
+                    console.log('Merge request is ready. Cannot commit.');
+                    return;
+                }
+            }
+            const stagedFiles = (yield (0, utils_1.promiseSpawn)('git', ['diff', '--name-only', '--cached'], 'pipe')).stdout
+                .trim()
+                .split('\n')
+                .map(preprocess);
+            if (stagedFiles.length === 0) {
+                console.log('Nothing to commit.');
                 return;
             }
-        }
-        const stagedFiles = (yield (0, utils_1.promiseSpawn)('git', ['diff', '--name-only', '--cached'], 'pipe')).stdout
-            .trim()
-            .split('\n')
-            .map(preprocess);
-        if (stagedFiles.length === 0) {
-            console.log('Nothing to commit.');
-            return;
-        }
-        const repoName = (0, utils_1.getRepoName)();
-        inquirer_1.default.registerPrompt('autocomplete', inquirer_autocomplete_prompt_1.default);
-        const commitScope = new commit_scope_class_1.CommitScope();
-        const commitScopeItems = commitScope.getItems(repoName);
-        const str = stagedFiles.length === 1 ? stagedFiles[0] : getCommon(stagedFiles);
-        const bestMatchRatings = (0, string_similarity_1.findBestMatch)(str, commitScopeItems).ratings;
-        bestMatchRatings.sort((a, b) => b.rating - a.rating);
-        const presortedCommitScopeItems = bestMatchRatings.map((r) => r.target);
-        const answers = yield inquirer_1.default.prompt([
-            {
-                name: 'type',
-                message: 'Enter commit type',
-                type: 'autocomplete',
-                source: (_, input = '') => {
-                    return Promise.resolve(fuzzy_1.default.filter(input, TYPES).map((t) => t.original));
+            const repoName = (0, utils_1.getRepoName)();
+            inquirer_1.default.registerPrompt('autocomplete', inquirer_autocomplete_prompt_1.default);
+            const commitScope = new commit_scope_class_1.CommitScope();
+            const commitScopeItems = commitScope.getItems(repoName);
+            const str = stagedFiles.length === 1 ? stagedFiles[0] : getCommon(stagedFiles);
+            const bestMatchRatings = (0, string_similarity_1.findBestMatch)(str, commitScopeItems).ratings;
+            bestMatchRatings.sort((a, b) => b.rating - a.rating);
+            const presortedCommitScopeItems = bestMatchRatings.map((r) => r.target);
+            const answers = yield inquirer_1.default.prompt([
+                {
+                    name: 'type',
+                    message: 'Enter commit type',
+                    type: 'autocomplete',
+                    source: (_, input = '') => {
+                        return Promise.resolve(fuzzy_1.default.filter(input, TYPES).map((t) => t.original));
+                    },
                 },
-            },
-            {
-                name: 'scope',
-                message: 'Enter commit scope',
-                type: 'autocomplete',
-                source: (_, input = '') => {
-                    return Promise.resolve(fuzzy_1.default.filter(input, presortedCommitScopeItems).map((t) => t.original));
+                {
+                    name: 'scope',
+                    message: 'Enter commit scope',
+                    type: 'autocomplete',
+                    source: (_, input = '') => {
+                        return Promise.resolve(fuzzy_1.default
+                            .filter(input, presortedCommitScopeItems)
+                            .map((t) => t.original));
+                    },
                 },
-            },
-            {
-                name: 'subject',
-                message: 'Enter commit subject',
-                type: 'input',
-            },
-        ]);
-        const { type, scope, subject } = answers;
-        const finalScope = scope === 'empty' ? null : scope;
-        const message = `${type}${finalScope ? '(' + finalScope + ')' : ''}: ${subject}`;
-        yield (0, utils_1.promiseSpawn)('git', ['commit', '-m', `"${message}"`], 'inherit');
-    });
+                {
+                    name: 'subject',
+                    message: 'Enter commit subject',
+                    type: 'input',
+                },
+            ]);
+            const { type, scope, subject } = answers;
+            const finalScope = scope === 'empty' ? null : scope;
+            const message = `${type}${finalScope ? '(' + finalScope + ')' : ''}: ${subject}`;
+            yield (0, utils_1.promiseSpawn)('git', ['commit', '-m', `"${message}"`], 'inherit');
+        });
+    }
 }
-exports.commitAction = commitAction;
+exports.CommitAction = CommitAction;
 function getCommon(pathList) {
     const pathArrayList = pathList.map((p) => p.split('/'));
     pathArrayList.sort((a, b) => a.length - b.length);
@@ -284,19 +334,30 @@ function getCommon(pathList) {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.copyAction = void 0;
+exports.CopyAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const clipboardy_1 = tslib_1.__importDefault(__webpack_require__("clipboardy"));
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
-function copyAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { clickUp } = yield (0, utils_1.getInfoFromArgv)(true);
-        const string = yield clickUp.getTaskString('todo');
-        clipboardy_1.default.writeSync(string);
-        console.log('Copied!');
-    });
+class CopyAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'copy';
+        this.description = 'copy a task in todo string format';
+        this.arguments = [
+            { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
+        ];
+    }
+    run(clickUpTaskIdArg) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const { clickUp } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg, true);
+            const string = yield clickUp.getTaskString('todo');
+            clipboardy_1.default.writeSync(string);
+            console.log('Copied!');
+        });
+    }
 }
-exports.copyAction = copyAction;
+exports.CopyAction = CopyAction;
 
 
 /***/ }),
@@ -306,146 +367,155 @@ exports.copyAction = copyAction;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.dailyProgressAction = void 0;
+exports.DailyProgressAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const child_process_1 = __webpack_require__("child_process");
 const date_fns_1 = __webpack_require__("date-fns");
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const daily_progress_class_1 = __webpack_require__("./apps/cli/src/classes/daily-progress.class.ts");
 const holiday_class_1 = __webpack_require__("./apps/cli/src/classes/holiday.class.ts");
 const progress_log_class_1 = __webpack_require__("./apps/cli/src/classes/progress-log.class.ts");
 const todo_class_1 = __webpack_require__("./apps/cli/src/classes/todo.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
-function dailyProgressAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const p = new progress_log_class_1.CustomProgressLog('Daily Progress', [
-            'Get Date',
-            'Get Pushed Events',
-            'Get Progressed Tasks',
-            'Get Todo Task',
-            'Get Processing Tasks',
-            'Get Reviewed Merge Requests',
-            'Get Meetings',
-            'Add Day Progress Entry',
-            'Copy Day Progress into Clipboard',
-        ]);
-        p.start(); // Get Date
-        const day = (0, utils_1.getDayFromArgv)();
-        const holiday = new holiday_class_1.Holiday();
-        const previousWorkDay = holiday.getPreviousWorkday(day);
-        console.log('Previous work day:', (0, node_shared_1.formatDate)(previousWorkDay));
-        p.next(); // Get Pushed Events
-        const after = (0, date_fns_1.add)(previousWorkDay, { days: -1 });
-        const before = day;
-        const pushedToEvents = (yield node_shared_1.GitLab.getPushedEvents(after, before)).filter((e) => e.action_name === 'pushed to');
-        const modifiedBranches = [
-            ...new Set(pushedToEvents.map((e) => e.push_data.ref)),
-        ];
-        p.next(); // Get Progressed Tasks
-        let previousDayItems = [];
-        for (const b of modifiedBranches) {
-            const taskId = (0, node_shared_1.getTaskIdFromBranchName)(b);
-            if (taskId) {
-                previousDayItems.push('    ' + (yield new node_shared_1.ClickUp(taskId).getTaskString('dp')));
+class DailyProgressAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'dailyProgress';
+        this.description = 'generate daily progress report and export it to file and clipboard';
+        this.arguments = [{ name: '[day]', description: 'optional day' }];
+    }
+    run(dayArg) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const p = new progress_log_class_1.CustomProgressLog('Daily Progress', [
+                'Get Date',
+                'Get Pushed Events',
+                'Get Progressed Tasks',
+                'Get Todo Task',
+                'Get Processing Tasks',
+                'Get Reviewed Merge Requests',
+                'Get Meetings',
+                'Add Day Progress Entry',
+                'Copy Day Progress into Clipboard',
+            ]);
+            p.start(); // Get Date
+            const day = (0, utils_1.getDayFromArgument)(dayArg);
+            const holiday = new holiday_class_1.Holiday();
+            const previousWorkDay = holiday.getPreviousWorkday(day);
+            console.log('Previous work day:', (0, node_shared_1.formatDate)(previousWorkDay));
+            p.next(); // Get Pushed Events
+            const after = (0, date_fns_1.add)(previousWorkDay, { days: -1 });
+            const before = day;
+            const pushedToEvents = (yield node_shared_1.GitLab.getPushedEvents(after, before)).filter((e) => e.action_name === 'pushed to');
+            const modifiedBranches = [
+                ...new Set(pushedToEvents.map((e) => e.push_data.ref)),
+            ];
+            p.next(); // Get Progressed Tasks
+            let previousDayItems = [];
+            for (const b of modifiedBranches) {
+                const taskId = (0, node_shared_1.getTaskIdFromBranchName)(b);
+                if (taskId) {
+                    previousDayItems.push('    ' + (yield new node_shared_1.ClickUp(taskId).getTaskString('dp')));
+                }
             }
-        }
-        p.next(); // Get Todo Task
-        let todayItems = [];
-        const todo = new todo_class_1.Todo();
-        const todoContent = todo.readFile();
-        let matchResult = todoContent.match(/## Todo\n([\s\S]+)\n##/);
-        if (matchResult) {
-            const todoList = matchResult[1].split('\n');
-            const firstTodo = todoList[0];
-            matchResult = firstTodo.match(/https:\/\/app.clickup.com\/t\/(\w+)\)/);
+            p.next(); // Get Todo Task
+            let todayItems = [];
+            const todo = new todo_class_1.Todo();
+            const todoContent = todo.readFile();
+            let matchResult = todoContent.match(/## Todo\n([\s\S]+)\n##/);
             if (matchResult) {
-                const taskId = matchResult[1];
-                const clickUp = new node_shared_1.ClickUp(taskId);
-                const taskString = yield clickUp.getTaskString('dp');
-                todayItems.push('    ' + taskString);
+                const todoList = matchResult[1].split('\n');
+                const firstTodo = todoList[0];
+                matchResult = firstTodo.match(/https:\/\/app.clickup.com\/t\/(\w+)\)/);
+                if (matchResult) {
+                    const taskId = matchResult[1];
+                    const clickUp = new node_shared_1.ClickUp(taskId);
+                    const taskString = yield clickUp.getTaskString('dp');
+                    todayItems.push('    ' + taskString);
+                }
+                else {
+                    todayItems.push('    ' + firstTodo.replace('- [ ]', '*'));
+                }
             }
             else {
-                todayItems.push('    ' + firstTodo.replace('- [ ]', '*'));
+                throw Error('Todo File Broken');
             }
-        }
-        else {
-            throw Error('Todo File Broken');
-        }
-        p.next(); // Get Processing Tasks
-        matchResult = todoContent.match(/## Processing\n([\s\S]+)\n##/);
-        if (matchResult) {
-            const processingList = matchResult[1].split('\n');
-            const firstProcessingItem = processingList[0];
-            matchResult = firstProcessingItem.match(/https:\/\/app.clickup.com\/t\/(\w+)\)/);
+            p.next(); // Get Processing Tasks
+            matchResult = todoContent.match(/## Processing\n([\s\S]+)\n##/);
             if (matchResult) {
-                const taskId = matchResult[1];
-                const clickUp = new node_shared_1.ClickUp(taskId);
-                const taskString = yield clickUp.getTaskString('dp');
-                previousDayItems.push('    ' + taskString);
-                todayItems.push('    ' + (yield clickUp.getTaskString('dp')));
+                const processingList = matchResult[1].split('\n');
+                const firstProcessingItem = processingList[0];
+                matchResult = firstProcessingItem.match(/https:\/\/app.clickup.com\/t\/(\w+)\)/);
+                if (matchResult) {
+                    const taskId = matchResult[1];
+                    const clickUp = new node_shared_1.ClickUp(taskId);
+                    const taskString = yield clickUp.getTaskString('dp');
+                    previousDayItems.push('    ' + taskString);
+                    todayItems.push('    ' + (yield clickUp.getTaskString('dp')));
+                }
+                else if (firstProcessingItem.includes('- [ ]')) {
+                    previousDayItems.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
+                    todayItems.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
+                }
             }
-            else if (firstProcessingItem.includes('- [ ]')) {
-                previousDayItems.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
-                todayItems.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
+            if (todayItems.length === 0) {
+                console.log('Todo of today is empty!');
+                process.exit();
             }
-        }
-        if (todayItems.length === 0) {
-            console.log('Todo of today is empty!');
-            process.exit();
-        }
-        previousDayItems = [...new Set(previousDayItems)];
-        todayItems = [...new Set(todayItems)];
-        p.next(); // Get Reviewed Merge Requests
-        const approvedEvents = yield node_shared_1.GitLab.getApprovedEvents(after, before);
-        if (approvedEvents.length > 0) {
-            previousDayItems.push('    * Review');
-            for (const approvedEvent of approvedEvents) {
-                const projectId = approvedEvent.project_id;
-                const mergeRequestIId = approvedEvent.target_iid;
-                const gitLab = new node_shared_1.GitLab(projectId.toString());
-                const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
-                previousDayItems.push(`        * [${mergeRequest.title}](${mergeRequest.web_url})`);
+            previousDayItems = [...new Set(previousDayItems)];
+            todayItems = [...new Set(todayItems)];
+            p.next(); // Get Reviewed Merge Requests
+            const approvedEvents = yield node_shared_1.GitLab.getApprovedEvents(after, before);
+            if (approvedEvents.length > 0) {
+                previousDayItems.push('    * Review');
+                for (const approvedEvent of approvedEvents) {
+                    const projectId = approvedEvent.project_id;
+                    const mergeRequestIId = approvedEvent.target_iid;
+                    const gitLab = new node_shared_1.GitLab(projectId.toString());
+                    const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
+                    previousDayItems.push(`        * [${mergeRequest.title}](${mergeRequest.web_url})`);
+                }
             }
-        }
-        p.next(); // Get Meetings
-        const g = new node_shared_1.Google();
-        const previousDayMeeting = yield g.listAttendingEvent(previousWorkDay.toISOString(), day.toISOString());
-        const todayMeeting = yield g.listAttendingEvent(day.toISOString(), (0, date_fns_1.add)(day, { days: 1 }).toISOString());
-        if (previousDayMeeting.length > 0) {
-            previousDayItems.push('    * Meeting');
-            for (const m of previousDayMeeting) {
-                previousDayItems.push(`        * ${m.summary.replace(/\(.*?\)/g, '').trim()}`);
+            p.next(); // Get Meetings
+            const g = new node_shared_1.Google();
+            const previousDayMeeting = yield g.listAttendingEvent(previousWorkDay.toISOString(), day.toISOString());
+            const todayMeeting = yield g.listAttendingEvent(day.toISOString(), (0, date_fns_1.add)(day, { days: 1 }).toISOString());
+            if (previousDayMeeting.length > 0) {
+                previousDayItems.push('    * Meeting');
+                for (const m of previousDayMeeting) {
+                    previousDayItems.push(`        * ${m.summary.replace(/\(.*?\)/g, '').trim()}`);
+                }
             }
-        }
-        if (todayMeeting.length > 0) {
-            todayItems.push('    * Meeting');
-            for (const m of todayMeeting) {
-                todayItems.push(`        * ${m.summary.replace(/\(.*?\)/g, '').trim()}`);
+            if (todayMeeting.length > 0) {
+                todayItems.push('    * Meeting');
+                for (const m of todayMeeting) {
+                    todayItems.push(`        * ${m.summary.replace(/\(.*?\)/g, '').trim()}`);
+                }
             }
-        }
-        p.next(); // Add Day Progress Entry
-        const dayDp = `### ${(0, node_shared_1.formatDate)(day)}\n1. Previous Day\n${previousDayItems.join('\n')}\n2. Today\n${todayItems.join('\n')}\n3. No blockers so far`;
-        new daily_progress_class_1.DailyProgress().addDayProgress(dayDp);
-        p.next(); // Copy Day Progress into Clipboard
-        let resultRecord = dayDp;
-        resultRecord = resultRecord
-            .replace(/\* (\([A-Za-z0-9 %]+\)) \[(.*?)\]\((https:\/\/app.clickup.com\/t\/\w+)\).*/g, '* $1 <a href="$3">$2</a>')
-            .replace(/\* \[(.*?)\]\((https:\/\/gitlab\.com.*?)\)/g, '* <a href="$2">$1</a>')
-            .replace(/ {2}-/g, '&nbsp;&nbsp;-')
-            .replace(/ {8}\*/g, '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*')
-            .replace(/ {4}\*/g, '&nbsp;&nbsp;&nbsp;&nbsp;*')
-            .replace(/\n/g, '<br/>')
-            .replace(/'/g, '');
-        (0, child_process_1.execSync)(`
+            p.next(); // Add Day Progress Entry
+            const dayDp = `### ${(0, node_shared_1.formatDate)(day)}\n1. Previous Day\n${previousDayItems.join('\n')}\n2. Today\n${todayItems.join('\n')}\n3. No blockers so far`;
+            new daily_progress_class_1.DailyProgress().addDayProgress(dayDp);
+            p.next(); // Copy Day Progress into Clipboard
+            let resultRecord = dayDp;
+            resultRecord = resultRecord
+                .replace(/\* (\([A-Za-z0-9 %]+\)) \[(.*?)\]\((https:\/\/app.clickup.com\/t\/\w+)\).*/g, '* $1 <a href="$3">$2</a>')
+                .replace(/\* \[(.*?)\]\((https:\/\/gitlab\.com.*?)\)/g, '* <a href="$2">$1</a>')
+                .replace(/ {2}-/g, '&nbsp;&nbsp;-')
+                .replace(/ {8}\*/g, '&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;*')
+                .replace(/ {4}\*/g, '&nbsp;&nbsp;&nbsp;&nbsp;*')
+                .replace(/\n/g, '<br/>')
+                .replace(/'/g, '');
+            (0, child_process_1.execSync)(`
   echo '${resultRecord}' |\
   hexdump -ve '1/1 "%.2x"' |\
   xargs printf "set the clipboard to {text:\\\" \\\", «class HTML»:«data HTML%s»}" |\
   osascript -
   `);
-        p.end(0);
-    });
+            p.end(0);
+        });
+    }
 }
-exports.dailyProgressAction = dailyProgressAction;
+exports.DailyProgressAction = DailyProgressAction;
 
 
 /***/ }),
@@ -455,17 +525,25 @@ exports.dailyProgressAction = dailyProgressAction;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.dumpMyTasksAction = void 0;
+exports.DumpMyTasksAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const fs_1 = __webpack_require__("fs");
-function dumpMyTasksAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const mySummarizedTasks = yield node_shared_1.ClickUp.getMySummarizedTasks();
-        (0, fs_1.writeFileSync)(node_shared_1.CONFIG.MySummarizedTasksFile, JSON.stringify(mySummarizedTasks));
-    });
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
+class DumpMyTasksAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'dumpMyTasks';
+        this.description = 'dump my tasks to file';
+    }
+    run() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const mySummarizedTasks = yield node_shared_1.ClickUp.getMySummarizedTasks();
+            (0, fs_1.writeFileSync)(node_shared_1.CONFIG.MySummarizedTasksFile, JSON.stringify(mySummarizedTasks));
+        });
+    }
 }
-exports.dumpMyTasksAction = dumpMyTasksAction;
+exports.DumpMyTasksAction = DumpMyTasksAction;
 
 
 /***/ }),
@@ -475,49 +553,60 @@ exports.dumpMyTasksAction = dumpMyTasksAction;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.endAction = void 0;
+exports.EndAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const progress_log_class_1 = __webpack_require__("./apps/cli/src/classes/progress-log.class.ts");
 const todo_class_1 = __webpack_require__("./apps/cli/src/classes/todo.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
-function endAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { gitLab, mergeRequest, clickUp, clickUpTask, clickUpTaskId } = yield (0, utils_1.getInfoFromArgv)();
-        const p = new progress_log_class_1.CustomProgressLog('End', [
-            'Check Task is Completed or not',
-            'Update GitLab Merge Request Ready Status and Assignee',
-            'Update ClickUp Task Status',
-            'Close Tab Group',
-            'Remove Todo',
-        ]);
-        p.next(); // Check Task is Completed or not
-        const targetChecklist = clickUpTask.checklists.find((c) => c.name.toLowerCase().includes('synced checklist'));
-        const clickUpNormalizedChecklist = (0, node_shared_1.normalizeClickUpChecklist)(targetChecklist.items);
-        const fullCompleted = clickUpNormalizedChecklist.every((item) => item.checked);
-        if (!fullCompleted) {
-            console.log('This task has uncompleted todo(s).');
-            process.exit();
-        }
-        p.next(); // Update GitLab Merge Request Ready Status and Assignee
-        yield gitLab.markMergeRequestAsReadyAndAddAssignee(mergeRequest);
-        p.next(); // Update ClickUp Task Status
-        try {
-            yield clickUp.setTaskStatus('in review');
-        }
-        catch (_a) {
-            yield clickUp.setTaskStatus('review');
-        }
-        p.next(); // Close Tab Group
-        (0, utils_1.openUrlsInTabGroup)([], clickUpTaskId);
-        p.next(); // Remove Todo
-        const todo = new todo_class_1.Todo();
-        todo.removeTodo(clickUpTaskId);
-        p.end(0);
-        console.log('Merge Request URL: ' + mergeRequest.web_url);
-    });
+class EndAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'end';
+        this.description = 'end current or specified task';
+        this.arguments = [
+            { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
+        ];
+    }
+    run(clickUpTaskIdArg) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const { gitLab, mergeRequest, clickUp, clickUpTask, clickUpTaskId } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
+            const p = new progress_log_class_1.CustomProgressLog('End', [
+                'Check Task is Completed or not',
+                'Update GitLab Merge Request Ready Status and Assignee',
+                'Update ClickUp Task Status',
+                'Close Tab Group',
+                'Remove Todo',
+            ]);
+            p.next(); // Check Task is Completed or not
+            const targetChecklist = clickUpTask.checklists.find((c) => c.name.toLowerCase().includes('synced checklist'));
+            const clickUpNormalizedChecklist = (0, node_shared_1.normalizeClickUpChecklist)(targetChecklist.items);
+            const fullCompleted = clickUpNormalizedChecklist.every((item) => item.checked);
+            if (!fullCompleted) {
+                console.log('This task has uncompleted todo(s).');
+                process.exit();
+            }
+            p.next(); // Update GitLab Merge Request Ready Status and Assignee
+            yield gitLab.markMergeRequestAsReadyAndAddAssignee(mergeRequest);
+            p.next(); // Update ClickUp Task Status
+            try {
+                yield clickUp.setTaskStatus('in review');
+            }
+            catch (_a) {
+                yield clickUp.setTaskStatus('review');
+            }
+            p.next(); // Close Tab Group
+            (0, utils_1.openUrlsInTabGroup)([], clickUpTaskId);
+            p.next(); // Remove Todo
+            const todo = new todo_class_1.Todo();
+            todo.removeTodo(clickUpTaskId);
+            p.end(0);
+            console.log('Merge Request URL: ' + mergeRequest.web_url);
+        });
+    }
 }
-exports.endAction = endAction;
+exports.EndAction = EndAction;
 
 
 /***/ }),
@@ -527,25 +616,33 @@ exports.endAction = endAction;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.fetchHolidayAction = void 0;
+exports.FetchHolidayAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const node_fetch_1 = tslib_1.__importDefault(__webpack_require__("node-fetch"));
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const holiday_class_1 = __webpack_require__("./apps/cli/src/classes/holiday.class.ts");
-function fetchHolidayAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        let page = 0;
-        let holidays = [];
-        let data = null;
-        while (data === null || data.length !== 0) {
-            const response = yield (0, node_fetch_1.default)(`https://data.ntpc.gov.tw/api/datasets/308DCD75-6434-45BC-A95F-584DA4FED251/json?page=${page}&size=1000`);
-            data = yield response.json();
-            holidays = [...holidays, ...data];
-            page += 1;
-        }
-        new holiday_class_1.Holiday().writeFile(JSON.stringify(holidays, null, 2));
-    });
+class FetchHolidayAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'fetchHoliday';
+        this.description = 'fetch holiday data from api';
+    }
+    run() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            let page = 0;
+            let holidays = [];
+            let data = null;
+            while (data === null || data.length !== 0) {
+                const response = yield (0, node_fetch_1.default)(`https://data.ntpc.gov.tw/api/datasets/308DCD75-6434-45BC-A95F-584DA4FED251/json?page=${page}&size=1000`);
+                data = yield response.json();
+                holidays = [...holidays, ...data];
+                page += 1;
+            }
+            new holiday_class_1.Holiday().writeFile(JSON.stringify(holidays, null, 2));
+        });
+    }
 }
-exports.fetchHolidayAction = fetchHolidayAction;
+exports.FetchHolidayAction = FetchHolidayAction;
 
 
 /***/ }),
@@ -555,22 +652,30 @@ exports.fetchHolidayAction = fetchHolidayAction;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.listDCAction = void 0;
+exports.ListDCAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const child_process_1 = __webpack_require__("child_process");
-function listDCAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const result = (0, child_process_1.execSync)(`for c in \`docker ps -q\`; do docker inspect $c --format '{{ index .Config.Labels "com.docker.compose.project.working_dir"}} ' ; done`, { encoding: 'utf-8' });
-        const workDirs = [
-            ...new Set(result
-                .trim()
-                .split('\n')
-                .map((s) => s.trim())),
-        ];
-        console.log(workDirs);
-    });
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
+class ListDCAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'listDC';
+        this.description = 'list running docker compose instances';
+    }
+    run() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const result = (0, child_process_1.execSync)(`for c in \`docker ps -q\`; do docker inspect $c --format '{{ index .Config.Labels "com.docker.compose.project.working_dir"}} ' ; done`, { encoding: 'utf-8' });
+            const workDirs = [
+                ...new Set(result
+                    .trim()
+                    .split('\n')
+                    .map((s) => s.trim())),
+            ];
+            console.log(workDirs);
+        });
+    }
 }
-exports.listDCAction = listDCAction;
+exports.ListDCAction = ListDCAction;
 
 
 /***/ }),
@@ -580,16 +685,27 @@ exports.listDCAction = listDCAction;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.listAction = void 0;
+exports.ListAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
-function listAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { clickUp } = yield (0, utils_1.getInfoFromArgv)();
-        console.log(yield clickUp.getFullTaskName());
-    });
+class ListAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'list';
+        this.description = 'show current or specified task name';
+        this.arguments = [
+            { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
+        ];
+    }
+    run(clickUpTaskIdArg) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const { clickUp } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
+            console.log(yield clickUp.getFullTaskName());
+        });
+    }
 }
-exports.listAction = listAction;
+exports.ListAction = ListAction;
 
 
 /***/ }),
@@ -599,41 +715,50 @@ exports.listAction = listAction;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.meetingTrackAction = void 0;
+exports.MeetingTrackAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const cron_1 = __webpack_require__("cron");
 const date_fns_1 = __webpack_require__("date-fns");
 const open_1 = tslib_1.__importDefault(__webpack_require__("open"));
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
-function meetingTrackAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        // get today meetings
-        const day = (0, utils_1.getDayFromArgv)();
-        const g = new node_shared_1.Google();
-        const todayMeetings = yield g.listAttendingEvent(day.toISOString(), (0, date_fns_1.add)(day, { days: 1 }).toISOString());
-        if (todayMeetings.length === 0) {
-            console.log('No meetings today!');
-        }
-        // print today meetings and times and meeting link
-        for (const m of todayMeetings) {
-            console.log(`- ${(0, date_fns_1.format)((0, date_fns_1.parseISO)(m.start.dateTime), 'Pp')}: ${m.summary}`);
-        }
-        // setup cron job for opening meeting link
-        todayMeetings.forEach((m) => {
-            const openTime = (0, date_fns_1.add)((0, date_fns_1.parseISO)(m.start.dateTime), { minutes: -5 });
-            if ((0, date_fns_1.isBefore)(openTime, day)) {
-                return;
+class MeetingTrackAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'meetingTrack';
+        this.description = 'track meeting of a day';
+        this.arguments = [{ name: '[day]', description: 'optional day' }];
+    }
+    run(dayArg) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            // get meetings
+            const day = (0, utils_1.getDayFromArgument)(dayArg);
+            const g = new node_shared_1.Google();
+            const todayMeetings = yield g.listAttendingEvent(day.toISOString(), (0, date_fns_1.add)(day, { days: 1 }).toISOString());
+            if (todayMeetings.length === 0) {
+                console.log('No meetings today!');
             }
-            const job = new cron_1.CronJob(openTime, () => {
-                (0, utils_1.displayNotification)(`${m.summary} at ${(0, date_fns_1.format)((0, date_fns_1.parseISO)(m.start.dateTime), 'Pp')}`);
-                (0, open_1.default)(m.hangoutLink + '?authuser=1');
+            // print today meetings and times and meeting link
+            for (const m of todayMeetings) {
+                console.log(`- ${(0, date_fns_1.format)((0, date_fns_1.parseISO)(m.start.dateTime), 'Pp')}: ${m.summary}`);
+            }
+            // setup cron job for opening meeting link
+            todayMeetings.forEach((m) => {
+                const openTime = (0, date_fns_1.add)((0, date_fns_1.parseISO)(m.start.dateTime), { minutes: -5 });
+                if ((0, date_fns_1.isBefore)(openTime, day)) {
+                    return;
+                }
+                const job = new cron_1.CronJob(openTime, () => {
+                    (0, utils_1.displayNotification)(`${m.summary} at ${(0, date_fns_1.format)((0, date_fns_1.parseISO)(m.start.dateTime), 'Pp')}`);
+                    (0, open_1.default)(m.hangoutLink + '?authuser=1');
+                });
+                job.start();
             });
-            job.start();
         });
-    });
+    }
 }
-exports.meetingTrackAction = meetingTrackAction;
+exports.MeetingTrackAction = MeetingTrackAction;
 
 
 /***/ }),
@@ -643,17 +768,28 @@ exports.meetingTrackAction = meetingTrackAction;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.openAction = void 0;
+exports.OpenAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
-function openAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { clickUpTaskId } = yield (0, utils_1.getInfoFromArgv)();
-        const urls = [`localhost:8112/task/${clickUpTaskId}`];
-        (0, utils_1.openUrlsInTabGroup)(urls, clickUpTaskId);
-    });
+class OpenAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'open';
+        this.description = 'open task todo page of current or specified task';
+        this.arguments = [
+            { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
+        ];
+    }
+    run(clickUpTaskIdArg) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const { clickUpTaskId } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
+            const urls = [`localhost:8112/task/${clickUpTaskId}`];
+            (0, utils_1.openUrlsInTabGroup)(urls, clickUpTaskId);
+        });
+    }
 }
-exports.openAction = openAction;
+exports.OpenAction = OpenAction;
 
 
 /***/ }),
@@ -663,25 +799,36 @@ exports.openAction = openAction;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.revertEndAction = void 0;
+exports.RevertEndAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const progress_log_class_1 = __webpack_require__("./apps/cli/src/classes/progress-log.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
-function revertEndAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { gitLab, mergeRequest, clickUp } = yield (0, utils_1.getInfoFromArgv)();
-        const p = new progress_log_class_1.CustomProgressLog("End", [
-            "Update GitLab Merge Request Ready Status and Assignee",
-            "Update ClickUp Task Status",
-        ]);
-        p.start();
-        yield gitLab.markMergeRequestAsUnreadyAndSetAssigneeToSelf(mergeRequest);
-        p.next();
-        yield clickUp.setTaskStatus("in progress");
-        p.end(0);
-    });
+class RevertEndAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'revertEnd';
+        this.description = 'revert end state of a task';
+        this.arguments = [
+            { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
+        ];
+    }
+    run(clickUpTaskIdArg) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const { gitLab, mergeRequest, clickUp } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
+            const p = new progress_log_class_1.CustomProgressLog('End', [
+                'Update GitLab Merge Request Ready Status and Assignee',
+                'Update ClickUp Task Status',
+            ]);
+            p.start();
+            yield gitLab.markMergeRequestAsUnreadyAndSetAssigneeToSelf(mergeRequest);
+            p.next();
+            yield clickUp.setTaskStatus('in progress');
+            p.end(0);
+        });
+    }
 }
-exports.revertEndAction = revertEndAction;
+exports.RevertEndAction = RevertEndAction;
 
 
 /***/ }),
@@ -691,12 +838,13 @@ exports.revertEndAction = revertEndAction;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.punch = exports.routineAction = exports.confirm = void 0;
+exports.punch = exports.RoutineAction = exports.confirm = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const fs_1 = tslib_1.__importDefault(__webpack_require__("fs"));
 const puppeteer_1 = tslib_1.__importDefault(__webpack_require__("puppeteer"));
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const readline_1 = tslib_1.__importDefault(__webpack_require__("readline"));
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const holiday_class_1 = __webpack_require__("./apps/cli/src/classes/holiday.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 const daily_progress_action_1 = __webpack_require__("./apps/cli/src/actions/daily-progress.action.ts");
@@ -719,37 +867,46 @@ function confirm(question) {
     });
 }
 exports.confirm = confirm;
-function routineAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const skipPunch = process.argv.includes('-s');
-        process.argv = process.argv.filter((a) => !a.startsWith('-'));
-        const day = (0, utils_1.getDayFromArgv)();
-        const hour = day.getHours();
-        const isMorning = hour < 12;
-        const holiday = new holiday_class_1.Holiday();
-        const isWorkDay = holiday.checkIsWorkday(day);
-        const message = isWorkDay ? 'Today is workday!' : 'Today is holiday!';
-        console.log(message);
-        if (isWorkDay && !skipPunch) {
-            yield confirm('run punch?');
-            const result = yield punch();
-            console.log(result);
-        }
-        if (isMorning) {
-            if (isWorkDay) {
-                yield confirm('run dump my tasks?');
-                yield (0, dump_my_tasks_action_1.dumpMyTasksAction)();
-                (0, utils_1.openUrlsInTabGroup)(['localhost:8112/tasks', 'localhost:8112/markdown/todo'], 'accel');
-                yield confirm('check tasks and todo done?');
-                yield confirm('run daily progress?');
-                yield (0, daily_progress_action_1.dailyProgressAction)();
-                yield confirm('send dp to slack done?');
+class RoutineAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'routine';
+        this.description = 'daily routine list';
+        this.arguments = [{ name: '[day]', description: 'optional day' }];
+        this.options = [
+            { flags: '-s, --skip-punch', description: 'skip punch item' },
+        ];
+    }
+    run(dayArg, { skipPunch }) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const day = (0, utils_1.getDayFromArgument)(dayArg);
+            const hour = day.getHours();
+            const isMorning = hour < 12;
+            const holiday = new holiday_class_1.Holiday();
+            const isWorkDay = holiday.checkIsWorkday(day);
+            const message = isWorkDay ? 'Today is workday!' : 'Today is holiday!';
+            console.log(message);
+            if (isWorkDay && !skipPunch) {
+                yield confirm('run punch?');
+                const result = yield punch();
+                console.log(result);
             }
-        }
-        console.log('Complete');
-    });
+            if (isMorning) {
+                if (isWorkDay) {
+                    yield confirm('run dump my tasks?');
+                    yield new dump_my_tasks_action_1.DumpMyTasksAction().run();
+                    (0, utils_1.openUrlsInTabGroup)(['localhost:8112/tasks', 'localhost:8112/markdown/todo'], 'accel');
+                    yield confirm('check tasks and todo done?');
+                    yield confirm('run daily progress?');
+                    yield new daily_progress_action_1.DailyProgressAction().run((0, node_shared_1.formatDate)(day));
+                    yield confirm('send dp to slack done?');
+                }
+            }
+            console.log('Complete');
+        });
+    }
 }
-exports.routineAction = routineAction;
+exports.RoutineAction = RoutineAction;
 function punch() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const { account, password, url } = JSON.parse(fs_1.default.readFileSync(node_shared_1.CONFIG.PunchInfoFile, { encoding: 'utf-8' }));
@@ -830,17 +987,25 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.RTVTasksAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
-function RTVTasksAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const user = (yield node_shared_1.ClickUp.getCurrentUser()).user;
-        const team = (yield node_shared_1.ClickUp.getTeams()).teams.find((t) => t.name === node_shared_1.CONFIG.ClickUpTeam);
-        if (!team) {
-            console.log("Team does not exist.");
-            return;
-        }
-        const tasks = (yield node_shared_1.ClickUp.getRTVTasks(team.id, user.id)).tasks;
-        console.log(tasks.map((t) => `- ${t.name} (${t.url})`).join("\n"));
-    });
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
+class RTVTasksAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'RTVTasks';
+        this.description = 'list ready to verify tasks';
+    }
+    run() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const user = (yield node_shared_1.ClickUp.getCurrentUser()).user;
+            const team = (yield node_shared_1.ClickUp.getTeams()).teams.find((t) => t.name === node_shared_1.CONFIG.ClickUpTeam);
+            if (!team) {
+                console.log('Team does not exist.');
+                return;
+            }
+            const tasks = (yield node_shared_1.ClickUp.getRTVTasks(team.id, user.id)).tasks;
+            console.log(tasks.map((t) => `- ${t.name} (${t.url})`).join('\n'));
+        });
+    }
 }
 exports.RTVTasksAction = RTVTasksAction;
 
@@ -852,37 +1017,49 @@ exports.RTVTasksAction = RTVTasksAction;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.showDiffAction = void 0;
+exports.ShowDiffAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
-function showDiffAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const htmlOnly = process.argv.includes("-h") || process.argv.includes("--html");
-        const pythonOnly = process.argv.includes("-p") || process.argv.includes("--python");
-        process.argv = process.argv.filter((a) => !a.startsWith("-"));
-        const { gitLab, mergeRequest } = yield (0, utils_1.getInfoFromArgv)();
-        const mergeRequestChanges = yield gitLab.getMergeRequestChanges(mergeRequest.iid);
-        const changes = mergeRequestChanges.changes;
-        let filteredChanges = [];
-        if (htmlOnly) {
-            filteredChanges = [
-                ...filteredChanges,
-                ...changes.filter((c) => c.new_path.endsWith(".html")),
-            ];
-        }
-        if (pythonOnly) {
-            filteredChanges = [
-                ...filteredChanges,
-                ...changes.filter((c) => c.new_path.endsWith(".py")),
-            ];
-        }
-        for (const change of filteredChanges) {
-            console.log(`### ${change.new_path}`);
-            console.log(change.diff);
-        }
-    });
+class ShowDiffAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'showDiff';
+        this.description = 'show diff of files in a task';
+        this.arguments = [
+            { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
+        ];
+        this.options = [
+            { flags: '-h, --html-only', description: 'show only html diff' },
+            { flags: '-p, --python-only', description: 'show only python diff' },
+        ];
+    }
+    run(clickUpTaskIdArg, { htmlOnly, pythonOnly }) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const { gitLab, mergeRequest } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
+            const mergeRequestChanges = yield gitLab.getMergeRequestChanges(mergeRequest.iid);
+            const changes = mergeRequestChanges.changes;
+            let filteredChanges = [];
+            if (htmlOnly) {
+                filteredChanges = [
+                    ...filteredChanges,
+                    ...changes.filter((c) => c.new_path.endsWith('.html')),
+                ];
+            }
+            if (pythonOnly) {
+                filteredChanges = [
+                    ...filteredChanges,
+                    ...changes.filter((c) => c.new_path.endsWith('.py')),
+                ];
+            }
+            for (const change of filteredChanges) {
+                console.log(`### ${change.new_path}`);
+                console.log(change.diff);
+            }
+        });
+    }
 }
-exports.showDiffAction = showDiffAction;
+exports.ShowDiffAction = ShowDiffAction;
 
 
 /***/ }),
@@ -892,7 +1069,7 @@ exports.showDiffAction = showDiffAction;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.startAction = void 0;
+exports.StartAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const fs_1 = __webpack_require__("fs");
 const inquirer_1 = tslib_1.__importDefault(__webpack_require__("inquirer"));
@@ -901,145 +1078,153 @@ const os_1 = tslib_1.__importDefault(__webpack_require__("os"));
 const path_1 = __webpack_require__("path");
 const untildify_1 = tslib_1.__importDefault(__webpack_require__("untildify"));
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const progress_log_class_1 = __webpack_require__("./apps/cli/src/classes/progress-log.class.ts");
 const todo_class_1 = __webpack_require__("./apps/cli/src/classes/todo.class.ts");
 const tracker_class_1 = __webpack_require__("./apps/cli/src/classes/tracker.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 const open_action_1 = __webpack_require__("./apps/cli/src/actions/open.action.ts");
-function startAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const repoName = (0, utils_1.getRepoName)();
-        const index = node_shared_1.CONFIG.GitLabProjects.findIndex((p) => p.repo.endsWith(`/${repoName}`));
-        const answers = yield inquirer_1.default.prompt([
-            {
-                name: 'gitLabProject',
-                message: 'Choose GitLab Project',
-                type: 'list',
-                choices: node_shared_1.CONFIG.GitLabProjects.map((p) => ({
-                    name: `${p.name} (${p.repo})`,
-                    value: p,
-                })),
-                default: index >= 0 ? index : null,
-                filter(input) {
-                    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-                        process.chdir(input.path.replace('~', os_1.default.homedir()));
-                        const isClean = yield (0, utils_1.checkWorkingTreeClean)();
-                        if (!isClean) {
-                            console.log('\nWorking tree is not clean or something is not pushed. Aborted.');
-                            process.exit();
-                        }
-                        return input;
-                    });
+class StartAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'start';
+        this.description = 'start a task';
+    }
+    run() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const repoName = (0, utils_1.getRepoName)();
+            const index = node_shared_1.CONFIG.GitLabProjects.findIndex((p) => p.repo.endsWith(`/${repoName}`));
+            const answers = yield inquirer_1.default.prompt([
+                {
+                    name: 'gitLabProject',
+                    message: 'Choose GitLab Project',
+                    type: 'list',
+                    choices: node_shared_1.CONFIG.GitLabProjects.map((p) => ({
+                        name: `${p.name} (${p.repo})`,
+                        value: p,
+                    })),
+                    default: index >= 0 ? index : null,
+                    filter(input) {
+                        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+                            process.chdir(input.path.replace('~', os_1.default.homedir()));
+                            const isClean = yield (0, utils_1.checkWorkingTreeClean)();
+                            if (!isClean) {
+                                console.log('\nWorking tree is not clean or something is not pushed. Aborted.');
+                                process.exit();
+                            }
+                            return input;
+                        });
+                    },
                 },
-            },
-            {
-                name: 'clickUpTaskId',
-                message: 'Enter ClickUp Task ID',
-                type: 'input',
-                filter: (input) => input.replace('#', ''),
-            },
-            {
-                name: 'mergeRequestTitle',
-                message: 'Enter Merge Request Title',
-                type: 'input',
-                default: (answers) => tslib_1.__awaiter(this, void 0, void 0, function* () {
-                    let task = yield new node_shared_1.ClickUp(answers.clickUpTaskId).getTask();
-                    const user = (yield node_shared_1.ClickUp.getCurrentUser()).user;
-                    if (!task.assignees.find((a) => a.id === user.id)) {
-                        console.log('\nTask is not assigned to you. Aborted.');
-                        process.exit();
-                    }
-                    if (answers.gitLabProject.products) {
-                        const product = yield node_shared_1.ClickUp.getProduct(task);
-                        if (!answers.gitLabProject.products.includes(product)) {
-                            console.log('\nTask is not in products of project. Aborted.');
+                {
+                    name: 'clickUpTaskId',
+                    message: 'Enter ClickUp Task ID',
+                    type: 'input',
+                    filter: (input) => input.replace('#', ''),
+                },
+                {
+                    name: 'mergeRequestTitle',
+                    message: 'Enter Merge Request Title',
+                    type: 'input',
+                    default: (answers) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+                        let task = yield new node_shared_1.ClickUp(answers.clickUpTaskId).getTask();
+                        const user = (yield node_shared_1.ClickUp.getCurrentUser()).user;
+                        if (!task.assignees.find((a) => a.id === user.id)) {
+                            console.log('\nTask is not assigned to you. Aborted.');
                             process.exit();
                         }
-                    }
-                    let result = task.name;
-                    while (task.parent) {
-                        task = yield new node_shared_1.ClickUp(task.parent).getTask();
-                        result = `${task.name} - ${result}`;
-                    }
-                    return result;
-                }),
-            },
-            {
-                name: 'todoConfig',
-                message: 'Choose Preset To-do Config',
-                type: 'checkbox',
-                choices: node_shared_1.CONFIG.ToDoConfigChoices,
-            },
-        ]);
-        const p = new progress_log_class_1.CustomProgressLog('Start', [
-            'Get ClickUp Task',
-            'Set ClickUp Task Status',
-            'Set ClickUp Task Start Date to Today',
-            'Render Todo List',
-            'Create GitLab Branch',
-            'Create GitLab Merge Request',
-            'Create Checklist at ClickUp',
-            'Add Todo Entry',
-            'Add Tracker Item',
-            'Do Git Fetch and Checkout',
-        ]);
-        process.chdir(answers.gitLabProject.path.replace('~', os_1.default.homedir()));
-        yield (0, utils_1.checkWorkingTreeClean)();
-        const gitLab = new node_shared_1.GitLab(answers.gitLabProject.id);
-        const clickUp = new node_shared_1.ClickUp(answers.clickUpTaskId);
-        p.start(); // Get ClickUp Task
-        const clickUpTask = yield clickUp.getTask();
-        const clickUpTaskUrl = clickUpTask['url'];
-        const gitLabMergeRequestTitle = answers.mergeRequestTitle;
-        p.next(); // Set ClickUp Task Status
-        yield clickUp.setTaskStatus('in progress');
-        p.next(); // Set ClickUp Task Start Date to Today
-        yield clickUp.setTaskStartDateToToday();
-        p.next(); // Render Todo List
-        const todoConfigMap = {};
-        answers.todoConfig.forEach((c) => {
-            todoConfigMap[c] = true;
+                        if (answers.gitLabProject.products) {
+                            const product = yield node_shared_1.ClickUp.getProduct(task);
+                            if (!answers.gitLabProject.products.includes(product)) {
+                                console.log('\nTask is not in products of project. Aborted.');
+                                process.exit();
+                            }
+                        }
+                        let result = task.name;
+                        while (task.parent) {
+                            task = yield new node_shared_1.ClickUp(task.parent).getTask();
+                            result = `${task.name} - ${result}`;
+                        }
+                        return result;
+                    }),
+                },
+                {
+                    name: 'todoConfig',
+                    message: 'Choose Preset To-do Config',
+                    type: 'checkbox',
+                    choices: node_shared_1.CONFIG.ToDoConfigChoices,
+                },
+            ]);
+            const p = new progress_log_class_1.CustomProgressLog('Start', [
+                'Get ClickUp Task',
+                'Set ClickUp Task Status',
+                'Set ClickUp Task Start Date to Today',
+                'Render Todo List',
+                'Create GitLab Branch',
+                'Create GitLab Merge Request',
+                'Create Checklist at ClickUp',
+                'Add Todo Entry',
+                'Add Tracker Item',
+                'Do Git Fetch and Checkout',
+            ]);
+            process.chdir(answers.gitLabProject.path.replace('~', os_1.default.homedir()));
+            yield (0, utils_1.checkWorkingTreeClean)();
+            const gitLab = new node_shared_1.GitLab(answers.gitLabProject.id);
+            const clickUp = new node_shared_1.ClickUp(answers.clickUpTaskId);
+            p.start(); // Get ClickUp Task
+            const clickUpTask = yield clickUp.getTask();
+            const clickUpTaskUrl = clickUpTask['url'];
+            const gitLabMergeRequestTitle = answers.mergeRequestTitle;
+            p.next(); // Set ClickUp Task Status
+            yield clickUp.setTaskStatus('in progress');
+            p.next(); // Set ClickUp Task Start Date to Today
+            yield clickUp.setTaskStartDateToToday();
+            p.next(); // Render Todo List
+            const todoConfigMap = {};
+            answers.todoConfig.forEach((c) => {
+                todoConfigMap[c] = true;
+            });
+            todoConfigMap[answers.gitLabProject.name] = true;
+            const template = (0, fs_1.readFileSync)((0, untildify_1.default)(node_shared_1.CONFIG.ToDoTemplate), {
+                encoding: 'utf-8',
+            });
+            const endingTodo = (0, mustache_1.render)(template, todoConfigMap);
+            const path = (0, path_1.join)(node_shared_1.CONFIG.TaskTodoFolder, answers.clickUpTaskId + '.md');
+            (0, fs_1.writeFileSync)(path, endingTodo);
+            p.next(); // Create GitLab Branch
+            const gitLabBranch = yield gitLab.createBranch(`CU-${answers.clickUpTaskId}`);
+            p.next(); // Create GitLab Merge Request
+            yield (0, node_shared_1.sleep)(2000); // prevent "branch restored" bug
+            const gitLabMergeRequest = yield gitLab.createMergeRequest(gitLabMergeRequestTitle + `__CU-${answers.clickUpTaskId}`, gitLabBranch.name, answers.gitLabProject.hasMergeRequestTemplate
+                ? yield gitLab.getMergeRequestTemplate()
+                : '');
+            const gitLabMergeRequestIId = gitLabMergeRequest.iid;
+            yield gitLab.createMergeRequestNote(gitLabMergeRequest, `ClickUp Task: [${gitLabMergeRequestTitle}](${clickUpTaskUrl})`);
+            p.next(); // Create Checklist at ClickUp
+            const clickUpChecklistTitle = `Synced checklist [${answers.gitLabProject.id.replace('%2F', '/')} !${gitLabMergeRequestIId}]`;
+            let clickUpChecklist = clickUpTask.checklists.find((c) => c.name === clickUpChecklistTitle);
+            if (!clickUpChecklist) {
+                clickUpChecklist = (yield clickUp.createChecklist(clickUpChecklistTitle))
+                    .checklist;
+                yield clickUp.updateChecklist(clickUpChecklist, endingTodo);
+            }
+            p.next(); // Add Todo Entry
+            const todoString = yield clickUp.getTaskString('todo');
+            new todo_class_1.Todo().addTodo(todoString);
+            p.next(); // Add Tracker Item
+            new tracker_class_1.Tracker().addItem(answers.clickUpTaskId);
+            p.next(); // Do Git Fetch and Checkout
+            process.chdir(answers.gitLabProject.path.replace('~', os_1.default.homedir()));
+            yield (0, utils_1.promiseSpawn)('git', ['fetch'], 'pipe');
+            yield (0, node_shared_1.sleep)(1000);
+            yield (0, utils_1.promiseSpawn)('git', ['checkout', gitLabBranch.name], 'pipe');
+            yield (0, utils_1.promiseSpawn)('git', ['submodule', 'update', '--init', '--recursive'], 'pipe');
+            yield new open_action_1.OpenAction().run(answers.clickUpTaskId);
+            p.end(0);
         });
-        todoConfigMap[answers.gitLabProject.name] = true;
-        const template = (0, fs_1.readFileSync)((0, untildify_1.default)(node_shared_1.CONFIG.ToDoTemplate), {
-            encoding: 'utf-8',
-        });
-        const endingTodo = (0, mustache_1.render)(template, todoConfigMap);
-        const path = (0, path_1.join)(node_shared_1.CONFIG.TaskTodoFolder, answers.clickUpTaskId + '.md');
-        (0, fs_1.writeFileSync)(path, endingTodo);
-        p.next(); // Create GitLab Branch
-        const gitLabBranch = yield gitLab.createBranch(`CU-${answers.clickUpTaskId}`);
-        p.next(); // Create GitLab Merge Request
-        yield (0, node_shared_1.sleep)(2000); // prevent "branch restored" bug
-        const gitLabMergeRequest = yield gitLab.createMergeRequest(gitLabMergeRequestTitle + `__CU-${answers.clickUpTaskId}`, gitLabBranch.name, answers.gitLabProject.hasMergeRequestTemplate
-            ? yield gitLab.getMergeRequestTemplate()
-            : '');
-        const gitLabMergeRequestIId = gitLabMergeRequest.iid;
-        yield gitLab.createMergeRequestNote(gitLabMergeRequest, `ClickUp Task: [${gitLabMergeRequestTitle}](${clickUpTaskUrl})`);
-        p.next(); // Create Checklist at ClickUp
-        const clickUpChecklistTitle = `Synced checklist [${answers.gitLabProject.id.replace('%2F', '/')} !${gitLabMergeRequestIId}]`;
-        let clickUpChecklist = clickUpTask.checklists.find((c) => c.name === clickUpChecklistTitle);
-        if (!clickUpChecklist) {
-            clickUpChecklist = (yield clickUp.createChecklist(clickUpChecklistTitle))
-                .checklist;
-            yield clickUp.updateChecklist(clickUpChecklist, endingTodo);
-        }
-        p.next(); // Add Todo Entry
-        const todoString = yield clickUp.getTaskString('todo');
-        new todo_class_1.Todo().addTodo(todoString);
-        p.next(); // Add Tracker Item
-        new tracker_class_1.Tracker().addItem(answers.clickUpTaskId);
-        p.next(); // Do Git Fetch and Checkout
-        process.chdir(answers.gitLabProject.path.replace('~', os_1.default.homedir()));
-        yield (0, utils_1.promiseSpawn)('git', ['fetch'], 'pipe');
-        yield (0, node_shared_1.sleep)(1000);
-        yield (0, utils_1.promiseSpawn)('git', ['checkout', gitLabBranch.name], 'pipe');
-        yield (0, utils_1.promiseSpawn)('git', ['submodule', 'update', '--init', '--recursive'], 'pipe');
-        yield (0, open_action_1.openAction)();
-        p.end(0);
-    });
+    }
 }
-exports.startAction = startAction;
+exports.StartAction = StartAction;
 
 
 /***/ }),
@@ -1049,37 +1234,48 @@ exports.startAction = startAction;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.switchAction = void 0;
+exports.SwitchAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const child_process_1 = __webpack_require__("child_process");
 const os_1 = tslib_1.__importDefault(__webpack_require__("os"));
 const actions_1 = __webpack_require__("./apps/cli/src/actions.ts");
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 const open_action_1 = __webpack_require__("./apps/cli/src/actions/open.action.ts");
-function switchAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        (0, actions_1.configReadline)();
-        const { gitLabProject, mergeRequest } = yield (0, utils_1.getInfoFromArgv)();
-        if (mergeRequest.state === "merged") {
-            console.log("This task is completed.");
-            return;
-        }
-        process.chdir(gitLabProject.path.replace("~", os_1.default.homedir()));
-        const branchName = (0, child_process_1.execSync)("git branch --show-current", {
-            encoding: "utf-8",
-        });
-        if (branchName.trim() !== mergeRequest.source_branch) {
-            const isClean = yield (0, utils_1.checkWorkingTreeClean)();
-            if (!isClean) {
-                console.log("\nWorking tree is not clean or something is not pushed. Aborted.");
-                process.exit();
+class SwitchAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'switch';
+        this.description = 'switch to a task';
+        this.arguments = [
+            { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
+        ];
+    }
+    run(clickUpTaskIdArg) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            (0, actions_1.configReadline)();
+            const { gitLabProject, mergeRequest, clickUpTaskId } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
+            if (mergeRequest.state === 'merged') {
+                console.log('This task is completed.');
+                return;
             }
-            yield (0, utils_1.promiseSpawn)("git", ["checkout", mergeRequest.source_branch], "pipe");
-            yield (0, open_action_1.openAction)();
-        }
-    });
+            process.chdir(gitLabProject.path.replace('~', os_1.default.homedir()));
+            const branchName = (0, child_process_1.execSync)('git branch --show-current', {
+                encoding: 'utf-8',
+            });
+            if (branchName.trim() !== mergeRequest.source_branch) {
+                const isClean = yield (0, utils_1.checkWorkingTreeClean)();
+                if (!isClean) {
+                    console.log('\nWorking tree is not clean or something is not pushed. Aborted.');
+                    process.exit();
+                }
+                yield (0, utils_1.promiseSpawn)('git', ['checkout', mergeRequest.source_branch], 'pipe');
+                yield new open_action_1.OpenAction().run(clickUpTaskId);
+            }
+        });
+    }
 }
-exports.switchAction = switchAction;
+exports.SwitchAction = SwitchAction;
 
 
 /***/ }),
@@ -1089,17 +1285,25 @@ exports.switchAction = switchAction;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.timeAction = void 0;
+exports.TimeAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const clipboardy_1 = tslib_1.__importDefault(__webpack_require__("clipboardy"));
 const date_fns_1 = __webpack_require__("date-fns");
-function timeAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        clipboardy_1.default.writeSync((0, date_fns_1.format)(new Date(), 'yyyyMMdd_HHmmss'));
-        console.log('Copied!');
-    });
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
+class TimeAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'time';
+        this.description = 'copy current time';
+    }
+    run() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            clipboardy_1.default.writeSync((0, date_fns_1.format)(new Date(), 'yyyyMMdd_HHmmss'));
+            console.log('Copied!');
+        });
+    }
 }
-exports.timeAction = timeAction;
+exports.TimeAction = TimeAction;
 
 
 /***/ }),
@@ -1109,7 +1313,7 @@ exports.timeAction = timeAction;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.toDoAction = void 0;
+exports.TodoAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const clipboardy_1 = tslib_1.__importDefault(__webpack_require__("clipboardy"));
@@ -1117,40 +1321,48 @@ const fs_1 = __webpack_require__("fs");
 const inquirer_1 = tslib_1.__importDefault(__webpack_require__("inquirer"));
 const mustache_1 = __webpack_require__("mustache");
 const untildify_1 = tslib_1.__importDefault(__webpack_require__("untildify"));
-function toDoAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const answers = yield inquirer_1.default.prompt([
-            {
-                name: "gitLabProject",
-                message: "Choose GitLab Project",
-                type: "list",
-                choices: node_shared_1.CONFIG.GitLabProjects.map((p) => ({
-                    name: `${p.name} (${p.repo})`,
-                    value: p,
-                })),
-            },
-            {
-                name: "todoConfig",
-                message: "Choose Preset To-do Config",
-                type: "checkbox",
-                choices: node_shared_1.CONFIG.ToDoConfigChoices,
-            },
-        ]);
-        const todoConfigMap = {};
-        answers.todoConfig.forEach((c) => {
-            todoConfigMap[c] = true;
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
+class TodoAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'toDo';
+        this.description = 'generate todo list';
+    }
+    run() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const answers = yield inquirer_1.default.prompt([
+                {
+                    name: 'gitLabProject',
+                    message: 'Choose GitLab Project',
+                    type: 'list',
+                    choices: node_shared_1.CONFIG.GitLabProjects.map((p) => ({
+                        name: `${p.name} (${p.repo})`,
+                        value: p,
+                    })),
+                },
+                {
+                    name: 'todoConfig',
+                    message: 'Choose Preset To-do Config',
+                    type: 'checkbox',
+                    choices: node_shared_1.CONFIG.ToDoConfigChoices,
+                },
+            ]);
+            const todoConfigMap = {};
+            answers.todoConfig.forEach((c) => {
+                todoConfigMap[c] = true;
+            });
+            todoConfigMap[answers.gitLabProject.name] = true;
+            const template = (0, fs_1.readFileSync)((0, untildify_1.default)(node_shared_1.CONFIG.ToDoTemplate), {
+                encoding: 'utf-8',
+            });
+            const endingTodo = (0, mustache_1.render)(template, todoConfigMap);
+            clipboardy_1.default.writeSync(endingTodo);
+            console.log(endingTodo);
+            console.log('Copied!');
         });
-        todoConfigMap[answers.gitLabProject.name] = true;
-        const template = (0, fs_1.readFileSync)((0, untildify_1.default)(node_shared_1.CONFIG.ToDoTemplate), {
-            encoding: "utf-8",
-        });
-        const endingTodo = (0, mustache_1.render)(template, todoConfigMap);
-        clipboardy_1.default.writeSync(endingTodo);
-        console.log(endingTodo);
-        console.log("Copied!");
-    });
+    }
 }
-exports.toDoAction = toDoAction;
+exports.TodoAction = TodoAction;
 
 
 /***/ }),
@@ -1160,24 +1372,32 @@ exports.toDoAction = toDoAction;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.trackAction = void 0;
+exports.TrackAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const single_instance_lock_1 = __webpack_require__("single-instance-lock");
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const tracker_class_1 = __webpack_require__("./apps/cli/src/classes/tracker.class.ts");
 const locker = new single_instance_lock_1.SingleInstanceLock('accel-shooter');
-function trackAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        locker.lock(single_instance_lock_1.LockType.First);
-        locker.on('locked', () => {
-            const tracker = new tracker_class_1.Tracker();
-            tracker.startSync();
+class TrackAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'track';
+        this.description = 'track for merge request merge status and then change ClickUp task status';
+    }
+    run() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            locker.lock(single_instance_lock_1.LockType.First);
+            locker.on('locked', () => {
+                const tracker = new tracker_class_1.Tracker();
+                tracker.startSync();
+            });
+            locker.on('error', () => {
+                console.log('Lock occupied!');
+            });
         });
-        locker.on('error', () => {
-            console.log('Lock occupied!');
-        });
-    });
+    }
 }
-exports.trackAction = trackAction;
+exports.TrackAction = TrackAction;
 
 
 /***/ }),
@@ -1187,33 +1407,43 @@ exports.trackAction = trackAction;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.watchPipelineAction = void 0;
+exports.WatchPipelineAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
-function watchPipelineAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const projectName = process.argv[3];
-        const mergeRequestIId = process.argv[4];
-        const gitLabProject = (0, utils_1.getGitLabProjectConfigByName)(projectName);
-        const gitLab = new node_shared_1.GitLab(gitLabProject.id);
-        function getAndPrintPipelineStatus() {
-            var _a;
-            return tslib_1.__awaiter(this, void 0, void 0, function* () {
-                const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
-                const status = ((_a = mergeRequest.head_pipeline) === null || _a === void 0 ? void 0 : _a.status) || 'none';
-                console.log(status);
-                if (status !== 'running' && status !== 'none') {
-                    (0, utils_1.displayNotification)(`Pipeline of ${projectName} !${mergeRequestIId} status: ${status}`);
-                    process.exit();
-                }
-            });
-        }
-        getAndPrintPipelineStatus();
-        setInterval(getAndPrintPipelineStatus, 30 * 1000);
-    });
+class WatchPipelineAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'watchPipeline';
+        this.description = 'watch pipeline status of a merge request';
+        this.arguments = [
+            { name: 'projectName', description: 'GitLab project name' },
+            { name: 'mergeRequestIId', description: 'merge request iid' },
+        ];
+    }
+    run(projectName, mergeRequestIId) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const gitLabProject = (0, utils_1.getGitLabProjectConfigByName)(projectName);
+            const gitLab = new node_shared_1.GitLab(gitLabProject.id);
+            function getAndPrintPipelineStatus() {
+                var _a;
+                return tslib_1.__awaiter(this, void 0, void 0, function* () {
+                    const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
+                    const status = ((_a = mergeRequest.head_pipeline) === null || _a === void 0 ? void 0 : _a.status) || 'none';
+                    console.log(status);
+                    if (status !== 'running' && status !== 'none') {
+                        (0, utils_1.displayNotification)(`Pipeline of ${projectName} !${mergeRequestIId} status: ${status}`);
+                        process.exit();
+                    }
+                });
+            }
+            getAndPrintPipelineStatus();
+            setInterval(getAndPrintPipelineStatus, 30 * 1000);
+        });
+    }
 }
-exports.watchPipelineAction = watchPipelineAction;
+exports.WatchPipelineAction = WatchPipelineAction;
 
 
 /***/ }),
@@ -1223,39 +1453,83 @@ exports.watchPipelineAction = watchPipelineAction;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.workAction = void 0;
+exports.WorkAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const kexec_1 = tslib_1.__importDefault(__webpack_require__("@jcoreio/kexec"));
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const todo_class_1 = __webpack_require__("./apps/cli/src/classes/todo.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
-function workAction() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const todo = new todo_class_1.Todo();
-        const todoContent = todo.readFile();
-        let matchResult = todoContent.match(/## Todo\n([\s\S]+)\n##/);
-        if (!matchResult) {
-            throw Error('Todo File Broken');
-        }
-        const todoList = matchResult[1].split('\n');
-        const firstTodo = todoList[0];
-        matchResult = firstTodo.match(/https:\/\/app.clickup.com\/t\/(\w+)\)/);
-        if (!matchResult) {
-            throw Error('First Todo is not a ClickUp task');
-        }
-        const clickUpTaskId = matchResult[1];
-        const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
-        const { gitLabProject } = yield clickUp.getGitLabProjectAndMergeRequestIId();
-        // Open Task Page
-        const urls = [`localhost:8112/task/${clickUpTaskId}`];
-        (0, utils_1.openUrlsInTabGroup)(urls, clickUpTaskId);
-        // Open tmux
-        const folder = gitLabProject.path;
-        const shortName = gitLabProject.shortName;
-        (0, kexec_1.default)(`cd ${folder}; tmux new -A -d -s ${shortName} -c ${folder}; tmux new -A -D -s ${shortName}`);
-    });
+class WorkAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'work';
+        this.description = 'set up work space for first item in todo list';
+    }
+    run() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const todo = new todo_class_1.Todo();
+            const todoContent = todo.readFile();
+            let matchResult = todoContent.match(/## Todo\n([\s\S]+)\n##/);
+            if (!matchResult) {
+                throw Error('Todo File Broken');
+            }
+            const todoList = matchResult[1].split('\n');
+            const firstTodo = todoList[0];
+            matchResult = firstTodo.match(/https:\/\/app.clickup.com\/t\/(\w+)\)/);
+            if (!matchResult) {
+                throw Error('First Todo is not a ClickUp task');
+            }
+            const clickUpTaskId = matchResult[1];
+            const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
+            const { gitLabProject } = yield clickUp.getGitLabProjectAndMergeRequestIId();
+            // Open Task Page
+            const urls = [`localhost:8112/task/${clickUpTaskId}`];
+            (0, utils_1.openUrlsInTabGroup)(urls, clickUpTaskId);
+            // Open tmux
+            const folder = gitLabProject.path;
+            const shortName = gitLabProject.shortName;
+            (0, kexec_1.default)(`cd ${folder}; tmux new -A -d -s ${shortName} -c ${folder}; tmux new -A -D -s ${shortName}`);
+        });
+    }
 }
-exports.workAction = workAction;
+exports.WorkAction = WorkAction;
+
+
+/***/ }),
+
+/***/ "./apps/cli/src/classes/action.class.ts":
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.Action = void 0;
+class Action {
+    constructor() {
+        this.arguments = [];
+        this.options = [];
+    }
+    init(program) {
+        const command = program.command(this.command).description(this.description);
+        this.arguments.forEach(({ name, description }) => {
+            command.argument(name, description);
+        });
+        this.options.forEach(({ flags, description }) => {
+            command.option(flags, description);
+        });
+        command.action(this.run);
+    }
+}
+exports.Action = Action;
+/*
+export class Action extends Action {
+  public command = '';
+  public description = '';
+  public arguments = [{ name: '', description: '' }];
+  public options = [{ flags: '', description: '' }];
+  public async run() {}
+}
+*/
 
 
 /***/ }),
@@ -1879,7 +2153,7 @@ exports.checkItemsMap = {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.displayNotification = exports.getDayFromArgv = exports.getRepoName = exports.openUrlsInTabGroup = exports.checkWorkingTreeClean = exports.getInfoFromArgv = exports.updateTaskStatusInDp = exports.getClickUpTaskIdFromGitLabMergeRequest = exports.getGitLabProjectConfigById = exports.getGitLabProjectConfigByName = exports.promiseSpawn = void 0;
+exports.displayNotification = exports.getDayFromArgument = exports.getRepoName = exports.openUrlsInTabGroup = exports.checkWorkingTreeClean = exports.getInfoFromArgument = exports.getGitLabProjectConfigByName = exports.promiseSpawn = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const child_process_1 = tslib_1.__importStar(__webpack_require__("child_process"));
 const node_notifier_1 = tslib_1.__importDefault(__webpack_require__("node-notifier"));
@@ -1924,40 +2198,10 @@ function getGitLabProjectConfigByName(n) {
     return node_shared_1.CONFIG.GitLabProjects.find(({ name }) => name === n);
 }
 exports.getGitLabProjectConfigByName = getGitLabProjectConfigByName;
-function getGitLabProjectConfigById(inputId) {
-    return node_shared_1.CONFIG.GitLabProjects.find(({ id }) => id === inputId);
-}
-exports.getGitLabProjectConfigById = getGitLabProjectConfigById;
-function getClickUpTaskIdFromGitLabMergeRequest(mergeRequest) {
-    const branchName = mergeRequest.source_branch;
-    const result = branchName.match(/CU-([a-z0-9]+)/);
-    return result ? result[1] : null;
-}
-exports.getClickUpTaskIdFromGitLabMergeRequest = getClickUpTaskIdFromGitLabMergeRequest;
-const dpItemRegex = /\* \([A-Za-z0-9 %]+\) \[.*?\]\(https:\/\/app.clickup.com\/t\/(\w+)\)/g;
-function updateTaskStatusInDp(dp) {
+function getInfoFromArgument(argument, clickUpOnly, allowEmptyInfo) {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        let match = null;
-        let resultDp = dp;
-        while ((match = dpItemRegex.exec(dp))) {
-            const full = match[0];
-            const clickUpTaskId = match[1];
-            const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
-            const task = yield clickUp.getTask();
-            const progress = clickUp.getTaskProgress();
-            const updatedFull = full.replace(/\* \([A-Za-z0-9 %]+\)/, task.status.status === 'in progress' && progress
-                ? `* (${(0, node_shared_1.titleCase)(task.status.status)} ${progress})`
-                : `* (${(0, node_shared_1.titleCase)(task.status.status)})`);
-            resultDp = resultDp.replace(full, updatedFull);
-        }
-        return resultDp;
-    });
-}
-exports.updateTaskStatusInDp = updateTaskStatusInDp;
-function getInfoFromArgv(clickUpOnly, allowEmptyInfo) {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        let clickUpTaskId = null;
-        if (process.argv.length === 3) {
+        let clickUpTaskId = argument;
+        if (!clickUpTaskId) {
             const branchName = (0, child_process_1.execSync)('git branch --show-current', {
                 encoding: 'utf-8',
             });
@@ -1977,9 +2221,6 @@ function getInfoFromArgv(clickUpOnly, allowEmptyInfo) {
                 throw Error('Cannot get task number from branch');
             }
             clickUpTaskId = match[1];
-        }
-        else {
-            clickUpTaskId = process.argv[3];
         }
         if (clickUpTaskId) {
             const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
@@ -2005,7 +2246,7 @@ function getInfoFromArgv(clickUpOnly, allowEmptyInfo) {
         }
     });
 }
-exports.getInfoFromArgv = getInfoFromArgv;
+exports.getInfoFromArgument = getInfoFromArgument;
 function checkWorkingTreeClean() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const result = yield promiseSpawn('git', ['status'], 'pipe');
@@ -2028,15 +2269,15 @@ function getRepoName() {
         .trim();
 }
 exports.getRepoName = getRepoName;
-function getDayFromArgv(dft) {
+function getDayFromArgument(argument, dft) {
     const today = new Date();
-    return process.argv.length >= 4
-        ? (0, date_fns_1.parse)(process.argv[3], node_shared_1.DateFormat.STANDARD, today)
+    return argument
+        ? (0, date_fns_1.parse)(argument, node_shared_1.DateFormat.STANDARD, today)
         : dft
             ? new Date(dft.valueOf())
             : today;
 }
-exports.getDayFromArgv = getDayFromArgv;
+exports.getDayFromArgument = getDayFromArgument;
 function displayNotification(message) {
     node_notifier_1.default.notify({
         title: 'Accel Shooter',
@@ -3063,6 +3304,13 @@ module.exports = require("clipboardy");
 
 /***/ }),
 
+/***/ "commander":
+/***/ ((module) => {
+
+module.exports = require("commander");
+
+/***/ }),
+
 /***/ "cron":
 /***/ ((module) => {
 
@@ -3286,6 +3534,7 @@ var exports = __webpack_exports__;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__("tslib");
+const commander_1 = __webpack_require__("commander");
 const bi_weekly_progress_action_1 = __webpack_require__("./apps/cli/src/actions/bi-weekly-progress.action.ts");
 const check_action_1 = __webpack_require__("./apps/cli/src/actions/check.action.ts");
 const close_action_1 = __webpack_require__("./apps/cli/src/actions/close.action.ts");
@@ -3310,40 +3559,38 @@ const to_do_action_1 = __webpack_require__("./apps/cli/src/actions/to-do.action.
 const track_action_1 = __webpack_require__("./apps/cli/src/actions/track.action.ts");
 const watch_pipeline_action_1 = __webpack_require__("./apps/cli/src/actions/watch-pipeline.action.ts");
 const work_action_1 = __webpack_require__("./apps/cli/src/actions/work.action.ts");
-const actions = {
-    start: start_action_1.startAction,
-    open: open_action_1.openAction,
-    switch: switch_action_1.switchAction,
-    dailyProgress: daily_progress_action_1.dailyProgressAction,
-    track: track_action_1.trackAction,
-    end: end_action_1.endAction,
-    revertEnd: revert_end_action_1.revertEndAction,
-    RTVTasks: rtv_tasks_action_1.RTVTasksAction,
-    check: check_action_1.checkAction,
-    dumpMyTasks: dump_my_tasks_action_1.dumpMyTasksAction,
-    list: list_action_1.listAction,
-    toDo: to_do_action_1.toDoAction,
-    copy: copy_action_1.copyAction,
-    showDiff: show_diff_action_1.showDiffAction,
-    time: time_action_1.timeAction,
-    fetchHoliday: fetch_holiday_action_1.fetchHolidayAction,
-    watchPipeline: watch_pipeline_action_1.watchPipelineAction,
-    commit: commit_action_1.commitAction,
-    close: close_action_1.closeAction,
-    work: work_action_1.workAction,
-    routine: routine_action_1.routineAction,
-    biWeeklyProgress: bi_weekly_progress_action_1.biWeeklyProgressAction,
-    listDC: list_dc_action_1.listDCAction,
-    meetingTrack: meeting_track_action_1.meetingTrackAction,
-};
+const ACTIONS = [
+    new bi_weekly_progress_action_1.BiWeeklyProgressAction(),
+    new check_action_1.CheckAction(),
+    new close_action_1.CloseAction(),
+    new commit_action_1.CommitAction(),
+    new copy_action_1.CopyAction(),
+    new daily_progress_action_1.DailyProgressAction(),
+    new dump_my_tasks_action_1.DumpMyTasksAction(),
+    new end_action_1.EndAction(),
+    new fetch_holiday_action_1.FetchHolidayAction(),
+    new list_dc_action_1.ListDCAction(),
+    new list_action_1.ListAction(),
+    new meeting_track_action_1.MeetingTrackAction(),
+    new open_action_1.OpenAction(),
+    new revert_end_action_1.RevertEndAction(),
+    new routine_action_1.RoutineAction(),
+    new rtv_tasks_action_1.RTVTasksAction(),
+    new show_diff_action_1.ShowDiffAction(),
+    new start_action_1.StartAction(),
+    new switch_action_1.SwitchAction(),
+    new time_action_1.TimeAction(),
+    new to_do_action_1.TodoAction(),
+    new track_action_1.TrackAction(),
+    new watch_pipeline_action_1.WatchPipelineAction(),
+    new work_action_1.WorkAction(),
+];
 (() => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
-    const action = process.argv[2];
-    if (actions[action]) {
-        yield actions[action]();
-    }
-    else {
-        throw Error(`Action ${action} is not supported.`);
-    }
+    commander_1.program.name('accel-shooter').description('CLI for automating some works');
+    ACTIONS.forEach((action) => {
+        action.init(commander_1.program);
+    });
+    commander_1.program.parseAsync();
 }))();
 
 })();
