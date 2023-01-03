@@ -1073,10 +1073,8 @@ exports.StartAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const fs_1 = __webpack_require__("fs");
 const inquirer_1 = tslib_1.__importDefault(__webpack_require__("inquirer"));
-const mustache_1 = __webpack_require__("mustache");
 const os_1 = tslib_1.__importDefault(__webpack_require__("os"));
 const path_1 = __webpack_require__("path");
-const untildify_1 = tslib_1.__importDefault(__webpack_require__("untildify"));
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const progress_log_class_1 = __webpack_require__("./apps/cli/src/classes/progress-log.class.ts");
@@ -1180,17 +1178,9 @@ class StartAction extends action_class_1.Action {
             p.next(); // Set ClickUp Task Start Date to Today
             yield clickUp.setTaskStartDateToToday();
             p.next(); // Render Todo List
-            const todoConfigMap = {};
-            answers.todoConfig.forEach((c) => {
-                todoConfigMap[c] = true;
-            });
-            todoConfigMap[answers.gitLabProject.name] = true;
-            const template = (0, fs_1.readFileSync)((0, untildify_1.default)(node_shared_1.CONFIG.ToDoTemplate), {
-                encoding: 'utf-8',
-            });
-            const endingTodo = (0, mustache_1.render)(template, todoConfigMap);
+            const todoList = (0, utils_1.renderTodoList)(answers.todoConfig, answers.gitLabProject.name);
             const path = (0, path_1.join)(node_shared_1.CONFIG.TaskTodoFolder, answers.clickUpTaskId + '.md');
-            (0, fs_1.writeFileSync)(path, endingTodo);
+            (0, fs_1.writeFileSync)(path, todoList);
             p.next(); // Create GitLab Branch
             const gitLabBranch = yield gitLab.createBranch(`CU-${answers.clickUpTaskId}`);
             p.next(); // Create GitLab Merge Request
@@ -1206,7 +1196,7 @@ class StartAction extends action_class_1.Action {
             if (!clickUpChecklist) {
                 clickUpChecklist = (yield clickUp.createChecklist(clickUpChecklistTitle))
                     .checklist;
-                yield clickUp.updateChecklist(clickUpChecklist, endingTodo);
+                yield clickUp.updateChecklist(clickUpChecklist, todoList);
             }
             p.next(); // Add Todo Entry
             const todoString = yield clickUp.getTaskString('todo');
@@ -1317,11 +1307,9 @@ exports.TodoAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const clipboardy_1 = tslib_1.__importDefault(__webpack_require__("clipboardy"));
-const fs_1 = __webpack_require__("fs");
 const inquirer_1 = tslib_1.__importDefault(__webpack_require__("inquirer"));
-const mustache_1 = __webpack_require__("mustache");
-const untildify_1 = tslib_1.__importDefault(__webpack_require__("untildify"));
 const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 class TodoAction extends action_class_1.Action {
     constructor() {
         super(...arguments);
@@ -1347,17 +1335,9 @@ class TodoAction extends action_class_1.Action {
                     choices: node_shared_1.CONFIG.ToDoConfigChoices,
                 },
             ]);
-            const todoConfigMap = {};
-            answers.todoConfig.forEach((c) => {
-                todoConfigMap[c] = true;
-            });
-            todoConfigMap[answers.gitLabProject.name] = true;
-            const template = (0, fs_1.readFileSync)((0, untildify_1.default)(node_shared_1.CONFIG.ToDoTemplate), {
-                encoding: 'utf-8',
-            });
-            const endingTodo = (0, mustache_1.render)(template, todoConfigMap);
-            clipboardy_1.default.writeSync(endingTodo);
-            console.log(endingTodo);
+            const todoList = (0, utils_1.renderTodoList)(answers.todoConfig, answers.gitLabProject.name);
+            clipboardy_1.default.writeSync(todoList);
+            console.log(todoList);
             console.log('Copied!');
         });
     }
@@ -2153,7 +2133,7 @@ exports.checkItemsMap = {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.displayNotification = exports.getDayFromArgument = exports.getRepoName = exports.openUrlsInTabGroup = exports.checkWorkingTreeClean = exports.getInfoFromArgument = exports.getGitLabProjectConfigByName = exports.promiseSpawn = void 0;
+exports.renderTodoList = exports.displayNotification = exports.getDayFromArgument = exports.getRepoName = exports.openUrlsInTabGroup = exports.checkWorkingTreeClean = exports.getInfoFromArgument = exports.getGitLabProjectConfigByName = exports.promiseSpawn = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const child_process_1 = tslib_1.__importStar(__webpack_require__("child_process"));
 const node_notifier_1 = tslib_1.__importDefault(__webpack_require__("node-notifier"));
@@ -2161,6 +2141,9 @@ const open_1 = tslib_1.__importDefault(__webpack_require__("open"));
 const qs_1 = tslib_1.__importDefault(__webpack_require__("qs"));
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const date_fns_1 = __webpack_require__("date-fns");
+const fs_1 = __webpack_require__("fs");
+const mustache_1 = __webpack_require__("mustache");
+const untildify_1 = tslib_1.__importDefault(__webpack_require__("untildify"));
 function promiseSpawn(command, args, stdio = 'inherit') {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         return new Promise((resolve, reject) => {
@@ -2285,6 +2268,18 @@ function displayNotification(message) {
     });
 }
 exports.displayNotification = displayNotification;
+function renderTodoList(todoConfig, gitLabProjectName) {
+    const todoConfigMap = {};
+    todoConfig.forEach((c) => {
+        todoConfigMap[c] = true;
+    });
+    todoConfigMap[gitLabProjectName] = true;
+    const template = (0, fs_1.readFileSync)((0, untildify_1.default)(node_shared_1.CONFIG.ToDoTemplate), {
+        encoding: 'utf-8',
+    });
+    return (0, mustache_1.render)(template, todoConfigMap);
+}
+exports.renderTodoList = renderTodoList;
 
 
 /***/ }),

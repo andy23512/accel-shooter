@@ -87,12 +87,17 @@ let AppController = class AppController {
             }
         });
     }
-    getMRDescription(taskId) {
+    getMRFromTaskId(taskId) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const clickUp = new node_shared_1.ClickUp(taskId);
             const { gitLabProject, mergeRequestIId } = yield clickUp.getGitLabProjectAndMergeRequestIId();
             const gitLab = new node_shared_1.GitLab(gitLabProject.id);
-            const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
+            return gitLab.getMergeRequest(mergeRequestIId);
+        });
+    }
+    getMRDescription(taskId) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const mergeRequest = yield this.getMRFromTaskId(taskId);
             return { content: mergeRequest.description };
         });
     }
@@ -108,10 +113,7 @@ let AppController = class AppController {
     getMRPipelineStatus(taskId) {
         var _a;
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const clickUp = new node_shared_1.ClickUp(taskId);
-            const { gitLabProject, mergeRequestIId } = yield clickUp.getGitLabProjectAndMergeRequestIId();
-            const gitLab = new node_shared_1.GitLab(gitLabProject.id);
-            const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
+            const mergeRequest = yield this.getMRFromTaskId(taskId);
             return { content: ((_a = mergeRequest.head_pipeline) === null || _a === void 0 ? void 0 : _a.status) || 'none' };
         });
     }

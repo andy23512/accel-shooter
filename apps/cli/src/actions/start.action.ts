@@ -1,9 +1,7 @@
-import { readFileSync, writeFileSync } from 'fs';
+import { writeFileSync } from 'fs';
 import inquirer from 'inquirer';
-import { render } from 'mustache';
 import os from 'os';
 import { join } from 'path';
-import untildify from 'untildify';
 
 import {
   ClickUp,
@@ -17,7 +15,12 @@ import { Action } from '../classes/action.class';
 import { CustomProgressLog } from '../classes/progress-log.class';
 import { Todo } from '../classes/todo.class';
 import { Tracker } from '../classes/tracker.class';
-import { checkWorkingTreeClean, getRepoName, promiseSpawn } from '../utils';
+import {
+  checkWorkingTreeClean,
+  getRepoName,
+  promiseSpawn,
+  renderTodoList,
+} from '../utils';
 import { OpenAction } from './open.action';
 
 export class StartAction extends Action {
@@ -117,17 +120,12 @@ export class StartAction extends Action {
     p.next(); // Set ClickUp Task Start Date to Today
     await clickUp.setTaskStartDateToToday();
     p.next(); // Render Todo List
-    const todoConfigMap: Record<string, boolean> = {};
-    answers.todoConfig.forEach((c: string) => {
-      todoConfigMap[c] = true;
-    });
-    todoConfigMap[answers.gitLabProject.name] = true;
-    const template = readFileSync(untildify(CONFIG.ToDoTemplate), {
-      encoding: 'utf-8',
-    });
-    const endingTodo = render(template, todoConfigMap);
+    const todoList = renderTodoList(
+      answers.todoConfig,
+      answers.gitLabProject.name
+    );
     const path = join(CONFIG.TaskTodoFolder, answers.clickUpTaskId + '.md');
-    writeFileSync(path, endingTodo);
+    writeFileSync(path, todoList);
     p.next(); // Create GitLab Branch
     const gitLabBranch = await gitLab.createBranch(
       `CU-${answers.clickUpTaskId}`

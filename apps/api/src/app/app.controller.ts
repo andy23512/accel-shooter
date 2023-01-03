@@ -7,7 +7,7 @@ import {
   NotFoundException,
   Param,
   Put,
-  Sse
+  Sse,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { readFileSync, writeFileSync } from 'fs';
@@ -103,15 +103,19 @@ export class AppController {
     }
   }
 
-  @Get('task/:id/mr_description')
-  async getMRDescription(
-    @Param('id') taskId: string
-  ): Promise<{ content: string }> {
+  async getMRFromTaskId(taskId: string) {
     const clickUp = new ClickUp(taskId);
     const { gitLabProject, mergeRequestIId } =
       await clickUp.getGitLabProjectAndMergeRequestIId();
     const gitLab = new GitLab(gitLabProject.id);
-    const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
+    return gitLab.getMergeRequest(mergeRequestIId);
+  }
+
+  @Get('task/:id/mr_description')
+  async getMRDescription(
+    @Param('id') taskId: string
+  ): Promise<{ content: string }> {
+    const mergeRequest = await this.getMRFromTaskId(taskId);
     return { content: mergeRequest.description };
   }
 
@@ -132,11 +136,7 @@ export class AppController {
   async getMRPipelineStatus(
     @Param('id') taskId: string
   ): Promise<{ content: string }> {
-    const clickUp = new ClickUp(taskId);
-    const { gitLabProject, mergeRequestIId } =
-      await clickUp.getGitLabProjectAndMergeRequestIId();
-    const gitLab = new GitLab(gitLabProject.id);
-    const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
+    const mergeRequest = await this.getMRFromTaskId(taskId);
     return { content: mergeRequest.head_pipeline?.status || 'none' };
   }
 

@@ -10,6 +10,9 @@ import {
   GitLab,
 } from '@accel-shooter/node-shared';
 import { parse } from 'date-fns';
+import { readFileSync } from 'fs';
+import { render } from 'mustache';
+import untildify from 'untildify';
 
 export async function promiseSpawn(
   command: string,
@@ -147,4 +150,19 @@ export function displayNotification(message: string) {
     title: 'Accel Shooter',
     message,
   });
+}
+
+export function renderTodoList(
+  todoConfig: string[],
+  gitLabProjectName: string
+) {
+  const todoConfigMap: Record<string, boolean> = {};
+  todoConfig.forEach((c) => {
+    todoConfigMap[c] = true;
+  });
+  todoConfigMap[gitLabProjectName] = true;
+  const template = readFileSync(untildify(CONFIG.ToDoTemplate), {
+    encoding: 'utf-8',
+  });
+  return render(template, todoConfigMap);
 }
