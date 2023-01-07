@@ -49,7 +49,7 @@ class BiWeeklyProgressAction extends action_class_1.Action {
             let fetchDay = new Date(today.valueOf());
             const holiday = new holiday_class_1.Holiday();
             const fetchDays = [];
-            while ((0, date_fns_1.compareAsc)(startDay, fetchDay) <= 0) {
+            while ((0, date_fns_1.compareAsc)(startDay, fetchDay) < 0) {
                 if (holiday.checkIsWorkday(fetchDay)) {
                     fetchDays.push(fetchDay);
                 }

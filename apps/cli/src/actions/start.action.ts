@@ -155,7 +155,7 @@ export class StartAction extends Action {
     if (!clickUpChecklist) {
       clickUpChecklist = (await clickUp.createChecklist(clickUpChecklistTitle))
         .checklist;
-      await clickUp.updateChecklist(clickUpChecklist, endingTodo);
+      await clickUp.updateChecklist(clickUpChecklist, todoList);
     }
     p.next(); // Add Todo Entry
     const todoString = await clickUp.getTaskString('todo');
