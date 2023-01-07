@@ -172,6 +172,7 @@ const tslib_1 = __webpack_require__("tslib");
 const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const progress_log_class_1 = __webpack_require__("./apps/cli/src/classes/progress-log.class.ts");
 const todo_class_1 = __webpack_require__("./apps/cli/src/classes/todo.class.ts");
+const tracker_class_1 = __webpack_require__("./apps/cli/src/classes/tracker.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 class CloseAction extends action_class_1.Action {
     constructor() {
@@ -190,6 +191,7 @@ class CloseAction extends action_class_1.Action {
                 'Update ClickUp Task Status',
                 'Close Tab Group',
                 'Remove Todo',
+                'Remove Track Item',
             ]);
             p.next(); // Close GitLab Merge Request
             yield gitLab.closeMergeRequest(mergeRequest);
@@ -200,6 +202,8 @@ class CloseAction extends action_class_1.Action {
             p.next(); // Remove Todo
             const todo = new todo_class_1.Todo();
             todo.removeTodo(clickUpTaskId);
+            p.next(); // Remove Track Item
+            new tracker_class_1.Tracker().closeItem(clickUpTaskId);
             p.end(0);
         });
     }

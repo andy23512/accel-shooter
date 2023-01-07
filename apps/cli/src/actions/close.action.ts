@@ -1,6 +1,7 @@
 import { Action } from '../classes/action.class';
 import { CustomProgressLog } from '../classes/progress-log.class';
 import { Todo } from '../classes/todo.class';
+import { Tracker } from '../classes/tracker.class';
 import { getInfoFromArgument, openUrlsInTabGroup } from '../utils';
 
 export class CloseAction extends Action {
@@ -17,6 +18,7 @@ export class CloseAction extends Action {
       'Update ClickUp Task Status',
       'Close Tab Group',
       'Remove Todo',
+      'Remove Track Item',
     ]);
     p.next(); // Close GitLab Merge Request
     await gitLab.closeMergeRequest(mergeRequest);
@@ -27,6 +29,8 @@ export class CloseAction extends Action {
     p.next(); // Remove Todo
     const todo = new Todo();
     todo.removeTodo(clickUpTaskId);
+    p.next(); // Remove Track Item
+    new Tracker().closeItem(clickUpTaskId);
     p.end(0);
   }
 }
