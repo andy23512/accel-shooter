@@ -2689,7 +2689,9 @@ class GitLab {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const assignee = yield this.getEndingAssignee();
             yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
-                title: merge_request.title.replace('WIP: ', '').replace('Draft: ', ''),
+                title: merge_request.title
+                    .replace(/WIP: /g, '')
+                    .replace(/Draft: /g, ''),
                 assignee_id: assignee.id,
             });
         });

@@ -161,7 +161,9 @@ export class GitLab {
       `/projects/${this.projectId}/merge_requests/${merge_request.iid}`,
       null,
       {
-        title: merge_request.title.replace('WIP: ', '').replace('Draft: ', ''),
+        title: merge_request.title
+          .replace(/WIP: /g, '')
+          .replace(/Draft: /g, ''),
         assignee_id: assignee.id,
       }
     );
