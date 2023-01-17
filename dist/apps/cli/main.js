@@ -455,11 +455,9 @@ class DailyProgressAction extends action_class_1.Action {
                     const clickUp = new node_shared_1.ClickUp(taskId);
                     const taskString = yield clickUp.getTaskString('dp');
                     previousDayItems.push('    ' + taskString);
-                    todayItems.push('    ' + (yield clickUp.getTaskString('dp')));
                 }
                 else if (firstProcessingItem.includes('- [ ]')) {
                     previousDayItems.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
-                    todayItems.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
                 }
             }
             if (todayItems.length === 0) {

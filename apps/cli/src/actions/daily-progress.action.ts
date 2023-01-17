@@ -90,12 +90,10 @@ export class DailyProgressAction extends Action {
         const clickUp = new ClickUp(taskId);
         const taskString = await clickUp.getTaskString('dp');
         previousDayItems.push('    ' + taskString);
-        todayItems.push('    ' + (await clickUp.getTaskString('dp')));
       } else if (firstProcessingItem.includes('- [ ]')) {
         previousDayItems.push(
           '    ' + firstProcessingItem.replace('- [ ]', '*')
         );
-        todayItems.push('    ' + firstProcessingItem.replace('- [ ]', '*'));
       }
     }
     if (todayItems.length === 0) {
