@@ -98,7 +98,6 @@ export class StartAction extends Action {
     const p = new CustomProgressLog('Start', [
       'Get ClickUp Task',
       'Set ClickUp Task Status',
-      'Set ClickUp Task Start Date to Today',
       'Render Todo List',
       'Create GitLab Branch',
       'Create GitLab Merge Request',
@@ -117,8 +116,6 @@ export class StartAction extends Action {
     const gitLabMergeRequestTitle = answers.mergeRequestTitle;
     p.next(); // Set ClickUp Task Status
     await clickUp.setTaskStatus('in progress');
-    p.next(); // Set ClickUp Task Start Date to Today
-    await clickUp.setTaskStartDateToToday();
     p.next(); // Render Todo List
     const todoList = renderTodoList(
       answers.todoConfig,

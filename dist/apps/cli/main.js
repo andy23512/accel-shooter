@@ -1158,7 +1158,6 @@ class StartAction extends action_class_1.Action {
             const p = new progress_log_class_1.CustomProgressLog('Start', [
                 'Get ClickUp Task',
                 'Set ClickUp Task Status',
-                'Set ClickUp Task Start Date to Today',
                 'Render Todo List',
                 'Create GitLab Branch',
                 'Create GitLab Merge Request',
@@ -1177,8 +1176,6 @@ class StartAction extends action_class_1.Action {
             const gitLabMergeRequestTitle = answers.mergeRequestTitle;
             p.next(); // Set ClickUp Task Status
             yield clickUp.setTaskStatus('in progress');
-            p.next(); // Set ClickUp Task Start Date to Today
-            yield clickUp.setTaskStartDateToToday();
             p.next(); // Render Todo List
             const todoList = (0, utils_1.renderTodoList)(answers.todoConfig, answers.gitLabProject.name);
             const path = (0, path_1.join)(node_shared_1.CONFIG.TaskTodoFolder, answers.clickUpTaskId + '.md');
