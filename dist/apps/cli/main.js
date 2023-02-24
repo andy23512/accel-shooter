@@ -1188,7 +1188,6 @@ class StartAction extends action_class_1.Action {
                 ? yield gitLab.getMergeRequestTemplate()
                 : '');
             const gitLabMergeRequestIId = gitLabMergeRequest.iid;
-            yield gitLab.createMergeRequestNote(gitLabMergeRequest, `ClickUp Task: [${gitLabMergeRequestTitle}](${clickUpTaskUrl})`);
             p.next(); // Create Checklist at ClickUp
             const clickUpChecklistTitle = `Synced checklist [${answers.gitLabProject.id.replace('%2F', '/')} !${gitLabMergeRequestIId}]`;
             let clickUpChecklist = clickUpTask.checklists.find((c) => c.name === clickUpChecklistTitle);
