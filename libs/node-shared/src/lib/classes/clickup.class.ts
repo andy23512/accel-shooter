@@ -45,6 +45,10 @@ export class ClickUp {
   public static async getProduct(task: Task) {
     const space = await ClickUp.getSpace(task.space.id);
     if (space.name === 'Product Team') {
+      const list = await ClickUp.getList(task.list.id);
+      if (list.folder.name === 'Product Request Mgmt') {
+        return list.name;
+      }
       const productField = task.custom_fields?.find(
         (f) => f.name === 'Product'
       );

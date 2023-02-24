@@ -293,6 +293,10 @@ class ClickUp {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const space = yield ClickUp.getSpace(task.space.id);
             if (space.name === 'Product Team') {
+                const list = yield ClickUp.getList(task.list.id);
+                if (list.folder.name === 'Product Request Mgmt') {
+                    return list.name;
+                }
                 const productField = (_a = task.custom_fields) === null || _a === void 0 ? void 0 : _a.find((f) => f.name === 'Product');
                 if (!productField) {
                     throw Error('No product field in this task');
