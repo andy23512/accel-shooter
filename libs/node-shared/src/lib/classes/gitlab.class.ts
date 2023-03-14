@@ -97,14 +97,14 @@ export class GitLab {
     );
   }
 
-  public async createBranch(branch: string) {
+  public async createBranch(branch: string, targetBranch?: string) {
     return callApi<Branch>(
       'post',
       `/projects/${this.projectId}/repository/branches`,
       null,
       {
         branch,
-        ref: await this.getDefaultBranchName(),
+        ref: targetBranch || (await this.getDefaultBranchName()),
       }
     );
   }
@@ -112,7 +112,8 @@ export class GitLab {
   public async createMergeRequest(
     title: string,
     branch: string,
-    description: string
+    description: string,
+    targetBranch?: string
   ) {
     return callApi<MergeRequest>(
       'post',
@@ -120,7 +121,7 @@ export class GitLab {
       null,
       {
         source_branch: branch,
-        target_branch: await this.getDefaultBranchName(),
+        target_branch: targetBranch || (await this.getDefaultBranchName()),
         title: `Draft: ${title}`,
         description,
       }

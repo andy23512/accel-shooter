@@ -1149,6 +1149,11 @@ class StartAction extends action_class_1.Action {
                     }),
                 },
                 {
+                    name: 'targetBranch',
+                    message: 'Enter Target Branch',
+                    type: 'input',
+                },
+                {
                     name: 'todoConfig',
                     message: 'Choose Preset To-do Config',
                     type: 'checkbox',
@@ -1181,12 +1186,12 @@ class StartAction extends action_class_1.Action {
             const path = (0, path_1.join)(node_shared_1.CONFIG.TaskTodoFolder, answers.clickUpTaskId + '.md');
             (0, fs_1.writeFileSync)(path, todoList);
             p.next(); // Create GitLab Branch
-            const gitLabBranch = yield gitLab.createBranch(`CU-${answers.clickUpTaskId}`);
+            const gitLabBranch = yield gitLab.createBranch(`CU-${answers.clickUpTaskId}`, answers.targetBranch);
             p.next(); // Create GitLab Merge Request
             yield (0, node_shared_1.sleep)(2000); // prevent "branch restored" bug
             const gitLabMergeRequest = yield gitLab.createMergeRequest(gitLabMergeRequestTitle + `__CU-${answers.clickUpTaskId}`, gitLabBranch.name, answers.gitLabProject.hasMergeRequestTemplate
                 ? yield gitLab.getMergeRequestTemplate()
-                : '');
+                : '', answers.targetBranch);
             const gitLabMergeRequestIId = gitLabMergeRequest.iid;
             p.next(); // Create Checklist at ClickUp
             const clickUpChecklistTitle = `Synced checklist [${answers.gitLabProject.id.replace('%2F', '/')} !${gitLabMergeRequestIId}]`;
@@ -2655,19 +2660,19 @@ class GitLab {
             return callApi('get', `/projects/${this.projectId}/pipelines/`, query);
         });
     }
-    createBranch(branch) {
+    createBranch(branch, targetBranch) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return callApi('post', `/projects/${this.projectId}/repository/branches`, null, {
                 branch,
-                ref: yield this.getDefaultBranchName(),
+                ref: targetBranch || (yield this.getDefaultBranchName()),
             });
         });
     }
-    createMergeRequest(title, branch, description) {
+    createMergeRequest(title, branch, description, targetBranch) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return callApi('post', `/projects/${this.projectId}/merge_requests`, null, {
                 source_branch: branch,
-                target_branch: yield this.getDefaultBranchName(),
+                target_branch: targetBranch || (yield this.getDefaultBranchName()),
                 title: `Draft: ${title}`,
                 description,
             });

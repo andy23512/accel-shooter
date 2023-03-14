@@ -619,19 +619,19 @@ class GitLab {
             return callApi('get', `/projects/${this.projectId}/pipelines/`, query);
         });
     }
-    createBranch(branch) {
+    createBranch(branch, targetBranch) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return callApi('post', `/projects/${this.projectId}/repository/branches`, null, {
                 branch,
-                ref: yield this.getDefaultBranchName(),
+                ref: targetBranch || (yield this.getDefaultBranchName()),
             });
         });
     }
-    createMergeRequest(title, branch, description) {
+    createMergeRequest(title, branch, description, targetBranch) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return callApi('post', `/projects/${this.projectId}/merge_requests`, null, {
                 source_branch: branch,
-                target_branch: yield this.getDefaultBranchName(),
+                target_branch: targetBranch || (yield this.getDefaultBranchName()),
                 title: `Draft: ${title}`,
                 description,
             });

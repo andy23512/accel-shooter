@@ -89,6 +89,11 @@ export class StartAction extends Action {
         },
       },
       {
+        name: 'targetBranch',
+        message: 'Enter Target Branch',
+        type: 'input',
+      },
+      {
         name: 'todoConfig',
         message: 'Choose Preset To-do Config',
         type: 'checkbox',
@@ -125,7 +130,8 @@ export class StartAction extends Action {
     writeFileSync(path, todoList);
     p.next(); // Create GitLab Branch
     const gitLabBranch = await gitLab.createBranch(
-      `CU-${answers.clickUpTaskId}`
+      `CU-${answers.clickUpTaskId}`,
+      answers.targetBranch
     );
     p.next(); // Create GitLab Merge Request
     await sleep(2000); // prevent "branch restored" bug
@@ -134,7 +140,8 @@ export class StartAction extends Action {
       gitLabBranch.name,
       answers.gitLabProject.hasMergeRequestTemplate
         ? await gitLab.getMergeRequestTemplate()
-        : ''
+        : '',
+      answers.targetBranch
     );
     const gitLabMergeRequestIId = gitLabMergeRequest.iid;
     p.next(); // Create Checklist at ClickUp
