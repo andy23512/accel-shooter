@@ -16,8 +16,8 @@ export function confirm(question: string) {
       input: process.stdin,
       output: process.stdout,
     });
-    prompt.question(question + ' (y/n) ', function (answer) {
-      if (answer === 'y' || answer === 'Y') {
+    prompt.question(question + ' (Enter or y or n) ', function (answer) {
+      if (answer === 'y' || answer === 'Y' || answer === '') {
         prompt.close();
         resolve();
       } else {
