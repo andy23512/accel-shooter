@@ -851,6 +851,7 @@ const holiday_class_1 = __webpack_require__("./apps/cli/src/classes/holiday.clas
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 const daily_progress_action_1 = __webpack_require__("./apps/cli/src/actions/daily-progress.action.ts");
 const dump_my_tasks_action_1 = __webpack_require__("./apps/cli/src/actions/dump-my-tasks.action.ts");
+const fetch_holiday_action_1 = __webpack_require__("./apps/cli/src/actions/fetch-holiday.action.ts");
 function confirm(question) {
     return new Promise((resolve, reject) => {
         const prompt = readline_1.default.createInterface({
@@ -887,7 +888,6 @@ class RoutineAction extends action_class_1.Action {
             const holiday = new holiday_class_1.Holiday();
             const isWorkDay = holiday.checkIsWorkday(day);
             const message = isWorkDay ? 'Today is workday!' : 'Today is holiday!';
-            console.log(message);
             if (isWorkDay && !skipPunch) {
                 yield confirm('run punch?');
                 const result = yield punch();
@@ -904,6 +904,7 @@ class RoutineAction extends action_class_1.Action {
                     yield confirm('send dp to slack done?');
                 }
             }
+            yield new fetch_holiday_action_1.FetchHolidayAction().run();
             console.log('Complete');
         });
     }
