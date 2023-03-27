@@ -324,6 +324,7 @@ class ClickUp {
                 'pending',
                 'ready to do',
                 'in progress',
+                'dev in progress',
                 'in discussion',
             ],
             assignees: [userID],
@@ -454,7 +455,7 @@ class ClickUp {
                 case 'todo':
                     return `- [ ] ${link}`;
                 case 'dp':
-                    return task.status.status === 'in progress' && progress
+                    return (['in progress', 'dev in progress'].includes(task.status.status)) && progress
                         ? `* (${(0, case_utils_1.titleCase)(task.status.status)} ${progress}) ${link}`
                         : `* (${(0, case_utils_1.titleCase)(task.status.status)}) ${link}`;
             }
@@ -551,6 +552,16 @@ class ClickUp {
             for (const checklistItem of actions.delete) {
                 yield this.deleteChecklistItem(clickUpChecklist.id, checklistItem.id);
             }
+        });
+    }
+    setTaskAsInProgressStatus() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const t = yield this.getTask();
+            const list = yield ClickUp.getList(t.list.id);
+            if (list.statuses.find((s) => s.status.toLowerCase() === 'dev in progress')) {
+                return this.setTaskStatus('dev in progress');
+            }
+            return this.setTaskStatus('in progress');
         });
     }
 }

@@ -81,6 +81,7 @@ export class ClickUp {
         'pending',
         'ready to do',
         'in progress',
+        'dev in progress',
         'in discussion',
       ],
       assignees: [userID],
@@ -254,7 +255,7 @@ export class ClickUp {
       case 'todo':
         return `- [ ] ${link}`;
       case 'dp':
-        return task.status.status === 'in progress' && progress
+        return (['in progress', 'dev in progress'].includes(task.status.status)) && progress
           ? `* (${titleCase(task.status.status)} ${progress}) ${link}`
           : `* (${titleCase(task.status.status)}) ${link}`;
     }
@@ -383,5 +384,14 @@ export class ClickUp {
         checklistItem.id as string
       );
     }
+  }
+
+  public async setTaskAsInProgressStatus () {
+    const t = await this.getTask();
+    const list = await ClickUp.getList(t.list.id);
+    if (list.statuses.find((s) => s.status.toLowerCase() === 'dev in progress')) {
+      return this.setTaskStatus('dev in progress')
+    }
+    return this.setTaskStatus('in progress')
   }
 }

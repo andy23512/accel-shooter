@@ -120,7 +120,7 @@ export class StartAction extends Action {
     const clickUpTaskUrl = clickUpTask['url'];
     const gitLabMergeRequestTitle = answers.mergeRequestTitle;
     p.next(); // Set ClickUp Task Status
-    await clickUp.setTaskStatus('in progress');
+    await clickUp.setTaskAsInProgressStatus();
     p.next(); // Render Todo List
     const todoList = renderTodoList(
       answers.todoConfig,

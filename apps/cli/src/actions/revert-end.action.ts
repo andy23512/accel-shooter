@@ -19,7 +19,7 @@ export class RevertEndAction extends Action {
     p.start();
     await gitLab.markMergeRequestAsUnreadyAndSetAssigneeToSelf(mergeRequest);
     p.next();
-    await clickUp.setTaskStatus('in progress');
+    await clickUp.setTaskAsInProgressStatus();
     p.end(0);
   }
 }

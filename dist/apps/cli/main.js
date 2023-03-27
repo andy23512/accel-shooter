@@ -825,7 +825,7 @@ class RevertEndAction extends action_class_1.Action {
             p.start();
             yield gitLab.markMergeRequestAsUnreadyAndSetAssigneeToSelf(mergeRequest);
             p.next();
-            yield clickUp.setTaskStatus('in progress');
+            yield clickUp.setTaskAsInProgressStatus();
             p.end(0);
         });
     }
@@ -1181,7 +1181,7 @@ class StartAction extends action_class_1.Action {
             const clickUpTaskUrl = clickUpTask['url'];
             const gitLabMergeRequestTitle = answers.mergeRequestTitle;
             p.next(); // Set ClickUp Task Status
-            yield clickUp.setTaskStatus('in progress');
+            yield clickUp.setTaskAsInProgressStatus();
             p.next(); // Render Todo List
             const todoList = (0, utils_1.renderTodoList)(answers.todoConfig, answers.gitLabProject.name);
             const path = (0, path_1.join)(node_shared_1.CONFIG.TaskTodoFolder, answers.clickUpTaskId + '.md');
@@ -2366,6 +2366,7 @@ class ClickUp {
                 'pending',
                 'ready to do',
                 'in progress',
+                'dev in progress',
                 'in discussion',
             ],
             assignees: [userID],
@@ -2496,7 +2497,7 @@ class ClickUp {
                 case 'todo':
                     return `- [ ] ${link}`;
                 case 'dp':
-                    return task.status.status === 'in progress' && progress
+                    return (['in progress', 'dev in progress'].includes(task.status.status)) && progress
                         ? `* (${(0, case_utils_1.titleCase)(task.status.status)} ${progress}) ${link}`
                         : `* (${(0, case_utils_1.titleCase)(task.status.status)}) ${link}`;
             }
@@ -2593,6 +2594,16 @@ class ClickUp {
             for (const checklistItem of actions.delete) {
                 yield this.deleteChecklistItem(clickUpChecklist.id, checklistItem.id);
             }
+        });
+    }
+    setTaskAsInProgressStatus() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const t = yield this.getTask();
+            const list = yield ClickUp.getList(t.list.id);
+            if (list.statuses.find((s) => s.status.toLowerCase() === 'dev in progress')) {
+                return this.setTaskStatus('dev in progress');
+            }
+            return this.setTaskStatus('in progress');
         });
     }
 }
