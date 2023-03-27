@@ -38,11 +38,7 @@ export class EndAction extends Action {
     p.next(); // Update GitLab Merge Request Ready Status and Assignee
     await gitLab.markMergeRequestAsReadyAndAddAssignee(mergeRequest);
     p.next(); // Update ClickUp Task Status
-    try {
-      await clickUp.setTaskStatus('in review');
-    } catch {
-      await clickUp.setTaskStatus('review');
-    }
+    await clickUp.setTaskAsInReviewStatus();
     p.next(); // Close Tab Group
     openUrlsInTabGroup([], clickUpTaskId);
     p.next(); // Remove Todo

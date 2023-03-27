@@ -564,6 +564,19 @@ class ClickUp {
             return this.setTaskStatus('in progress');
         });
     }
+    setTaskAsInReviewStatus() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const t = yield this.getTask();
+            const list = yield ClickUp.getList(t.list.id);
+            if (list.statuses.find((s) => s.status.toLowerCase() === 'dev in review')) {
+                return this.setTaskStatus('dev in review');
+            }
+            if (list.statuses.find((s) => s.status.toLowerCase() === 'in review')) {
+                return this.setTaskStatus('in review');
+            }
+            return this.setTaskStatus('review');
+        });
+    }
 }
 exports.ClickUp = ClickUp;
 

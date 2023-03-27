@@ -54,7 +54,7 @@ export class Tracker extends BaseFileRef {
       return;
     }
     if (gitLabProject.stagingStatus && mergeRequest.state === 'merged') {
-      if (clickUpTask.status.status === 'in review') {
+      if (['dev in review', 'in review', 'review'].includes(clickUpTask.status.status)) {
         const list = await ClickUp.getList(clickUpTask.list.id);
         let stagingStatus =
           gitLabProject.stagingStatus[list.name] ||
@@ -72,7 +72,7 @@ export class Tracker extends BaseFileRef {
           stagingStatus = 'closed';
           await clickUp.setTaskStatus('closed');
         }
-        let message = `${await clickUp.getFullTaskName()} (${clickUpTaskId}): In Review -> ${titleCase(
+        let message = `${await clickUp.getFullTaskName()} (${clickUpTaskId}): ${titleCase(clickUpTask.status.status)} -> ${titleCase(
           stagingStatus
         )}`;
         if (!clickUpTask.due_date) {

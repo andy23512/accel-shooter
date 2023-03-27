@@ -592,12 +592,7 @@ class EndAction extends action_class_1.Action {
             p.next(); // Update GitLab Merge Request Ready Status and Assignee
             yield gitLab.markMergeRequestAsReadyAndAddAssignee(mergeRequest);
             p.next(); // Update ClickUp Task Status
-            try {
-                yield clickUp.setTaskStatus('in review');
-            }
-            catch (_a) {
-                yield clickUp.setTaskStatus('review');
-            }
+            yield clickUp.setTaskAsInReviewStatus();
             p.next(); // Close Tab Group
             (0, utils_1.openUrlsInTabGroup)([], clickUpTaskId);
             p.next(); // Remove Todo
@@ -1974,7 +1969,7 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
                 return;
             }
             if (gitLabProject.stagingStatus && mergeRequest.state === 'merged') {
-                if (clickUpTask.status.status === 'in review') {
+                if (['dev in review', 'in review', 'review'].includes(clickUpTask.status.status)) {
                     const list = yield node_shared_1.ClickUp.getList(clickUpTask.list.id);
                     let stagingStatus = gitLabProject.stagingStatus[list.name] ||
                         gitLabProject.stagingStatus['*'];
@@ -1989,7 +1984,7 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
                         stagingStatus = 'closed';
                         yield clickUp.setTaskStatus('closed');
                     }
-                    let message = `${yield clickUp.getFullTaskName()} (${clickUpTaskId}): In Review -> ${(0, node_shared_1.titleCase)(stagingStatus)}`;
+                    let message = `${yield clickUp.getFullTaskName()} (${clickUpTaskId}): ${(0, node_shared_1.titleCase)(clickUpTask.status.status)} -> ${(0, node_shared_1.titleCase)(stagingStatus)}`;
                     if (!clickUpTask.due_date) {
                         yield clickUp.setTaskDueDateToToday();
                         message += '; due date was set';
@@ -2604,6 +2599,19 @@ class ClickUp {
                 return this.setTaskStatus('dev in progress');
             }
             return this.setTaskStatus('in progress');
+        });
+    }
+    setTaskAsInReviewStatus() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const t = yield this.getTask();
+            const list = yield ClickUp.getList(t.list.id);
+            if (list.statuses.find((s) => s.status.toLowerCase() === 'dev in review')) {
+                return this.setTaskStatus('dev in review');
+            }
+            if (list.statuses.find((s) => s.status.toLowerCase() === 'in review')) {
+                return this.setTaskStatus('in review');
+            }
+            return this.setTaskStatus('review');
         });
     }
 }

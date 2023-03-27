@@ -394,4 +394,16 @@ export class ClickUp {
     }
     return this.setTaskStatus('in progress')
   }
+
+  public async setTaskAsInReviewStatus () {
+    const t = await this.getTask();
+    const list = await ClickUp.getList(t.list.id);
+    if (list.statuses.find((s) => s.status.toLowerCase() === 'dev in review')) {
+      return this.setTaskStatus('dev in review')
+    }
+    if (list.statuses.find((s) => s.status.toLowerCase() === 'in review')) {
+      return this.setTaskStatus('in review')
+    }
+    return this.setTaskStatus('review')
+  }
 }
