@@ -1,9 +1,10 @@
 import { ChecklistItem, NormalizedChecklist } from '@accel-shooter/node-shared';
+import { Clipboard } from '@angular/cdk/clipboard';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { interval, merge, Subject } from 'rxjs';
+import { Subject, interval, merge } from 'rxjs';
 import {
   concatMap,
   debounceTime,
@@ -48,7 +49,8 @@ export class TaskPageComponent implements OnInit {
     private http: HttpClient,
     private matSnackBar: MatSnackBar,
     private router: Router,
-    private pageTitleService: PageTitleService
+    private pageTitleService: PageTitleService,
+    private clipboard: Clipboard
   ) {}
 
   public ngOnInit(): void {
@@ -127,6 +129,13 @@ export class TaskPageComponent implements OnInit {
         )
       )
       .subscribe();
+  }
+
+  public copyTaskId() {
+    this.clipboard.copy(this.taskId);
+    this.matSnackBar.open(`Task ID ${this.taskId} copied!`, '', {
+      duration: 5000,
+    });
   }
 
   private getMergeRequestDescriptionLink(id: string) {
