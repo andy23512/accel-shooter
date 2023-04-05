@@ -9,7 +9,6 @@ import { Holiday } from '../classes/holiday.class';
 import { getDayFromArgument, openUrlsInTabGroup } from '../utils';
 import { DailyProgressAction } from './daily-progress.action';
 import { DumpMyTasksAction } from './dump-my-tasks.action';
-import { FetchHolidayAction } from './fetch-holiday.action';
 
 export function confirm(question: string) {
   return new Promise<void>((resolve, reject) => {
@@ -61,7 +60,6 @@ export class RoutineAction extends Action {
         await confirm('send dp to slack done?');
       }
     }
-    await new FetchHolidayAction().run();
     console.log('Complete');
   }
 }
