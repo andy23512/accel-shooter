@@ -169,6 +169,7 @@ exports.CheckAction = CheckAction;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.CloseAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const progress_log_class_1 = __webpack_require__("./apps/cli/src/classes/progress-log.class.ts");
 const todo_class_1 = __webpack_require__("./apps/cli/src/classes/todo.class.ts");
@@ -196,7 +197,7 @@ class CloseAction extends action_class_1.Action {
             p.next(); // Close GitLab Merge Request
             yield gitLab.closeMergeRequest(mergeRequest);
             p.next(); // Update ClickUp Task Status
-            yield clickUp.setTaskStatus('suspended');
+            yield clickUp.setTaskStatus(node_shared_1.TaskStatus.Suspended);
             p.next(); // Close Tab Group
             (0, utils_1.openUrlsInTabGroup)([], clickUpTaskId);
             p.next(); // Remove Todo
@@ -1962,25 +1963,34 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
             const gitLab = new node_shared_1.GitLab(gitLabProject.id);
             const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
             const clickUpTask = yield clickUp.getTask();
-            if (['closed', 'verified', 'ready to verify', 'done'].includes(clickUpTask.status.status.toLowerCase())) {
+            if ([
+                node_shared_1.TaskStatus.Closed,
+                node_shared_1.TaskStatus.Verified,
+                node_shared_1.TaskStatus.ReadyToVerify,
+                node_shared_1.TaskStatus.Done,
+            ].includes(clickUpTask.status.status.toLowerCase())) {
                 this.closeItem(clickUpTaskId);
                 return;
             }
             if (gitLabProject.stagingStatus && mergeRequest.state === 'merged') {
-                if (['dev in review', 'in review', 'review'].includes(clickUpTask.status.status)) {
+                if ([
+                    node_shared_1.TaskStatus.DevInReview,
+                    node_shared_1.TaskStatus.InReview,
+                    node_shared_1.TaskStatus.Review,
+                ].includes(clickUpTask.status.status.toLowerCase())) {
                     const list = yield node_shared_1.ClickUp.getList(clickUpTask.list.id);
                     let stagingStatus = gitLabProject.stagingStatus[list.name] ||
                         gitLabProject.stagingStatus['*'];
                     if (list.statuses.find((s) => s.status.toLowerCase() === stagingStatus)) {
                         yield clickUp.setTaskStatus(stagingStatus);
                     }
-                    else if (list.statuses.find((s) => s.status.toLowerCase() === 'done')) {
-                        stagingStatus = 'done';
-                        yield clickUp.setTaskStatus('done');
+                    else if (list.statuses.find((s) => s.status.toLowerCase() === node_shared_1.TaskStatus.Done)) {
+                        stagingStatus = node_shared_1.TaskStatus.Done;
+                        yield clickUp.setTaskStatus(node_shared_1.TaskStatus.Done);
                     }
                     else {
-                        stagingStatus = 'closed';
-                        yield clickUp.setTaskStatus('closed');
+                        stagingStatus = node_shared_1.TaskStatus.Closed;
+                        yield clickUp.setTaskStatus(node_shared_1.TaskStatus.Closed);
                     }
                     let message = `${yield clickUp.getFullTaskName()} (${clickUpTaskId}): ${(0, node_shared_1.titleCase)(clickUpTask.status.status)} -> ${(0, node_shared_1.titleCase)(stagingStatus)}`;
                     if (!clickUpTask.due_date) {
@@ -2303,6 +2313,7 @@ const cli_progress_1 = __webpack_require__("cli-progress");
 const fs_1 = __webpack_require__("fs");
 const path_1 = __webpack_require__("path");
 const config_1 = __webpack_require__("./libs/node-shared/src/lib/config.ts");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/lib/node-shared.ts");
 const api_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/api.utils.ts");
 const case_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/case.utils.ts");
 const checklist_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/checklist.utils.ts");
@@ -2347,7 +2358,7 @@ class ClickUp {
     }
     static getRTVTasks(teamId, userID) {
         return callApi('get', `/team/${teamId}/task/`, {
-            statuses: ['ready to verify'],
+            statuses: [node_shared_1.TaskStatus.ReadyToVerify],
             include_closed: true,
             assignees: [userID],
         });
@@ -2355,12 +2366,13 @@ class ClickUp {
     static getMyTasks(teamId, userID) {
         return callApi('get', `/team/${teamId}/task/`, {
             statuses: [
-                'Open',
-                'pending',
-                'ready to do',
-                'in progress',
-                'dev in progress',
-                'in discussion',
+                node_shared_1.TaskStatus.Open,
+                node_shared_1.TaskStatus.Pending,
+                node_shared_1.TaskStatus.ReadyToDo,
+                node_shared_1.TaskStatus.ReadyToDev,
+                node_shared_1.TaskStatus.InProgress,
+                node_shared_1.TaskStatus.DevInProgress,
+                node_shared_1.TaskStatus.InDiscussion,
             ],
             assignees: [userID],
             subtasks: true,
@@ -2490,7 +2502,7 @@ class ClickUp {
                 case 'todo':
                     return `- [ ] ${link}`;
                 case 'dp':
-                    return (['in progress', 'dev in progress'].includes(task.status.status)) && progress
+                    return [node_shared_1.TaskStatus.InProgress, node_shared_1.TaskStatus.DevInProgress].includes(task.status.status) && progress
                         ? `* (${(0, case_utils_1.titleCase)(task.status.status)} ${progress}) ${link}`
                         : `* (${(0, case_utils_1.titleCase)(task.status.status)}) ${link}`;
             }
@@ -2593,23 +2605,23 @@ class ClickUp {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const t = yield this.getTask();
             const list = yield ClickUp.getList(t.list.id);
-            if (list.statuses.find((s) => s.status.toLowerCase() === 'dev in progress')) {
-                return this.setTaskStatus('dev in progress');
+            if (list.statuses.find((s) => s.status.toLowerCase() === node_shared_1.TaskStatus.DevInProgress)) {
+                return this.setTaskStatus(node_shared_1.TaskStatus.DevInProgress);
             }
-            return this.setTaskStatus('in progress');
+            return this.setTaskStatus(node_shared_1.TaskStatus.InProgress);
         });
     }
     setTaskAsInReviewStatus() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const t = yield this.getTask();
             const list = yield ClickUp.getList(t.list.id);
-            if (list.statuses.find((s) => s.status.toLowerCase() === 'dev in review')) {
-                return this.setTaskStatus('dev in review');
+            if (list.statuses.find((s) => s.status.toLowerCase() === node_shared_1.TaskStatus.DevInReview)) {
+                return this.setTaskStatus(node_shared_1.TaskStatus.DevInReview);
             }
-            if (list.statuses.find((s) => s.status.toLowerCase() === 'in review')) {
-                return this.setTaskStatus('in review');
+            if (list.statuses.find((s) => s.status.toLowerCase() === node_shared_1.TaskStatus.InReview)) {
+                return this.setTaskStatus(node_shared_1.TaskStatus.DevInReview);
             }
-            return this.setTaskStatus('review');
+            return this.setTaskStatus(node_shared_1.TaskStatus.Review);
         });
     }
 }
@@ -2957,6 +2969,34 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
+/***/ "./libs/node-shared/src/lib/models/clickup/task-status.enum.ts":
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.TaskStatus = void 0;
+var TaskStatus;
+(function (TaskStatus) {
+    TaskStatus["Open"] = "open";
+    TaskStatus["Pending"] = "pending";
+    TaskStatus["InDiscussion"] = "in discussion";
+    TaskStatus["ReadyToDo"] = "ready to do";
+    TaskStatus["ReadyToDev"] = "ready to dev";
+    TaskStatus["InProgress"] = "in progress";
+    TaskStatus["DevInProgress"] = "dev in progress";
+    TaskStatus["Review"] = "review";
+    TaskStatus["InReview"] = "in review";
+    TaskStatus["DevInReview"] = "dev in review";
+    TaskStatus["ReadyToVerify"] = "ready to verify";
+    TaskStatus["Suspended"] = "suspended";
+    TaskStatus["Verified"] = "verified";
+    TaskStatus["Closed"] = "closed";
+    TaskStatus["Done"] = "done";
+})(TaskStatus = exports.TaskStatus || (exports.TaskStatus = {}));
+
+
+/***/ }),
+
 /***/ "./libs/node-shared/src/lib/models/clickup/task.models.ts":
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -2998,7 +3038,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sleep = exports.formatDate = exports.DateFormat = exports.getTaskIdFromBranchName = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.titleCase = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.IHoliday = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Task = exports.Space = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.Google = exports.GitLab = exports.ClickUp = void 0;
+exports.sleep = exports.formatDate = exports.DateFormat = exports.getTaskIdFromBranchName = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.titleCase = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.IHoliday = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Task = exports.TaskStatus = exports.Space = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.Google = exports.GitLab = exports.ClickUp = void 0;
 var clickup_class_1 = __webpack_require__("./libs/node-shared/src/lib/classes/clickup.class.ts");
 Object.defineProperty(exports, "ClickUp", ({ enumerable: true, get: function () { return clickup_class_1.ClickUp; } }));
 var gitlab_class_1 = __webpack_require__("./libs/node-shared/src/lib/classes/gitlab.class.ts");
@@ -3012,6 +3052,8 @@ var checklist_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/
 Object.defineProperty(exports, "ChecklistItem", ({ enumerable: true, get: function () { return checklist_models_1.ChecklistItem; } }));
 var space_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/space.models.ts");
 Object.defineProperty(exports, "Space", ({ enumerable: true, get: function () { return space_models_1.Space; } }));
+var task_status_enum_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/task-status.enum.ts");
+Object.defineProperty(exports, "TaskStatus", ({ enumerable: true, get: function () { return task_status_enum_1.TaskStatus; } }));
 var task_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/task.models.ts");
 Object.defineProperty(exports, "Task", ({ enumerable: true, get: function () { return task_models_1.Task; } }));
 var job_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/gitlab/job.models.ts");

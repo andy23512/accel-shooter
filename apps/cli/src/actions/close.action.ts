@@ -1,3 +1,4 @@
+import { TaskStatus } from '@accel-shooter/node-shared';
 import { Action } from '../classes/action.class';
 import { CustomProgressLog } from '../classes/progress-log.class';
 import { Todo } from '../classes/todo.class';
@@ -23,7 +24,7 @@ export class CloseAction extends Action {
     p.next(); // Close GitLab Merge Request
     await gitLab.closeMergeRequest(mergeRequest);
     p.next(); // Update ClickUp Task Status
-    await clickUp.setTaskStatus('suspended');
+    await clickUp.setTaskStatus(TaskStatus.Suspended);
     p.next(); // Close Tab Group
     openUrlsInTabGroup([], clickUpTaskId);
     p.next(); // Remove Todo

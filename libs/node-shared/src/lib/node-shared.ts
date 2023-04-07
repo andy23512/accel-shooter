@@ -4,6 +4,7 @@ export { Google } from './classes/google.class';
 export { CONFIG, getConfig } from './config';
 export { ChecklistItem } from './models/clickup/checklist.models';
 export { Space } from './models/clickup/space.models';
+export { TaskStatus } from './models/clickup/task-status.enum';
 export { Task } from './models/clickup/task.models';
 export { Job } from './models/gitlab/job.models';
 export { Change, FullMergeRequest } from './models/gitlab/merge-request.models';

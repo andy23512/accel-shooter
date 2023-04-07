@@ -13,6 +13,7 @@ import { Space } from '../models/clickup/space.models';
 import { Task, TaskIncludeSubTasks } from '../models/clickup/task.models';
 import { Team } from '../models/clickup/team.models';
 import { User } from '../models/clickup/user.models';
+import { TaskStatus } from '../node-shared';
 import { callApiFactory } from '../utils/api.utils';
 import { titleCase } from '../utils/case.utils';
 import {
@@ -68,7 +69,7 @@ export class ClickUp {
 
   public static getRTVTasks(teamId: string, userID: number) {
     return callApi<{ tasks: Task[] }>('get', `/team/${teamId}/task/`, {
-      statuses: ['ready to verify'],
+      statuses: [TaskStatus.ReadyToVerify],
       include_closed: true,
       assignees: [userID],
     });
@@ -77,12 +78,13 @@ export class ClickUp {
   public static getMyTasks(teamId: string, userID: number) {
     return callApi<{ tasks: Task[] }>('get', `/team/${teamId}/task/`, {
       statuses: [
-        'Open',
-        'pending',
-        'ready to do',
-        'in progress',
-        'dev in progress',
-        'in discussion',
+        TaskStatus.Open,
+        TaskStatus.Pending,
+        TaskStatus.ReadyToDo,
+        TaskStatus.ReadyToDev,
+        TaskStatus.InProgress,
+        TaskStatus.DevInProgress,
+        TaskStatus.InDiscussion,
       ],
       assignees: [userID],
       subtasks: true,
@@ -106,7 +108,7 @@ export class ClickUp {
     ).then((r) => r.comments);
   }
 
-  public setTaskStatus(status: string) {
+  public setTaskStatus(status: TaskStatus) {
     return callApi<Task>('put', `/task/${this.taskId}`, null, { status });
   }
 
@@ -255,7 +257,9 @@ export class ClickUp {
       case 'todo':
         return `- [ ] ${link}`;
       case 'dp':
-        return (['in progress', 'dev in progress'].includes(task.status.status)) && progress
+        return [TaskStatus.InProgress, TaskStatus.DevInProgress].includes(
+          task.status.status as TaskStatus
+        ) && progress
           ? `* (${titleCase(task.status.status)} ${progress}) ${link}`
           : `* (${titleCase(task.status.status)}) ${link}`;
     }
@@ -386,24 +390,34 @@ export class ClickUp {
     }
   }
 
-  public async setTaskAsInProgressStatus () {
+  public async setTaskAsInProgressStatus() {
     const t = await this.getTask();
     const list = await ClickUp.getList(t.list.id);
-    if (list.statuses.find((s) => s.status.toLowerCase() === 'dev in progress')) {
-      return this.setTaskStatus('dev in progress')
+    if (
+      list.statuses.find(
+        (s) => s.status.toLowerCase() === TaskStatus.DevInProgress
+      )
+    ) {
+      return this.setTaskStatus(TaskStatus.DevInProgress);
     }
-    return this.setTaskStatus('in progress')
+    return this.setTaskStatus(TaskStatus.InProgress);
   }
 
-  public async setTaskAsInReviewStatus () {
+  public async setTaskAsInReviewStatus() {
     const t = await this.getTask();
     const list = await ClickUp.getList(t.list.id);
-    if (list.statuses.find((s) => s.status.toLowerCase() === 'dev in review')) {
-      return this.setTaskStatus('dev in review')
+    if (
+      list.statuses.find(
+        (s) => s.status.toLowerCase() === TaskStatus.DevInReview
+      )
+    ) {
+      return this.setTaskStatus(TaskStatus.DevInReview);
     }
-    if (list.statuses.find((s) => s.status.toLowerCase() === 'in review')) {
-      return this.setTaskStatus('in review')
+    if (
+      list.statuses.find((s) => s.status.toLowerCase() === TaskStatus.InReview)
+    ) {
+      return this.setTaskStatus(TaskStatus.DevInReview);
     }
-    return this.setTaskStatus('review')
+    return this.setTaskStatus(TaskStatus.Review);
   }
 }

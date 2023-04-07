@@ -1,4 +1,10 @@
-import { ClickUp, CONFIG, GitLab, titleCase } from '@accel-shooter/node-shared';
+import {
+  ClickUp,
+  CONFIG,
+  GitLab,
+  TaskStatus,
+  titleCase,
+} from '@accel-shooter/node-shared';
 import { appendFileSync } from 'fs';
 import untildify from 'untildify';
 import { displayNotification } from '../utils';
@@ -46,15 +52,24 @@ export class Tracker extends BaseFileRef {
     const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
     const clickUpTask = await clickUp.getTask();
     if (
-      ['closed', 'verified', 'ready to verify', 'done'].includes(
-        clickUpTask.status.status.toLowerCase()
-      )
+      [
+        TaskStatus.Closed,
+        TaskStatus.Verified,
+        TaskStatus.ReadyToVerify,
+        TaskStatus.Done,
+      ].includes(clickUpTask.status.status.toLowerCase() as TaskStatus)
     ) {
       this.closeItem(clickUpTaskId);
       return;
     }
     if (gitLabProject.stagingStatus && mergeRequest.state === 'merged') {
-      if (['dev in review', 'in review', 'review'].includes(clickUpTask.status.status)) {
+      if (
+        [
+          TaskStatus.DevInReview,
+          TaskStatus.InReview,
+          TaskStatus.Review,
+        ].includes(clickUpTask.status.status.toLowerCase() as TaskStatus)
+      ) {
         const list = await ClickUp.getList(clickUpTask.list.id);
         let stagingStatus =
           gitLabProject.stagingStatus[list.name] ||
@@ -62,19 +77,19 @@ export class Tracker extends BaseFileRef {
         if (
           list.statuses.find((s) => s.status.toLowerCase() === stagingStatus)
         ) {
-          await clickUp.setTaskStatus(stagingStatus);
+          await clickUp.setTaskStatus(stagingStatus as TaskStatus);
         } else if (
-          list.statuses.find((s) => s.status.toLowerCase() === 'done')
+          list.statuses.find((s) => s.status.toLowerCase() === TaskStatus.Done)
         ) {
-          stagingStatus = 'done';
-          await clickUp.setTaskStatus('done');
+          stagingStatus = TaskStatus.Done;
+          await clickUp.setTaskStatus(TaskStatus.Done);
         } else {
-          stagingStatus = 'closed';
-          await clickUp.setTaskStatus('closed');
+          stagingStatus = TaskStatus.Closed;
+          await clickUp.setTaskStatus(TaskStatus.Closed);
         }
-        let message = `${await clickUp.getFullTaskName()} (${clickUpTaskId}): ${titleCase(clickUpTask.status.status)} -> ${titleCase(
-          stagingStatus
-        )}`;
+        let message = `${await clickUp.getFullTaskName()} (${clickUpTaskId}): ${titleCase(
+          clickUpTask.status.status
+        )} -> ${titleCase(stagingStatus)}`;
         if (!clickUpTask.due_date) {
           await clickUp.setTaskDueDateToToday();
           message += '; due date was set';
