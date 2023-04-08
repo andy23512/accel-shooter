@@ -2,7 +2,7 @@ import fuzzy from 'fuzzy';
 import inquirer from 'inquirer';
 import inquirerAutoCompletePrompt from 'inquirer-autocomplete-prompt';
 
-import { findBestMatch } from 'string-similarity';
+import path from 'path';
 import { Action } from '../classes/action.class';
 import { CommitScope } from '../classes/commit-scope.class';
 import { getInfoFromArgument, getRepoName, promiseSpawn } from '../utils';
@@ -66,11 +66,12 @@ export class CommitAction extends Action {
     inquirer.registerPrompt('autocomplete', inquirerAutoCompletePrompt);
     const commitScope = new CommitScope();
     const commitScopeItems = commitScope.getItems(repoName);
-    const str =
-      stagedFiles.length === 1 ? stagedFiles[0] : getCommon(stagedFiles);
-    const bestMatchRatings = findBestMatch(str, commitScopeItems).ratings;
-    bestMatchRatings.sort((a, b) => b.rating - a.rating);
-    const presortedCommitScopeItems = bestMatchRatings.map((r) => r.target);
+    const bestMatchRatings = commitScopeItems.map((scope) => ({
+      scope,
+      score: getScopeScore(scope, stagedFiles),
+    }));
+    bestMatchRatings.sort((a, b) => b.score - a.score);
+    const presortedCommitScopeItems = bestMatchRatings.map((r) => r.scope);
     const answers = await inquirer.prompt([
       {
         name: 'type',
@@ -109,15 +110,25 @@ export class CommitAction extends Action {
   }
 }
 
-function getCommon(pathList: string[]) {
-  const pathArrayList = pathList.map((p) => p.split('/'));
-  pathArrayList.sort((a, b) => a.length - b.length);
-  let i = 0;
-  while (
-    i < pathArrayList[0].length &&
-    pathArrayList.every((pa) => pa[i] === pathArrayList[0][i])
-  ) {
-    i++;
+function getScopeScore(scope: string, files: string[]) {
+  if (scope === 'empty') {
+    return 0;
   }
-  return pathArrayList[0].slice(undefined, i).join('/');
+  return files.reduce((acc: number, file) => {
+    const folderPath = path.dirname(file).split('/');
+    return (
+      acc +
+      scope.split('/').reduce((acc, si, i) => {
+        if (i === 0) {
+          if (si === folderPath[0]) {
+            return acc + 100;
+          }
+          return acc - 100;
+        } else {
+          const position = folderPath.indexOf(si);
+          return acc + position;
+        }
+      }, 0)
+    );
+  }, 0);
 }

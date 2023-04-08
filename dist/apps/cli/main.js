@@ -224,7 +224,7 @@ const tslib_1 = __webpack_require__("tslib");
 const fuzzy_1 = tslib_1.__importDefault(__webpack_require__("fuzzy"));
 const inquirer_1 = tslib_1.__importDefault(__webpack_require__("inquirer"));
 const inquirer_autocomplete_prompt_1 = tslib_1.__importDefault(__webpack_require__("inquirer-autocomplete-prompt"));
-const string_similarity_1 = __webpack_require__("string-similarity");
+const path_1 = tslib_1.__importDefault(__webpack_require__("path"));
 const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const commit_scope_class_1 = __webpack_require__("./apps/cli/src/classes/commit-scope.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
@@ -283,10 +283,12 @@ class CommitAction extends action_class_1.Action {
             inquirer_1.default.registerPrompt('autocomplete', inquirer_autocomplete_prompt_1.default);
             const commitScope = new commit_scope_class_1.CommitScope();
             const commitScopeItems = commitScope.getItems(repoName);
-            const str = stagedFiles.length === 1 ? stagedFiles[0] : getCommon(stagedFiles);
-            const bestMatchRatings = (0, string_similarity_1.findBestMatch)(str, commitScopeItems).ratings;
-            bestMatchRatings.sort((a, b) => b.rating - a.rating);
-            const presortedCommitScopeItems = bestMatchRatings.map((r) => r.target);
+            const bestMatchRatings = commitScopeItems.map((scope) => ({
+                scope,
+                score: getScopeScore(scope, stagedFiles),
+            }));
+            bestMatchRatings.sort((a, b) => b.score - a.score);
+            const presortedCommitScopeItems = bestMatchRatings.map((r) => r.scope);
             const answers = yield inquirer_1.default.prompt([
                 {
                     name: 'type',
@@ -320,15 +322,26 @@ class CommitAction extends action_class_1.Action {
     }
 }
 exports.CommitAction = CommitAction;
-function getCommon(pathList) {
-    const pathArrayList = pathList.map((p) => p.split('/'));
-    pathArrayList.sort((a, b) => a.length - b.length);
-    let i = 0;
-    while (i < pathArrayList[0].length &&
-        pathArrayList.every((pa) => pa[i] === pathArrayList[0][i])) {
-        i++;
+function getScopeScore(scope, files) {
+    if (scope === 'empty') {
+        return 0;
     }
-    return pathArrayList[0].slice(undefined, i).join('/');
+    return files.reduce((acc, file) => {
+        const folderPath = path_1.default.dirname(file).split('/');
+        return (acc +
+            scope.split('/').reduce((acc, si, i) => {
+                if (i === 0) {
+                    if (si === folderPath[0]) {
+                        return acc + 100;
+                    }
+                    return acc - 100;
+                }
+                else {
+                    const position = folderPath.indexOf(si);
+                    return acc + position;
+                }
+            }, 0));
+    }, 0);
 }
 
 
@@ -3505,13 +3518,6 @@ module.exports = require("rxjs/operators");
 /***/ ((module) => {
 
 module.exports = require("single-instance-lock");
-
-/***/ }),
-
-/***/ "string-similarity":
-/***/ ((module) => {
-
-module.exports = require("string-similarity");
 
 /***/ }),
 
