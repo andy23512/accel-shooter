@@ -416,7 +416,7 @@ export class ClickUp {
     if (
       list.statuses.find((s) => s.status.toLowerCase() === TaskStatus.InReview)
     ) {
-      return this.setTaskStatus(TaskStatus.DevInReview);
+      return this.setTaskStatus(TaskStatus.InReview);
     }
     return this.setTaskStatus(TaskStatus.Review);
   }

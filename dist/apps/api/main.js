@@ -574,7 +574,7 @@ class ClickUp {
                 return this.setTaskStatus(node_shared_1.TaskStatus.DevInReview);
             }
             if (list.statuses.find((s) => s.status.toLowerCase() === node_shared_1.TaskStatus.InReview)) {
-                return this.setTaskStatus(node_shared_1.TaskStatus.DevInReview);
+                return this.setTaskStatus(node_shared_1.TaskStatus.InReview);
             }
             return this.setTaskStatus(node_shared_1.TaskStatus.Review);
         });
