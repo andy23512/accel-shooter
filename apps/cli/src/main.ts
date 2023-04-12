@@ -1,5 +1,4 @@
 import { program } from 'commander';
-import { BiWeeklyProgressAction } from './actions/bi-weekly-progress.action';
 import { CheckAction } from './actions/check.action';
 import { CloseAction } from './actions/close.action';
 import { CommitAction } from './actions/commit.action';
@@ -22,11 +21,11 @@ import { TimeAction } from './actions/time.action';
 import { TodoAction } from './actions/to-do.action';
 import { TrackAction } from './actions/track.action';
 import { WatchPipelineAction } from './actions/watch-pipeline.action';
+import { WeeklyProgressAction } from './actions/weekly-progress.action';
 import { WorkAction } from './actions/work.action';
 import { Action } from './classes/action.class';
 
 const ACTIONS: Action[] = [
-  new BiWeeklyProgressAction(),
   new CheckAction(),
   new CloseAction(),
   new CommitAction(),
@@ -49,6 +48,7 @@ const ACTIONS: Action[] = [
   new TodoAction(),
   new TrackAction(),
   new WatchPipelineAction(),
+  new WeeklyProgressAction(),
   new WorkAction(),
 ];
 

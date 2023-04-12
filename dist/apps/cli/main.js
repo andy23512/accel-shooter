@@ -18,112 +18,6 @@ exports.configReadline = configReadline;
 
 /***/ }),
 
-/***/ "./apps/cli/src/actions/bi-weekly-progress.action.ts":
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
-
-
-Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.BiWeeklyProgressAction = void 0;
-const tslib_1 = __webpack_require__("tslib");
-const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
-const clipboardy_1 = tslib_1.__importDefault(__webpack_require__("clipboardy"));
-const date_fns_1 = __webpack_require__("date-fns");
-const ramda_1 = __webpack_require__("ramda");
-const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
-const daily_progress_class_1 = __webpack_require__("./apps/cli/src/classes/daily-progress.class.ts");
-const holiday_class_1 = __webpack_require__("./apps/cli/src/classes/holiday.class.ts");
-const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
-class BiWeeklyProgressAction extends action_class_1.Action {
-    constructor() {
-        super(...arguments);
-        this.command = 'biWeeklyProgress';
-        this.description = 'generate bi-weekly progress report and copy it to clipboard';
-        this.arguments = [
-            { name: '[startDay]', description: 'optional start day of date range' },
-        ];
-    }
-    run(startDayArg) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const today = new Date();
-            const startDay = (0, utils_1.getDayFromArgument)(startDayArg, (0, date_fns_1.add)(today, { weeks: -2 }));
-            let fetchDay = new Date(today.valueOf());
-            const holiday = new holiday_class_1.Holiday();
-            const fetchDays = [];
-            while ((0, date_fns_1.compareAsc)(startDay, fetchDay) < 0) {
-                if (holiday.checkIsWorkday(fetchDay)) {
-                    fetchDays.push(fetchDay);
-                }
-                fetchDay = (0, date_fns_1.add)(fetchDay, { days: -1 });
-            }
-            const dpContent = new daily_progress_class_1.DailyProgress().readFile();
-            const data = {};
-            for (const d of fetchDays) {
-                const previousWorkDayString = (0, node_shared_1.formatDate)(holiday.getPreviousWorkday(d));
-                const dString = (0, node_shared_1.formatDate)(d);
-                const matchResult = dpContent.match(new RegExp(`### ${dString}\n1\\. Previous Day\n(.*?)\n2\\. Today`, 's'));
-                if (matchResult) {
-                    const record = matchResult[1];
-                    const lines = record.split('\n').filter(Boolean);
-                    for (const line of lines) {
-                        const matchItem = line.match(/(\([A-Za-z0-9 %]+\)) \[(.*?)\]\((https:\/\/app.clickup.com\/t\/(\w+))\)/);
-                        if (matchItem) {
-                            const name = matchItem[2];
-                            const url = matchItem[3];
-                            const taskId = matchItem[4];
-                            if (data[url]) {
-                                data[url].days.push(previousWorkDayString);
-                            }
-                            else {
-                                const { gitLabProject } = yield new node_shared_1.ClickUp(taskId).getGitLabProjectAndMergeRequestIId();
-                                data[url] = {
-                                    url,
-                                    name,
-                                    project: gitLabProject.name,
-                                    days: [previousWorkDayString],
-                                };
-                            }
-                        }
-                    }
-                }
-                else {
-                    console.log('No Result!');
-                }
-            }
-            const finalData = Object.values(data).map((item) => (Object.assign(Object.assign({}, item), { startDay: item.days[item.days.length - 1], endDay: item.days[0] })));
-            finalData.sort((a, b) => a.endDay.localeCompare(b.endDay));
-            const groupedRecords = (0, ramda_1.groupBy)((0, ramda_1.prop)('project'), finalData);
-            const previousWorkDayOfToday = holiday.getPreviousWorkday(today);
-            let result = `## ${(0, node_shared_1.formatDate)(startDay)}~${(0, node_shared_1.formatDate)(previousWorkDayOfToday)}`;
-            Object.entries(groupedRecords).forEach(([project, records]) => {
-                result += `\n### ${project}`;
-                records.forEach(({ name, url, startDay, endDay }) => {
-                    if (startDay === endDay) {
-                        result += `\n- ${startDay} [${name}](${url})`;
-                    }
-                    else {
-                        result += `\n- ${startDay}~${subtractCommon(endDay, startDay)} [${name}](${url})`;
-                    }
-                });
-            });
-            clipboardy_1.default.writeSync(result);
-            console.log('Copied!');
-        });
-    }
-}
-exports.BiWeeklyProgressAction = BiWeeklyProgressAction;
-function subtractCommon(a, b) {
-    const ar = a.split('/');
-    const br = b.split('/');
-    let i = 0;
-    while (i < ar.length && ar[i] === br[i]) {
-        i++;
-    }
-    return ar.slice(i).join('/');
-}
-
-
-/***/ }),
-
 /***/ "./apps/cli/src/actions/check.action.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -1435,6 +1329,112 @@ class WatchPipelineAction extends action_class_1.Action {
     }
 }
 exports.WatchPipelineAction = WatchPipelineAction;
+
+
+/***/ }),
+
+/***/ "./apps/cli/src/actions/weekly-progress.action.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.WeeklyProgressAction = void 0;
+const tslib_1 = __webpack_require__("tslib");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const clipboardy_1 = tslib_1.__importDefault(__webpack_require__("clipboardy"));
+const date_fns_1 = __webpack_require__("date-fns");
+const ramda_1 = __webpack_require__("ramda");
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
+const daily_progress_class_1 = __webpack_require__("./apps/cli/src/classes/daily-progress.class.ts");
+const holiday_class_1 = __webpack_require__("./apps/cli/src/classes/holiday.class.ts");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
+class WeeklyProgressAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'weeklyProgress';
+        this.description = 'generate weekly progress report and copy it to clipboard';
+        this.arguments = [
+            { name: '[startDay]', description: 'optional start day of date range' },
+        ];
+    }
+    run(startDayArg) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const today = new Date();
+            const startDay = (0, utils_1.getDayFromArgument)(startDayArg, (0, date_fns_1.add)(today, { weeks: -1 }));
+            let fetchDay = new Date(today.valueOf());
+            const holiday = new holiday_class_1.Holiday();
+            const fetchDays = [];
+            while ((0, date_fns_1.compareAsc)(startDay, fetchDay) < 0) {
+                if (holiday.checkIsWorkday(fetchDay)) {
+                    fetchDays.push(fetchDay);
+                }
+                fetchDay = (0, date_fns_1.add)(fetchDay, { days: -1 });
+            }
+            const dpContent = new daily_progress_class_1.DailyProgress().readFile();
+            const data = {};
+            for (const d of fetchDays) {
+                const previousWorkDayString = (0, node_shared_1.formatDate)(holiday.getPreviousWorkday(d));
+                const dString = (0, node_shared_1.formatDate)(d);
+                const matchResult = dpContent.match(new RegExp(`### ${dString}\n1\\. Previous Day\n(.*?)\n2\\. Today`, 's'));
+                if (matchResult) {
+                    const record = matchResult[1];
+                    const lines = record.split('\n').filter(Boolean);
+                    for (const line of lines) {
+                        const matchItem = line.match(/(\([A-Za-z0-9 %]+\)) \[(.*?)\]\((https:\/\/app.clickup.com\/t\/(\w+))\)/);
+                        if (matchItem) {
+                            const name = matchItem[2];
+                            const url = matchItem[3];
+                            const taskId = matchItem[4];
+                            if (data[url]) {
+                                data[url].days.push(previousWorkDayString);
+                            }
+                            else {
+                                const { gitLabProject } = yield new node_shared_1.ClickUp(taskId).getGitLabProjectAndMergeRequestIId();
+                                data[url] = {
+                                    url,
+                                    name,
+                                    project: gitLabProject.name,
+                                    days: [previousWorkDayString],
+                                };
+                            }
+                        }
+                    }
+                }
+                else {
+                    console.log('No Result!');
+                }
+            }
+            const finalData = Object.values(data).map((item) => (Object.assign(Object.assign({}, item), { startDay: item.days[item.days.length - 1], endDay: item.days[0] })));
+            finalData.sort((a, b) => a.endDay.localeCompare(b.endDay));
+            const groupedRecords = (0, ramda_1.groupBy)((0, ramda_1.prop)('project'), finalData);
+            const previousWorkDayOfToday = holiday.getPreviousWorkday(today);
+            let result = `## ${(0, node_shared_1.formatDate)(startDay)}~${(0, node_shared_1.formatDate)(previousWorkDayOfToday)}`;
+            Object.entries(groupedRecords).forEach(([project, records]) => {
+                result += `\n### ${project}`;
+                records.forEach(({ name, url, startDay, endDay }) => {
+                    if (startDay === endDay) {
+                        result += `\n- ${startDay} [${name}](${url})`;
+                    }
+                    else {
+                        result += `\n- ${startDay}~${subtractCommon(endDay, startDay)} [${name}](${url})`;
+                    }
+                });
+            });
+            clipboardy_1.default.writeSync(result);
+            console.log('Copied!');
+        });
+    }
+}
+exports.WeeklyProgressAction = WeeklyProgressAction;
+function subtractCommon(a, b) {
+    const ar = a.split('/');
+    const br = b.split('/');
+    let i = 0;
+    while (i < ar.length && ar[i] === br[i]) {
+        i++;
+    }
+    return ar.slice(i).join('/');
+}
 
 
 /***/ }),
@@ -3605,7 +3605,6 @@ var exports = __webpack_exports__;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__("tslib");
 const commander_1 = __webpack_require__("commander");
-const bi_weekly_progress_action_1 = __webpack_require__("./apps/cli/src/actions/bi-weekly-progress.action.ts");
 const check_action_1 = __webpack_require__("./apps/cli/src/actions/check.action.ts");
 const close_action_1 = __webpack_require__("./apps/cli/src/actions/close.action.ts");
 const commit_action_1 = __webpack_require__("./apps/cli/src/actions/commit.action.ts");
@@ -3628,9 +3627,9 @@ const time_action_1 = __webpack_require__("./apps/cli/src/actions/time.action.ts
 const to_do_action_1 = __webpack_require__("./apps/cli/src/actions/to-do.action.ts");
 const track_action_1 = __webpack_require__("./apps/cli/src/actions/track.action.ts");
 const watch_pipeline_action_1 = __webpack_require__("./apps/cli/src/actions/watch-pipeline.action.ts");
+const weekly_progress_action_1 = __webpack_require__("./apps/cli/src/actions/weekly-progress.action.ts");
 const work_action_1 = __webpack_require__("./apps/cli/src/actions/work.action.ts");
 const ACTIONS = [
-    new bi_weekly_progress_action_1.BiWeeklyProgressAction(),
     new check_action_1.CheckAction(),
     new close_action_1.CloseAction(),
     new commit_action_1.CommitAction(),
@@ -3653,6 +3652,7 @@ const ACTIONS = [
     new to_do_action_1.TodoAction(),
     new track_action_1.TrackAction(),
     new watch_pipeline_action_1.WatchPipelineAction(),
+    new weekly_progress_action_1.WeeklyProgressAction(),
     new work_action_1.WorkAction(),
 ];
 (() => tslib_1.__awaiter(void 0, void 0, void 0, function* () {

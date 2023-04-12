@@ -7,16 +7,16 @@ import { DailyProgress } from '../classes/daily-progress.class';
 import { Holiday } from '../classes/holiday.class';
 import { getDayFromArgument } from '../utils';
 
-export class BiWeeklyProgressAction extends Action {
-  public command = 'biWeeklyProgress';
+export class WeeklyProgressAction extends Action {
+  public command = 'weeklyProgress';
   public description =
-    'generate bi-weekly progress report and copy it to clipboard';
+    'generate weekly progress report and copy it to clipboard';
   public arguments = [
     { name: '[startDay]', description: 'optional start day of date range' },
   ];
   public async run(startDayArg: string) {
     const today = new Date();
-    const startDay = getDayFromArgument(startDayArg, add(today, { weeks: -2 }));
+    const startDay = getDayFromArgument(startDayArg, add(today, { weeks: -1 }));
     let fetchDay = new Date(today.valueOf());
     const holiday = new Holiday();
     const fetchDays: Date[] = [];
