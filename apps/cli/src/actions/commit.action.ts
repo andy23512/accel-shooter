@@ -22,10 +22,6 @@ const TYPES = [
 ];
 
 function preprocess(path: string) {
-  const match = path.match(/frontend\/libs\/(.*?)\//);
-  if (match) {
-    return `frontend/${match[1]}`;
-  }
   const match2 = path.match(/libs\/pheno\/(.*?)\//);
   if (match2) {
     return `phe-${match2[1]}`;
