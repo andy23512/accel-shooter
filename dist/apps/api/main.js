@@ -430,6 +430,7 @@ class ClickUp {
                     };
                 }
             }
+            console.warn(`No synced checklist found in this task: ${t.id}`);
             return null;
         });
     }
