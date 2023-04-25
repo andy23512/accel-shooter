@@ -3,12 +3,15 @@ import { Checklist } from './checklist.models';
 
 export interface Task {
   id: string;
+  custom_id: string;
   name: string;
+  text_content: string;
+  description: string;
   status: Status;
   orderindex: string;
   date_created: string;
   date_updated: string;
-  date_closed?: any;
+  date_closed: string;
   creator: Creator;
   assignees: Assignee[];
   checklists: Checklist[];

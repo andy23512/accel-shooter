@@ -2326,6 +2326,7 @@ const node_shared_1 = __webpack_require__("./libs/node-shared/src/lib/node-share
 const api_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/api.utils.ts");
 const case_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/case.utils.ts");
 const checklist_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/checklist.utils.ts");
+const FIGMA_REGEX = /(?:https:\/\/)?(?:www\.)?figma\.com\/(file|proto)\/([0-9a-zA-Z]{22,128})(?:\/([^\?\n\r\/]+)?((?:\?[^\/]*?node-id=([^&\n\r\/]+))?[^\/]*?)(\/duplicate)?)?/g;
 const callApi = (0, api_utils_1.callApiFactory)('ClickUp');
 class ClickUp {
     constructor(taskId) {
@@ -2444,10 +2445,14 @@ class ClickUp {
                 }
                 currentTaskId = task.parent;
             }
-            const taskQueue = [rootTaskId];
+            const taskQueue = [rootTaskId, this.taskId];
             while (taskQueue.length > 0) {
                 const taskId = taskQueue.shift();
                 const clickUp = new ClickUp(taskId);
+                const task = yield clickUp.getTask();
+                [...task.description.matchAll(FIGMA_REGEX)].forEach(([url]) => {
+                    frameUrls.push(url);
+                });
                 const comments = yield clickUp.getTaskComments();
                 comments.forEach((co) => {
                     co.comment

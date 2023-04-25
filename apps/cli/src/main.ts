@@ -24,6 +24,7 @@ import { WatchPipelineAction } from './actions/watch-pipeline.action';
 import { WeeklyProgressAction } from './actions/weekly-progress.action';
 import { WorkAction } from './actions/work.action';
 import { Action } from './classes/action.class';
+import { ClickUp } from '@accel-shooter/node-shared';
 
 const ACTIONS: Action[] = [
   new CheckAction(),

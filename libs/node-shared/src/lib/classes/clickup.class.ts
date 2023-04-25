@@ -22,6 +22,9 @@ import {
   normalizeMarkdownChecklist,
 } from '../utils/checklist.utils';
 
+const FIGMA_REGEX =
+  /(?:https:\/\/)?(?:www\.)?figma\.com\/(file|proto)\/([0-9a-zA-Z]{22,128})(?:\/([^\?\n\r\/]+)?((?:\?[^\/]*?node-id=([^&\n\r\/]+))?[^\/]*?)(\/duplicate)?)?/g;
+
 const callApi = callApiFactory('ClickUp');
 
 export class ClickUp {
@@ -189,10 +192,14 @@ export class ClickUp {
       }
       currentTaskId = task.parent;
     }
-    const taskQueue: string[] = [rootTaskId as string];
+    const taskQueue: string[] = [rootTaskId as string, this.taskId];
     while (taskQueue.length > 0) {
       const taskId = taskQueue.shift() as string;
       const clickUp = new ClickUp(taskId);
+      const task = await clickUp.getTask();
+      [...task.description.matchAll(FIGMA_REGEX)].forEach(([url]) => {
+        frameUrls.push(url);
+      });
       const comments = await clickUp.getTaskComments();
       comments.forEach((co) => {
         co.comment
