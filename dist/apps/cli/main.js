@@ -1824,6 +1824,9 @@ class Holiday extends base_file_ref_class_1.BaseFileRef {
     checkIsWorkday(day) {
         const dayString = (0, node_shared_1.formatDate)(day, node_shared_1.DateFormat.HOLIDAY);
         const h = this.data.find((d) => d.date === dayString);
+        if (day.getMonth() === 4 && day.getDate() === 1) {
+            return false;
+        }
         return (!h ||
             (h.isHoliday === '否' && h.name !== '勞動節') ||
             (h.name === '軍人節' && h.holidayCategory === '特定節日'));

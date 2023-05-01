@@ -25,6 +25,9 @@ export class Holiday extends BaseFileRef {
   public checkIsWorkday(day: Date) {
     const dayString = formatDate(day, DateFormat.HOLIDAY);
     const h = this.data.find((d) => d.date === dayString);
+    if (day.getMonth() === 4 && day.getDate() === 1) {
+      return false;
+    }
     return (
       !h ||
       (h.isHoliday === '否' && h.name !== '勞動節') ||
