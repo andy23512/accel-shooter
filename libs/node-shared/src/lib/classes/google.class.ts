@@ -4,6 +4,7 @@ import { calendar_v3, google } from 'googleapis';
 
 import { authenticate } from '@google-cloud/local-auth';
 
+import { parseISO } from 'date-fns';
 import { CONFIG } from '../config';
 
 export class Google {
@@ -67,15 +68,30 @@ export class Google {
         orderBy: 'startTime',
       });
       const events = res.data.items;
-      return (
+      const attendingEvents =
         events?.filter((event) => {
           if (!event.attendees) {
             return true;
           }
           const self = event.attendees.find((a) => a.self);
           return !self || self.responseStatus !== 'declined';
-        }) || []
+        }) || [];
+      const studyGroupRes = await calendar.events.list({
+        calendarId: CONFIG.StudyGroupGoogleCalendarId,
+        timeMin,
+        timeMax,
+        maxResults: 10,
+        singleEvents: true,
+        orderBy: 'startTime',
+      });
+      const studyGroupEvents = studyGroupRes.data.items;
+      const allEvents = attendingEvents.concat(studyGroupEvents);
+      allEvents.sort(
+        (a, b) =>
+          parseISO(a.start.dateTime).valueOf() -
+          parseISO(b.start.dateTime).valueOf()
       );
+      return attendingEvents.concat(studyGroupEvents);
     } catch (e: any) {
       if (e.response.data.error === 'invalid_grant') {
         console.log('Invalid Grant!');

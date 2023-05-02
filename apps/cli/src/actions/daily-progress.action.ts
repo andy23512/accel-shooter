@@ -129,17 +129,19 @@ export class DailyProgressAction extends Action {
     if (previousDayMeeting.length > 0) {
       previousDayItems.push('    * Meeting');
       for (const m of previousDayMeeting) {
-        previousDayItems.push(
-          `        * ${m.summary.replace(/\(.*?\)/g, '').trim()}`
-        );
+        const item = `        * ${m.summary.replace(/\(.*?\)/g, '').trim()}`;
+        if (!previousDayItems.includes(item)) {
+          previousDayItems.push(item);
+        }
       }
     }
     if (todayMeeting.length > 0) {
       todayItems.push('    * Meeting');
       for (const m of todayMeeting) {
-        todayItems.push(
-          `        * ${m.summary.replace(/\(.*?\)/g, '').trim()}`
-        );
+        const item = `        * ${m.summary.replace(/\(.*?\)/g, '').trim()}`;
+        if (!todayItems.includes(item)) {
+          todayItems.push(item);
+        }
       }
     }
     p.next(); // Add Day Progress Entry

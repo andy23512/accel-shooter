@@ -389,13 +389,19 @@ class DailyProgressAction extends action_class_1.Action {
             if (previousDayMeeting.length > 0) {
                 previousDayItems.push('    * Meeting');
                 for (const m of previousDayMeeting) {
-                    previousDayItems.push(`        * ${m.summary.replace(/\(.*?\)/g, '').trim()}`);
+                    const item = `        * ${m.summary.replace(/\(.*?\)/g, '').trim()}`;
+                    if (!previousDayItems.includes(item)) {
+                        previousDayItems.push(item);
+                    }
                 }
             }
             if (todayMeeting.length > 0) {
                 todayItems.push('    * Meeting');
                 for (const m of todayMeeting) {
-                    todayItems.push(`        * ${m.summary.replace(/\(.*?\)/g, '').trim()}`);
+                    const item = `        * ${m.summary.replace(/\(.*?\)/g, '').trim()}`;
+                    if (!todayItems.includes(item)) {
+                        todayItems.push(item);
+                    }
                 }
             }
             p.next(); // Add Day Progress Entry
@@ -2829,6 +2835,7 @@ const tslib_1 = __webpack_require__("tslib");
 const fs_1 = tslib_1.__importDefault(__webpack_require__("fs"));
 const googleapis_1 = __webpack_require__("googleapis");
 const local_auth_1 = __webpack_require__("@google-cloud/local-auth");
+const date_fns_1 = __webpack_require__("date-fns");
 const config_1 = __webpack_require__("./libs/node-shared/src/lib/config.ts");
 class Google {
     constructor() {
@@ -2894,13 +2901,31 @@ class Google {
                     orderBy: 'startTime',
                 });
                 const events = res.data.items;
-                return ((events === null || events === void 0 ? void 0 : events.filter((event) => {
+                const attendingEvents = (events === null || events === void 0 ? void 0 : events.filter((event) => {
                     if (!event.attendees) {
                         return true;
                     }
                     const self = event.attendees.find((a) => a.self);
                     return !self || self.responseStatus !== 'declined';
-                })) || []);
+                })) || [];
+                const studyGroupRes = yield calendar.events.list({
+                    calendarId: config_1.CONFIG.StudyGroupGoogleCalendarId,
+                    timeMin,
+                    timeMax,
+                    maxResults: 10,
+                    singleEvents: true,
+                    orderBy: 'startTime',
+                });
+                const studyGroupEvents = studyGroupRes.data.items || [];
+                const allEvents = attendingEvents.concat(studyGroupEvents);
+                allEvents.sort((a, b) => {
+                    var _a, _b;
+                    return ((_a = a.start) === null || _a === void 0 ? void 0 : _a.dateTime) && ((_b = b.start) === null || _b === void 0 ? void 0 : _b.dateTime)
+                        ? (0, date_fns_1.parseISO)(a.start.dateTime).valueOf() -
+                            (0, date_fns_1.parseISO)(b.start.dateTime).valueOf()
+                        : 0;
+                });
+                return attendingEvents.concat(studyGroupEvents);
             }
             catch (e) {
                 if (e.response.data.error === 'invalid_grant') {

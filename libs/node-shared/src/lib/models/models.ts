@@ -40,6 +40,7 @@ export interface Config {
   GoogleTokenFile: string;
   GoogleCredentialsFile: string;
   PunchInfoFile: string;
+  StudyGroupGoogleCalendarId: string;
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];
 export interface NormalizedChecklistItem {
