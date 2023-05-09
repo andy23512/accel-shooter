@@ -42,4 +42,12 @@ export class Holiday extends BaseFileRef {
     }
     return previousDay;
   }
+
+  public getNextWorkday(day: Date): Date {
+    let nextDay = add(day, { days: 1 });
+    while (!this.checkIsWorkday(nextDay)) {
+      nextDay = add(nextDay, { days: 1 });
+    }
+    return nextDay;
+  }
 }

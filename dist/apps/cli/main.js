@@ -1361,23 +1361,24 @@ class WeeklyProgressAction extends action_class_1.Action {
     }
     run(startDayArg) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const today = new Date();
-            const startDay = (0, utils_1.getDayFromArgument)(startDayArg, (0, date_fns_1.add)(today, { weeks: -1 }));
-            let fetchDay = new Date(today.valueOf());
+            const today = (0, date_fns_1.startOfDay)(new Date());
+            const startDay = (0, date_fns_1.startOfDay)((0, utils_1.getDayFromArgument)(startDayArg, (0, date_fns_1.add)(today, { weeks: -1 })));
+            const range = [(0, date_fns_1.add)(startDay, { days: -1 }), (0, date_fns_1.add)(today, { days: -1 })];
+            let tempDay = new Date(range[1].valueOf());
             const holiday = new holiday_class_1.Holiday();
-            const fetchDays = [];
-            while ((0, date_fns_1.compareAsc)(startDay, fetchDay) < 0) {
-                if (holiday.checkIsWorkday(fetchDay)) {
-                    fetchDays.push(fetchDay);
+            const workDaysInRange = [];
+            while ((0, date_fns_1.compareAsc)(range[0], tempDay) < 0) {
+                if (holiday.checkIsWorkday(tempDay)) {
+                    workDaysInRange.push(tempDay);
                 }
-                fetchDay = (0, date_fns_1.add)(fetchDay, { days: -1 });
+                tempDay = (0, date_fns_1.add)(tempDay, { days: -1 });
             }
             const dpContent = new daily_progress_class_1.DailyProgress().readFile();
             const data = {};
-            for (const d of fetchDays) {
-                const previousWorkDayString = (0, node_shared_1.formatDate)(holiday.getPreviousWorkday(d));
+            for (const d of workDaysInRange) {
+                const nextWorkDay = (0, node_shared_1.formatDate)(holiday.getNextWorkday(d));
                 const dString = (0, node_shared_1.formatDate)(d);
-                const matchResult = dpContent.match(new RegExp(`### ${dString}\n1\\. Previous Day\n(.*?)\n2\\. Today`, 's'));
+                const matchResult = dpContent.match(new RegExp(`### ${nextWorkDay}\n1\\. Previous Day\n(.*?)\n2\\. Today`, 's'));
                 if (matchResult) {
                     const record = matchResult[1];
                     const lines = record.split('\n').filter(Boolean);
@@ -1388,7 +1389,7 @@ class WeeklyProgressAction extends action_class_1.Action {
                             const url = matchItem[3];
                             const taskId = matchItem[4];
                             if (data[url]) {
-                                data[url].days.push(previousWorkDayString);
+                                data[url].days.push(dString);
                             }
                             else {
                                 const { gitLabProject } = yield new node_shared_1.ClickUp(taskId).getGitLabProjectAndMergeRequestIId();
@@ -1396,7 +1397,7 @@ class WeeklyProgressAction extends action_class_1.Action {
                                     url,
                                     name,
                                     project: gitLabProject.name,
-                                    days: [previousWorkDayString],
+                                    days: [dString],
                                 };
                             }
                         }
@@ -1843,6 +1844,13 @@ class Holiday extends base_file_ref_class_1.BaseFileRef {
             previousDay = (0, date_fns_1.add)(previousDay, { days: -1 });
         }
         return previousDay;
+    }
+    getNextWorkday(day) {
+        let nextDay = (0, date_fns_1.add)(day, { days: 1 });
+        while (!this.checkIsWorkday(nextDay)) {
+            nextDay = (0, date_fns_1.add)(nextDay, { days: 1 });
+        }
+        return nextDay;
     }
 }
 exports.Holiday = Holiday;

@@ -1,6 +1,6 @@
 import { ClickUp, formatDate } from '@accel-shooter/node-shared';
 import clipboardy from 'clipboardy';
-import { add, compareAsc } from 'date-fns';
+import { add, compareAsc, endOfDay, startOfDay } from 'date-fns';
 import { groupBy, prop } from 'ramda';
 import { Action } from '../classes/action.class';
 import { DailyProgress } from '../classes/daily-progress.class';
@@ -15,24 +15,30 @@ export class WeeklyProgressAction extends Action {
     { name: '[startDay]', description: 'optional start day of date range' },
   ];
   public async run(startDayArg: string) {
-    const today = new Date();
-    const startDay = getDayFromArgument(startDayArg, add(today, { weeks: -1 }));
-    let fetchDay = new Date(today.valueOf());
+    const today = startOfDay(new Date());
+    const startDay = startOfDay(
+      getDayFromArgument(startDayArg, add(today, { weeks: -1 }))
+    );
+    const range = [add(startDay, { days: -1 }), add(today, { days: -1 })];
+    let tempDay = new Date(range[1].valueOf());
     const holiday = new Holiday();
-    const fetchDays: Date[] = [];
-    while (compareAsc(startDay, fetchDay) < 0) {
-      if (holiday.checkIsWorkday(fetchDay)) {
-        fetchDays.push(fetchDay);
+    const workDaysInRange: Date[] = [];
+    while (compareAsc(range[0], tempDay) < 0) {
+      if (holiday.checkIsWorkday(tempDay)) {
+        workDaysInRange.push(tempDay);
       }
-      fetchDay = add(fetchDay, { days: -1 });
+      tempDay = add(tempDay, { days: -1 });
     }
     const dpContent = new DailyProgress().readFile();
     const data: Record<string, Item> = {};
-    for (const d of fetchDays) {
-      const previousWorkDayString = formatDate(holiday.getPreviousWorkday(d));
+    for (const d of workDaysInRange) {
+      const nextWorkDay = formatDate(holiday.getNextWorkday(d));
       const dString = formatDate(d);
       const matchResult = dpContent.match(
-        new RegExp(`### ${dString}\n1\\. Previous Day\n(.*?)\n2\\. Today`, 's')
+        new RegExp(
+          `### ${nextWorkDay}\n1\\. Previous Day\n(.*?)\n2\\. Today`,
+          's'
+        )
       );
       if (matchResult) {
         const record = matchResult[1];
@@ -46,7 +52,7 @@ export class WeeklyProgressAction extends Action {
             const url = matchItem[3];
             const taskId = matchItem[4];
             if (data[url]) {
-              data[url].days.push(previousWorkDayString);
+              data[url].days.push(dString);
             } else {
               const { gitLabProject } = await new ClickUp(
                 taskId
@@ -55,7 +61,7 @@ export class WeeklyProgressAction extends Action {
                 url,
                 name,
                 project: gitLabProject.name,
-                days: [previousWorkDayString],
+                days: [dString],
               };
             }
           }

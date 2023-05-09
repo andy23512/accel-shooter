@@ -84,12 +84,13 @@ export class Google {
         singleEvents: true,
         orderBy: 'startTime',
       });
-      const studyGroupEvents = studyGroupRes.data.items;
+      const studyGroupEvents = studyGroupRes.data.items || [];
       const allEvents = attendingEvents.concat(studyGroupEvents);
-      allEvents.sort(
-        (a, b) =>
-          parseISO(a.start.dateTime).valueOf() -
-          parseISO(b.start.dateTime).valueOf()
+      allEvents.sort((a, b) =>
+        a.start?.dateTime && b.start?.dateTime
+          ? parseISO(a.start.dateTime).valueOf() -
+            parseISO(b.start.dateTime).valueOf()
+          : 0
       );
       return attendingEvents.concat(studyGroupEvents);
     } catch (e: any) {
