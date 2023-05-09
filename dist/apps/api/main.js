@@ -22,6 +22,7 @@ const CONFIG_KEY_MAP = {
     todo: 'TodoFile',
     work_note: 'WorkNoteFile',
 };
+const FIGMA_REGEX = /(?:https:\/\/)?(?:www\.)?figma\.com\/(file|proto)\/([0-9a-zA-Z]{22,128})(?:\/([^\?\n\r\/]+)?((?:\?[^\/]*?node-id=([^&\n\r\/]+))?[^\/]*?)(\/duplicate)?)?/g;
 let AppController = class AppController {
     constructor(configService) {
         this.configService = configService;
@@ -66,6 +67,9 @@ let AppController = class AppController {
             const folderPath = this.configService.get('TaskTodoFolder');
             const path = (0, path_1.join)(folderPath, taskId + '.md');
             const content = (0, fs_1.readFileSync)(path, { encoding: 'utf-8' });
+            [...content.matchAll(FIGMA_REGEX)].forEach(([url]) => {
+                frameUrls.push(url);
+            });
             return {
                 mergeRequestLink: mergeRequest.web_url,
                 taskLink: task.url,
