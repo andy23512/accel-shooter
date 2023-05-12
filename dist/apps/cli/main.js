@@ -389,7 +389,10 @@ class DailyProgressAction extends action_class_1.Action {
             if (previousDayMeeting.length > 0) {
                 previousDayItems.push('    * Meeting');
                 for (const m of previousDayMeeting) {
-                    const item = `        * ${m.summary.replace(/\(.*?\)/g, '').trim()}`;
+                    const item = `        * ${m.summary
+                        .replace(/\(.*?\)/g, '')
+                        .replace(/: Session \d/g, '')
+                        .trim()}`;
                     if (!previousDayItems.includes(item)) {
                         previousDayItems.push(item);
                     }
@@ -398,7 +401,10 @@ class DailyProgressAction extends action_class_1.Action {
             if (todayMeeting.length > 0) {
                 todayItems.push('    * Meeting');
                 for (const m of todayMeeting) {
-                    const item = `        * ${m.summary.replace(/\(.*?\)/g, '').trim()}`;
+                    const item = `        * ${m.summary
+                        .replace(/\(.*?\)/g, '')
+                        .replace(/: Session \d/g, '')
+                        .trim()}`;
                     if (!todayItems.includes(item)) {
                         todayItems.push(item);
                     }
