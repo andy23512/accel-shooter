@@ -28,7 +28,7 @@ export class MeetingTrackAction extends Action {
     }
     // setup cron job for opening meeting link
     todayMeetings.forEach((m) => {
-      const openTime = add(parseISO(m.start.dateTime), { minutes: -5 });
+      const openTime = add(parseISO(m.start.dateTime), { minutes: -2 });
       if (isBefore(openTime, day)) {
         return;
       }
