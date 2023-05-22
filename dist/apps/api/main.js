@@ -400,9 +400,11 @@ class ClickUp {
                 const taskId = taskQueue.shift();
                 const clickUp = new ClickUp(taskId);
                 const task = yield clickUp.getTask();
-                [...task.description.matchAll(FIGMA_REGEX)].forEach(([url]) => {
-                    frameUrls.push(url);
-                });
+                if (task.description) {
+                    [...task.description.matchAll(FIGMA_REGEX)].forEach(([url]) => {
+                        frameUrls.push(url);
+                    });
+                }
                 const comments = yield clickUp.getTaskComments();
                 comments.forEach((co) => {
                     co.comment
