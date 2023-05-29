@@ -8,17 +8,16 @@ import { CommitScope } from '../classes/commit-scope.class';
 import { getInfoFromArgument, getRepoName, promiseSpawn } from '../utils';
 
 const TYPES = [
-  'feat',
-  'fix',
-  'docs',
-  'style',
-  'refactor',
-  'perf',
-  'test',
-  'build',
-  'ci',
-  'chore',
-  'revert',
+  { name: 'feat', short: 'f' },
+  { name: 'fix', short: 'x' },
+  { name: 'docs', short: 'd' },
+  { name: 'style', short: 's' },
+  { name: 'refactor', short: 'r' },
+  { name: 'perf', short: 'p' },
+  { name: 'test', short: 't' },
+  { name: 'build', short: 'b' },
+  { name: 'ci', short: 'i' },
+  { name: 'chore', short: 'c' },
 ];
 
 function preprocess(path: string) {
@@ -75,7 +74,7 @@ export class CommitAction extends Action {
         type: 'autocomplete',
         source: (_: unknown, input = '') => {
           return Promise.resolve(
-            fuzzy.filter(input, TYPES).map((t) => t.original)
+            TYPES.filter((t) => !input || t.short === input).map((t) => t.name)
           );
         },
       },

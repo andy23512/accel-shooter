@@ -123,17 +123,16 @@ const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.
 const commit_scope_class_1 = __webpack_require__("./apps/cli/src/classes/commit-scope.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 const TYPES = [
-    'feat',
-    'fix',
-    'docs',
-    'style',
-    'refactor',
-    'perf',
-    'test',
-    'build',
-    'ci',
-    'chore',
-    'revert',
+    { name: 'feat', short: 'f' },
+    { name: 'fix', short: 'x' },
+    { name: 'docs', short: 'd' },
+    { name: 'style', short: 's' },
+    { name: 'refactor', short: 'r' },
+    { name: 'perf', short: 'p' },
+    { name: 'test', short: 't' },
+    { name: 'build', short: 'b' },
+    { name: 'ci', short: 'i' },
+    { name: 'chore', short: 'c' },
 ];
 function preprocess(path) {
     const match2 = path.match(/libs\/pheno\/(.*?)\//);
@@ -185,7 +184,7 @@ class CommitAction extends action_class_1.Action {
                     message: 'Enter commit type',
                     type: 'autocomplete',
                     source: (_, input = '') => {
-                        return Promise.resolve(fuzzy_1.default.filter(input, TYPES).map((t) => t.original));
+                        return Promise.resolve(TYPES.filter((t) => !input || t.short === input).map((t) => t.name));
                     },
                 },
                 {
