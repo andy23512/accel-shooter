@@ -15,6 +15,7 @@ import { RevertEndAction } from './actions/revert-end.action';
 import { RoutineAction } from './actions/routine.action';
 import { RTVTasksAction } from './actions/rtv-tasks.action';
 import { ShowDiffAction } from './actions/show-diff.action';
+import { StartReviewAction } from './actions/start-review.action';
 import { StartAction } from './actions/start.action';
 import { SwitchAction } from './actions/switch.action';
 import { TimeAction } from './actions/time.action';
@@ -24,7 +25,6 @@ import { WatchPipelineAction } from './actions/watch-pipeline.action';
 import { WeeklyProgressAction } from './actions/weekly-progress.action';
 import { WorkAction } from './actions/work.action';
 import { Action } from './classes/action.class';
-import { startOfDay } from 'date-fns';
 
 const ACTIONS: Action[] = [
   new CheckAction(),
@@ -44,6 +44,7 @@ const ACTIONS: Action[] = [
   new RTVTasksAction(),
   new ShowDiffAction(),
   new StartAction(),
+  new StartReviewAction(),
   new SwitchAction(),
   new TimeAction(),
   new TodoAction(),

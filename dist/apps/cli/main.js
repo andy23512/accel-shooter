@@ -975,6 +975,36 @@ exports.ShowDiffAction = ShowDiffAction;
 
 /***/ }),
 
+/***/ "./apps/cli/src/actions/start-review.action.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.StartReviewAction = void 0;
+const tslib_1 = __webpack_require__("tslib");
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
+class StartReviewAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'startReview';
+        this.description = 'start review current or specified task';
+        this.arguments = [
+            { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
+        ];
+    }
+    run(clickUpTaskIdArg) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const { clickUp } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
+            yield clickUp.setTaskAsInReviewStatus();
+        });
+    }
+}
+exports.StartReviewAction = StartReviewAction;
+
+
+/***/ }),
+
 /***/ "./apps/cli/src/actions/start.action.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -3666,6 +3696,7 @@ const revert_end_action_1 = __webpack_require__("./apps/cli/src/actions/revert-e
 const routine_action_1 = __webpack_require__("./apps/cli/src/actions/routine.action.ts");
 const rtv_tasks_action_1 = __webpack_require__("./apps/cli/src/actions/rtv-tasks.action.ts");
 const show_diff_action_1 = __webpack_require__("./apps/cli/src/actions/show-diff.action.ts");
+const start_review_action_1 = __webpack_require__("./apps/cli/src/actions/start-review.action.ts");
 const start_action_1 = __webpack_require__("./apps/cli/src/actions/start.action.ts");
 const switch_action_1 = __webpack_require__("./apps/cli/src/actions/switch.action.ts");
 const time_action_1 = __webpack_require__("./apps/cli/src/actions/time.action.ts");
@@ -3692,6 +3723,7 @@ const ACTIONS = [
     new rtv_tasks_action_1.RTVTasksAction(),
     new show_diff_action_1.ShowDiffAction(),
     new start_action_1.StartAction(),
+    new start_review_action_1.StartReviewAction(),
     new switch_action_1.SwitchAction(),
     new time_action_1.TimeAction(),
     new to_do_action_1.TodoAction(),
