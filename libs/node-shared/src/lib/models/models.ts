@@ -53,7 +53,7 @@ export interface NormalizedChecklistItem {
 export interface IHoliday {
   date: string;
   name: string;
-  isHoliday: string;
-  holidayCategory: string;
+  isholiday: string;
+  holidaycategory: string;
   description: string;
 }

@@ -1870,8 +1870,8 @@ class Holiday extends base_file_ref_class_1.BaseFileRef {
             return false;
         }
         return (!h ||
-            (h.isHoliday === '否' && h.name !== '勞動節') ||
-            (h.name === '軍人節' && h.holidayCategory === '特定節日'));
+            (h.isholiday === '否' && h.name !== '勞動節') ||
+            (h.name === '軍人節' && h.holidaycategory === '特定節日'));
     }
     getPreviousWorkday(day) {
         let previousDay = (0, date_fns_1.add)(day, { days: -1 });

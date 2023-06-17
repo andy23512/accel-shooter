@@ -30,8 +30,8 @@ export class Holiday extends BaseFileRef {
     }
     return (
       !h ||
-      (h.isHoliday === '否' && h.name !== '勞動節') ||
-      (h.name === '軍人節' && h.holidayCategory === '特定節日')
+      (h.isholiday === '否' && h.name !== '勞動節') ||
+      (h.name === '軍人節' && h.holidaycategory === '特定節日')
     );
   }
 
