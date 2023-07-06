@@ -24,3 +24,8 @@ export interface SummarizedTask {
   status: Status;
   product: string;
 }
+
+export interface TimeTrack {
+  start: string;
+  end: string;
+}

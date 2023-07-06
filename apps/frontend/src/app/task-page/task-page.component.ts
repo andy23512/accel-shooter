@@ -1,3 +1,4 @@
+import { TimeTrack } from '@accel-shooter/api-interfaces';
 import { ChecklistItem, NormalizedChecklist } from '@accel-shooter/node-shared';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { HttpClient } from '@angular/common/http';
@@ -43,6 +44,7 @@ export class TaskPageComponent implements OnInit {
   public mrPipelineStatus = '';
   public changeSubject = new Subject<void>();
   public saveSubject = new Subject<void>();
+  public timeTracks: TimeTrack[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -56,6 +58,7 @@ export class TaskPageComponent implements OnInit {
   public ngOnInit(): void {
     this.taskId = this.route.snapshot.paramMap.get('id') as string;
     this.pageTitleService.setTitle(`Task "${this.taskId}"`);
+    this.getTimeTracks();
     this.http
       .get<{
         mergeRequestLink: string;
@@ -136,6 +139,24 @@ export class TaskPageComponent implements OnInit {
     this.matSnackBar.open(`Task ID ${this.taskId} copied!`, '', {
       duration: 5000,
     });
+  }
+
+  public postTimeTrack(type: 'start' | 'end') {
+    this.http
+      .post(`/api/task/${this.taskId}/time_track`, { type })
+      .subscribe(() => {
+        this.getTimeTracks();
+      });
+  }
+
+  public getTimeTracks() {
+    this.http
+      .get<{
+        timeTracks: TimeTrack[];
+      }>(`/api/task/${this.taskId}/time_tracks`)
+      .subscribe(({ timeTracks }) => {
+        this.timeTracks = timeTracks.slice(-5);
+      });
   }
 
   private getMergeRequestDescriptionLink(id: string) {

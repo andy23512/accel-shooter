@@ -14,5 +14,38 @@
   ><br />
   <a [href]="taskLink" target="_blank">ClickUp Task<br /></a>
   <a *ngIf="frameUrl" [href]="frameUrl" target="_blank">Frame<br /></a>
-  <span *ngIf="mrPipelineStatus">{{ mrPipelineStatus }}</span>
+  <span *ngIf="mrPipelineStatus">{{ mrPipelineStatus }}</span
+  ><br />
+  <table>
+    <thead>
+      <tr>
+        <th>
+          <button
+            (click)="postTimeTrack('start')"
+            [disabled]="
+              timeTracks.length !== 0 && !timeTracks[timeTracks.length - 1].end
+            "
+          >
+            Start
+          </button>
+        </th>
+        <th>
+          <button
+            (click)="postTimeTrack('end')"
+            [disabled]="
+              timeTracks.length === 0 || timeTracks[timeTracks.length - 1].end
+            "
+          >
+            End
+          </button>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let row of timeTracks">
+        <td>{{ row.start | date : 'MM/dd HH:mm' }}</td>
+        <td>{{ row.end | date : 'MM/dd HH:mm' }}</td>
+      </tr>
+    </tbody>
+  </table>
 </div>

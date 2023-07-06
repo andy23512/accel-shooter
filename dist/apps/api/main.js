@@ -6,7 +6,7 @@
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b, _c, _d, _e, _f, _g;
+var _a, _b, _c, _d, _e, _f, _g, _h;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AppController = void 0;
 const tslib_1 = __webpack_require__("tslib");
@@ -121,6 +121,36 @@ let AppController = class AppController {
             return { content: ((_a = mergeRequest.head_pipeline) === null || _a === void 0 ? void 0 : _a.status) || 'none' };
         });
     }
+    getTimeTracks(taskId) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const folderPath = this.configService.get('TaskTimeTrackFolder');
+            const path = (0, path_1.join)(folderPath, taskId + '.csv');
+            if ((0, fs_1.existsSync)(path)) {
+                const content = (0, fs_1.readFileSync)(path, { encoding: 'utf-8' });
+                return {
+                    timeTracks: content
+                        .split('\n')
+                        .filter(Boolean)
+                        .map((l) => {
+                        const cells = l.split(',');
+                        return { start: cells[0], end: cells[1] };
+                    }),
+                };
+            }
+            else {
+                return { timeTracks: [] };
+            }
+        });
+    }
+    postTimeTrack(taskId, type) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const folderPath = this.configService.get('TaskTimeTrackFolder');
+            const path = (0, path_1.join)(folderPath, taskId + '.csv');
+            const time = new Date().toISOString();
+            const addedContent = type === 'start' ? `\n${time},` : time;
+            (0, fs_1.appendFileSync)(path, addedContent, { encoding: 'utf-8' });
+        });
+    }
     todoSse() {
         return (0, watch_rx_1.watchRx)(node_shared_1.CONFIG.TodoChangeNotificationFile).pipe((0, operators_1.map)(() => (0, fs_1.readFileSync)(node_shared_1.CONFIG.TodoFile, { encoding: 'utf-8' })));
     }
@@ -184,10 +214,25 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:returntype", typeof (_f = typeof Promise !== "undefined" && Promise) === "function" ? _f : Object)
 ], AppController.prototype, "getMRPipelineStatus", null);
 tslib_1.__decorate([
+    (0, common_1.Get)('task/:id/time_tracks'),
+    tslib_1.__param(0, (0, common_1.Param)('id')),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [String]),
+    tslib_1.__metadata("design:returntype", typeof (_g = typeof Promise !== "undefined" && Promise) === "function" ? _g : Object)
+], AppController.prototype, "getTimeTracks", null);
+tslib_1.__decorate([
+    (0, common_1.Post)('task/:id/time_track'),
+    tslib_1.__param(0, (0, common_1.Param)('id')),
+    tslib_1.__param(1, (0, common_1.Body)('type')),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [String, String]),
+    tslib_1.__metadata("design:returntype", Promise)
+], AppController.prototype, "postTimeTrack", null);
+tslib_1.__decorate([
     (0, common_1.Sse)('todo-sse'),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", []),
-    tslib_1.__metadata("design:returntype", typeof (_g = typeof rxjs_1.Observable !== "undefined" && rxjs_1.Observable) === "function" ? _g : Object)
+    tslib_1.__metadata("design:returntype", typeof (_h = typeof rxjs_1.Observable !== "undefined" && rxjs_1.Observable) === "function" ? _h : Object)
 ], AppController.prototype, "todoSse", null);
 AppController = tslib_1.__decorate([
     (0, common_1.Controller)(),
@@ -916,6 +961,7 @@ function getConfig() {
     config.GitLabProjects = config.GitLabProjects.map((p) => (Object.assign(Object.assign({}, p), { path: (0, untildify_1.default)(p.path) })));
     const filePathKeys = [
         'TaskTodoFolder',
+        'TaskTimeTrackFolder',
         'TodoFile',
         'TodoChangeNotificationFile',
         'WorkNoteFile',
