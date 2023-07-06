@@ -474,6 +474,9 @@ exports.EndAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
+const date_fns_1 = __webpack_require__("date-fns");
+const fs_1 = __webpack_require__("fs");
+const path_1 = __webpack_require__("path");
 const progress_log_class_1 = __webpack_require__("./apps/cli/src/classes/progress-log.class.ts");
 const todo_class_1 = __webpack_require__("./apps/cli/src/classes/todo.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
@@ -493,6 +496,7 @@ class EndAction extends action_class_1.Action {
                 'Check Task is Completed or not',
                 'Update GitLab Merge Request Ready Status and Assignee',
                 'Update ClickUp Task Status',
+                'Set ClickUp Task Time Estimate',
                 'Close Tab Group',
                 'Remove Todo',
             ]);
@@ -508,6 +512,18 @@ class EndAction extends action_class_1.Action {
             yield gitLab.markMergeRequestAsReadyAndAddAssignee(mergeRequest);
             p.next(); // Update ClickUp Task Status
             yield clickUp.setTaskAsInReviewStatus();
+            p.next(); // Set ClickUp Task Time Estimate
+            const path = (0, path_1.join)(node_shared_1.CONFIG.TaskTimeTrackFolder, `${clickUpTaskId}.csv`);
+            const content = (0, fs_1.readFileSync)(path, { encoding: 'utf-8' });
+            const timeEstimate = content
+                .split('\n')
+                .filter(Boolean)
+                .map((line) => {
+                const cells = line.split(',');
+                return (0, date_fns_1.differenceInMilliseconds)((0, date_fns_1.parseISO)(cells[1]), (0, date_fns_1.parseISO)(cells[0]));
+            })
+                .reduce((a, b) => a + b);
+            yield clickUp.setTaskTimeEstimate(timeEstimate);
             p.next(); // Close Tab Group
             (0, utils_1.openUrlsInTabGroup)([], clickUpTaskId);
             p.next(); // Remove Todo
@@ -2453,6 +2469,11 @@ class ClickUp {
     }
     setTaskStatus(status) {
         return callApi('put', `/task/${this.taskId}`, null, { status });
+    }
+    setTaskTimeEstimate(timeEstimate) {
+        return callApi('put', `/task/${this.taskId}`, null, {
+            time_estimate: timeEstimate,
+        });
     }
     setTaskStartDateToToday() {
         return callApi('put', `/task/${this.taskId}`, null, {

@@ -1,6 +1,9 @@
-import { normalizeClickUpChecklist } from '@accel-shooter/node-shared';
+import { CONFIG, normalizeClickUpChecklist } from '@accel-shooter/node-shared';
 import { Action } from '../classes/action.class';
 
+import { differenceInMilliseconds, parseISO } from 'date-fns';
+import { readFileSync } from 'fs';
+import { join } from 'path';
 import { CustomProgressLog } from '../classes/progress-log.class';
 import { Todo } from '../classes/todo.class';
 import { getInfoFromArgument, openUrlsInTabGroup } from '../utils';
@@ -18,6 +21,7 @@ export class EndAction extends Action {
       'Check Task is Completed or not',
       'Update GitLab Merge Request Ready Status and Assignee',
       'Update ClickUp Task Status',
+      'Set ClickUp Task Time Estimate',
       'Close Tab Group',
       'Remove Todo',
     ]);
@@ -39,6 +43,18 @@ export class EndAction extends Action {
     await gitLab.markMergeRequestAsReadyAndAddAssignee(mergeRequest);
     p.next(); // Update ClickUp Task Status
     await clickUp.setTaskAsInReviewStatus();
+    p.next(); // Set ClickUp Task Time Estimate
+    const path = join(CONFIG.TaskTimeTrackFolder, `${clickUpTaskId}.csv`);
+    const content = readFileSync(path, { encoding: 'utf-8' });
+    const timeEstimate = content
+      .split('\n')
+      .filter(Boolean)
+      .map((line) => {
+        const cells = line.split(',');
+        return differenceInMilliseconds(parseISO(cells[1]), parseISO(cells[0]));
+      })
+      .reduce((a, b) => a + b);
+    await clickUp.setTaskTimeEstimate(timeEstimate);
     p.next(); // Close Tab Group
     openUrlsInTabGroup([], clickUpTaskId);
     p.next(); // Remove Todo

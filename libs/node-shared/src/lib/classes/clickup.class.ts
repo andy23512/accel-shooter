@@ -115,6 +115,12 @@ export class ClickUp {
     return callApi<Task>('put', `/task/${this.taskId}`, null, { status });
   }
 
+  public setTaskTimeEstimate(timeEstimate: number) {
+    return callApi<Task>('put', `/task/${this.taskId}`, null, {
+      time_estimate: timeEstimate,
+    });
+  }
+
   public setTaskStartDateToToday() {
     return callApi<Task>('put', `/task/${this.taskId}`, null, {
       start_date: new Date().valueOf(),

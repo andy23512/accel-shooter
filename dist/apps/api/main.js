@@ -397,6 +397,11 @@ class ClickUp {
     setTaskStatus(status) {
         return callApi('put', `/task/${this.taskId}`, null, { status });
     }
+    setTaskTimeEstimate(timeEstimate) {
+        return callApi('put', `/task/${this.taskId}`, null, {
+            time_estimate: timeEstimate,
+        });
+    }
     setTaskStartDateToToday() {
         return callApi('put', `/task/${this.taskId}`, null, {
             start_date: new Date().valueOf(),
