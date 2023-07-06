@@ -180,17 +180,13 @@ export class ClickUp {
     );
   }
 
-  public async getFrameUrls() {
-    let currentTaskId = this.taskId;
-    let rootTaskId = null;
+  public async getFrameUrls(task?: Task) {
+    let t = task || (await this.getTask());
+    let rootTaskId = this.taskId;
     const frameUrls: string[] = [];
-    while (currentTaskId) {
-      const clickUp = new ClickUp(currentTaskId);
-      const task = await clickUp.getTask();
-      if (!task.parent) {
-        rootTaskId = task.id;
-      }
-      currentTaskId = task.parent;
+    while (t.parent) {
+      t = await new ClickUp(t.parent).getTask();
+      rootTaskId = t.id;
     }
     const taskQueue: string[] = [rootTaskId as string, this.taskId];
     while (taskQueue.length > 0) {

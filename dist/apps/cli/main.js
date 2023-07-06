@@ -2484,18 +2484,14 @@ class ClickUp {
     deleteChecklistItem(checklistId, checklistItemId) {
         return callApi('delete', `/checklist/${checklistId}/checklist_item/${checklistItemId}`);
     }
-    getFrameUrls() {
+    getFrameUrls(task) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            let currentTaskId = this.taskId;
-            let rootTaskId = null;
+            let t = task || (yield this.getTask());
+            let rootTaskId = this.taskId;
             const frameUrls = [];
-            while (currentTaskId) {
-                const clickUp = new ClickUp(currentTaskId);
-                const task = yield clickUp.getTask();
-                if (!task.parent) {
-                    rootTaskId = task.id;
-                }
-                currentTaskId = task.parent;
+            while (t.parent) {
+                t = yield new ClickUp(t.parent).getTask();
+                rootTaskId = t.id;
             }
             const taskQueue = [rootTaskId, this.taskId];
             while (taskQueue.length > 0) {

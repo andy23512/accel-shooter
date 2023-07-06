@@ -72,10 +72,10 @@ export class AppController {
   }> {
     const clickUp = new ClickUp(taskId);
     const task = await clickUp.getTask();
-    const fullTaskName = await clickUp.getFullTaskName();
-    const frameUrls = await clickUp.getFrameUrls();
+    const fullTaskName = await clickUp.getFullTaskName(task);
+    const frameUrls = await clickUp.getFrameUrls(task);
     const { gitLabProject, mergeRequestIId } =
-      await clickUp.getGitLabProjectAndMergeRequestIId();
+      await clickUp.getGitLabProjectAndMergeRequestIId(task);
     const gitLab = new GitLab(gitLabProject.id);
     const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
     const folderPath = this.configService.get<string>('TaskTodoFolder');
