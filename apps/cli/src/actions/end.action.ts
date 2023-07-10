@@ -62,5 +62,6 @@ export class EndAction extends Action {
     todo.removeTodo(clickUpTaskId);
     p.end(0);
     console.log('Merge Request URL: ' + mergeRequest.web_url);
+    console.log('Task URL: ' + clickUpTask.url);
   }
 }
