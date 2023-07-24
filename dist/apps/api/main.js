@@ -968,6 +968,7 @@ function getConfig() {
         'WorkNoteFile',
         'MySummarizedTasksFile',
         'HolidayFile',
+        'PersonalHolidayFile',
         'CommitScopeFile',
         'GoogleTokenFile',
         'GoogleCredentialsFile',

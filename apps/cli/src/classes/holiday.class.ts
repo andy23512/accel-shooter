@@ -8,18 +8,28 @@ import {
 } from '@accel-shooter/node-shared';
 
 import { add } from 'date-fns';
+import { readFileSync } from 'fs';
 import { BaseFileRef } from './base-file-ref.class';
 
 export class Holiday extends BaseFileRef {
+  private data: IHoliday[];
+
   protected get path() {
     return untildify(CONFIG.HolidayFile);
   }
 
-  private data: IHoliday[];
-
   constructor() {
     super();
-    this.data = JSON.parse(this.readFile());
+    this.data = [
+      ...JSON.parse(
+        readFileSync(untildify(CONFIG.HolidayFile), { encoding: 'utf-8' })
+      ),
+      ...JSON.parse(
+        readFileSync(untildify(CONFIG.PersonalHolidayFile), {
+          encoding: 'utf-8',
+        })
+      ),
+    ];
   }
 
   public checkIsWorkday(day: Date) {

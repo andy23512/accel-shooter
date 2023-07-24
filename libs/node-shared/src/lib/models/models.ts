@@ -36,6 +36,7 @@ export interface Config {
   WorkNoteFile: string;
   MySummarizedTasksFile: string;
   HolidayFile: string;
+  PersonalHolidayFile: string;
   CommitScopeFile: string;
   GoogleTokenFile: string;
   GoogleCredentialsFile: string;

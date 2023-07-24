@@ -32,6 +32,7 @@ export function getConfig(): Config {
     'WorkNoteFile',
     'MySummarizedTasksFile',
     'HolidayFile',
+    'PersonalHolidayFile',
     'CommitScopeFile',
     'GoogleTokenFile',
     'GoogleCredentialsFile',

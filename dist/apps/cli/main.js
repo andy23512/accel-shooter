@@ -1871,11 +1871,17 @@ const tslib_1 = __webpack_require__("tslib");
 const untildify_1 = tslib_1.__importDefault(__webpack_require__("untildify"));
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const date_fns_1 = __webpack_require__("date-fns");
+const fs_1 = __webpack_require__("fs");
 const base_file_ref_class_1 = __webpack_require__("./apps/cli/src/classes/base-file-ref.class.ts");
 class Holiday extends base_file_ref_class_1.BaseFileRef {
     constructor() {
         super();
-        this.data = JSON.parse(this.readFile());
+        this.data = [
+            ...JSON.parse((0, fs_1.readFileSync)((0, untildify_1.default)(node_shared_1.CONFIG.HolidayFile), { encoding: 'utf-8' })),
+            ...JSON.parse((0, fs_1.readFileSync)((0, untildify_1.default)(node_shared_1.CONFIG.PersonalHolidayFile), {
+                encoding: 'utf-8',
+            })),
+        ];
     }
     get path() {
         return (0, untildify_1.default)(node_shared_1.CONFIG.HolidayFile);
@@ -3042,6 +3048,7 @@ function getConfig() {
         'WorkNoteFile',
         'MySummarizedTasksFile',
         'HolidayFile',
+        'PersonalHolidayFile',
         'CommitScopeFile',
         'GoogleTokenFile',
         'GoogleCredentialsFile',
