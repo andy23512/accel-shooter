@@ -7,6 +7,7 @@ import { DailyProgressAction } from './actions/daily-progress.action';
 import { DumpMyTasksAction } from './actions/dump-my-tasks.action';
 import { EndAction } from './actions/end.action';
 import { FetchHolidayAction } from './actions/fetch-holiday.action';
+import { GenAction } from './actions/gen.action';
 import { ListDCAction } from './actions/list-dc.action';
 import { ListAction } from './actions/list.action';
 import { MeetingTrackAction } from './actions/meeting-track.action';
@@ -35,6 +36,7 @@ const ACTIONS: Action[] = [
   new DumpMyTasksAction(),
   new EndAction(),
   new FetchHolidayAction(),
+  new GenAction(),
   new ListDCAction(),
   new ListAction(),
   new MeetingTrackAction(),

@@ -576,6 +576,90 @@ exports.FetchHolidayAction = FetchHolidayAction;
 
 /***/ }),
 
+/***/ "./apps/cli/src/actions/gen.action.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.GenAction = void 0;
+const tslib_1 = __webpack_require__("tslib");
+const fs_1 = __webpack_require__("fs");
+const glob_1 = __webpack_require__("glob");
+const path_1 = tslib_1.__importDefault(__webpack_require__("path"));
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
+class GenAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'gen';
+        this.description = 'shorthand for nx angular generate command';
+        this.arguments = [
+            { name: 'generator', description: 'generator name' },
+            { name: 'name', description: 'instance name' },
+        ];
+    }
+    run(generator, name) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const cwd = process.cwd();
+            let modulePath = '';
+            let rootPath = '';
+            let folder = cwd;
+            while (folder !== '/') {
+                if (!modulePath) {
+                    const findModuleResult = yield (0, glob_1.glob)(path_1.default.join(folder, '*.module.ts'));
+                    if (findModuleResult.length > 0) {
+                        modulePath = findModuleResult[0];
+                    }
+                }
+                if ((0, fs_1.existsSync)(path_1.default.join(folder, 'nx.json'))) {
+                    rootPath = folder;
+                }
+                folder = path_1.default.resolve(folder, '../');
+            }
+            const moduleRelativePath = path_1.default.relative(cwd, modulePath);
+            const cwdRelativePath = path_1.default.relative(rootPath, cwd);
+            let args = [];
+            if (['c', 'component'].includes(generator)) {
+                args = [
+                    'nx',
+                    'g',
+                    `@nrwl/angular:${generator}`,
+                    `--path=${cwdRelativePath}`,
+                    `--module=${moduleRelativePath}`,
+                    '--style=scss',
+                    name,
+                ];
+            }
+            else if (['p', 'pipe'].includes(generator)) {
+                args = [
+                    'nx',
+                    'g',
+                    `@nrwl/angular:${generator}`,
+                    `--path=${cwdRelativePath}`,
+                    `--module=${moduleRelativePath}`,
+                    name,
+                ];
+            }
+            else if (['s', 'service'].includes(generator)) {
+                args = [
+                    'nx',
+                    'g',
+                    `@nrwl/angular:${generator}`,
+                    `--path=${cwdRelativePath}`,
+                    name,
+                ];
+            }
+            if (args.length) {
+                yield (0, utils_1.promiseSpawn)('yarn', args);
+            }
+        });
+    }
+}
+exports.GenAction = GenAction;
+
+
+/***/ }),
+
 /***/ "./apps/cli/src/actions/list-dc.action.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -3517,6 +3601,13 @@ module.exports = require("fuzzy");
 
 /***/ }),
 
+/***/ "glob":
+/***/ ((module) => {
+
+module.exports = require("glob");
+
+/***/ }),
+
 /***/ "googleapis":
 /***/ ((module) => {
 
@@ -3714,6 +3805,7 @@ const daily_progress_action_1 = __webpack_require__("./apps/cli/src/actions/dail
 const dump_my_tasks_action_1 = __webpack_require__("./apps/cli/src/actions/dump-my-tasks.action.ts");
 const end_action_1 = __webpack_require__("./apps/cli/src/actions/end.action.ts");
 const fetch_holiday_action_1 = __webpack_require__("./apps/cli/src/actions/fetch-holiday.action.ts");
+const gen_action_1 = __webpack_require__("./apps/cli/src/actions/gen.action.ts");
 const list_dc_action_1 = __webpack_require__("./apps/cli/src/actions/list-dc.action.ts");
 const list_action_1 = __webpack_require__("./apps/cli/src/actions/list.action.ts");
 const meeting_track_action_1 = __webpack_require__("./apps/cli/src/actions/meeting-track.action.ts");
@@ -3740,6 +3832,7 @@ const ACTIONS = [
     new dump_my_tasks_action_1.DumpMyTasksAction(),
     new end_action_1.EndAction(),
     new fetch_holiday_action_1.FetchHolidayAction(),
+    new gen_action_1.GenAction(),
     new list_dc_action_1.ListDCAction(),
     new list_action_1.ListAction(),
     new meeting_track_action_1.MeetingTrackAction(),
