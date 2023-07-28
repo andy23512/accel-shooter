@@ -11,7 +11,7 @@
   },
   "scripts": {
     "ng": "nx",
-    "postinstall": "if [ -e ./decorate-angular-cli.js ]; then node ./decorate-angular-cli.js; fi",
+    "prepare": "if [ -e ./decorate-angular-cli.js ]; then node ./decorate-angular-cli.js; fi",
     "start-api": "nx serve api",
     "start-frontend": "nx serve frontend --port 4203",
     "start": "nx serve cli",
