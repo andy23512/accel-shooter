@@ -11,7 +11,7 @@
   },
   "scripts": {
     "ng": "nx",
-    "prepare": "if [ -e ./decorate-angular-cli.js ]; then node ./decorate-angular-cli.js; fi",
+    "postinall": "node -e \"process.env.NODE_ENV != 'production' && process.exit(1)\" || node ./decorate-angular-cli.js",
     "start-api": "nx serve api",
     "start-frontend": "nx serve frontend --port 4203",
     "start": "nx serve cli",
