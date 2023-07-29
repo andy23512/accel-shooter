@@ -43,6 +43,8 @@ export interface Config {
   PunchInfoFile: string;
   StudyGroupGoogleCalendarId: string;
   TaskTimeTrackFolder: string;
+  TaskInProgressTimesFolder: string;
+  TimingAppExportFolder: string;
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];
 export interface NormalizedChecklistItem {

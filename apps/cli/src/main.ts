@@ -20,6 +20,7 @@ import { StartReviewAction } from './actions/start-review.action';
 import { StartAction } from './actions/start.action';
 import { SwitchAction } from './actions/switch.action';
 import { TimeAction } from './actions/time.action';
+import { TmpAction } from './actions/tmp.action';
 import { TodoAction } from './actions/to-do.action';
 import { TrackAction } from './actions/track.action';
 import { WatchPipelineAction } from './actions/watch-pipeline.action';
@@ -49,6 +50,7 @@ const ACTIONS: Action[] = [
   new StartReviewAction(),
   new SwitchAction(),
   new TimeAction(),
+  new TmpAction(),
   new TodoAction(),
   new TrackAction(),
   new WatchPipelineAction(),

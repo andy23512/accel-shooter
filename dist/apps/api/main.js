@@ -973,6 +973,8 @@ function getConfig() {
         'GoogleTokenFile',
         'GoogleCredentialsFile',
         'PunchInfoFile',
+        'TaskInProgressTimesFolder',
+        'TimingAppExportFolder',
     ];
     filePathKeys.forEach((key) => {
         config[key] = (0, untildify_1.default)(config[key]);
@@ -1351,6 +1353,7 @@ var DateFormat;
     DateFormat["STANDARD"] = "yyyy/MM/dd";
     DateFormat["GITLAB"] = "yyyy-MM-dd";
     DateFormat["HOLIDAY"] = "yyyy/M/d";
+    DateFormat["TIMING_APP"] = "yyyy/M/d";
 })(DateFormat = exports.DateFormat || (exports.DateFormat = {}));
 function formatDate(day, dateFormat = DateFormat.STANDARD) {
     return (0, date_fns_1.format)(day, dateFormat);

@@ -13,6 +13,7 @@ import {
 
 import { Action } from '../classes/action.class';
 import { CustomProgressLog } from '../classes/progress-log.class';
+import { TaskProgressTracker } from '../classes/task-progress-tracker.class';
 import { Todo } from '../classes/todo.class';
 import { Tracker } from '../classes/tracker.class';
 import {
@@ -110,6 +111,7 @@ export class StartAction extends Action {
       'Add Todo Entry',
       'Add Tracker Item',
       'Do Git Fetch and Checkout',
+      'Start Task Progress Tracker',
     ]);
     process.chdir(answers.gitLabProject.path.replace('~', os.homedir()));
     await checkWorkingTreeClean();
@@ -173,6 +175,8 @@ export class StartAction extends Action {
       'pipe'
     );
     await new OpenAction().run(answers.clickUpTaskId);
+    p.next(); // Start Task Progress Tracker
+    new TaskProgressTracker(answers.clickUpTaskId).setTime('start');
     p.end(0);
   }
 }

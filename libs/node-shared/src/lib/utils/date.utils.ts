@@ -4,6 +4,7 @@ export enum DateFormat {
   STANDARD = 'yyyy/MM/dd',
   GITLAB = 'yyyy-MM-dd',
   HOLIDAY = 'yyyy/M/d',
+  TIMING_APP = 'yyyy/M/d',
 }
 
 export function formatDate(

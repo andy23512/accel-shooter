@@ -2,9 +2,11 @@ import { CONFIG, normalizeClickUpChecklist } from '@accel-shooter/node-shared';
 import { Action } from '../classes/action.class';
 
 import { differenceInMilliseconds, parseISO } from 'date-fns';
-import { readFileSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { CustomProgressLog } from '../classes/progress-log.class';
+import { TaskProgressTracker } from '../classes/task-progress-tracker.class';
+import { TimingApp } from '../classes/timing-app.class';
 import { Todo } from '../classes/todo.class';
 import { getInfoFromArgument, openUrlsInTabGroup } from '../utils';
 
@@ -15,12 +17,19 @@ export class EndAction extends Action {
     { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
   ];
   public async run(clickUpTaskIdArg: string) {
-    const { gitLab, mergeRequest, clickUp, clickUpTask, clickUpTaskId } =
-      await getInfoFromArgument(clickUpTaskIdArg);
+    const {
+      gitLab,
+      mergeRequest,
+      clickUp,
+      clickUpTask,
+      clickUpTaskId,
+      gitLabProject,
+    } = await getInfoFromArgument(clickUpTaskIdArg);
     const p = new CustomProgressLog('End', [
       'Check Task is Completed or not',
       'Update GitLab Merge Request Ready Status and Assignee',
       'Update ClickUp Task Status',
+      'End Task Progress Tracker',
       'Set ClickUp Task Time Estimate',
       'Close Tab Group',
       'Remove Todo',
@@ -43,18 +52,34 @@ export class EndAction extends Action {
     await gitLab.markMergeRequestAsReadyAndAddAssignee(mergeRequest);
     p.next(); // Update ClickUp Task Status
     await clickUp.setTaskAsInReviewStatus();
+    p.next(); // End Task Progress Tracker
+    new TaskProgressTracker(clickUpTaskId).setTime('end');
     p.next(); // Set ClickUp Task Time Estimate
     const path = join(CONFIG.TaskTimeTrackFolder, `${clickUpTaskId}.csv`);
-    const content = readFileSync(path, { encoding: 'utf-8' });
-    const timeEstimate = content
-      .split('\n')
-      .filter(Boolean)
-      .map((line) => {
-        const cells = line.split(',');
-        return differenceInMilliseconds(parseISO(cells[1]), parseISO(cells[0]));
-      })
-      .reduce((a, b) => a + b);
-    await clickUp.setTaskTimeEstimate(timeEstimate);
+    let timeEstimate = 0;
+    if (existsSync(path)) {
+      const content = readFileSync(path, { encoding: 'utf-8' });
+      timeEstimate += content
+        .split('\n')
+        .filter(Boolean)
+        .map((line) => {
+          const cells = line.split(',');
+          return differenceInMilliseconds(
+            parseISO(cells[1]),
+            parseISO(cells[0])
+          );
+        })
+        .reduce((a, b) => a + b);
+    }
+    timeEstimate += await new TimingApp().getWorkingTimeInTask(
+      clickUpTaskId,
+      gitLabProject.path
+    );
+    if (timeEstimate) {
+      await clickUp.setTaskTimeEstimate(timeEstimate);
+    } else {
+      console.warn('Time Estimate is zero!');
+    }
     p.next(); // Close Tab Group
     openUrlsInTabGroup([], clickUpTaskId);
     p.next(); // Remove Todo

@@ -37,6 +37,8 @@ export function getConfig(): Config {
     'GoogleTokenFile',
     'GoogleCredentialsFile',
     'PunchInfoFile',
+    'TaskInProgressTimesFolder',
+    'TimingAppExportFolder',
   ] as const;
   filePathKeys.forEach((key) => {
     config[key] = untildify(config[key]);
