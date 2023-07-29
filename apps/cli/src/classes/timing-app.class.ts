@@ -56,7 +56,6 @@ export class TimingApp {
     startDate: Date,
     endDate: Date
   ): Promise<TimingAppRecord[]> {
-    console.log(startDate, endDate);
     const exportPath = path.join(
       CONFIG.TimingAppExportFolder,
       `${formatDate(startDate, DateFormat.GITLAB)}_${formatDate(

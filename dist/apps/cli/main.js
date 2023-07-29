@@ -2169,7 +2169,6 @@ class TimingApp {
     }
     getRecords(startDate, endDate) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            console.log(startDate, endDate);
             const exportPath = path_1.default.join(node_shared_1.CONFIG.TimingAppExportFolder, `${(0, node_shared_1.formatDate)(startDate, node_shared_1.DateFormat.GITLAB)}_${(0, node_shared_1.formatDate)(endDate, node_shared_1.DateFormat.GITLAB)}.json`);
             const script = (0, fs_1.readFileSync)(path_1.default.resolve(__dirname, './assets/timing-app-export.applescript'), { encoding: 'utf-8' })
                 .replace(/START_DATE/g, (0, node_shared_1.formatDate)(startDate, node_shared_1.DateFormat.TIMING_APP))
