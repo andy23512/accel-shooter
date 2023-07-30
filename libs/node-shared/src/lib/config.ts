@@ -39,6 +39,7 @@ export function getConfig(): Config {
     'PunchInfoFile',
     'TaskInProgressTimesFolder',
     'TimingAppExportFolder',
+    'TaskInProgressTimeTable',
   ] as const;
   filePathKeys.forEach((key) => {
     config[key] = untildify(config[key]);

@@ -5,10 +5,10 @@ import { differenceInMilliseconds, parseISO } from 'date-fns';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { CustomProgressLog } from '../classes/progress-log.class';
-import { TaskProgressTracker } from '../classes/task-progress-tracker.class';
 import { TimingApp } from '../classes/timing-app.class';
 import { Todo } from '../classes/todo.class';
 import { getInfoFromArgument, openUrlsInTabGroup } from '../utils';
+import { PauseAction } from './pause.action';
 
 export class EndAction extends Action {
   public command = 'end';
@@ -27,9 +27,9 @@ export class EndAction extends Action {
     } = await getInfoFromArgument(clickUpTaskIdArg);
     const p = new CustomProgressLog('End', [
       'Check Task is Completed or not',
+      'Pause Task',
       'Update GitLab Merge Request Ready Status and Assignee',
       'Update ClickUp Task Status',
-      'End Task Progress Tracker',
       'Set ClickUp Task Time Estimate',
       'Close Tab Group',
       'Remove Todo',
@@ -48,12 +48,12 @@ export class EndAction extends Action {
       console.log('This task has uncompleted todo(s).');
       process.exit();
     }
+    p.next(); // Pause Task
+    await new PauseAction().run(clickUpTaskId);
     p.next(); // Update GitLab Merge Request Ready Status and Assignee
     await gitLab.markMergeRequestAsReadyAndAddAssignee(mergeRequest);
     p.next(); // Update ClickUp Task Status
     await clickUp.setTaskAsInReviewStatus();
-    p.next(); // End Task Progress Tracker
-    new TaskProgressTracker(clickUpTaskId).setTime('end');
     p.next(); // Set ClickUp Task Time Estimate
     const path = join(CONFIG.TaskTimeTrackFolder, `${clickUpTaskId}.csv`);
     let timeEstimate = 0;

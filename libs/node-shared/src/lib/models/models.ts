@@ -45,6 +45,7 @@ export interface Config {
   TaskTimeTrackFolder: string;
   TaskInProgressTimesFolder: string;
   TimingAppExportFolder: string;
+  TaskInProgressTimeTable: string;
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];
 export interface NormalizedChecklistItem {

@@ -69,6 +69,7 @@ const progress_log_class_1 = __webpack_require__("./apps/cli/src/classes/progres
 const todo_class_1 = __webpack_require__("./apps/cli/src/classes/todo.class.ts");
 const tracker_class_1 = __webpack_require__("./apps/cli/src/classes/tracker.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
+const pause_action_1 = __webpack_require__("./apps/cli/src/actions/pause.action.ts");
 class CloseAction extends action_class_1.Action {
     constructor() {
         super(...arguments);
@@ -82,12 +83,15 @@ class CloseAction extends action_class_1.Action {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const { gitLab, mergeRequest, clickUp, clickUpTaskId } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
             const p = new progress_log_class_1.CustomProgressLog('Close', [
+                'Pause Task',
                 'Close GitLab Merge Request',
                 'Update ClickUp Task Status',
                 'Close Tab Group',
                 'Remove Todo',
                 'Remove Track Item',
             ]);
+            p.next(); // Pause Task
+            yield new pause_action_1.PauseAction().run(clickUpTaskId);
             p.next(); // Close GitLab Merge Request
             yield gitLab.closeMergeRequest(mergeRequest);
             p.next(); // Update ClickUp Task Status
@@ -478,10 +482,10 @@ const date_fns_1 = __webpack_require__("date-fns");
 const fs_1 = __webpack_require__("fs");
 const path_1 = __webpack_require__("path");
 const progress_log_class_1 = __webpack_require__("./apps/cli/src/classes/progress-log.class.ts");
-const task_progress_tracker_class_1 = __webpack_require__("./apps/cli/src/classes/task-progress-tracker.class.ts");
 const timing_app_class_1 = __webpack_require__("./apps/cli/src/classes/timing-app.class.ts");
 const todo_class_1 = __webpack_require__("./apps/cli/src/classes/todo.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
+const pause_action_1 = __webpack_require__("./apps/cli/src/actions/pause.action.ts");
 class EndAction extends action_class_1.Action {
     constructor() {
         super(...arguments);
@@ -496,9 +500,9 @@ class EndAction extends action_class_1.Action {
             const { gitLab, mergeRequest, clickUp, clickUpTask, clickUpTaskId, gitLabProject, } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
             const p = new progress_log_class_1.CustomProgressLog('End', [
                 'Check Task is Completed or not',
+                'Pause Task',
                 'Update GitLab Merge Request Ready Status and Assignee',
                 'Update ClickUp Task Status',
-                'End Task Progress Tracker',
                 'Set ClickUp Task Time Estimate',
                 'Close Tab Group',
                 'Remove Todo',
@@ -511,12 +515,12 @@ class EndAction extends action_class_1.Action {
                 console.log('This task has uncompleted todo(s).');
                 process.exit();
             }
+            p.next(); // Pause Task
+            yield new pause_action_1.PauseAction().run(clickUpTaskId);
             p.next(); // Update GitLab Merge Request Ready Status and Assignee
             yield gitLab.markMergeRequestAsReadyAndAddAssignee(mergeRequest);
             p.next(); // Update ClickUp Task Status
             yield clickUp.setTaskAsInReviewStatus();
-            p.next(); // End Task Progress Tracker
-            new task_progress_tracker_class_1.TaskProgressTracker(clickUpTaskId).setTime('end');
             p.next(); // Set ClickUp Task Time Estimate
             const path = (0, path_1.join)(node_shared_1.CONFIG.TaskTimeTrackFolder, `${clickUpTaskId}.csv`);
             let timeEstimate = 0;
@@ -821,6 +825,42 @@ exports.OpenAction = OpenAction;
 
 /***/ }),
 
+/***/ "./apps/cli/src/actions/pause.action.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.PauseAction = void 0;
+const tslib_1 = __webpack_require__("tslib");
+const child_process_1 = __webpack_require__("child_process");
+const os_1 = tslib_1.__importDefault(__webpack_require__("os"));
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
+const task_progress_tracker_class_1 = __webpack_require__("./apps/cli/src/classes/task-progress-tracker.class.ts");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
+class PauseAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'pause';
+        this.description = 'pause a task (record end time in progress tracker)';
+        this.arguments = [
+            { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
+        ];
+    }
+    run(clickUpTaskIdArg) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const { clickUpTaskId, gitLabProject, gitLab } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
+            new task_progress_tracker_class_1.TaskProgressTracker().setTime(clickUpTaskId, 'end');
+            const defaultBranch = gitLab.getDefaultBranchName();
+            process.chdir(gitLabProject.path.replace('~', os_1.default.homedir()));
+            (0, child_process_1.execSync)(`git checkout ${defaultBranch}`);
+        });
+    }
+}
+exports.PauseAction = PauseAction;
+
+
+/***/ }),
+
 /***/ "./apps/cli/src/actions/revert-end.action.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -830,7 +870,6 @@ exports.RevertEndAction = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const progress_log_class_1 = __webpack_require__("./apps/cli/src/classes/progress-log.class.ts");
-const task_progress_tracker_class_1 = __webpack_require__("./apps/cli/src/classes/task-progress-tracker.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 class RevertEndAction extends action_class_1.Action {
     constructor() {
@@ -843,18 +882,15 @@ class RevertEndAction extends action_class_1.Action {
     }
     run(clickUpTaskIdArg) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const { gitLab, mergeRequest, clickUp, clickUpTaskId } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
+            const { gitLab, mergeRequest, clickUp } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
             const p = new progress_log_class_1.CustomProgressLog('End', [
                 'Update GitLab Merge Request Ready Status and Assignee',
                 'Update ClickUp Task Status',
-                'Start Task Progress Tracker',
             ]);
             p.start();
             yield gitLab.markMergeRequestAsUnreadyAndSetAssigneeToSelf(mergeRequest);
             p.next();
             yield clickUp.setTaskAsInProgressStatus();
-            p.next();
-            new task_progress_tracker_class_1.TaskProgressTracker(clickUpTaskId).setTime('start');
             p.end(0);
         });
     }
@@ -1274,7 +1310,7 @@ class StartAction extends action_class_1.Action {
             yield (0, utils_1.promiseSpawn)('git', ['submodule', 'update', '--init', '--recursive'], 'pipe');
             yield new open_action_1.OpenAction().run(answers.clickUpTaskId);
             p.next(); // Start Task Progress Tracker
-            new task_progress_tracker_class_1.TaskProgressTracker(answers.clickUpTaskId).setTime('start');
+            new task_progress_tracker_class_1.TaskProgressTracker().setTime(answers.clickUpTaskId, 'start');
             p.end(0);
         });
     }
@@ -1310,7 +1346,6 @@ class SwitchAction extends action_class_1.Action {
     run(clickUpTaskIdArg) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             (0, actions_1.configReadline)();
-            const { clickUpTaskId: previousClickUpTaskId } = yield (0, utils_1.getInfoFromArgument)(null);
             const { gitLabProject, mergeRequest, clickUpTaskId } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
             if (mergeRequest.state === 'merged') {
                 console.log('This task is completed.');
@@ -1326,10 +1361,9 @@ class SwitchAction extends action_class_1.Action {
                     console.log('\nWorking tree is not clean or something is not pushed. Aborted.');
                     process.exit();
                 }
+                yield new task_progress_tracker_class_1.TaskProgressTracker().setTime(clickUpTaskId, 'start');
                 yield (0, utils_1.promiseSpawn)('git', ['checkout', mergeRequest.source_branch], 'pipe');
                 yield new open_action_1.OpenAction().run(clickUpTaskId);
-                new task_progress_tracker_class_1.TaskProgressTracker(previousClickUpTaskId).setTime('end');
-                new task_progress_tracker_class_1.TaskProgressTracker(clickUpTaskId).setTime('start');
             }
         });
     }
@@ -1729,6 +1763,9 @@ class BaseFileRef {
     writeFile(content) {
         (0, fs_1.writeFileSync)(this.path, content);
     }
+    appendFile(content) {
+        (0, fs_1.appendFileSync)(this.path, content);
+    }
 }
 exports.BaseFileRef = BaseFileRef;
 
@@ -2096,21 +2133,46 @@ exports.CustomProgressLog = CustomProgressLog;
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TaskProgressTracker = void 0;
+const tslib_1 = __webpack_require__("tslib");
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
-const fs_1 = __webpack_require__("fs");
-const path_1 = __webpack_require__("path");
-class TaskProgressTracker {
-    constructor(taskId) {
-        this.taskId = taskId;
+const pause_action_1 = __webpack_require__("./apps/cli/src/actions/pause.action.ts");
+const base_file_ref_class_1 = __webpack_require__("./apps/cli/src/classes/base-file-ref.class.ts");
+class TaskProgressTracker extends base_file_ref_class_1.BaseFileRef {
+    get path() {
+        return node_shared_1.CONFIG.TaskInProgressTimeTable;
     }
-    get filePath() {
-        const folderPath = node_shared_1.CONFIG.TaskInProgressTimesFolder;
-        return (0, path_1.join)(folderPath, this.taskId + '.csv');
-    }
-    setTime(type) {
-        const time = new Date().toISOString();
-        const addedContent = type === 'start' ? `\n${time},` : time;
-        (0, fs_1.appendFileSync)(this.filePath, addedContent, { encoding: 'utf-8' });
+    setTime(taskId, type) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const content = this.readFile();
+            const lines = content.split('\n').filter(Boolean);
+            const lastRowCols = lines[lines.length - 1].split(',');
+            const lastTaskId = lastRowCols[0];
+            const lastTaskEndTime = lastRowCols[2];
+            let addedContent = '';
+            if (type === 'start') {
+                if (lastTaskEndTime === '') {
+                    if (lastTaskId === taskId) {
+                        return;
+                    }
+                    yield new pause_action_1.PauseAction().run(lastTaskId);
+                }
+                addedContent += `\n${taskId},${new Date().toISOString()},`;
+            }
+            else {
+                if (lastTaskEndTime === '') {
+                    if (lastTaskId === taskId) {
+                        addedContent = new Date().toISOString();
+                    }
+                    else {
+                        throw Error('Task ID mismatch.');
+                    }
+                }
+                else {
+                    throw Error('Task is not started.');
+                }
+            }
+            this.appendFile(addedContent);
+        });
     }
 }
 exports.TaskProgressTracker = TaskProgressTracker;
@@ -2128,40 +2190,49 @@ const tslib_1 = __webpack_require__("tslib");
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const date_fns_1 = __webpack_require__("date-fns");
 const fs_1 = __webpack_require__("fs");
-const path_1 = tslib_1.__importStar(__webpack_require__("path"));
+const path_1 = tslib_1.__importDefault(__webpack_require__("path"));
 const run_applescript_1 = tslib_1.__importDefault(__webpack_require__("run-applescript"));
+const holiday_class_1 = __webpack_require__("./apps/cli/src/classes/holiday.class.ts");
+const task_progress_tracker_class_1 = __webpack_require__("./apps/cli/src/classes/task-progress-tracker.class.ts");
 class TimingApp {
     getWorkingTimeInTask(clickUpTaskId, gitLabProjectPath) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const taskProgressTimeFile = (0, path_1.join)(node_shared_1.CONFIG.TaskInProgressTimesFolder, `${clickUpTaskId}.csv`);
-            const taskProgressTimeEntries = (0, fs_1.readFileSync)(taskProgressTimeFile, {
-                encoding: 'utf-8',
-            })
+            const content = new task_progress_tracker_class_1.TaskProgressTracker().readFile();
+            const taskProgressTimeEntries = content
                 .split('\n')
                 .filter(Boolean)
                 .map((line) => {
                 const col = line.split(',');
-                return [(0, date_fns_1.parseISO)(col[0]), (0, date_fns_1.parseISO)(col[1])];
-            });
-            const startDate = (0, date_fns_1.startOfDay)(taskProgressTimeEntries[0][0]);
-            const endDate = (0, date_fns_1.startOfDay)(taskProgressTimeEntries[taskProgressTimeEntries.length - 1][1]);
-            const records = yield this.getRecords(startDate, endDate);
+                return [col[0], (0, date_fns_1.parseISO)(col[1]), (0, date_fns_1.parseISO)(col[2])];
+            })
+                .filter(([taskId]) => taskId === clickUpTaskId);
+            const startFetchDate = (0, date_fns_1.startOfDay)(taskProgressTimeEntries[0][1]);
+            const endFetchDate = (0, date_fns_1.startOfDay)(taskProgressTimeEntries[taskProgressTimeEntries.length - 1][2]);
+            const records = yield this.getRecords(startFetchDate, endFetchDate);
+            const holiday = new holiday_class_1.Holiday();
             const workingRecords = records
+                .filter(({ startDate, endDate }) => {
+                return taskProgressTimeEntries.some((e) => (e[1] <= startDate && e[2] >= startDate) ||
+                    (e[1] <= endDate && e[2] >= endDate));
+            })
+                .filter((r) => holiday.checkIsWorkday(r.startDate) &&
+                holiday.checkIsWorkday(r.endDate))
                 .filter((r) => {
-                const start = (0, date_fns_1.parseISO)(r.startDate);
-                const end = (0, date_fns_1.parseISO)(r.endDate);
-                return taskProgressTimeEntries.some((e) => (e[0] <= start && e[1] >= start) || (e[0] <= end && e[1] >= end));
+                const startHour = r.startDate.getHours();
+                const endHour = r.endDate.getHours();
+                return startHour >= 9 && startHour < 18 && endHour >= 9 && endHour < 18;
             })
                 .filter((r) => {
-                var _a, _b, _c, _d, _e;
+                var _a, _b, _c, _d, _e, _f;
                 return (r.application === 'Code - Insiders' &&
                     ((_a = r.path) === null || _a === void 0 ? void 0 : _a.includes(gitLabProjectPath))) ||
                     r.application === 'iTerm2' ||
                     (r.application === 'Brave Browser' &&
-                        (((_b = r.path) === null || _b === void 0 ? void 0 : _b.includes('localhost:')) ||
-                            ((_c = r.path) === null || _c === void 0 ? void 0 : _c.includes('npm.io')) ||
-                            ((_d = r.path) === null || _d === void 0 ? void 0 : _d.includes('npmjs.com')) ||
-                            ((_e = r.path) === null || _e === void 0 ? void 0 : _e.includes('gitlab.com')))) ||
+                        (((_b = r.path) === null || _b === void 0 ? void 0 : _b.includes('localhost')) ||
+                            ((_c = r.path) === null || _c === void 0 ? void 0 : _c.includes('app.clickup.com')) ||
+                            ((_d = r.path) === null || _d === void 0 ? void 0 : _d.includes('github.com')) ||
+                            ((_e = r.path) === null || _e === void 0 ? void 0 : _e.includes('figma.com')) ||
+                            ((_f = r.path) === null || _f === void 0 ? void 0 : _f.includes('gitlab.com')))) ||
                     r.project === 'Development';
             });
             return workingRecords.reduce((acc, cur) => acc + cur.duration, 0) * 1000;
@@ -2176,7 +2247,7 @@ class TimingApp {
                 .replace(/EXPORT_PATH/g, exportPath);
             yield (0, run_applescript_1.default)(script);
             const records = JSON.parse((0, fs_1.readFileSync)(exportPath, { encoding: 'utf-8' }));
-            return records;
+            return records.map((r) => (Object.assign(Object.assign({}, r), { startDate: (0, date_fns_1.parseISO)(r.startDate), endDate: (0, date_fns_1.parseISO)(r.endDate) })));
         });
     }
 }
@@ -3285,6 +3356,7 @@ function getConfig() {
         'PunchInfoFile',
         'TaskInProgressTimesFolder',
         'TimingAppExportFolder',
+        'TaskInProgressTimeTable',
     ];
     filePathKeys.forEach((key) => {
         config[key] = (0, untildify_1.default)(config[key]);

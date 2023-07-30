@@ -1,41 +1,52 @@
 import { CONFIG, DateFormat, formatDate } from '@accel-shooter/node-shared';
 import { parseISO, startOfDay } from 'date-fns';
 import { readFileSync } from 'fs';
-import path, { join } from 'path';
+import path from 'path';
 import runAppleScript from 'run-applescript';
-import { TimingAppRecord } from '../models/timing-app-record.models';
+import {
+  RawTimingAppRecord,
+  TimingAppRecord,
+} from '../models/timing-app-record.models';
+import { Holiday } from './holiday.class';
+import { TaskProgressTracker } from './task-progress-tracker.class';
 
 export class TimingApp {
   public async getWorkingTimeInTask(
     clickUpTaskId: string,
     gitLabProjectPath: string
   ) {
-    const taskProgressTimeFile = join(
-      CONFIG.TaskInProgressTimesFolder,
-      `${clickUpTaskId}.csv`
-    );
-    const taskProgressTimeEntries = readFileSync(taskProgressTimeFile, {
-      encoding: 'utf-8',
-    })
+    const content = new TaskProgressTracker().readFile();
+    const taskProgressTimeEntries = content
       .split('\n')
       .filter(Boolean)
       .map((line) => {
         const col = line.split(',');
-        return [parseISO(col[0]), parseISO(col[1])];
-      });
-    const startDate = startOfDay(taskProgressTimeEntries[0][0]);
-    const endDate = startOfDay(
-      taskProgressTimeEntries[taskProgressTimeEntries.length - 1][1]
+        return [col[0], parseISO(col[1]), parseISO(col[2])] as const;
+      })
+      .filter(([taskId]) => taskId === clickUpTaskId);
+    const startFetchDate = startOfDay(taskProgressTimeEntries[0][1]);
+    const endFetchDate = startOfDay(
+      taskProgressTimeEntries[taskProgressTimeEntries.length - 1][2]
     );
-    const records = await this.getRecords(startDate, endDate);
+    const records = await this.getRecords(startFetchDate, endFetchDate);
+    const holiday = new Holiday();
     const workingRecords = records
-      .filter((r) => {
-        const start = parseISO(r.startDate);
-        const end = parseISO(r.endDate);
+      .filter(({ startDate, endDate }) => {
         return taskProgressTimeEntries.some(
           (e) =>
-            (e[0] <= start && e[1] >= start) || (e[0] <= end && e[1] >= end)
+            (e[1] <= startDate && e[2] >= startDate) ||
+            (e[1] <= endDate && e[2] >= endDate)
         );
+      })
+      .filter(
+        (r) =>
+          holiday.checkIsWorkday(r.startDate) &&
+          holiday.checkIsWorkday(r.endDate)
+      )
+      .filter((r) => {
+        const startHour = r.startDate.getHours();
+        const endHour = r.endDate.getHours();
+        return startHour >= 9 && startHour < 18 && endHour >= 9 && endHour < 18;
       })
       .filter(
         (r) =>
@@ -43,9 +54,10 @@ export class TimingApp {
             r.path?.includes(gitLabProjectPath)) ||
           r.application === 'iTerm2' ||
           (r.application === 'Brave Browser' &&
-            (r.path?.includes('localhost:') ||
-              r.path?.includes('npm.io') ||
-              r.path?.includes('npmjs.com') ||
+            (r.path?.includes('localhost') ||
+              r.path?.includes('app.clickup.com') ||
+              r.path?.includes('github.com') ||
+              r.path?.includes('figma.com') ||
               r.path?.includes('gitlab.com'))) ||
           r.project === 'Development'
       );
@@ -71,9 +83,13 @@ export class TimingApp {
       .replace(/END_DATE/g, formatDate(endDate, DateFormat.TIMING_APP))
       .replace(/EXPORT_PATH/g, exportPath);
     await runAppleScript(script);
-    const records: TimingAppRecord[] = JSON.parse(
+    const records: RawTimingAppRecord[] = JSON.parse(
       readFileSync(exportPath, { encoding: 'utf-8' })
     );
-    return records;
+    return records.map((r) => ({
+      ...r,
+      startDate: parseISO(r.startDate),
+      endDate: parseISO(r.endDate),
+    }));
   }
 }

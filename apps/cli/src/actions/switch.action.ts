@@ -18,9 +18,6 @@ export class SwitchAction extends Action {
   ];
   public async run(clickUpTaskIdArg: string) {
     configReadline();
-    const { clickUpTaskId: previousClickUpTaskId } = await getInfoFromArgument(
-      null
-    );
     const { gitLabProject, mergeRequest, clickUpTaskId } =
       await getInfoFromArgument(clickUpTaskIdArg);
     if (mergeRequest.state === 'merged') {
@@ -39,14 +36,13 @@ export class SwitchAction extends Action {
         );
         process.exit();
       }
+      await new TaskProgressTracker().setTime(clickUpTaskId, 'start');
       await promiseSpawn(
         'git',
         ['checkout', mergeRequest.source_branch],
         'pipe'
       );
       await new OpenAction().run(clickUpTaskId);
-      new TaskProgressTracker(previousClickUpTaskId).setTime('end');
-      new TaskProgressTracker(clickUpTaskId).setTime('start');
     }
   }
 }

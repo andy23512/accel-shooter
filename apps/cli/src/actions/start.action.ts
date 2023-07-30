@@ -176,7 +176,7 @@ export class StartAction extends Action {
     );
     await new OpenAction().run(answers.clickUpTaskId);
     p.next(); // Start Task Progress Tracker
-    new TaskProgressTracker(answers.clickUpTaskId).setTime('start');
+    new TaskProgressTracker().setTime(answers.clickUpTaskId, 'start');
     p.end(0);
   }
 }

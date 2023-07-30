@@ -975,6 +975,7 @@ function getConfig() {
         'PunchInfoFile',
         'TaskInProgressTimesFolder',
         'TimingAppExportFolder',
+        'TaskInProgressTimeTable',
     ];
     filePathKeys.forEach((key) => {
         config[key] = (0, untildify_1.default)(config[key]);

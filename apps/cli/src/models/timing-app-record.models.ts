@@ -1,4 +1,4 @@
-export interface TimingAppRecord {
+export interface RawTimingAppRecord {
   activityTitle: string;
   activityType: string;
   application: string;
@@ -9,3 +9,11 @@ export interface TimingAppRecord {
   month: string;
   path?: string;
 }
+
+export type TimingAppRecord = Omit<
+  RawTimingAppRecord,
+  'startDate' | 'endDate'
+> & {
+  startDate: Date;
+  endDate: Date;
+};

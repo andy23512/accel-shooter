@@ -4,6 +4,7 @@ import { CustomProgressLog } from '../classes/progress-log.class';
 import { Todo } from '../classes/todo.class';
 import { Tracker } from '../classes/tracker.class';
 import { getInfoFromArgument, openUrlsInTabGroup } from '../utils';
+import { PauseAction } from './pause.action';
 
 export class CloseAction extends Action {
   public command = 'close';
@@ -15,12 +16,15 @@ export class CloseAction extends Action {
     const { gitLab, mergeRequest, clickUp, clickUpTaskId } =
       await getInfoFromArgument(clickUpTaskIdArg);
     const p = new CustomProgressLog('Close', [
+      'Pause Task',
       'Close GitLab Merge Request',
       'Update ClickUp Task Status',
       'Close Tab Group',
       'Remove Todo',
       'Remove Track Item',
     ]);
+    p.next(); // Pause Task
+    await new PauseAction().run(clickUpTaskId);
     p.next(); // Close GitLab Merge Request
     await gitLab.closeMergeRequest(mergeRequest);
     p.next(); // Update ClickUp Task Status

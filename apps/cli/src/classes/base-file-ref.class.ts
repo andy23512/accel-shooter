@@ -1,4 +1,4 @@
-import { readFileSync, writeFileSync } from 'fs';
+import { appendFileSync, readFileSync, writeFileSync } from 'fs';
 
 export abstract class BaseFileRef {
   protected abstract get path(): string;
@@ -9,5 +9,9 @@ export abstract class BaseFileRef {
 
   public writeFile(content: string) {
     writeFileSync(this.path, content);
+  }
+
+  public appendFile(content: string) {
+    appendFileSync(this.path, content);
   }
 }
