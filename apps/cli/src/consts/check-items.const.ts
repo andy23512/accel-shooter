@@ -26,9 +26,9 @@ const checkConflict = new CheckItem(
     return { code: isConflict ? 1 : 0 };
   }
 );
-const checkFrontendConsoleLog = new CheckItem(
+const checkFrontendLongImportAndConsole = new CheckItem(
   'Frontend',
-  'Check console.log',
+  'Check long import and console',
   true,
   async ({ frontendChanges }) => {
     return {
@@ -38,7 +38,9 @@ const checkFrontendConsoleLog = new CheckItem(
           c.diff
             .split('\n')
             .some(
-              (line) => !line.startsWith('-') && line.includes('console.log')
+              (line) =>
+                !line.startsWith('-') &&
+                (line.includes('../../lib/') || line.includes('console.log'))
             )
       )
         ? 1
@@ -46,47 +48,9 @@ const checkFrontendConsoleLog = new CheckItem(
     };
   }
 );
-const checkFrontendLongImport = new CheckItem(
-  'Frontend',
-  'Check long import',
-  true,
-  async ({ frontendChanges }) => {
-    return {
-      code: frontendChanges.some(
-        (c) =>
-          c.new_path.endsWith('.ts') &&
-          c.diff
-            .split('\n')
-            .some(
-              (line) => !line.startsWith('-') && line.includes('../../lib/')
-            )
-      )
-        ? 1
-        : 0,
-    };
-  }
-);
-const checkBackendPrint = new CheckItem(
+const checkBackendDoubleQuotesAndPrint = new CheckItem(
   'Backend',
-  'Check Print',
-  true,
-  async ({ backendChanges }) => {
-    return {
-      code: backendChanges.some(
-        (c) =>
-          c.new_path.endsWith('.py') &&
-          c.diff
-            .split('\n')
-            .some((line) => !line.startsWith('-') && line.includes('print('))
-      )
-        ? 1
-        : 0,
-    };
-  }
-);
-const checkBackendDoubleQuotes = new CheckItem(
-  'Backend',
-  'Check Double Quotes',
+  'Check Double Quotes and Print',
   true,
   async ({ backendChanges }) => {
     return {
@@ -97,7 +61,9 @@ const checkBackendDoubleQuotes = new CheckItem(
             .split('\n')
             .some(
               (line) =>
-                !line.startsWith('-') && line.replace(/"""/g, '').includes('"')
+                !line.startsWith('-') &&
+                (line.replace(/"""/g, '').includes('"') ||
+                  line.includes('print('))
             )
       )
         ? 1
@@ -146,18 +112,15 @@ const checkBackendMigrationConflict = new CheckItem(
 const fullProjectCheckItems: CheckItem[] = [
   checkNonPushedChanges,
   checkConflict,
-  checkFrontendConsoleLog,
-  checkFrontendLongImport,
-  checkBackendPrint,
-  checkBackendDoubleQuotes,
+  checkFrontendLongImportAndConsole,
+  checkBackendDoubleQuotesAndPrint,
   checkBackendMigrationConflict,
 ];
 
 const frontendProjectCheckItems: CheckItem[] = [
   checkNonPushedChanges,
   checkConflict,
-  checkFrontendConsoleLog,
-  checkFrontendLongImport,
+  checkFrontendLongImportAndConsole,
 ];
 
 const otherProjectCheckItems: CheckItem[] = [

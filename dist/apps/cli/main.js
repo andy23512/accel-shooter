@@ -2426,42 +2426,25 @@ const checkConflict = new check_item_class_1.CheckItem('Global', 'Check Conflict
     const isConflict = fullMergeRequest.has_conflicts;
     return { code: isConflict ? 1 : 0 };
 }));
-const checkFrontendConsoleLog = new check_item_class_1.CheckItem('Frontend', 'Check console.log', true, ({ frontendChanges }) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
+const checkFrontendLongImportAndConsole = new check_item_class_1.CheckItem('Frontend', 'Check long import and console', true, ({ frontendChanges }) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     return {
         code: frontendChanges.some((c) => c.new_path.endsWith('.ts') &&
             c.diff
                 .split('\n')
-                .some((line) => !line.startsWith('-') && line.includes('console.log')))
+                .some((line) => !line.startsWith('-') &&
+                (line.includes('../../lib/') || line.includes('console.log'))))
             ? 1
             : 0,
     };
 }));
-const checkFrontendLongImport = new check_item_class_1.CheckItem('Frontend', 'Check long import', true, ({ frontendChanges }) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
-    return {
-        code: frontendChanges.some((c) => c.new_path.endsWith('.ts') &&
-            c.diff
-                .split('\n')
-                .some((line) => !line.startsWith('-') && line.includes('../../lib/')))
-            ? 1
-            : 0,
-    };
-}));
-const checkBackendPrint = new check_item_class_1.CheckItem('Backend', 'Check Print', true, ({ backendChanges }) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
+const checkBackendDoubleQuotesAndPrint = new check_item_class_1.CheckItem('Backend', 'Check Double Quotes and Print', true, ({ backendChanges }) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
     return {
         code: backendChanges.some((c) => c.new_path.endsWith('.py') &&
             c.diff
                 .split('\n')
-                .some((line) => !line.startsWith('-') && line.includes('print(')))
-            ? 1
-            : 0,
-    };
-}));
-const checkBackendDoubleQuotes = new check_item_class_1.CheckItem('Backend', 'Check Double Quotes', true, ({ backendChanges }) => tslib_1.__awaiter(void 0, void 0, void 0, function* () {
-    return {
-        code: backendChanges.some((c) => c.new_path.endsWith('.py') &&
-            c.diff
-                .split('\n')
-                .some((line) => !line.startsWith('-') && line.replace(/"""/g, '').includes('"')))
+                .some((line) => !line.startsWith('-') &&
+                (line.replace(/"""/g, '').includes('"') ||
+                    line.includes('print('))))
             ? 1
             : 0,
     };
@@ -2495,17 +2478,14 @@ const checkBackendMigrationConflict = new check_item_class_1.CheckItem('Backend'
 const fullProjectCheckItems = [
     checkNonPushedChanges,
     checkConflict,
-    checkFrontendConsoleLog,
-    checkFrontendLongImport,
-    checkBackendPrint,
-    checkBackendDoubleQuotes,
+    checkFrontendLongImportAndConsole,
+    checkBackendDoubleQuotesAndPrint,
     checkBackendMigrationConflict,
 ];
 const frontendProjectCheckItems = [
     checkNonPushedChanges,
     checkConflict,
-    checkFrontendConsoleLog,
-    checkFrontendLongImport,
+    checkFrontendLongImportAndConsole,
 ];
 const otherProjectCheckItems = [
     checkNonPushedChanges,
