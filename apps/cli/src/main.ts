@@ -12,6 +12,7 @@ import { ListDCAction } from './actions/list-dc.action';
 import { ListAction } from './actions/list.action';
 import { MeetingTrackAction } from './actions/meeting-track.action';
 import { OpenAction } from './actions/open.action';
+import { PauseAction } from './actions/pause.action';
 import { RevertEndAction } from './actions/revert-end.action';
 import { RoutineAction } from './actions/routine.action';
 import { RTVTasksAction } from './actions/rtv-tasks.action';
@@ -42,6 +43,7 @@ const ACTIONS: Action[] = [
   new ListAction(),
   new MeetingTrackAction(),
   new OpenAction(),
+  new PauseAction(),
   new RevertEndAction(),
   new RoutineAction(),
   new RTVTasksAction(),

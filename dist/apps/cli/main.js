@@ -850,7 +850,7 @@ class PauseAction extends action_class_1.Action {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const { clickUpTaskId, gitLabProject, gitLab } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
             new task_progress_tracker_class_1.TaskProgressTracker().setTime(clickUpTaskId, 'end');
-            const defaultBranch = gitLab.getDefaultBranchName();
+            const defaultBranch = yield gitLab.getDefaultBranchName();
             process.chdir(gitLabProject.path.replace('~', os_1.default.homedir()));
             (0, child_process_1.execSync)(`git checkout ${defaultBranch}`);
         });
@@ -4018,6 +4018,7 @@ const list_dc_action_1 = __webpack_require__("./apps/cli/src/actions/list-dc.act
 const list_action_1 = __webpack_require__("./apps/cli/src/actions/list.action.ts");
 const meeting_track_action_1 = __webpack_require__("./apps/cli/src/actions/meeting-track.action.ts");
 const open_action_1 = __webpack_require__("./apps/cli/src/actions/open.action.ts");
+const pause_action_1 = __webpack_require__("./apps/cli/src/actions/pause.action.ts");
 const revert_end_action_1 = __webpack_require__("./apps/cli/src/actions/revert-end.action.ts");
 const routine_action_1 = __webpack_require__("./apps/cli/src/actions/routine.action.ts");
 const rtv_tasks_action_1 = __webpack_require__("./apps/cli/src/actions/rtv-tasks.action.ts");
@@ -4046,6 +4047,7 @@ const ACTIONS = [
     new list_action_1.ListAction(),
     new meeting_track_action_1.MeetingTrackAction(),
     new open_action_1.OpenAction(),
+    new pause_action_1.PauseAction(),
     new revert_end_action_1.RevertEndAction(),
     new routine_action_1.RoutineAction(),
     new rtv_tasks_action_1.RTVTasksAction(),

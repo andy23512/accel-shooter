@@ -15,7 +15,7 @@ export class PauseAction extends Action {
       clickUpTaskIdArg
     );
     new TaskProgressTracker().setTime(clickUpTaskId, 'end');
-    const defaultBranch = gitLab.getDefaultBranchName();
+    const defaultBranch = await gitLab.getDefaultBranchName();
     process.chdir(gitLabProject.path.replace('~', os.homedir()));
     execSync(`git checkout ${defaultBranch}`);
   }
