@@ -2143,7 +2143,7 @@ class TaskProgressTracker extends base_file_ref_class_1.BaseFileRef {
     }
     setTime(taskId, type) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const content = this.readFile();
+            const content = this.readFile().trim();
             const lines = content.split('\n').filter(Boolean);
             const lastRowCols = lines[lines.length - 1].split(',');
             const lastTaskId = lastRowCols[0];
@@ -2171,7 +2171,7 @@ class TaskProgressTracker extends base_file_ref_class_1.BaseFileRef {
                     throw Error('Task is not started.');
                 }
             }
-            this.appendFile(addedContent);
+            this.writeFile(content + addedContent);
         });
     }
 }

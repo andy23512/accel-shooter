@@ -8,7 +8,7 @@ export class TaskProgressTracker extends BaseFileRef {
   }
 
   public async setTime(taskId: string, type: 'start' | 'end') {
-    const content = this.readFile();
+    const content = this.readFile().trim();
     const lines = content.split('\n').filter(Boolean);
     const lastRowCols = lines[lines.length - 1].split(',');
     const lastTaskId = lastRowCols[0];
@@ -33,6 +33,6 @@ export class TaskProgressTracker extends BaseFileRef {
         throw Error('Task is not started.');
       }
     }
-    this.appendFile(addedContent);
+    this.writeFile(content + addedContent);
   }
 }
