@@ -849,7 +849,7 @@ class PauseAction extends action_class_1.Action {
     run(clickUpTaskIdArg) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const { clickUpTaskId, gitLabProject, gitLab } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
-            new task_progress_tracker_class_1.TaskProgressTracker().setTime(clickUpTaskId, 'end');
+            yield new task_progress_tracker_class_1.TaskProgressTracker().setTime(clickUpTaskId, 'end');
             const defaultBranch = yield gitLab.getDefaultBranchName();
             process.chdir(gitLabProject.path.replace('~', os_1.default.homedir()));
             (0, child_process_1.execSync)(`git checkout ${defaultBranch}`);
@@ -1310,7 +1310,7 @@ class StartAction extends action_class_1.Action {
             yield (0, utils_1.promiseSpawn)('git', ['submodule', 'update', '--init', '--recursive'], 'pipe');
             yield new open_action_1.OpenAction().run(answers.clickUpTaskId);
             p.next(); // Start Task Progress Tracker
-            new task_progress_tracker_class_1.TaskProgressTracker().setTime(answers.clickUpTaskId, 'start');
+            yield new task_progress_tracker_class_1.TaskProgressTracker().setTime(answers.clickUpTaskId, 'start');
             p.end(0);
         });
     }
@@ -2171,6 +2171,7 @@ class TaskProgressTracker extends base_file_ref_class_1.BaseFileRef {
                     throw Error('Task is not started.');
                 }
             }
+            console.log('addedContent: ', addedContent);
             this.writeFile(content + addedContent);
         });
     }

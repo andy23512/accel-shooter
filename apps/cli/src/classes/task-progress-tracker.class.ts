@@ -33,6 +33,7 @@ export class TaskProgressTracker extends BaseFileRef {
         throw Error('Task is not started.');
       }
     }
+    console.log('addedContent: ', addedContent);
     this.writeFile(content + addedContent);
   }
 }
