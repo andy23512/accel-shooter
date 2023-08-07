@@ -1028,6 +1028,7 @@ var TaskStatus;
     TaskStatus["Suspended"] = "suspended";
     TaskStatus["Verified"] = "verified";
     TaskStatus["Closed"] = "closed";
+    TaskStatus["Complete"] = "complete";
     TaskStatus["Done"] = "done";
 })(TaskStatus = exports.TaskStatus || (exports.TaskStatus = {}));
 

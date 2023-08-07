@@ -852,6 +852,7 @@ class PauseAction extends action_class_1.Action {
             yield new task_progress_tracker_class_1.TaskProgressTracker().setTime(clickUpTaskId, 'end');
             const defaultBranch = yield gitLab.getDefaultBranchName();
             process.chdir(gitLabProject.path.replace('~', os_1.default.homedir()));
+            (0, child_process_1.execSync)(`git stash`);
             (0, child_process_1.execSync)(`git checkout ${defaultBranch}`);
         });
     }
@@ -1539,7 +1540,6 @@ class WatchPipelineAction extends action_class_1.Action {
                 return tslib_1.__awaiter(this, void 0, void 0, function* () {
                     const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
                     const status = ((_a = mergeRequest.head_pipeline) === null || _a === void 0 ? void 0 : _a.status) || 'none';
-                    console.log(status);
                     if (status !== 'running' && status !== 'none') {
                         (0, utils_1.displayNotification)(`Pipeline of ${projectName} !${mergeRequestIId} status: ${status}`);
                         process.exit();
@@ -2374,9 +2374,13 @@ class Tracker extends base_file_ref_class_1.BaseFileRef {
                         stagingStatus = node_shared_1.TaskStatus.Done;
                         yield clickUp.setTaskStatus(node_shared_1.TaskStatus.Done);
                     }
-                    else {
+                    else if (list.statuses.find((s) => s.status.toLowerCase() === node_shared_1.TaskStatus.Closed)) {
                         stagingStatus = node_shared_1.TaskStatus.Closed;
                         yield clickUp.setTaskStatus(node_shared_1.TaskStatus.Closed);
+                    }
+                    else {
+                        stagingStatus = node_shared_1.TaskStatus.Complete;
+                        yield clickUp.setTaskStatus(node_shared_1.TaskStatus.Complete);
                     }
                     let message = `${yield clickUp.getFullTaskName()} (${clickUpTaskId}): ${(0, node_shared_1.titleCase)(clickUpTask.status.status)} -> ${(0, node_shared_1.titleCase)(stagingStatus)}`;
                     if (!clickUpTask.due_date) {
@@ -3390,6 +3394,7 @@ var TaskStatus;
     TaskStatus["Suspended"] = "suspended";
     TaskStatus["Verified"] = "verified";
     TaskStatus["Closed"] = "closed";
+    TaskStatus["Complete"] = "complete";
     TaskStatus["Done"] = "done";
 })(TaskStatus = exports.TaskStatus || (exports.TaskStatus = {}));
 

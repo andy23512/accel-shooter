@@ -83,9 +83,16 @@ export class Tracker extends BaseFileRef {
         ) {
           stagingStatus = TaskStatus.Done;
           await clickUp.setTaskStatus(TaskStatus.Done);
-        } else {
+        } else if (
+          list.statuses.find(
+            (s) => s.status.toLowerCase() === TaskStatus.Closed
+          )
+        ) {
           stagingStatus = TaskStatus.Closed;
           await clickUp.setTaskStatus(TaskStatus.Closed);
+        } else {
+          stagingStatus = TaskStatus.Complete;
+          await clickUp.setTaskStatus(TaskStatus.Complete);
         }
         let message = `${await clickUp.getFullTaskName()} (${clickUpTaskId}): ${titleCase(
           clickUpTask.status.status

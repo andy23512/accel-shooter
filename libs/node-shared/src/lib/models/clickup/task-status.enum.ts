@@ -17,5 +17,6 @@ export enum TaskStatus {
   Suspended = 'suspended',
   Verified = 'verified',
   Closed = 'closed',
+  Complete = 'complete',
   Done = 'done',
 }

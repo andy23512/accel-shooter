@@ -15,7 +15,6 @@ export class WatchPipelineAction extends Action {
     async function getAndPrintPipelineStatus() {
       const mergeRequest = await gitLab.getMergeRequest(mergeRequestIId);
       const status = mergeRequest.head_pipeline?.status || 'none';
-      console.log(status);
       if (status !== 'running' && status !== 'none') {
         displayNotification(
           `Pipeline of ${projectName} !${mergeRequestIId} status: ${status}`
