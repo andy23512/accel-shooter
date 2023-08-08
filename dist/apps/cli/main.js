@@ -644,6 +644,7 @@ class GenAction extends action_class_1.Action {
                     `@nrwl/angular:${generator}`,
                     `--path=${cwdRelativePath}`,
                     `--module=${moduleRelativePath}`,
+                    `--changeDetection=OnPush`,
                     '--style=scss',
                     name,
                 ];

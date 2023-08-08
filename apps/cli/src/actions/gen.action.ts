@@ -39,6 +39,7 @@ export class GenAction extends Action {
         `@nrwl/angular:${generator}`,
         `--path=${cwdRelativePath}`,
         `--module=${moduleRelativePath}`,
+        `--changeDetection=OnPush`,
         '--style=scss',
         name,
       ];
