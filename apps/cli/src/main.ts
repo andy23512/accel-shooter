@@ -16,6 +16,7 @@ import { PauseAction } from './actions/pause.action';
 import { RevertEndAction } from './actions/revert-end.action';
 import { RoutineAction } from './actions/routine.action';
 import { RTVTasksAction } from './actions/rtv-tasks.action';
+import { SetTEAction } from './actions/set-te.action';
 import { ShowDiffAction } from './actions/show-diff.action';
 import { StartReviewAction } from './actions/start-review.action';
 import { StartAction } from './actions/start.action';
@@ -47,6 +48,7 @@ const ACTIONS: Action[] = [
   new RevertEndAction(),
   new RoutineAction(),
   new RTVTasksAction(),
+  new SetTEAction(),
   new ShowDiffAction(),
   new StartAction(),
   new StartReviewAction(),

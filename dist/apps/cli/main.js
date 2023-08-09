@@ -1080,6 +1080,60 @@ exports.RTVTasksAction = RTVTasksAction;
 
 /***/ }),
 
+/***/ "./apps/cli/src/actions/set-te.action.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.SetTEAction = void 0;
+const tslib_1 = __webpack_require__("tslib");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
+const date_fns_1 = __webpack_require__("date-fns");
+const fs_1 = __webpack_require__("fs");
+const path_1 = __webpack_require__("path");
+const timing_app_class_1 = __webpack_require__("./apps/cli/src/classes/timing-app.class.ts");
+const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
+class SetTEAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'setTE';
+        this.description = 'set time estimate for current or specified task';
+        this.arguments = [
+            { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
+        ];
+    }
+    run(clickUpTaskIdArg) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const { gitLab, mergeRequest, clickUp, clickUpTask, clickUpTaskId, gitLabProject, } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
+            const path = (0, path_1.join)(node_shared_1.CONFIG.TaskTimeTrackFolder, `${clickUpTaskId}.csv`);
+            let timeEstimate = 0;
+            if ((0, fs_1.existsSync)(path)) {
+                const content = (0, fs_1.readFileSync)(path, { encoding: 'utf-8' });
+                timeEstimate += content
+                    .split('\n')
+                    .filter(Boolean)
+                    .map((line) => {
+                    const cells = line.split(',');
+                    return (0, date_fns_1.differenceInMilliseconds)((0, date_fns_1.parseISO)(cells[1]), (0, date_fns_1.parseISO)(cells[0]));
+                })
+                    .reduce((a, b) => a + b);
+            }
+            timeEstimate += yield new timing_app_class_1.TimingApp().getWorkingTimeInTask(clickUpTaskId, gitLabProject.path);
+            if (timeEstimate) {
+                yield clickUp.setTaskTimeEstimate(timeEstimate);
+            }
+            else {
+                console.warn('Time Estimate is zero!');
+            }
+        });
+    }
+}
+exports.SetTEAction = SetTEAction;
+
+
+/***/ }),
+
 /***/ "./apps/cli/src/actions/show-diff.action.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -2144,7 +2198,7 @@ class TaskProgressTracker extends base_file_ref_class_1.BaseFileRef {
     }
     setTime(taskId, type) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const content = this.readFile().trim();
+            let content = this.readFile().trim();
             const lines = content.split('\n').filter(Boolean);
             const lastRowCols = lines[lines.length - 1].split(',');
             const lastTaskId = lastRowCols[0];
@@ -2156,6 +2210,7 @@ class TaskProgressTracker extends base_file_ref_class_1.BaseFileRef {
                         return;
                     }
                     yield new pause_action_1.PauseAction().run(lastTaskId);
+                    content = this.readFile().trim();
                 }
                 addedContent += `\n${taskId},${new Date().toISOString()},`;
             }
@@ -4029,6 +4084,7 @@ const pause_action_1 = __webpack_require__("./apps/cli/src/actions/pause.action.
 const revert_end_action_1 = __webpack_require__("./apps/cli/src/actions/revert-end.action.ts");
 const routine_action_1 = __webpack_require__("./apps/cli/src/actions/routine.action.ts");
 const rtv_tasks_action_1 = __webpack_require__("./apps/cli/src/actions/rtv-tasks.action.ts");
+const set_te_action_1 = __webpack_require__("./apps/cli/src/actions/set-te.action.ts");
 const show_diff_action_1 = __webpack_require__("./apps/cli/src/actions/show-diff.action.ts");
 const start_review_action_1 = __webpack_require__("./apps/cli/src/actions/start-review.action.ts");
 const start_action_1 = __webpack_require__("./apps/cli/src/actions/start.action.ts");
@@ -4058,6 +4114,7 @@ const ACTIONS = [
     new revert_end_action_1.RevertEndAction(),
     new routine_action_1.RoutineAction(),
     new rtv_tasks_action_1.RTVTasksAction(),
+    new set_te_action_1.SetTEAction(),
     new show_diff_action_1.ShowDiffAction(),
     new start_action_1.StartAction(),
     new start_review_action_1.StartReviewAction(),
