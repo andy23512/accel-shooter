@@ -8,6 +8,7 @@ import { openUrlsInTabGroup } from '../utils';
 export class WorkAction extends Action {
   public command = 'work';
   public description = 'set up work space for first item in todo list';
+  public alias = 'wr';
   public async run() {
     const todo = new Todo();
     const todoContent = todo.readFile();

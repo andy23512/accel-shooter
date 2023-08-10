@@ -33,6 +33,7 @@ class CheckAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'check';
         this.description = 'do automate checking for current or specified task';
+        this.alias = 'c';
         this.arguments = [
             { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
         ];
@@ -75,6 +76,7 @@ class CloseAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'close';
         this.description = 'close current or specified task';
+        this.alias = 'cl';
         this.arguments = [
             { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
         ];
@@ -150,6 +152,7 @@ class CommitAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'commit';
         this.description = 'commit in convention';
+        this.alias = 'ci';
         this.arguments = [
             { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
         ];
@@ -255,6 +258,7 @@ class CopyAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'copy';
         this.description = 'copy a task in todo string format';
+        this.alias = 'cp';
         this.arguments = [
             { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
         ];
@@ -294,6 +298,7 @@ class DailyProgressAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'dailyProgress';
         this.description = 'generate daily progress report and export it to file and clipboard';
+        this.alias = 'dp';
         this.arguments = [{ name: '[day]', description: 'optional day' }];
     }
     run(dayArg) {
@@ -456,6 +461,7 @@ class DumpMyTasksAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'dumpMyTasks';
         this.description = 'dump my tasks to file';
+        this.alias = 'du';
     }
     run() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -491,6 +497,7 @@ class EndAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'end';
         this.description = 'end current or specified task';
+        this.alias = 'e';
         this.arguments = [
             { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
         ];
@@ -573,6 +580,7 @@ class FetchHolidayAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'fetchHoliday';
         this.description = 'fetch holiday data from api';
+        this.alias = 'fh';
     }
     run() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -611,6 +619,7 @@ class GenAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'gen';
         this.description = 'shorthand for nx angular generate command';
+        this.alias = 'g';
         this.arguments = [
             { name: 'generator', description: 'generator name' },
             { name: 'name', description: 'instance name' },
@@ -693,6 +702,7 @@ class ListDCAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'listDC';
         this.description = 'list running docker compose instances';
+        this.alias = 'ld';
     }
     run() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -726,6 +736,7 @@ class ListAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'list';
         this.description = 'show current or specified task name';
+        this.alias = 'l';
         this.arguments = [
             { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
         ];
@@ -760,6 +771,7 @@ class MeetingTrackAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'meetingTrack';
         this.description = 'track meeting of a day';
+        this.alias = 'mt';
         this.arguments = [{ name: '[day]', description: 'optional day' }];
     }
     run(dayArg) {
@@ -809,6 +821,7 @@ class OpenAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'open';
         this.description = 'open task todo page of current or specified task';
+        this.alias = 'o';
         this.arguments = [
             { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
         ];
@@ -843,6 +856,7 @@ class PauseAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'pause';
         this.description = 'pause a task (record end time in progress tracker)';
+        this.alias = 'p';
         this.arguments = [
             { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
         ];
@@ -878,6 +892,7 @@ class RevertEndAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'revertEnd';
         this.description = 'revert end state of a task';
+        this.alias = 're';
         this.arguments = [
             { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
         ];
@@ -941,6 +956,7 @@ class RoutineAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'routine';
         this.description = 'daily routine list';
+        this.alias = 'ro';
         this.arguments = [{ name: '[day]', description: 'optional day' }];
         this.options = [
             { flags: '-s, --skip-punch', description: 'skip punch item' },
@@ -1061,6 +1077,7 @@ class RTVTasksAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'RTVTasks';
         this.description = 'list ready to verify tasks';
+        this.alias = 'rtv';
     }
     run() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -1099,6 +1116,7 @@ class SetTEAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'setTE';
         this.description = 'set time estimate for current or specified task';
+        this.alias = 'st';
         this.arguments = [
             { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
         ];
@@ -1148,6 +1166,7 @@ class ShowDiffAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'showDiff';
         this.description = 'show diff of files in a task';
+        this.alias = 'sd';
         this.arguments = [
             { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
         ];
@@ -1200,6 +1219,7 @@ class StartReviewAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'startReview';
         this.description = 'start review current or specified task';
+        this.alias = 'sr';
         this.arguments = [
             { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
         ];
@@ -1240,6 +1260,7 @@ class StartAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'start';
         this.description = 'start a task';
+        this.alias = 's';
     }
     run() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -1395,6 +1416,7 @@ class SwitchAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'switch';
         this.description = 'switch to a task';
+        this.alias = 'sw';
         this.arguments = [
             { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
         ];
@@ -1444,6 +1466,7 @@ class TimeAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'time';
         this.description = 'copy current time';
+        this.alias = 'ti';
     }
     run() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -1470,6 +1493,7 @@ class TmpAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'tmp';
         this.description = 'temporary action for development testing';
+        this.alias = 't';
     }
     run() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -1499,6 +1523,7 @@ class TodoAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'toDo';
         this.description = 'generate todo list';
+        this.alias = 'td';
     }
     run() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -1547,6 +1572,7 @@ class TrackAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'track';
         this.description = 'track for merge request merge status and then change ClickUp task status';
+        this.alias = 'tr';
     }
     run() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -1581,6 +1607,7 @@ class WatchPipelineAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'watchPipeline';
         this.description = 'watch pipeline status of a merge request';
+        this.alias = 'wp';
         this.arguments = [
             { name: 'projectName', description: 'GitLab project name' },
             { name: 'mergeRequestIId', description: 'merge request iid' },
@@ -1631,6 +1658,7 @@ class WeeklyProgressAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'weeklyProgress';
         this.description = 'generate weekly progress report and copy it to clipboard';
+        this.alias = 'w';
         this.arguments = [
             { name: '[startDay]', description: 'optional start day of date range' },
         ];
@@ -1735,6 +1763,7 @@ class WorkAction extends action_class_1.Action {
         super(...arguments);
         this.command = 'work';
         this.description = 'set up work space for first item in todo list';
+        this.alias = 'wr';
     }
     run() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -1780,7 +1809,10 @@ class Action {
         this.options = [];
     }
     init(program) {
-        const command = program.command(this.command).description(this.description);
+        const command = program
+            .command(this.command)
+            .alias(this.alias)
+            .description(this.description);
         this.arguments.forEach(({ name, description }) => {
             command.argument(name, description);
         });
@@ -1795,6 +1827,7 @@ exports.Action = Action;
 export class Action extends Action {
   public command = '';
   public description = '';
+  public alias = '';
   public arguments = [{ name: '', description: '' }];
   public options = [{ flags: '', description: '' }];
   public async run() {}

@@ -5,6 +5,7 @@ import { getInfoFromArgument } from '../utils';
 export class RevertEndAction extends Action {
   public command = 'revertEnd';
   public description = 'revert end state of a task';
+  public alias = 're';
   public arguments = [
     { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
   ];

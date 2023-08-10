@@ -9,6 +9,7 @@ import { PauseAction } from './pause.action';
 export class CloseAction extends Action {
   public command = 'close';
   public description = 'close current or specified task';
+  public alias = 'cl';
   public arguments = [
     { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
   ];

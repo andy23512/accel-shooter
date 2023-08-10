@@ -7,6 +7,7 @@ import { getInfoFromArgument } from '../utils';
 export class PauseAction extends Action {
   public command = 'pause';
   public description = 'pause a task (record end time in progress tracker)';
+  public alias = 'p';
   public arguments = [
     { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
   ];

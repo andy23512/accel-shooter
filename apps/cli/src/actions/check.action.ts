@@ -5,6 +5,7 @@ import { getInfoFromArgument } from '../utils';
 export class CheckAction extends Action {
   public command = 'check';
   public description = 'do automate checking for current or specified task';
+  public alias = 'c';
   public arguments = [
     { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
   ];

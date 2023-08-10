@@ -10,6 +10,7 @@ import { getInfoFromArgument } from '../utils';
 export class SetTEAction extends Action {
   public command = 'setTE';
   public description = 'set time estimate for current or specified task';
+  public alias = 'st';
   public arguments = [
     { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
   ];

@@ -1,6 +1,6 @@
 import { ClickUp, formatDate } from '@accel-shooter/node-shared';
 import clipboardy from 'clipboardy';
-import { add, compareAsc, endOfDay, startOfDay } from 'date-fns';
+import { add, compareAsc, startOfDay } from 'date-fns';
 import { groupBy, prop } from 'ramda';
 import { Action } from '../classes/action.class';
 import { DailyProgress } from '../classes/daily-progress.class';
@@ -11,6 +11,7 @@ export class WeeklyProgressAction extends Action {
   public command = 'weeklyProgress';
   public description =
     'generate weekly progress report and copy it to clipboard';
+  public alias = 'w';
   public arguments = [
     { name: '[startDay]', description: 'optional start day of date range' },
   ];

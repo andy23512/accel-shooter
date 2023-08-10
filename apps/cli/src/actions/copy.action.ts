@@ -6,6 +6,7 @@ import { getInfoFromArgument } from '../utils';
 export class CopyAction extends Action {
   public command = 'copy';
   public description = 'copy a task in todo string format';
+  public alias = 'cp';
   public arguments = [
     { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
   ];

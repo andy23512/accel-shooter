@@ -7,6 +7,7 @@ import { promiseSpawn } from '../utils';
 export class GenAction extends Action {
   public command = 'gen';
   public description = 'shorthand for nx angular generate command';
+  public alias = 'g';
   public arguments = [
     { name: 'generator', description: 'generator name' },
     { name: 'name', description: 'instance name' },

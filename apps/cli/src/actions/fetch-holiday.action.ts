@@ -8,6 +8,7 @@ import { Holiday } from '../classes/holiday.class';
 export class FetchHolidayAction extends Action {
   public command = 'fetchHoliday';
   public description = 'fetch holiday data from api';
+  public alias = 'fh';
   public async run() {
     let page = 0;
     let holidays: IHoliday[] = [];

@@ -13,6 +13,7 @@ import { OpenAction } from './open.action';
 export class SwitchAction extends Action {
   public command = 'switch';
   public description = 'switch to a task';
+  public alias = 'sw';
   public arguments = [
     { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
   ];

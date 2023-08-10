@@ -5,6 +5,7 @@ import { Action } from '../classes/action.class';
 export class DumpMyTasksAction extends Action {
   public command = 'dumpMyTasks';
   public description = 'dump my tasks to file';
+  public alias = 'du';
   public async run() {
     const mySummarizedTasks = await ClickUp.getMySummarizedTasks();
     writeFileSync(

@@ -30,6 +30,7 @@ export function confirm(question: string) {
 export class RoutineAction extends Action {
   public command = 'routine';
   public description = 'daily routine list';
+  public alias = 'ro';
   public arguments = [{ name: '[day]', description: 'optional day' }];
   public options = [
     { flags: '-s, --skip-punch', description: 'skip punch item' },

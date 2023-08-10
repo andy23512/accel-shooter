@@ -8,6 +8,7 @@ export class TrackAction extends Action {
   public command = 'track';
   public description =
     'track for merge request merge status and then change ClickUp task status';
+  public alias = 'tr';
   public async run() {
     locker.lock(LockType.First);
     locker.on('locked', () => {

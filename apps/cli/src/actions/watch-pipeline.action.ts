@@ -5,6 +5,7 @@ import { displayNotification, getGitLabProjectConfigByName } from '../utils';
 export class WatchPipelineAction extends Action {
   public command = 'watchPipeline';
   public description = 'watch pipeline status of a merge request';
+  public alias = 'wp';
   public arguments = [
     { name: 'projectName', description: 'GitLab project name' },
     { name: 'mergeRequestIId', description: 'merge request iid' },

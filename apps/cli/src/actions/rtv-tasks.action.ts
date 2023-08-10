@@ -4,6 +4,7 @@ import { Action } from '../classes/action.class';
 export class RTVTasksAction extends Action {
   public command = 'RTVTasks';
   public description = 'list ready to verify tasks';
+  public alias = 'rtv';
   public async run() {
     const user = (await ClickUp.getCurrentUser()).user;
     const team = (await ClickUp.getTeams()).teams.find(

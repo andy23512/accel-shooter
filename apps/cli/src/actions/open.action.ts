@@ -4,6 +4,7 @@ import { getInfoFromArgument, openUrlsInTabGroup } from '../utils';
 export class OpenAction extends Action {
   public command = 'open';
   public description = 'open task todo page of current or specified task';
+  public alias = 'o';
   public arguments = [
     { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
   ];

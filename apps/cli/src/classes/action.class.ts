@@ -3,11 +3,15 @@ import { Command } from 'commander';
 export abstract class Action {
   public abstract command: string;
   public abstract description: string;
+  public abstract alias: string;
   public arguments: { name: string; description: string }[] = [];
   public options: { flags: string; description: string }[] = [];
   public abstract run(...args: any[]): Promise<void>;
   public init(program: Command) {
-    const command = program.command(this.command).description(this.description);
+    const command = program
+      .command(this.command)
+      .alias(this.alias)
+      .description(this.description);
     this.arguments.forEach(({ name, description }) => {
       command.argument(name, description);
     });
@@ -22,6 +26,7 @@ export abstract class Action {
 export class Action extends Action {
   public command = '';
   public description = '';
+  public alias = '';
   public arguments = [{ name: '', description: '' }];
   public options = [{ flags: '', description: '' }];
   public async run() {}

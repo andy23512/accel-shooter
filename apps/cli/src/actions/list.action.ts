@@ -4,6 +4,7 @@ import { getInfoFromArgument } from '../utils';
 export class ListAction extends Action {
   public command = 'list';
   public description = 'show current or specified task name';
+  public alias = 'l';
   public arguments = [
     { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
   ];

@@ -7,6 +7,7 @@ import { renderTodoList } from '../utils';
 export class TodoAction extends Action {
   public command = 'toDo';
   public description = 'generate todo list';
+  public alias = 'td';
   public async run() {
     const answers = await inquirer.prompt([
       {

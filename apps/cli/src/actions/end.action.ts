@@ -13,6 +13,7 @@ import { PauseAction } from './pause.action';
 export class EndAction extends Action {
   public command = 'end';
   public description = 'end current or specified task';
+  public alias = 'e';
   public arguments = [
     { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
   ];

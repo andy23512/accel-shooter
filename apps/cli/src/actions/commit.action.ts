@@ -31,6 +31,7 @@ function preprocess(path: string) {
 export class CommitAction extends Action {
   public command = 'commit';
   public description = 'commit in convention';
+  public alias = 'ci';
   public arguments = [
     { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
   ];

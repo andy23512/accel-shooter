@@ -27,6 +27,7 @@ import { OpenAction } from './open.action';
 export class StartAction extends Action {
   public command = 'start';
   public description = 'start a task';
+  public alias = 's';
   public async run() {
     const repoName = getRepoName();
     const index = CONFIG.GitLabProjects.findIndex((p) =>

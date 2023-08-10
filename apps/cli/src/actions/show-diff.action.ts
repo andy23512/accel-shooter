@@ -4,6 +4,7 @@ import { getInfoFromArgument } from '../utils';
 export class ShowDiffAction extends Action {
   public command = 'showDiff';
   public description = 'show diff of files in a task';
+  public alias = 'sd';
   public arguments = [
     { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
   ];

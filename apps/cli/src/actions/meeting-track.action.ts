@@ -8,6 +8,7 @@ import { displayNotification, getDayFromArgument } from '../utils';
 export class MeetingTrackAction extends Action {
   public command = 'meetingTrack';
   public description = 'track meeting of a day';
+  public alias = 'mt';
   public arguments = [{ name: '[day]', description: 'optional day' }];
   public async run(dayArg: string) {
     // get meetings

@@ -20,6 +20,7 @@ export class DailyProgressAction extends Action {
   public command = 'dailyProgress';
   public description =
     'generate daily progress report and export it to file and clipboard';
+  public alias = 'dp';
   public arguments = [{ name: '[day]', description: 'optional day' }];
   public async run(dayArg: string) {
     const p = new CustomProgressLog('Daily Progress', [
