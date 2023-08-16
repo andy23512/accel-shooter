@@ -544,7 +544,7 @@ class EndAction extends action_class_1.Action {
             }
             timeEstimate += yield new timing_app_class_1.TimingApp().getWorkingTimeInTask(clickUpTaskId, gitLabProject.path);
             if (timeEstimate) {
-                yield clickUp.setTaskTimeEstimate(timeEstimate);
+                yield clickUp.setTaskTimeEstimate(Math.round(timeEstimate));
             }
             else {
                 console.warn('Time Estimate is zero!');

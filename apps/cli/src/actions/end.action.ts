@@ -77,7 +77,7 @@ export class EndAction extends Action {
       gitLabProject.path
     );
     if (timeEstimate) {
-      await clickUp.setTaskTimeEstimate(timeEstimate);
+      await clickUp.setTaskTimeEstimate(Math.round(timeEstimate));
     } else {
       console.warn('Time Estimate is zero!');
     }
