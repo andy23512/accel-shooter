@@ -2310,7 +2310,7 @@ class TimingApp {
                 .filter((r) => {
                 const startHour = r.startDate.getHours();
                 const endHour = r.endDate.getHours();
-                return startHour >= 9 && startHour < 19 && endHour >= 9 && endHour < 19;
+                return startHour >= 9 && startHour < 18 && endHour >= 9 && endHour < 18;
             })
                 .filter((r) => {
                 var _a, _b, _c, _d, _e, _f;
