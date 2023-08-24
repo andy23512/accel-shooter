@@ -32,6 +32,7 @@ export class EndAction extends Action {
       'Update GitLab Merge Request Ready Status and Assignee',
       'Update ClickUp Task Status',
       'Set ClickUp Task Time Estimate',
+      'Set ClickUp Task Due Date',
       'Close Tab Group',
       'Remove Todo',
     ]);
@@ -81,6 +82,8 @@ export class EndAction extends Action {
     } else {
       console.warn('Time Estimate is zero!');
     }
+    p.next(); // Set ClickUp Task Due Date
+    await clickUp.setTaskDueDateToToday();
     p.next(); // Close Tab Group
     openUrlsInTabGroup([], clickUpTaskId);
     p.next(); // Remove Todo
