@@ -1344,8 +1344,8 @@ class StartAction extends action_class_1.Action {
                 'Create Checklist at ClickUp',
                 'Add Todo Entry',
                 'Add Tracker Item',
-                'Do Git Fetch and Checkout',
                 'Start Task Progress Tracker',
+                'Do Git Fetch and Checkout',
             ]);
             process.chdir(answers.gitLabProject.path.replace('~', os_1.default.homedir()));
             yield (0, utils_1.checkWorkingTreeClean)();
@@ -1382,6 +1382,8 @@ class StartAction extends action_class_1.Action {
             new todo_class_1.Todo().addTodo(todoString);
             p.next(); // Add Tracker Item
             new tracker_class_1.Tracker().addItem(answers.clickUpTaskId);
+            p.next(); // Start Task Progress Tracker
+            yield new task_progress_tracker_class_1.TaskProgressTracker().setTime(answers.clickUpTaskId, 'start');
             p.next(); // Do Git Fetch and Checkout
             process.chdir(answers.gitLabProject.path.replace('~', os_1.default.homedir()));
             yield (0, utils_1.promiseSpawn)('git', ['fetch'], 'pipe');
@@ -1389,8 +1391,6 @@ class StartAction extends action_class_1.Action {
             yield (0, utils_1.promiseSpawn)('git', ['checkout', gitLabBranch.name], 'pipe');
             yield (0, utils_1.promiseSpawn)('git', ['submodule', 'update', '--init', '--recursive'], 'pipe');
             yield new open_action_1.OpenAction().run(answers.clickUpTaskId);
-            p.next(); // Start Task Progress Tracker
-            yield new task_progress_tracker_class_1.TaskProgressTracker().setTime(answers.clickUpTaskId, 'start');
             p.end(0);
         });
     }
@@ -2313,7 +2313,7 @@ class TimingApp {
                 .filter((r) => {
                 const startHour = r.startDate.getHours();
                 const endHour = r.endDate.getHours();
-                return startHour >= 9 && startHour < 18 && endHour >= 9 && endHour < 18;
+                return startHour >= 9 && startHour < 19 && endHour >= 9 && endHour < 19;
             })
                 .filter((r) => {
                 var _a, _b, _c, _d, _e, _f;

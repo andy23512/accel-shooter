@@ -111,8 +111,8 @@ export class StartAction extends Action {
       'Create Checklist at ClickUp',
       'Add Todo Entry',
       'Add Tracker Item',
-      'Do Git Fetch and Checkout',
       'Start Task Progress Tracker',
+      'Do Git Fetch and Checkout',
     ]);
     process.chdir(answers.gitLabProject.path.replace('~', os.homedir()));
     await checkWorkingTreeClean();
@@ -165,6 +165,8 @@ export class StartAction extends Action {
     new Todo().addTodo(todoString);
     p.next(); // Add Tracker Item
     new Tracker().addItem(answers.clickUpTaskId);
+    p.next(); // Start Task Progress Tracker
+    await new TaskProgressTracker().setTime(answers.clickUpTaskId, 'start');
     p.next(); // Do Git Fetch and Checkout
     process.chdir(answers.gitLabProject.path.replace('~', os.homedir()));
     await promiseSpawn('git', ['fetch'], 'pipe');
@@ -176,8 +178,6 @@ export class StartAction extends Action {
       'pipe'
     );
     await new OpenAction().run(answers.clickUpTaskId);
-    p.next(); // Start Task Progress Tracker
-    await new TaskProgressTracker().setTime(answers.clickUpTaskId, 'start');
     p.end(0);
   }
 }
