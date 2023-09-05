@@ -43,11 +43,6 @@ export class TimingApp {
           holiday.checkIsWorkday(r.startDate) &&
           holiday.checkIsWorkday(r.endDate)
       )
-      .filter((r) => {
-        const startHour = r.startDate.getHours();
-        const endHour = r.endDate.getHours();
-        return startHour >= 9 && startHour < 19 && endHour >= 9 && endHour < 19;
-      })
       .filter(
         (r) =>
           (r.application === 'Code - Insiders' &&
