@@ -2311,6 +2311,11 @@ class TimingApp {
                 .filter((r) => holiday.checkIsWorkday(r.startDate) &&
                 holiday.checkIsWorkday(r.endDate))
                 .filter((r) => {
+                const startHour = r.startDate.getHours();
+                const endHour = r.endDate.getHours();
+                return startHour >= 9 && startHour < 19 && endHour >= 9 && endHour < 19;
+            })
+                .filter((r) => {
                 var _a, _b, _c, _d, _e, _f;
                 return (r.application === 'Code - Insiders' &&
                     ((_a = r.path) === null || _a === void 0 ? void 0 : _a.includes(gitLabProjectPath))) ||
