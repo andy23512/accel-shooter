@@ -877,6 +877,7 @@ class Google {
         });
     }
     listAttendingEvent(timeMin, timeMax) {
+        var _a;
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             try {
                 const auth = yield this.authorize();
@@ -896,7 +897,7 @@ class Google {
                     }
                     const self = event.attendees.find((a) => a.self);
                     return !self || self.responseStatus !== 'declined';
-                })) || [];
+                }).map((e) => (Object.assign(Object.assign({}, e), { isStudyGroup: false })))) || [];
                 const studyGroupRes = yield calendar.events.list({
                     calendarId: config_1.CONFIG.StudyGroupGoogleCalendarId,
                     timeMin,
@@ -905,7 +906,8 @@ class Google {
                     singleEvents: true,
                     orderBy: 'startTime',
                 });
-                const studyGroupEvents = studyGroupRes.data.items || [];
+                const studyGroupEvents = ((_a = studyGroupRes.data.items) === null || _a === void 0 ? void 0 : _a.map((e) => (Object.assign(Object.assign({}, e), { isStudyGroup: true })))) ||
+                    [];
                 const allEvents = attendingEvents.concat(studyGroupEvents);
                 allEvents.sort((a, b) => {
                     var _a, _b;

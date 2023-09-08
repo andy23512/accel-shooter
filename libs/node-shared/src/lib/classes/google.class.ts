@@ -55,7 +55,7 @@ export class Google {
   public async listAttendingEvent(
     timeMin: string,
     timeMax: string
-  ): Promise<calendar_v3.Schema$Event[]> {
+  ): Promise<(calendar_v3.Schema$Event & { isStudyGroup: boolean })[]> {
     try {
       const auth = await this.authorize();
       const calendar = google.calendar({ version: 'v3', auth });
@@ -69,13 +69,15 @@ export class Google {
       });
       const events = res.data.items;
       const attendingEvents =
-        events?.filter((event) => {
-          if (!event.attendees) {
-            return true;
-          }
-          const self = event.attendees.find((a) => a.self);
-          return !self || self.responseStatus !== 'declined';
-        }) || [];
+        events
+          ?.filter((event) => {
+            if (!event.attendees) {
+              return true;
+            }
+            const self = event.attendees.find((a) => a.self);
+            return !self || self.responseStatus !== 'declined';
+          })
+          .map((e) => ({ ...e, isStudyGroup: false })) || [];
       const studyGroupRes = await calendar.events.list({
         calendarId: CONFIG.StudyGroupGoogleCalendarId,
         timeMin,
@@ -84,7 +86,9 @@ export class Google {
         singleEvents: true,
         orderBy: 'startTime',
       });
-      const studyGroupEvents = studyGroupRes.data.items || [];
+      const studyGroupEvents =
+        studyGroupRes.data.items.map((e) => ({ ...e, isStudyGroup: true })) ||
+        [];
       const allEvents = attendingEvents.concat(studyGroupEvents);
       allEvents.sort((a, b) =>
         a.start?.dateTime && b.start?.dateTime
