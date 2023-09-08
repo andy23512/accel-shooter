@@ -3352,7 +3352,7 @@ class Google {
                         return true;
                     }
                     const self = event.attendees.find((a) => a.self);
-                    return !self || self.responseStatus !== 'declined';
+                    return !self || self.responseStatus === 'accepted';
                 }).map((e) => (Object.assign(Object.assign({}, e), { isStudyGroup: false })))) || [];
                 const studyGroupRes = yield calendar.events.list({
                     calendarId: config_1.CONFIG.StudyGroupGoogleCalendarId,

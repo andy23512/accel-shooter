@@ -75,7 +75,7 @@ export class Google {
               return true;
             }
             const self = event.attendees.find((a) => a.self);
-            return !self || self.responseStatus !== 'declined';
+            return !self || self.responseStatus === 'accepted';
           })
           .map((e) => ({ ...e, isStudyGroup: false })) || [];
       const studyGroupRes = await calendar.events.list({
@@ -87,7 +87,7 @@ export class Google {
         orderBy: 'startTime',
       });
       const studyGroupEvents =
-        studyGroupRes.data.items.map((e) => ({ ...e, isStudyGroup: true })) ||
+        studyGroupRes.data.items?.map((e) => ({ ...e, isStudyGroup: true })) ||
         [];
       const allEvents = attendingEvents.concat(studyGroupEvents);
       allEvents.sort((a, b) =>
