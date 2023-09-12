@@ -38,29 +38,32 @@ export class TimingApp {
             (e[1] <= endDate && e[2] >= endDate)
         );
       })
-      .filter(
-        (r) =>
-          holiday.checkIsWorkday(r.startDate) &&
-          holiday.checkIsWorkday(r.endDate)
-      )
       .filter((r) => {
+        const isWorkday =
+          holiday.checkIsWorkday(r.startDate) &&
+          holiday.checkIsWorkday(r.endDate);
         const startHour = r.startDate.getHours();
         const endHour = r.endDate.getHours();
-        return startHour >= 9 && startHour < 19 && endHour >= 9 && endHour < 19;
-      })
-      .filter(
-        (r) =>
+        const inWorkHour =
+          isWorkday &&
+          startHour >= 9 &&
+          startHour < 18 &&
+          endHour >= 9 &&
+          endHour < 18;
+        return (
+          (inWorkHour &&
+            (r.application === 'iTerm2' ||
+              (r.application === 'Brave Browser' &&
+                (r.path?.includes('localhost') ||
+                  r.path?.includes('app.clickup.com') ||
+                  r.path?.includes('github.com') ||
+                  r.path?.includes('figma.com') ||
+                  r.path?.includes('gitlab.com'))) ||
+              r.project === 'Development')) ||
           (r.application === 'Code - Insiders' &&
-            r.path?.includes(gitLabProjectPath)) ||
-          r.application === 'iTerm2' ||
-          (r.application === 'Brave Browser' &&
-            (r.path?.includes('localhost') ||
-              r.path?.includes('app.clickup.com') ||
-              r.path?.includes('github.com') ||
-              r.path?.includes('figma.com') ||
-              r.path?.includes('gitlab.com'))) ||
-          r.project === 'Development'
-      );
+            r.path?.includes(gitLabProjectPath))
+        );
+      });
     return workingRecords.reduce((acc, cur) => acc + cur.duration, 0) * 1000;
   }
 
