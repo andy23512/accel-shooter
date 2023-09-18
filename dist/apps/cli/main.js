@@ -2319,7 +2319,8 @@ class TimingApp {
                     endHour < 18;
                 return ((inWorkHour &&
                     (r.application === 'iTerm2' ||
-                        (r.application === 'Brave Browser' &&
+                        ((r.application === 'Brave Browser' ||
+                            r.application === 'Google Chrome') &&
                             (((_a = r.path) === null || _a === void 0 ? void 0 : _a.includes('localhost')) ||
                                 ((_b = r.path) === null || _b === void 0 ? void 0 : _b.includes('app.clickup.com')) ||
                                 ((_c = r.path) === null || _c === void 0 ? void 0 : _c.includes('github.com')) ||
