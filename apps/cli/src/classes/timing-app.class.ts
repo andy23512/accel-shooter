@@ -39,28 +39,16 @@ export class TimingApp {
         );
       })
       .filter((r) => {
-        const isWorkday =
-          holiday.checkIsWorkday(r.startDate) &&
-          holiday.checkIsWorkday(r.endDate);
-        const startHour = r.startDate.getHours();
-        const endHour = r.endDate.getHours();
-        const inWorkHour =
-          isWorkday &&
-          startHour >= 9 &&
-          startHour < 18 &&
-          endHour >= 9 &&
-          endHour < 18;
         return (
-          (inWorkHour &&
-            (r.application === 'iTerm2' ||
-              ((r.application === 'Brave Browser' ||
-                r.application === 'Google Chrome') &&
-                (r.path?.includes('localhost') ||
-                  r.path?.includes('app.clickup.com') ||
-                  r.path?.includes('github.com') ||
-                  r.path?.includes('figma.com') ||
-                  r.path?.includes('gitlab.com'))) ||
-              r.project === 'Development')) ||
+          r.application === 'iTerm2' ||
+          ((r.application === 'Brave Browser' ||
+            r.application === 'Google Chrome') &&
+            (r.path?.includes('localhost') ||
+              r.path?.includes('app.clickup.com') ||
+              r.path?.includes('github.com') ||
+              r.path?.includes('figma.com') ||
+              r.path?.includes('gitlab.com'))) ||
+          r.project === 'Development' ||
           (r.application === 'Code - Insiders' &&
             r.path?.includes(gitLabProjectPath))
         );

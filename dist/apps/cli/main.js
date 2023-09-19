@@ -2308,25 +2308,15 @@ class TimingApp {
             })
                 .filter((r) => {
                 var _a, _b, _c, _d, _e, _f;
-                const isWorkday = holiday.checkIsWorkday(r.startDate) &&
-                    holiday.checkIsWorkday(r.endDate);
-                const startHour = r.startDate.getHours();
-                const endHour = r.endDate.getHours();
-                const inWorkHour = isWorkday &&
-                    startHour >= 9 &&
-                    startHour < 18 &&
-                    endHour >= 9 &&
-                    endHour < 18;
-                return ((inWorkHour &&
-                    (r.application === 'iTerm2' ||
-                        ((r.application === 'Brave Browser' ||
-                            r.application === 'Google Chrome') &&
-                            (((_a = r.path) === null || _a === void 0 ? void 0 : _a.includes('localhost')) ||
-                                ((_b = r.path) === null || _b === void 0 ? void 0 : _b.includes('app.clickup.com')) ||
-                                ((_c = r.path) === null || _c === void 0 ? void 0 : _c.includes('github.com')) ||
-                                ((_d = r.path) === null || _d === void 0 ? void 0 : _d.includes('figma.com')) ||
-                                ((_e = r.path) === null || _e === void 0 ? void 0 : _e.includes('gitlab.com')))) ||
-                        r.project === 'Development')) ||
+                return (r.application === 'iTerm2' ||
+                    ((r.application === 'Brave Browser' ||
+                        r.application === 'Google Chrome') &&
+                        (((_a = r.path) === null || _a === void 0 ? void 0 : _a.includes('localhost')) ||
+                            ((_b = r.path) === null || _b === void 0 ? void 0 : _b.includes('app.clickup.com')) ||
+                            ((_c = r.path) === null || _c === void 0 ? void 0 : _c.includes('github.com')) ||
+                            ((_d = r.path) === null || _d === void 0 ? void 0 : _d.includes('figma.com')) ||
+                            ((_e = r.path) === null || _e === void 0 ? void 0 : _e.includes('gitlab.com')))) ||
+                    r.project === 'Development' ||
                     (r.application === 'Code - Insiders' &&
                         ((_f = r.path) === null || _f === void 0 ? void 0 : _f.includes(gitLabProjectPath))));
             });
