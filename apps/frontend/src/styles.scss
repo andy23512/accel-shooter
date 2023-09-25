@@ -19,15 +19,11 @@ $frontend-warn: mat.define-palette(mat.$red-palette);
 
 // Create the theme object. A theme consists of configurations for individual
 // theming systems such as "color" or "typography".
-$frontend-theme: mat.define-light-theme(
-  (
-    color: (
-      primary: $frontend-primary,
-      accent: $frontend-accent,
-      warn: $frontend-warn,
-    ),
-  )
-);
+$frontend-theme: mat.define-light-theme((color: (primary: $frontend-primary,
+        accent: $frontend-accent,
+        warn: $frontend-warn,
+      ),
+    ));
 
 // Include theme styles for core and each component used in your app.
 // Alternatively, you can import and @include the theme mixins for each component
@@ -39,6 +35,7 @@ $frontend-theme: mat.define-light-theme(
 
 @import 'codemirror/lib/codemirror';
 @import './one-dark';
+@import 'darkreader.css';
 
 html,
 body {
@@ -55,46 +52,57 @@ body {
   -webkit-overflow-scrolling: touch;
   height: 100vh;
 }
+
 /* support japanese font */
 .CodeMirror[lang^='ja'] {
   font-family: 'Source Code Pro', Consolas, monaco, Meiryo, 'ＭＳ ゴシック',
     'MS Gothic', monospace;
 }
+
 /* support zh-tw font */
 .CodeMirror[lang='zh-tw'] {
   font-family: 'Source Code Pro', Consolas, monaco, 'Microsoft JhengHei',
     '微軟正黑', monospace;
 }
+
 /* support zh-cn font */
 .CodeMirror[lang='zh-cn'] {
   font-family: 'Source Code Pro', Consolas, monaco, 'Microsoft YaHei',
     '微软雅黑', monospace;
 }
+
 .CodeMirror-placeholder {
   color: #777 !important;
 }
+
 .CodeMirror-scroll {
   overflow-x: hidden !important;
   overflow-y: auto !important;
 }
+
 .CodeMirror-code {
   /*padding-bottom: 36px;*/
 }
+
 .CodeMirror-gutter-elt {
   text-align: center;
 }
+
 .CodeMirror-linenumber {
   /*    opacity: 0.5;*/
   min-width: 1.5em;
   text-align: right;
 }
+
 .CodeMirror-gutter.authorship-gutters {
   width: 8px;
 }
+
 .CodeMirror-matchingtag {
   background: rgba(255, 255, 255, 0.1);
   line-height: 1em;
 }
+
 .CodeMirror-foldmarker {
   color: #d0d0d0;
   text-shadow: none;
@@ -105,39 +113,48 @@ body {
   margin: 2px;
   padding-bottom: 2px;
 }
+
 .CodeMirror-foldgutter {
   /*width: 1em;*/
   cursor: default;
   line-height: 100%;
 }
+
 .CodeMirror-foldgutter-open,
 .CodeMirror-foldgutter-folded {
   line-height: 1em;
   cursor: pointer;
 }
+
 .CodeMirror-foldgutter-open {
   padding-top: 1px;
 }
+
 .CodeMirror-foldgutter-folded {
   padding-top: 2px;
 }
+
 .CodeMirror-foldgutter-open:after {
   content: '⌵';
   font-size: 1em;
   /*    opacity: 0.5;*/
 }
+
 .CodeMirror-foldgutter-folded:after {
   content: '+';
   font-size: 1em;
   font-weight: 700;
 }
+
 .CodeMirror-foldmarker,
 .CodeMirror-foldgutter-folded:after {
   color: #78b2f2 !important;
 }
+
 .CodeMirror-sizer {
   margin-bottom: 0px !important;
 }
+
 .CodeMirror-insert-match {
   background: lawngreen;
   border: 1px solid limegreen;
@@ -145,6 +162,7 @@ body {
   box-sizing: border-box;
   opacity: 0.5;
 }
+
 .CodeMirror-delete-match {
   background: indianred;
   border: 1px solid darkred;
@@ -165,6 +183,7 @@ html,
 body {
   height: 100%;
 }
+
 body {
   margin: 0;
   font-family: Roboto, 'Helvetica Neue', sans-serif;
