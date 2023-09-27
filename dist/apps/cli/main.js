@@ -1327,6 +1327,16 @@ class StartAction extends action_class_1.Action {
                     type: 'input',
                 },
                 {
+                    name: 'labels',
+                    message: 'Choose GitLab labels to add to Merge Request',
+                    type: 'checkbox',
+                    choices: ({ gitLabProject }) => tslib_1.__awaiter(this, void 0, void 0, function* () {
+                        return new node_shared_1.GitLab(gitLabProject.id)
+                            .listProjectLabels()
+                            .then((labels) => labels.map(({ name }) => name));
+                    }),
+                },
+                {
                     name: 'todoConfig',
                     message: 'Choose Preset To-do Config',
                     type: 'checkbox',
@@ -1349,9 +1359,9 @@ class StartAction extends action_class_1.Action {
             yield (0, utils_1.checkWorkingTreeClean)();
             const gitLab = new node_shared_1.GitLab(answers.gitLabProject.id);
             const clickUp = new node_shared_1.ClickUp(answers.clickUpTaskId);
+            const selectedGitLabLabels = answers.labels;
             p.start(); // Get ClickUp Task
             const clickUpTask = yield clickUp.getTask();
-            const clickUpTaskUrl = clickUpTask['url'];
             const gitLabMergeRequestTitle = answers.mergeRequestTitle;
             p.next(); // Set ClickUp Task Status
             yield clickUp.setTaskAsInProgressStatus();
@@ -1365,7 +1375,7 @@ class StartAction extends action_class_1.Action {
             yield (0, node_shared_1.sleep)(2000); // prevent "branch restored" bug
             const gitLabMergeRequest = yield gitLab.createMergeRequest(gitLabMergeRequestTitle + `__CU-${answers.clickUpTaskId}`, gitLabBranch.name, answers.gitLabProject.hasMergeRequestTemplate
                 ? yield gitLab.getMergeRequestTemplate()
-                : '', answers.targetBranch);
+                : '', selectedGitLabLabels, answers.targetBranch);
             const gitLabMergeRequestIId = gitLabMergeRequest.iid;
             p.next(); // Create Checklist at ClickUp
             const clickUpChecklistTitle = `Synced checklist [${answers.gitLabProject.id.replace('%2F', '/')} !${gitLabMergeRequestIId}]`;
@@ -3153,6 +3163,13 @@ class GitLab {
             return callApi('get', `/projects/${this.projectId}/pipelines/`, query);
         });
     }
+    listProjectLabels() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return callApi('get', `/projects/${this.projectId}/labels`, {
+                per_page: 100,
+            });
+        });
+    }
     createBranch(branch, targetBranch) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return callApi('post', `/projects/${this.projectId}/repository/branches`, null, {
@@ -3161,13 +3178,14 @@ class GitLab {
             });
         });
     }
-    createMergeRequest(title, branch, description, targetBranch) {
+    createMergeRequest(title, branch, description, labels, targetBranch) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return callApi('post', `/projects/${this.projectId}/merge_requests`, null, {
                 source_branch: branch,
                 target_branch: targetBranch || (yield this.getDefaultBranchName()),
                 title: `Draft: ${title}`,
                 description,
+                labels: labels.join(','),
             });
         });
     }

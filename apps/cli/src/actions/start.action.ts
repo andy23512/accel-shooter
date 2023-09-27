@@ -96,6 +96,15 @@ export class StartAction extends Action {
         type: 'input',
       },
       {
+        name: 'labels',
+        message: 'Choose GitLab labels to add to Merge Request',
+        type: 'checkbox',
+        choices: async ({ gitLabProject }: { gitLabProject: GitLabProject }) =>
+          new GitLab(gitLabProject.id)
+            .listProjectLabels()
+            .then((labels) => labels.map(({ name }) => name)),
+      },
+      {
         name: 'todoConfig',
         message: 'Choose Preset To-do Config',
         type: 'checkbox',
@@ -118,9 +127,9 @@ export class StartAction extends Action {
     await checkWorkingTreeClean();
     const gitLab = new GitLab(answers.gitLabProject.id);
     const clickUp = new ClickUp(answers.clickUpTaskId);
+    const selectedGitLabLabels: string[] = answers.labels;
     p.start(); // Get ClickUp Task
     const clickUpTask = await clickUp.getTask();
-    const clickUpTaskUrl = clickUpTask['url'];
     const gitLabMergeRequestTitle = answers.mergeRequestTitle;
     p.next(); // Set ClickUp Task Status
     await clickUp.setTaskAsInProgressStatus();
@@ -144,6 +153,7 @@ export class StartAction extends Action {
       answers.gitLabProject.hasMergeRequestTemplate
         ? await gitLab.getMergeRequestTemplate()
         : '',
+      selectedGitLabLabels,
       answers.targetBranch
     );
     const gitLabMergeRequestIId = gitLabMergeRequest.iid;

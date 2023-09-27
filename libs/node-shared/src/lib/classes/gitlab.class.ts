@@ -4,6 +4,7 @@ import { Commit } from '../models/gitlab/commit.models';
 import { Compare } from '../models/gitlab/compare.models';
 import { Event } from '../models/gitlab/event.models';
 import { Job } from '../models/gitlab/job.models';
+import { Label } from '../models/gitlab/label.models';
 import {
   FullMergeRequest,
   MergeRequestChanges,
@@ -97,6 +98,12 @@ export class GitLab {
     );
   }
 
+  public async listProjectLabels() {
+    return callApi<Label[]>('get', `/projects/${this.projectId}/labels`, {
+      per_page: 100,
+    });
+  }
+
   public async createBranch(branch: string, targetBranch?: string) {
     return callApi<Branch>(
       'post',
@@ -113,6 +120,7 @@ export class GitLab {
     title: string,
     branch: string,
     description: string,
+    labels: string[],
     targetBranch?: string
   ) {
     return callApi<MergeRequest>(
@@ -124,6 +132,7 @@ export class GitLab {
         target_branch: targetBranch || (await this.getDefaultBranchName()),
         title: `Draft: ${title}`,
         description,
+        labels: labels.join(','),
       }
     );
   }

@@ -703,6 +703,13 @@ class GitLab {
             return callApi('get', `/projects/${this.projectId}/pipelines/`, query);
         });
     }
+    listProjectLabels() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return callApi('get', `/projects/${this.projectId}/labels`, {
+                per_page: 100,
+            });
+        });
+    }
     createBranch(branch, targetBranch) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return callApi('post', `/projects/${this.projectId}/repository/branches`, null, {
@@ -711,13 +718,14 @@ class GitLab {
             });
         });
     }
-    createMergeRequest(title, branch, description, targetBranch) {
+    createMergeRequest(title, branch, description, labels, targetBranch) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             return callApi('post', `/projects/${this.projectId}/merge_requests`, null, {
                 source_branch: branch,
                 target_branch: targetBranch || (yield this.getDefaultBranchName()),
                 title: `Draft: ${title}`,
                 description,
+                labels: labels.join(','),
             });
         });
     }
