@@ -159,7 +159,7 @@ class CommitAction extends action_class_1.Action {
     }
     run(clickUpTaskIdArg) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const { mergeRequest } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg, false, true);
+            const { mergeRequest, gitLabProject } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg, false, true);
             if (mergeRequest) {
                 const title = mergeRequest.title;
                 if (!(title.startsWith('WIP: ') || title.startsWith('Draft: '))) {
@@ -181,7 +181,7 @@ class CommitAction extends action_class_1.Action {
             const commitScopeItems = commitScope.getItems(repoName);
             const bestMatchRatings = commitScopeItems.map((scope) => ({
                 scope,
-                score: getScopeScore(scope, stagedFiles),
+                score: getScopeScore(scope, stagedFiles, gitLabProject.projectType),
             }));
             bestMatchRatings.sort((a, b) => b.score - a.score);
             const presortedCommitScopeItems = bestMatchRatings.map((r) => r.scope);
@@ -218,7 +218,7 @@ class CommitAction extends action_class_1.Action {
     }
 }
 exports.CommitAction = CommitAction;
-function getScopeScore(scope, files) {
+function getScopeScore(scope, files, projectType) {
     if (scope === 'empty') {
         return 0;
     }
@@ -226,7 +226,7 @@ function getScopeScore(scope, files) {
         const folderPath = path_1.default.dirname(file).split('/');
         return (acc +
             scope.split('/').reduce((acc, si, i) => {
-                if (i === 0) {
+                if (projectType === 'full' && i === 0) {
                     if (si === folderPath[0]) {
                         return acc + 100;
                     }
@@ -490,6 +490,7 @@ const timing_app_class_1 = __webpack_require__("./apps/cli/src/classes/timing-ap
 const todo_class_1 = __webpack_require__("./apps/cli/src/classes/todo.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
 const pause_action_1 = __webpack_require__("./apps/cli/src/actions/pause.action.ts");
+const duration_fns_1 = __webpack_require__("duration-fns");
 class EndAction extends action_class_1.Action {
     constructor() {
         super(...arguments);
@@ -543,6 +544,7 @@ class EndAction extends action_class_1.Action {
             }
             timeEstimate += yield new timing_app_class_1.TimingApp().getWorkingTimeInTask(clickUpTaskId, gitLabProject.path);
             if (timeEstimate) {
+                console.log((0, date_fns_1.formatDuration)((0, duration_fns_1.normalize)({ seconds: Math.round(timeEstimate / 1000) })));
                 yield clickUp.setTaskTimeEstimate(Math.round(timeEstimate));
             }
             else {
@@ -3895,6 +3897,13 @@ module.exports = require("cron");
 /***/ ((module) => {
 
 module.exports = require("date-fns");
+
+/***/ }),
+
+/***/ "duration-fns":
+/***/ ((module) => {
+
+module.exports = require("duration-fns");
 
 /***/ }),
 

@@ -6,6 +6,7 @@ import path from 'path';
 import { Action } from '../classes/action.class';
 import { CommitScope } from '../classes/commit-scope.class';
 import { getInfoFromArgument, getRepoName, promiseSpawn } from '../utils';
+import { GitLabProject } from '@accel-shooter/node-shared';
 
 const TYPES = [
   { name: 'feat', short: 'f' },
@@ -36,7 +37,7 @@ export class CommitAction extends Action {
     { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
   ];
   public async run(clickUpTaskIdArg: string) {
-    const { mergeRequest } = await getInfoFromArgument(
+    const { mergeRequest, gitLabProject } = await getInfoFromArgument(
       clickUpTaskIdArg,
       false,
       true
@@ -64,7 +65,7 @@ export class CommitAction extends Action {
     const commitScopeItems = commitScope.getItems(repoName);
     const bestMatchRatings = commitScopeItems.map((scope) => ({
       scope,
-      score: getScopeScore(scope, stagedFiles),
+      score: getScopeScore(scope, stagedFiles, gitLabProject.projectType),
     }));
     bestMatchRatings.sort((a, b) => b.score - a.score);
     const presortedCommitScopeItems = bestMatchRatings.map((r) => r.scope);
@@ -106,7 +107,11 @@ export class CommitAction extends Action {
   }
 }
 
-function getScopeScore(scope: string, files: string[]) {
+function getScopeScore(
+  scope: string,
+  files: string[],
+  projectType: GitLabProject['projectType']
+) {
   if (scope === 'empty') {
     return 0;
   }
@@ -115,7 +120,7 @@ function getScopeScore(scope: string, files: string[]) {
     return (
       acc +
       scope.split('/').reduce((acc, si, i) => {
-        if (i === 0) {
+        if (projectType === 'full' && i === 0) {
           if (si === folderPath[0]) {
             return acc + 100;
           }

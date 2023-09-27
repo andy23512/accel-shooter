@@ -1,7 +1,7 @@
 import { CONFIG, normalizeClickUpChecklist } from '@accel-shooter/node-shared';
 import { Action } from '../classes/action.class';
 
-import { differenceInMilliseconds, parseISO } from 'date-fns';
+import { differenceInMilliseconds, parseISO, formatDuration } from 'date-fns';
 import { existsSync, readFileSync } from 'fs';
 import { join } from 'path';
 import { CustomProgressLog } from '../classes/progress-log.class';
@@ -9,6 +9,7 @@ import { TimingApp } from '../classes/timing-app.class';
 import { Todo } from '../classes/todo.class';
 import { getInfoFromArgument, openUrlsInTabGroup } from '../utils';
 import { PauseAction } from './pause.action';
+import { normalize as normalizeDuration } from 'duration-fns';
 
 export class EndAction extends Action {
   public command = 'end';
@@ -78,6 +79,11 @@ export class EndAction extends Action {
       gitLabProject.path
     );
     if (timeEstimate) {
+      console.log(
+        formatDuration(
+          normalizeDuration({ seconds: Math.round(timeEstimate / 1000) })
+        )
+      );
       await clickUp.setTaskTimeEstimate(Math.round(timeEstimate));
     } else {
       console.warn('Time Estimate is zero!');
