@@ -65,7 +65,7 @@ export class CommitAction extends Action {
     const commitScopeItems = commitScope.getItems(repoName);
     const bestMatchRatings = commitScopeItems.map((scope) => ({
       scope,
-      score: getScopeScore(scope, stagedFiles, gitLabProject.projectType),
+      score: getScopeScore(scope, stagedFiles, gitLabProject?.projectType),
     }));
     bestMatchRatings.sort((a, b) => b.score - a.score);
     const presortedCommitScopeItems = bestMatchRatings.map((r) => r.scope);

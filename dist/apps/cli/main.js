@@ -181,7 +181,7 @@ class CommitAction extends action_class_1.Action {
             const commitScopeItems = commitScope.getItems(repoName);
             const bestMatchRatings = commitScopeItems.map((scope) => ({
                 scope,
-                score: getScopeScore(scope, stagedFiles, gitLabProject.projectType),
+                score: getScopeScore(scope, stagedFiles, gitLabProject === null || gitLabProject === void 0 ? void 0 : gitLabProject.projectType),
             }));
             bestMatchRatings.sort((a, b) => b.score - a.score);
             const presortedCommitScopeItems = bestMatchRatings.map((r) => r.scope);
@@ -1455,6 +1455,9 @@ class SwitchAction extends action_class_1.Action {
                 yield new task_progress_tracker_class_1.TaskProgressTracker().setTime(clickUpTaskId, 'start');
                 yield (0, utils_1.promiseSpawn)('git', ['checkout', mergeRequest.source_branch], 'pipe');
                 yield new open_action_1.OpenAction().run(clickUpTaskId);
+            }
+            else {
+                yield new task_progress_tracker_class_1.TaskProgressTracker().setTime(clickUpTaskId, 'start');
             }
         });
     }

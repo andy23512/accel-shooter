@@ -44,6 +44,8 @@ export class SwitchAction extends Action {
         'pipe'
       );
       await new OpenAction().run(clickUpTaskId);
+    } else {
+      await new TaskProgressTracker().setTime(clickUpTaskId, 'start');
     }
   }
 }
