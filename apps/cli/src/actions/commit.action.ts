@@ -7,6 +7,7 @@ import { Action } from '../classes/action.class';
 import { CommitScope } from '../classes/commit-scope.class';
 import { getInfoFromArgument, getRepoName, promiseSpawn } from '../utils';
 import { GitLabProject } from '@accel-shooter/node-shared';
+import { TaskProgressTracker } from '../classes/task-progress-tracker.class';
 
 const TYPES = [
   { name: 'feat', short: 'f' },
@@ -37,11 +38,8 @@ export class CommitAction extends Action {
     { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
   ];
   public async run(clickUpTaskIdArg: string) {
-    const { mergeRequest, gitLabProject } = await getInfoFromArgument(
-      clickUpTaskIdArg,
-      false,
-      true
-    );
+    const { mergeRequest, gitLabProject, clickUpTaskId } =
+      await getInfoFromArgument(clickUpTaskIdArg, false, true);
     if (mergeRequest) {
       const title = mergeRequest.title;
       if (!(title.startsWith('WIP: ') || title.startsWith('Draft: '))) {
@@ -104,6 +102,9 @@ export class CommitAction extends Action {
       finalScope ? '(' + finalScope + ')' : ''
     }: ${subject}`;
     await promiseSpawn('git', ['commit', '-m', `"${message}"`], 'inherit');
+    if (clickUpTaskId) {
+      await new TaskProgressTracker().setTime(answers.clickUpTaskId, 'start');
+    }
   }
 }
 

@@ -128,6 +128,7 @@ const path_1 = tslib_1.__importDefault(__webpack_require__("path"));
 const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const commit_scope_class_1 = __webpack_require__("./apps/cli/src/classes/commit-scope.class.ts");
 const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
+const task_progress_tracker_class_1 = __webpack_require__("./apps/cli/src/classes/task-progress-tracker.class.ts");
 const TYPES = [
     { name: 'feat', short: 'f' },
     { name: 'fix', short: 'x' },
@@ -159,7 +160,7 @@ class CommitAction extends action_class_1.Action {
     }
     run(clickUpTaskIdArg) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const { mergeRequest, gitLabProject } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg, false, true);
+            const { mergeRequest, gitLabProject, clickUpTaskId } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg, false, true);
             if (mergeRequest) {
                 const title = mergeRequest.title;
                 if (!(title.startsWith('WIP: ') || title.startsWith('Draft: '))) {
@@ -214,6 +215,9 @@ class CommitAction extends action_class_1.Action {
             const finalScope = scope === 'empty' ? null : scope;
             const message = `${type}${finalScope ? '(' + finalScope + ')' : ''}: ${subject}`;
             yield (0, utils_1.promiseSpawn)('git', ['commit', '-m', `"${message}"`], 'inherit');
+            if (clickUpTaskId) {
+                yield new task_progress_tracker_class_1.TaskProgressTracker().setTime(answers.clickUpTaskId, 'start');
+            }
         });
     }
 }
@@ -2239,7 +2243,6 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.TaskProgressTracker = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
-const pause_action_1 = __webpack_require__("./apps/cli/src/actions/pause.action.ts");
 const base_file_ref_class_1 = __webpack_require__("./apps/cli/src/classes/base-file-ref.class.ts");
 class TaskProgressTracker extends base_file_ref_class_1.BaseFileRef {
     get path() {
@@ -2258,7 +2261,6 @@ class TaskProgressTracker extends base_file_ref_class_1.BaseFileRef {
                     if (lastTaskId === taskId) {
                         return;
                     }
-                    yield new pause_action_1.PauseAction().run(lastTaskId);
                     content = this.readFile().trim();
                 }
                 addedContent += `\n${taskId},${new Date().toISOString()},`;
