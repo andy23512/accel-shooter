@@ -103,7 +103,7 @@ export class CommitAction extends Action {
     }: ${subject}`;
     await promiseSpawn('git', ['commit', '-m', `"${message}"`], 'inherit');
     if (clickUpTaskId) {
-      await new TaskProgressTracker().setTime(answers.clickUpTaskId, 'start');
+      await new TaskProgressTracker().setTime(clickUpTaskId, 'start');
     }
   }
 }

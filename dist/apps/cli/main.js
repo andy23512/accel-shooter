@@ -216,7 +216,7 @@ class CommitAction extends action_class_1.Action {
             const message = `${type}${finalScope ? '(' + finalScope + ')' : ''}: ${subject}`;
             yield (0, utils_1.promiseSpawn)('git', ['commit', '-m', `"${message}"`], 'inherit');
             if (clickUpTaskId) {
-                yield new task_progress_tracker_class_1.TaskProgressTracker().setTime(answers.clickUpTaskId, 'start');
+                yield new task_progress_tracker_class_1.TaskProgressTracker().setTime(clickUpTaskId, 'start');
             }
         });
     }
