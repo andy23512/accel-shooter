@@ -19,6 +19,7 @@ export class TaskProgressTracker extends BaseFileRef {
         if (lastTaskId === taskId) {
           return;
         }
+        this.setTime(lastTaskId, 'end');
         content = this.readFile().trim();
       }
       addedContent += `\n${taskId},${new Date().toISOString()},`;

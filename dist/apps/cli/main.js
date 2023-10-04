@@ -2261,6 +2261,7 @@ class TaskProgressTracker extends base_file_ref_class_1.BaseFileRef {
                     if (lastTaskId === taskId) {
                         return;
                     }
+                    this.setTime(lastTaskId, 'end');
                     content = this.readFile().trim();
                 }
                 addedContent += `\n${taskId},${new Date().toISOString()},`;
