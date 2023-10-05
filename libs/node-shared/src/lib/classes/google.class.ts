@@ -89,14 +89,16 @@ export class Google {
       const studyGroupEvents =
         studyGroupRes.data.items?.map((e) => ({ ...e, isStudyGroup: true })) ||
         [];
-      const allEvents = attendingEvents.concat(studyGroupEvents);
+      const allEvents = attendingEvents
+        .filter((e) => !studyGroupEvents.some((se) => se.id === e.id))
+        .concat(studyGroupEvents);
       allEvents.sort((a, b) =>
         a.start?.dateTime && b.start?.dateTime
           ? parseISO(a.start.dateTime).valueOf() -
             parseISO(b.start.dateTime).valueOf()
           : 0
       );
-      return attendingEvents.concat(studyGroupEvents);
+      return allEvents;
     } catch (e: any) {
       if (e.response.data.error === 'invalid_grant') {
         console.log('Invalid Grant!');

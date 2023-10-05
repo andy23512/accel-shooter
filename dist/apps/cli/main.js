@@ -3384,7 +3384,9 @@ class Google {
                 });
                 const studyGroupEvents = ((_a = studyGroupRes.data.items) === null || _a === void 0 ? void 0 : _a.map((e) => (Object.assign(Object.assign({}, e), { isStudyGroup: true })))) ||
                     [];
-                const allEvents = attendingEvents.concat(studyGroupEvents);
+                const allEvents = attendingEvents
+                    .filter((e) => !studyGroupEvents.some((se) => se.id === e.id))
+                    .concat(studyGroupEvents);
                 allEvents.sort((a, b) => {
                     var _a, _b;
                     return ((_a = a.start) === null || _a === void 0 ? void 0 : _a.dateTime) && ((_b = b.start) === null || _b === void 0 ? void 0 : _b.dateTime)
@@ -3392,7 +3394,7 @@ class Google {
                             (0, date_fns_1.parseISO)(b.start.dateTime).valueOf()
                         : 0;
                 });
-                return attendingEvents.concat(studyGroupEvents);
+                return allEvents;
             }
             catch (e) {
                 if (e.response.data.error === 'invalid_grant') {
