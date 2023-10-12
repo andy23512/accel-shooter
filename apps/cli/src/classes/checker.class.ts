@@ -4,7 +4,7 @@ import inquirer from 'inquirer';
 import os from 'os';
 import { combineLatest, interval } from 'rxjs';
 import untildify from 'untildify';
-import { promiseSpawn } from '../utils';
+import { displayNotification, promiseSpawn } from '../utils';
 import { checkItemsMap } from './../consts/check-items.const';
 import { CheckItem } from './check-item.class';
 
@@ -138,6 +138,11 @@ export class Checker {
                 .join('\n\n'),
               () => {}
             );
+            displayNotification(
+              `Checker done. Found ${nonSuccessStatusList.length} error(s).`
+            );
+          } else {
+            displayNotification('Checker done. Found no error.');
           }
           console.log('');
         }

@@ -2046,6 +2046,10 @@ class Checker {
                         (0, fs_1.writeFile)((0, untildify_1.default)('~/ac-checker-log'), nonSuccessStatusList
                             .map((s) => `###### [${s.group}] ${s.name} ${s.code}\n${s.stdout}\n${s.stderr}`)
                             .join('\n\n'), () => { });
+                        (0, utils_1.displayNotification)(`Checker done. Found ${nonSuccessStatusList.length} error(s).`);
+                    }
+                    else {
+                        (0, utils_1.displayNotification)('Checker done. Found no error.');
                     }
                     console.log('');
                 }
