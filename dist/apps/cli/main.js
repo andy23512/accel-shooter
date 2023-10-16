@@ -990,6 +990,7 @@ class RoutineAction extends action_class_1.Action {
                     yield confirm('check tasks and todo done?');
                     yield confirm('run daily progress?');
                     yield new daily_progress_action_1.DailyProgressAction().run((0, node_shared_1.formatDate)(day));
+                    yield (0, utils_1.promiseSpawn)('open', ['-a', 'Slack']);
                     yield confirm('send dp to slack done?');
                 }
             }

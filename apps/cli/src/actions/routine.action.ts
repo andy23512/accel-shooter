@@ -6,7 +6,7 @@ import { CONFIG, formatDate, sleep } from '@accel-shooter/node-shared';
 import readline from 'readline';
 import { Action } from '../classes/action.class';
 import { Holiday } from '../classes/holiday.class';
-import { getDayFromArgument, openUrlsInTabGroup } from '../utils';
+import { getDayFromArgument, openUrlsInTabGroup, promiseSpawn } from '../utils';
 import { DailyProgressAction } from './daily-progress.action';
 import { DumpMyTasksAction } from './dump-my-tasks.action';
 
@@ -58,6 +58,7 @@ export class RoutineAction extends Action {
         await confirm('check tasks and todo done?');
         await confirm('run daily progress?');
         await new DailyProgressAction().run(formatDate(day));
+        await promiseSpawn('open', ['-a', 'Slack']);
         await confirm('send dp to slack done?');
       }
     }
