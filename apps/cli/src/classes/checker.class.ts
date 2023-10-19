@@ -1,4 +1,9 @@
-import { Change, GitLab, GitLabProject } from '@accel-shooter/node-shared';
+import {
+  Change,
+  ClickUp,
+  GitLab,
+  GitLabProject,
+} from '@accel-shooter/node-shared';
 import { writeFile } from 'fs';
 import inquirer from 'inquirer';
 import os from 'os';
@@ -26,14 +31,17 @@ const SPINNER = [
 export class Checker {
   private gitLabProjectId: string;
   private gitLab: GitLab;
+  private clickUp: ClickUp;
 
   constructor(
     private gitLabProject: GitLabProject,
     private mergeRequestIId: string,
+    private clickUpTaskId: string,
     private selectMode: boolean
   ) {
     this.gitLabProjectId = this.gitLabProject.id;
     this.gitLab = new GitLab(this.gitLabProjectId);
+    this.clickUp = new ClickUp(this.clickUpTaskId);
   }
 
   public async start() {
@@ -95,6 +103,7 @@ export class Checker {
       frontendChanges,
       backendChanges,
     };
+    const fullTaskName = await this.clickUp.getFullTaskName();
     const obss = runningItems.map((r) => r.getObs(context));
     const checkStream = combineLatest(obss);
     process.stdout.write(runningItems.map(() => '').join('\n'));
@@ -139,10 +148,12 @@ export class Checker {
               () => {}
             );
             displayNotification(
-              `Checker done. Found ${nonSuccessStatusList.length} error(s).`
+              `${fullTaskName} (${this.clickUpTaskId}): Checker done. Found ${nonSuccessStatusList.length} error(s).`
             );
           } else {
-            displayNotification('Checker done. Found no error.');
+            displayNotification(
+              `${fullTaskName} (${this.clickUpTaskId}): Checker done. Found no error.`
+            );
           }
           console.log('');
         }

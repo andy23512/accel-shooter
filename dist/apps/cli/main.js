@@ -46,8 +46,8 @@ class CheckAction extends action_class_1.Action {
     }
     run(clickUpTaskIdArg, { select }) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const { gitLabProject, mergeRequestIId } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
-            const checker = new checker_class_1.Checker(gitLabProject, mergeRequestIId, select);
+            const { gitLabProject, clickUpTaskId, mergeRequestIId } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
+            const checker = new checker_class_1.Checker(gitLabProject, mergeRequestIId, clickUpTaskId, select);
             yield checker.start();
         });
     }
@@ -1959,12 +1959,14 @@ const SPINNER = [
     '🕚',
 ];
 class Checker {
-    constructor(gitLabProject, mergeRequestIId, selectMode) {
+    constructor(gitLabProject, mergeRequestIId, clickUpTaskId, selectMode) {
         this.gitLabProject = gitLabProject;
         this.mergeRequestIId = mergeRequestIId;
+        this.clickUpTaskId = clickUpTaskId;
         this.selectMode = selectMode;
         this.gitLabProjectId = this.gitLabProject.id;
         this.gitLab = new node_shared_1.GitLab(this.gitLabProjectId);
+        this.clickUp = new node_shared_1.ClickUp(this.clickUpTaskId);
     }
     start() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
@@ -2014,6 +2016,7 @@ class Checker {
                 frontendChanges,
                 backendChanges,
             };
+            const fullTaskName = yield this.clickUp.getFullTaskName();
             const obss = runningItems.map((r) => r.getObs(context));
             const checkStream = (0, rxjs_1.combineLatest)(obss);
             process.stdout.write(runningItems.map(() => '').join('\n'));
@@ -2047,10 +2050,10 @@ class Checker {
                         (0, fs_1.writeFile)((0, untildify_1.default)('~/ac-checker-log'), nonSuccessStatusList
                             .map((s) => `###### [${s.group}] ${s.name} ${s.code}\n${s.stdout}\n${s.stderr}`)
                             .join('\n\n'), () => { });
-                        (0, utils_1.displayNotification)(`Checker done. Found ${nonSuccessStatusList.length} error(s).`);
+                        (0, utils_1.displayNotification)(`${fullTaskName} (${this.clickUpTaskId}): Checker done. Found ${nonSuccessStatusList.length} error(s).`);
                     }
                     else {
-                        (0, utils_1.displayNotification)('Checker done. Found no error.');
+                        (0, utils_1.displayNotification)(`${fullTaskName} (${this.clickUpTaskId}): Checker done. Found no error.`);
                     }
                     console.log('');
                 }

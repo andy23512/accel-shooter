@@ -16,10 +16,14 @@ export class CheckAction extends Action {
     },
   ];
   public async run(clickUpTaskIdArg: string, { select }: { select: boolean }) {
-    const { gitLabProject, mergeRequestIId } = await getInfoFromArgument(
-      clickUpTaskIdArg
+    const { gitLabProject, clickUpTaskId, mergeRequestIId } =
+      await getInfoFromArgument(clickUpTaskIdArg);
+    const checker = new Checker(
+      gitLabProject,
+      mergeRequestIId,
+      clickUpTaskId,
+      select
     );
-    const checker = new Checker(gitLabProject, mergeRequestIId, select);
     await checker.start();
   }
 }
