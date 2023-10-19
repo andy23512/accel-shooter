@@ -1,17 +1,16 @@
-import { SummarizedTask, TimeTrack } from '@accel-shooter/api-interfaces';
-import { CONFIG, ClickUp, GitLab } from '@accel-shooter/node-shared';
+import { SummarizedTask } from '@accel-shooter/api-interfaces';
+import { ClickUp, CONFIG, GitLab } from '@accel-shooter/node-shared';
 import {
   Body,
   Controller,
   Get,
   NotFoundException,
   Param,
-  Post,
   Put,
   Sse,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { appendFileSync, existsSync, readFileSync, writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -145,40 +144,6 @@ export class AppController {
   ): Promise<{ content: string }> {
     const mergeRequest = await this.getMRFromTaskId(taskId);
     return { content: mergeRequest.head_pipeline?.status || 'none' };
-  }
-
-  @Get('task/:id/time_tracks')
-  async getTimeTracks(
-    @Param('id') taskId: string
-  ): Promise<{ timeTracks: TimeTrack[] }> {
-    const folderPath = this.configService.get<string>('TaskTimeTrackFolder');
-    const path = join(folderPath, taskId + '.csv');
-    if (existsSync(path)) {
-      const content = readFileSync(path, { encoding: 'utf-8' });
-      return {
-        timeTracks: content
-          .split('\n')
-          .filter(Boolean)
-          .map((l) => {
-            const cells = l.split(',');
-            return { start: cells[0], end: cells[1] };
-          }),
-      };
-    } else {
-      return { timeTracks: [] };
-    }
-  }
-
-  @Post('task/:id/time_track')
-  async postTimeTrack(
-    @Param('id') taskId: string,
-    @Body('type') type: 'start' | 'end'
-  ) {
-    const folderPath = this.configService.get<string>('TaskTimeTrackFolder');
-    const path = join(folderPath, taskId + '.csv');
-    const time = new Date().toISOString();
-    const addedContent = type === 'start' ? `\n${time},` : time;
-    appendFileSync(path, addedContent, { encoding: 'utf-8' });
   }
 
   @Sse('todo-sse')
