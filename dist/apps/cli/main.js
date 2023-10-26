@@ -2384,7 +2384,8 @@ class TimingApp {
                 var _a, _b, _c, _d, _e, _f;
                 return (r.application === 'iTerm2' ||
                     ((r.application === 'Brave Browser' ||
-                        r.application === 'Google Chrome') &&
+                        r.application === 'Google Chrome' ||
+                        r.application === 'Microsoft Edge') &&
                         (((_a = r.path) === null || _a === void 0 ? void 0 : _a.includes('localhost')) ||
                             ((_b = r.path) === null || _b === void 0 ? void 0 : _b.includes('app.clickup.com')) ||
                             ((_c = r.path) === null || _c === void 0 ? void 0 : _c.includes('github.com')) ||

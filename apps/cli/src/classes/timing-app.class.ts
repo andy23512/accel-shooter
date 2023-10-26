@@ -42,7 +42,8 @@ export class TimingApp {
         return (
           r.application === 'iTerm2' ||
           ((r.application === 'Brave Browser' ||
-            r.application === 'Google Chrome') &&
+            r.application === 'Google Chrome' ||
+            r.application === 'Microsoft Edge') &&
             (r.path?.includes('localhost') ||
               r.path?.includes('app.clickup.com') ||
               r.path?.includes('github.com') ||
