@@ -46,6 +46,7 @@ export interface Config {
   TaskInProgressTimesFolder: string;
   TimingAppExportFolder: string;
   TaskInProgressTimeTable: string;
+  UserIdList: { clickUpUserId: number; gitLabUserId: number }[];
 }
 export type NormalizedChecklist = NormalizedChecklistItem[];
 export interface NormalizedChecklistItem {

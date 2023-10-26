@@ -1,5 +1,6 @@
 import { CONFIG } from '../config';
 import { Branch, MergeRequest, Project, User } from '../models/gitlab.models';
+import { Approval } from '../models/gitlab/approval.models';
 import { Commit } from '../models/gitlab/commit.models';
 import { Compare } from '../models/gitlab/compare.models';
 import { Event } from '../models/gitlab/event.models';
@@ -35,6 +36,25 @@ export class GitLab {
     );
   }
 
+  public static getReadyToReviewMergeRequestsByReviewer(reviewerId: number) {
+    return callApi<MergeRequest[]>('get', `/merge_requests`, {
+      state: 'opened',
+      per_page: '100',
+      reviewer_id: reviewerId,
+      wip: 'no',
+    });
+  }
+
+  public static getMergeRequestApprovals(
+    projectId: number | string,
+    mergeRequestIId: number
+  ) {
+    return callApi<Approval>(
+      'get',
+      `/projects/${projectId}/merge_requests/${mergeRequestIId}/approvals`
+    );
+  }
+
   public getMergeRequest(mergeRequestNumber: string | number) {
     return callApi<FullMergeRequest>(
       'get',
@@ -56,13 +76,21 @@ export class GitLab {
     );
   }
 
-  public getEndingAssignee() {
+  public static async getUserByUserName(username: string) {
+    return callApi<User[]>('get', `/users`, {
+      username,
+    }).then((users) => users[0]);
+  }
+
+  public static async getUserById(id: number) {
+    return callApi<User>('get', `/users/${id}`);
+  }
+
+  public static getEndingAssignee() {
     if (!CONFIG.EndingAssignee) {
       throw Error('No ending assignee was set');
     }
-    return callApi<User[]>('get', `/users`, {
-      username: CONFIG.EndingAssignee,
-    }).then((users) => users[0]);
+    return this.getUserByUserName(CONFIG.EndingAssignee);
   }
 
   public listPipelineJobs(pipelineId: number) {
@@ -165,7 +193,7 @@ export class GitLab {
   public async markMergeRequestAsReadyAndAddAssignee(
     merge_request: FullMergeRequest
   ) {
-    const assignee = await this.getEndingAssignee();
+    const assignee = await GitLab.getEndingAssignee();
     await callApi(
       'put',
       `/projects/${this.projectId}/merge_requests/${merge_request.iid}`,

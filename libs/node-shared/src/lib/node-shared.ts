@@ -6,6 +6,8 @@ export { ChecklistItem } from './models/clickup/checklist.models';
 export { Space } from './models/clickup/space.models';
 export { TaskStatus } from './models/clickup/task-status.enum';
 export { Task } from './models/clickup/task.models';
+export { User as ClickUpUser } from './models/clickup/user.models';
+export { Approval } from './models/gitlab/approval.models';
 export { Job } from './models/gitlab/job.models';
 export { Change, FullMergeRequest } from './models/gitlab/merge-request.models';
 export {

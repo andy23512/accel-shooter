@@ -14,6 +14,7 @@ import { MeetingTrackAction } from './actions/meeting-track.action';
 import { OpenAction } from './actions/open.action';
 import { PauseAction } from './actions/pause.action';
 import { RevertEndAction } from './actions/revert-end.action';
+import { ReviewStatsAction } from './actions/review-stats.action';
 import { RoutineAction } from './actions/routine.action';
 import { RTVTasksAction } from './actions/rtv-tasks.action';
 import { SetTEAction } from './actions/set-te.action';
@@ -46,6 +47,7 @@ const ACTIONS: Action[] = [
   new OpenAction(),
   new PauseAction(),
   new RevertEndAction(),
+  new ReviewStatsAction(),
   new RoutineAction(),
   new RTVTasksAction(),
   new SetTEAction(),

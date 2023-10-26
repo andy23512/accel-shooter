@@ -8,6 +8,7 @@ import { CONFIG } from '../config';
 import { ChecklistResponse } from '../models/clickup.models';
 import { Checklist } from '../models/clickup/checklist.models';
 import { Comment } from '../models/clickup/comment.models';
+import { Group } from '../models/clickup/group.models';
 import { List } from '../models/clickup/list.models';
 import { Space } from '../models/clickup/space.models';
 import { Task, TaskIncludeSubTasks } from '../models/clickup/task.models';
@@ -431,5 +432,22 @@ export class ClickUp {
       return this.setTaskStatus(TaskStatus.InReview);
     }
     return this.setTaskStatus(TaskStatus.Review);
+  }
+
+  public static async getGroups() {
+    const team = (await ClickUp.getTeams()).teams.find(
+      (t) => t.name === CONFIG.ClickUpTeam
+    );
+    if (!team) {
+      console.log('Team does not exist.');
+      return;
+    }
+    return callApi<{ groups: Group[] }>('get', `/group/`, { team_id: team.id });
+  }
+
+  public static async getFrontendGroupMembers() {
+    return (await this.getGroups())?.groups.find(
+      (g) => g.name === 'Frontend Team'
+    )?.members;
   }
 }

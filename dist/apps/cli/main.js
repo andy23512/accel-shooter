@@ -924,6 +924,54 @@ exports.RevertEndAction = RevertEndAction;
 
 /***/ }),
 
+/***/ "./apps/cli/src/actions/review-stats.action.ts":
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.ReviewStatsAction = void 0;
+const tslib_1 = __webpack_require__("tslib");
+const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
+class ReviewStatsAction extends action_class_1.Action {
+    constructor() {
+        super(...arguments);
+        this.command = 'reviewStats';
+        this.description = 'review tasks stats of frontend members';
+        this.alias = 'rs';
+    }
+    run() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const me = (yield node_shared_1.ClickUp.getCurrentUser()).user;
+            const frontendGroupMembers = (yield node_shared_1.ClickUp.getFrontendGroupMembers()).filter((m) => m.id !== me.id);
+            const team = (yield node_shared_1.ClickUp.getTeams()).teams.find((t) => t.name === node_shared_1.CONFIG.ClickUpTeam);
+            const membersWithCount = [];
+            for (const member of frontendGroupMembers) {
+                const tasks = (yield node_shared_1.ClickUp.getMyTasks(team.id, member.id)).tasks;
+                const gitLabUserId = node_shared_1.CONFIG.UserIdList.find((item) => item.clickUpUserId === member.id).gitLabUserId;
+                const mergeRequests = (yield node_shared_1.GitLab.getReadyToReviewMergeRequestsByReviewer(gitLabUserId)).filter((m) => m.merge_status === 'can_be_merged');
+                let gitLabCount = 0;
+                for (const mergeRequest of mergeRequests) {
+                    const approval = yield node_shared_1.GitLab.getMergeRequestApprovals(mergeRequest.project_id, mergeRequest.iid);
+                    if (!approval.approved_by.some((a) => a.user.id === gitLabUserId)) {
+                        gitLabCount += 1;
+                    }
+                }
+                membersWithCount.push({
+                    member,
+                    clickUpCount: tasks.filter((t) => t.name === 'Code Review').length,
+                    gitLabCount,
+                });
+            }
+            console.log(membersWithCount.map((m) => `${m.member.username}: ${m.gitLabCount}, ${m.clickUpCount}`));
+        });
+    }
+}
+exports.ReviewStatsAction = ReviewStatsAction;
+
+
+/***/ }),
+
 /***/ "./apps/cli/src/actions/routine.action.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
@@ -3113,6 +3161,22 @@ class ClickUp {
             return this.setTaskStatus(node_shared_1.TaskStatus.Review);
         });
     }
+    static getGroups() {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const team = (yield ClickUp.getTeams()).teams.find((t) => t.name === config_1.CONFIG.ClickUpTeam);
+            if (!team) {
+                console.log('Team does not exist.');
+                return;
+            }
+            return callApi('get', `/group/`, { team_id: team.id });
+        });
+    }
+    static getFrontendGroupMembers() {
+        var _a, _b;
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return (_b = (_a = (yield this.getGroups())) === null || _a === void 0 ? void 0 : _a.groups.find((g) => g.name === 'Frontend Team')) === null || _b === void 0 ? void 0 : _b.members;
+        });
+    }
 }
 exports.ClickUp = ClickUp;
 
@@ -3146,6 +3210,17 @@ class GitLab {
     getOpenedMergeRequests() {
         return callApi('get', `/projects/${this.projectId}/merge_requests`, { state: 'opened', per_page: '100' });
     }
+    static getReadyToReviewMergeRequestsByReviewer(reviewerId) {
+        return callApi('get', `/merge_requests`, {
+            state: 'opened',
+            per_page: '100',
+            reviewer_id: reviewerId,
+            wip: 'no',
+        });
+    }
+    static getMergeRequestApprovals(projectId, mergeRequestIId) {
+        return callApi('get', `/projects/${projectId}/merge_requests/${mergeRequestIId}/approvals`);
+    }
     getMergeRequest(mergeRequestNumber) {
         return callApi('get', `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}`);
     }
@@ -3155,13 +3230,23 @@ class GitLab {
     getCommit(sha) {
         return callApi('get', `/projects/${this.projectId}/repository/commits/${sha}`);
     }
-    getEndingAssignee() {
+    static getUserByUserName(username) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return callApi('get', `/users`, {
+                username,
+            }).then((users) => users[0]);
+        });
+    }
+    static getUserById(id) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            return callApi('get', `/users/${id}`);
+        });
+    }
+    static getEndingAssignee() {
         if (!config_1.CONFIG.EndingAssignee) {
             throw Error('No ending assignee was set');
         }
-        return callApi('get', `/users`, {
-            username: config_1.CONFIG.EndingAssignee,
-        }).then((users) => users[0]);
+        return this.getUserByUserName(config_1.CONFIG.EndingAssignee);
     }
     listPipelineJobs(pipelineId) {
         return callApi('get', `/projects/${this.projectId}/pipelines/${pipelineId}/jobs`);
@@ -3219,7 +3304,7 @@ class GitLab {
     }
     markMergeRequestAsReadyAndAddAssignee(merge_request) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const assignee = yield this.getEndingAssignee();
+            const assignee = yield GitLab.getEndingAssignee();
             yield callApi('put', `/projects/${this.projectId}/merge_requests/${merge_request.iid}`, null, {
                 title: merge_request.title
                     .replace(/WIP: /g, '')
@@ -3532,6 +3617,24 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
+/***/ "./libs/node-shared/src/lib/models/clickup/user.models.ts":
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+
+/***/ }),
+
+/***/ "./libs/node-shared/src/lib/models/gitlab/approval.models.ts":
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+
+/***/ }),
+
 /***/ "./libs/node-shared/src/lib/models/gitlab/job.models.ts":
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -3564,7 +3667,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sleep = exports.formatDate = exports.DateFormat = exports.getTaskIdFromBranchName = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.titleCase = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.IHoliday = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Task = exports.TaskStatus = exports.Space = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.Google = exports.GitLab = exports.ClickUp = void 0;
+exports.sleep = exports.formatDate = exports.DateFormat = exports.getTaskIdFromBranchName = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.titleCase = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.IHoliday = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Approval = exports.ClickUpUser = exports.Task = exports.TaskStatus = exports.Space = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.Google = exports.GitLab = exports.ClickUp = void 0;
 var clickup_class_1 = __webpack_require__("./libs/node-shared/src/lib/classes/clickup.class.ts");
 Object.defineProperty(exports, "ClickUp", ({ enumerable: true, get: function () { return clickup_class_1.ClickUp; } }));
 var gitlab_class_1 = __webpack_require__("./libs/node-shared/src/lib/classes/gitlab.class.ts");
@@ -3582,6 +3685,10 @@ var task_status_enum_1 = __webpack_require__("./libs/node-shared/src/lib/models/
 Object.defineProperty(exports, "TaskStatus", ({ enumerable: true, get: function () { return task_status_enum_1.TaskStatus; } }));
 var task_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/task.models.ts");
 Object.defineProperty(exports, "Task", ({ enumerable: true, get: function () { return task_models_1.Task; } }));
+var user_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/user.models.ts");
+Object.defineProperty(exports, "ClickUpUser", ({ enumerable: true, get: function () { return user_models_1.User; } }));
+var approval_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/gitlab/approval.models.ts");
+Object.defineProperty(exports, "Approval", ({ enumerable: true, get: function () { return approval_models_1.Approval; } }));
 var job_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/gitlab/job.models.ts");
 Object.defineProperty(exports, "Job", ({ enumerable: true, get: function () { return job_models_1.Job; } }));
 var merge_request_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/gitlab/merge-request.models.ts");
@@ -4155,6 +4262,7 @@ const meeting_track_action_1 = __webpack_require__("./apps/cli/src/actions/meeti
 const open_action_1 = __webpack_require__("./apps/cli/src/actions/open.action.ts");
 const pause_action_1 = __webpack_require__("./apps/cli/src/actions/pause.action.ts");
 const revert_end_action_1 = __webpack_require__("./apps/cli/src/actions/revert-end.action.ts");
+const review_stats_action_1 = __webpack_require__("./apps/cli/src/actions/review-stats.action.ts");
 const routine_action_1 = __webpack_require__("./apps/cli/src/actions/routine.action.ts");
 const rtv_tasks_action_1 = __webpack_require__("./apps/cli/src/actions/rtv-tasks.action.ts");
 const set_te_action_1 = __webpack_require__("./apps/cli/src/actions/set-te.action.ts");
@@ -4185,6 +4293,7 @@ const ACTIONS = [
     new open_action_1.OpenAction(),
     new pause_action_1.PauseAction(),
     new revert_end_action_1.RevertEndAction(),
+    new review_stats_action_1.ReviewStatsAction(),
     new routine_action_1.RoutineAction(),
     new rtv_tasks_action_1.RTVTasksAction(),
     new set_te_action_1.SetTEAction(),
