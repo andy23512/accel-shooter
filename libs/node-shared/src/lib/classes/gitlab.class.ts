@@ -41,7 +41,6 @@ export class GitLab {
       state: 'opened',
       per_page: '100',
       reviewer_id: reviewerId,
-      wip: 'no',
       scope: 'all',
     });
   }
