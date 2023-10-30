@@ -18,7 +18,7 @@ export class WeeklyProgressAction extends Action {
   public async run(startDayArg: string) {
     const today = startOfDay(new Date());
     const startDay = startOfDay(
-      getDayFromArgument(startDayArg, add(today, { weeks: -1 }))
+      getDayFromArgument(startDayArg, add(today, { weeks: -2 }))
     );
     const range = [add(startDay, { days: -1 }), add(today, { days: -1 })];
     let tempDay = new Date(range[1].valueOf());
@@ -55,15 +55,17 @@ export class WeeklyProgressAction extends Action {
             if (data[url]) {
               data[url].days.push(dString);
             } else {
-              const { gitLabProject } = await new ClickUp(
+              const result = await new ClickUp(
                 taskId
               ).getGitLabProjectAndMergeRequestIId();
-              data[url] = {
-                url,
-                name,
-                project: gitLabProject.name,
-                days: [dString],
-              };
+              if (result?.gitLabProject) {
+                data[url] = {
+                  url,
+                  name,
+                  project: result.gitLabProject.name,
+                  days: [dString],
+                };
+              }
             }
           }
         }

@@ -665,7 +665,7 @@ class GenAction extends action_class_1.Action {
                     name,
                 ];
             }
-            else if (['p', 'pipe'].includes(generator)) {
+            else if (['d', 'directive', 'p', 'pipe'].includes(generator)) {
                 args = [
                     'nx',
                     'g',
@@ -1735,7 +1735,7 @@ class WeeklyProgressAction extends action_class_1.Action {
     run(startDayArg) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const today = (0, date_fns_1.startOfDay)(new Date());
-            const startDay = (0, date_fns_1.startOfDay)((0, utils_1.getDayFromArgument)(startDayArg, (0, date_fns_1.add)(today, { weeks: -1 })));
+            const startDay = (0, date_fns_1.startOfDay)((0, utils_1.getDayFromArgument)(startDayArg, (0, date_fns_1.add)(today, { weeks: -2 })));
             const range = [(0, date_fns_1.add)(startDay, { days: -1 }), (0, date_fns_1.add)(today, { days: -1 })];
             let tempDay = new Date(range[1].valueOf());
             const holiday = new holiday_class_1.Holiday();
@@ -1765,13 +1765,15 @@ class WeeklyProgressAction extends action_class_1.Action {
                                 data[url].days.push(dString);
                             }
                             else {
-                                const { gitLabProject } = yield new node_shared_1.ClickUp(taskId).getGitLabProjectAndMergeRequestIId();
-                                data[url] = {
-                                    url,
-                                    name,
-                                    project: gitLabProject.name,
-                                    days: [dString],
-                                };
+                                const result = yield new node_shared_1.ClickUp(taskId).getGitLabProjectAndMergeRequestIId();
+                                if (result === null || result === void 0 ? void 0 : result.gitLabProject) {
+                                    data[url] = {
+                                        url,
+                                        name,
+                                        project: result.gitLabProject.name,
+                                        days: [dString],
+                                    };
+                                }
                             }
                         }
                     }

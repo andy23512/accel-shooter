@@ -44,7 +44,7 @@ export class GenAction extends Action {
         '--style=scss',
         name,
       ];
-    } else if (['p', 'pipe'].includes(generator)) {
+    } else if (['d', 'directive', 'p', 'pipe'].includes(generator)) {
       args = [
         'nx',
         'g',
