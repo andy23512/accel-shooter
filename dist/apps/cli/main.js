@@ -977,10 +977,9 @@ exports.ReviewStatsAction = ReviewStatsAction;
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.punch = exports.RoutineAction = exports.confirm = void 0;
+exports.RoutineAction = exports.confirm = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const fs_1 = tslib_1.__importDefault(__webpack_require__("fs"));
-const puppeteer_1 = tslib_1.__importDefault(__webpack_require__("puppeteer"));
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const readline_1 = tslib_1.__importDefault(__webpack_require__("readline"));
 const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
@@ -1025,10 +1024,11 @@ class RoutineAction extends action_class_1.Action {
             const holiday = new holiday_class_1.Holiday();
             const isWorkDay = holiday.checkIsWorkday(day);
             const message = isWorkDay ? 'Today is workday!' : 'Today is holiday!';
+            console.log(message);
             if (isWorkDay && !skipPunch) {
-                yield confirm('run punch?');
-                const result = yield punch();
-                console.log(result);
+                const { url } = JSON.parse(fs_1.default.readFileSync(node_shared_1.CONFIG.PunchInfoFile, { encoding: 'utf-8' }));
+                open(url);
+                yield confirm('punch done (manual)?');
             }
             if (isMorning) {
                 if (isWorkDay) {
@@ -1047,74 +1047,6 @@ class RoutineAction extends action_class_1.Action {
     }
 }
 exports.RoutineAction = RoutineAction;
-function punch() {
-    return tslib_1.__awaiter(this, void 0, void 0, function* () {
-        const { account, password, url } = JSON.parse(fs_1.default.readFileSync(node_shared_1.CONFIG.PunchInfoFile, { encoding: 'utf-8' }));
-        const browser = yield puppeteer_1.default.launch({
-            headless: false,
-        });
-        const page = yield browser.newPage();
-        yield page.goto(url);
-        yield page.evaluate((a, p) => {
-            const userName = document.querySelector('#user_username');
-            if (userName) {
-                userName.value = a;
-            }
-            const userPassword = document.querySelector('#user_passwd');
-            if (userPassword) {
-                userPassword.value = p;
-            }
-            const button = document.querySelector('#s_buttom');
-            if (button) {
-                button.click();
-            }
-        }, account, password);
-        yield page.waitForNavigation();
-        const hour = new Date().getHours();
-        yield page.evaluate((h) => {
-            const punchInputs = document.querySelectorAll('.clock_enabled');
-            const punchTimes = document.querySelectorAll('#clock_listing td:nth-child(2)');
-            if (!punchTimes[0].textContent || !punchTimes[1].textContent) {
-                return;
-            }
-            const start = punchTimes[0].textContent.replace(/[\s\n]/g, '');
-            const end = punchTimes[1].textContent.replace(/[\s\n]/g, '');
-            if (h > 7 && h < 11 && start === '') {
-                punchInputs[0].click();
-            }
-            else if (h > 16 && h < 20 && end === '') {
-                punchInputs[1].click();
-            }
-        }, hour);
-        yield page.waitForFunction((h) => {
-            const punchTimes = document.querySelectorAll('#clock_listing td:nth-child(2)');
-            if (!punchTimes[0].textContent || !punchTimes[1].textContent) {
-                return;
-            }
-            const start = punchTimes[0].textContent.replace(/[\s\n]/g, '');
-            const end = punchTimes[1].textContent.replace(/[\s\n]/g, '');
-            if (h > 7 && h < 11) {
-                return start !== '';
-            }
-            else if (h > 16 && h < 20) {
-                return end !== '';
-            }
-        }, {}, hour);
-        const result = yield page.evaluate(() => {
-            const punchTimes = document.querySelectorAll('#clock_listing td:nth-child(2)');
-            if (!punchTimes[0].textContent || !punchTimes[1].textContent) {
-                return;
-            }
-            const start = punchTimes[0].textContent.replace(/[\s\n]/g, '');
-            const end = punchTimes[1].textContent.replace(/[\s\n]/g, '');
-            return [start, end];
-        });
-        yield (0, node_shared_1.sleep)(3000);
-        yield browser.close();
-        return result;
-    });
-}
-exports.punch = punch;
 
 
 /***/ }),
@@ -4114,13 +4046,6 @@ module.exports = require("open");
 /***/ ((module) => {
 
 module.exports = require("progress-logs");
-
-/***/ }),
-
-/***/ "puppeteer":
-/***/ ((module) => {
-
-module.exports = require("puppeteer");
 
 /***/ }),
 
