@@ -959,7 +959,7 @@ class ReviewStatsAction extends action_class_1.Action {
                 }
                 membersWithCount.push({
                     member,
-                    clickUpCount: tasks.filter((t) => t.name === 'Code Review').length,
+                    clickUpCount: tasks.filter((t) => t.name.toLowerCase() === 'code review').length,
                     gitLabCount,
                 });
             }
