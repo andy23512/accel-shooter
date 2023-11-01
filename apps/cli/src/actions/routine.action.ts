@@ -2,6 +2,7 @@ import fs from 'fs';
 
 import { CONFIG, formatDate } from '@accel-shooter/node-shared';
 
+import open from 'open';
 import readline from 'readline';
 import { Action } from '../classes/action.class';
 import { Holiday } from '../classes/holiday.class';

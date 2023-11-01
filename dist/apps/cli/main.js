@@ -981,6 +981,7 @@ exports.RoutineAction = exports.confirm = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const fs_1 = tslib_1.__importDefault(__webpack_require__("fs"));
 const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const open_1 = tslib_1.__importDefault(__webpack_require__("open"));
 const readline_1 = tslib_1.__importDefault(__webpack_require__("readline"));
 const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const holiday_class_1 = __webpack_require__("./apps/cli/src/classes/holiday.class.ts");
@@ -1027,7 +1028,7 @@ class RoutineAction extends action_class_1.Action {
             console.log(message);
             if (isWorkDay && !skipPunch) {
                 const { url } = JSON.parse(fs_1.default.readFileSync(node_shared_1.CONFIG.PunchInfoFile, { encoding: 'utf-8' }));
-                open(url);
+                (0, open_1.default)(url);
                 yield confirm('punch done (manual)?');
             }
             if (isMorning) {
