@@ -157,6 +157,10 @@ export class StartAction extends Action {
       answers.targetBranch
     );
     const gitLabMergeRequestIId = gitLabMergeRequest.iid;
+    await gitLab.createMergeRequestNote(
+      gitLabMergeRequest,
+      `ClickUp Task: [${gitLabMergeRequestTitle}](${clickUpTask.url})`
+    );
     p.next(); // Create Checklist at ClickUp
     const clickUpChecklistTitle = `Synced checklist [${answers.gitLabProject.id.replace(
       '%2F',
