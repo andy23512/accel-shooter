@@ -1360,7 +1360,7 @@ class StartAction extends action_class_1.Action {
             p.next(); // Create GitLab Branch
             const gitLabBranch = yield gitLab.createBranch(`CU-${answers.clickUpTaskId}`, answers.targetBranch);
             p.next(); // Create GitLab Merge Request
-            yield (0, node_shared_1.sleep)(2000); // prevent "branch restored" bug
+            yield (0, node_shared_1.sleep)(4000); // prevent "branch restored" bug
             const gitLabMergeRequest = yield gitLab.createMergeRequest(gitLabMergeRequestTitle + `__CU-${answers.clickUpTaskId}`, gitLabBranch.name, answers.gitLabProject.hasMergeRequestTemplate
                 ? yield gitLab.getMergeRequestTemplate()
                 : '', selectedGitLabLabels, answers.targetBranch);

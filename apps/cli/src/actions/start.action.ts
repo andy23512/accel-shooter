@@ -146,7 +146,7 @@ export class StartAction extends Action {
       answers.targetBranch
     );
     p.next(); // Create GitLab Merge Request
-    await sleep(2000); // prevent "branch restored" bug
+    await sleep(4000); // prevent "branch restored" bug
     const gitLabMergeRequest = await gitLab.createMergeRequest(
       gitLabMergeRequestTitle + `__CU-${answers.clickUpTaskId}`,
       gitLabBranch.name,
