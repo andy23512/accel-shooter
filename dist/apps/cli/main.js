@@ -835,8 +835,16 @@ class OpenAction extends action_class_1.Action {
     }
     run(clickUpTaskIdArg) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            const { clickUpTaskId } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
-            const urls = [`localhost:8112/task/${clickUpTaskId}`];
+            const { mergeRequest, clickUp, clickUpTask, clickUpTaskId } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
+            const frameUrls = yield clickUp.getFrameUrls();
+            const urls = [
+                `localhost:8112/task/${clickUpTaskId}`,
+                mergeRequest.web_url,
+                clickUpTask.url,
+            ];
+            if (frameUrls.length) {
+                urls.push(frameUrls[0]);
+            }
             (0, utils_1.openUrlsInTabGroup)(urls, clickUpTaskId);
         });
     }

@@ -9,8 +9,17 @@ export class OpenAction extends Action {
     { name: '[clickUpTaskId]', description: 'optional ClickUp Task Id' },
   ];
   public async run(clickUpTaskIdArg: string) {
-    const { clickUpTaskId } = await getInfoFromArgument(clickUpTaskIdArg);
-    const urls = [`localhost:8112/task/${clickUpTaskId}`];
+    const { mergeRequest, clickUp, clickUpTask, clickUpTaskId } =
+      await getInfoFromArgument(clickUpTaskIdArg);
+    const frameUrls = await clickUp.getFrameUrls();
+    const urls = [
+      `localhost:8112/task/${clickUpTaskId}`,
+      mergeRequest.web_url,
+      clickUpTask.url,
+    ];
+    if (frameUrls.length) {
+      urls.push(frameUrls[0]);
+    }
     openUrlsInTabGroup(urls, clickUpTaskId);
   }
 }
