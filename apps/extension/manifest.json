@@ -6,5 +6,11 @@
   "background": {
     "service_worker": "main.js"
   },
-  "permissions": ["tabs", "tabGroups"]
+  "permissions": ["tabs", "tabGroups"],
+  "content_scripts": [
+    {
+      "matches": ["https://gitlab.com/*/*/-/merge_requests/*"],
+      "js": ["content_scripts.js"]
+    }
+  ]
 }

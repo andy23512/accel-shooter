@@ -9,25 +9,25 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 function getAllUrlParams(url) {
     // get query string from url (optional) or window
-    let queryString = url ? url.split("?")[1] : window.location.search.slice(1);
+    let queryString = url ? url.split('?')[1] : window.location.search.slice(1);
     // we'll store the parameters here
     const obj = {};
     // if query string exists
     if (queryString) {
         // stuff after # is not part of query string, so get rid of it
-        queryString = queryString.split("#")[0];
+        queryString = queryString.split('#')[0];
         // split our query string into its component parts
-        const arr = queryString.split("&");
+        const arr = queryString.split('&');
         for (const part of arr) {
             // separate the keys and the values
-            const a = part.split("=");
+            const a = part.split('=');
             // set parameter name and value (use 'true' if empty)
             const paramName = a[0];
-            const paramValue = typeof a[1] === "undefined" ? true : a[1];
+            const paramValue = typeof a[1] === 'undefined' ? true : a[1];
             // if the paramName ends with square brackets, e.g. colors[] or colors[2]
             if (paramName.match(/\[(\d+)?\]$/)) {
                 // create key if it doesn't exist
-                const key = paramName.replace(/\[(\d+)?\]/, "");
+                const key = paramName.replace(/\[(\d+)?\]/, '');
                 if (!obj[key])
                     obj[key] = [];
                 // if it's an indexed array e.g. colors[2]
@@ -47,7 +47,7 @@ function getAllUrlParams(url) {
                     // if it doesn't exist, create property
                     obj[paramName] = paramValue;
                 }
-                else if (obj[paramName] && typeof obj[paramName] === "string") {
+                else if (obj[paramName] && typeof obj[paramName] === 'string') {
                     // if property does exist and it's a string, convert it to an array
                     obj[paramName] = [obj[paramName]];
                     obj[paramName].push(paramValue);
@@ -63,13 +63,10 @@ function getAllUrlParams(url) {
 }
 chrome.tabs.onCreated.addListener((tab) => __awaiter(this, void 0, void 0, function* () {
     const isAccelShooterLink = tab.pendingUrl &&
-        tab.pendingUrl.startsWith("http://localhost:8315/accel-shooter/");
-    console.log(isAccelShooterLink);
+        tab.pendingUrl.startsWith('http://localhost:8315/accel-shooter/');
     if (isAccelShooterLink) {
         const query = getAllUrlParams(tab.pendingUrl);
         const { urls, group } = query;
-        console.log(urls);
-        console.log(group);
         const tabIds = [];
         const existingGroups = yield chrome.tabGroups.query({ title: group });
         for (const g of existingGroups) {
@@ -83,7 +80,7 @@ chrome.tabs.onCreated.addListener((tab) => __awaiter(this, void 0, void 0, funct
                 tabIds.push(t.id);
             }
             const groupId = yield chrome.tabs.group({ tabIds: tabIds });
-            chrome.tabGroups.update(groupId, { color: "cyan", title: group });
+            chrome.tabGroups.update(groupId, { color: 'cyan', title: group });
             const pinnedTabs = yield chrome.tabs.query({
                 currentWindow: true,
                 pinned: true,
