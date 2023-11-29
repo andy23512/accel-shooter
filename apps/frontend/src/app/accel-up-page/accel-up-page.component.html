@@ -1,0 +1,10 @@
+<ng-container *ngIf="task$ | async as task">
+  ID: {{ task.id }} <br />
+  Name: {{ task.name }} <br />
+  Status: {{ task.status.status }} <br />
+  Parent: {{ task.parent }} <br />
+  Priority: {{ task.priority }} <br />
+  Text Content:
+  <pre>{{ task.text_content }}</pre>
+  <br />
+</ng-container>

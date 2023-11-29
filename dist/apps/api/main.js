@@ -6,7 +6,7 @@
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b, _c, _d, _e, _f, _g;
+var _a, _b, _c, _d, _e, _f, _g, _h;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AppController = void 0;
 const tslib_1 = __webpack_require__("tslib");
@@ -32,6 +32,15 @@ let AppController = class AppController {
             const path = this.configService.get('MySummarizedTasksFile');
             const tasks = JSON.parse((0, fs_1.readFileSync)(path, { encoding: 'utf-8' }));
             return { tasks };
+        });
+    }
+    getTask(taskId) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const clickUp = new node_shared_1.ClickUp(taskId);
+            const task = yield clickUp.getTask();
+            return {
+                task,
+            };
         });
     }
     getMarkdown(markdownId) {
@@ -132,11 +141,18 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:returntype", typeof (_b = typeof Promise !== "undefined" && Promise) === "function" ? _b : Object)
 ], AppController.prototype, "getTasks", null);
 tslib_1.__decorate([
-    (0, common_1.Get)('markdown/:id'),
+    (0, common_1.Get)('task/:id'),
     tslib_1.__param(0, (0, common_1.Param)('id')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String]),
     tslib_1.__metadata("design:returntype", typeof (_c = typeof Promise !== "undefined" && Promise) === "function" ? _c : Object)
+], AppController.prototype, "getTask", null);
+tslib_1.__decorate([
+    (0, common_1.Get)('markdown/:id'),
+    tslib_1.__param(0, (0, common_1.Param)('id')),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [String]),
+    tslib_1.__metadata("design:returntype", typeof (_d = typeof Promise !== "undefined" && Promise) === "function" ? _d : Object)
 ], AppController.prototype, "getMarkdown", null);
 tslib_1.__decorate([
     (0, common_1.Put)('markdown/:id'),
@@ -151,7 +167,7 @@ tslib_1.__decorate([
     tslib_1.__param(0, (0, common_1.Param)('id')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String]),
-    tslib_1.__metadata("design:returntype", typeof (_d = typeof Promise !== "undefined" && Promise) === "function" ? _d : Object)
+    tslib_1.__metadata("design:returntype", typeof (_e = typeof Promise !== "undefined" && Promise) === "function" ? _e : Object)
 ], AppController.prototype, "getChecklist", null);
 tslib_1.__decorate([
     (0, common_1.Put)('task/:id/checklist'),
@@ -166,7 +182,7 @@ tslib_1.__decorate([
     tslib_1.__param(0, (0, common_1.Param)('id')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String]),
-    tslib_1.__metadata("design:returntype", typeof (_e = typeof Promise !== "undefined" && Promise) === "function" ? _e : Object)
+    tslib_1.__metadata("design:returntype", typeof (_f = typeof Promise !== "undefined" && Promise) === "function" ? _f : Object)
 ], AppController.prototype, "getMRDescription", null);
 tslib_1.__decorate([
     (0, common_1.Put)('task/:id/mr_description'),
@@ -181,13 +197,13 @@ tslib_1.__decorate([
     tslib_1.__param(0, (0, common_1.Param)('id')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String]),
-    tslib_1.__metadata("design:returntype", typeof (_f = typeof Promise !== "undefined" && Promise) === "function" ? _f : Object)
+    tslib_1.__metadata("design:returntype", typeof (_g = typeof Promise !== "undefined" && Promise) === "function" ? _g : Object)
 ], AppController.prototype, "getMRPipelineStatus", null);
 tslib_1.__decorate([
     (0, common_1.Sse)('todo-sse'),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", []),
-    tslib_1.__metadata("design:returntype", typeof (_g = typeof rxjs_1.Observable !== "undefined" && rxjs_1.Observable) === "function" ? _g : Object)
+    tslib_1.__metadata("design:returntype", typeof (_h = typeof rxjs_1.Observable !== "undefined" && rxjs_1.Observable) === "function" ? _h : Object)
 ], AppController.prototype, "todoSse", null);
 AppController = tslib_1.__decorate([
     (0, common_1.Controller)(),

@@ -1,5 +1,5 @@
 import { SummarizedTask } from '@accel-shooter/api-interfaces';
-import { ClickUp, CONFIG, GitLab } from '@accel-shooter/node-shared';
+import { ClickUp, CONFIG, GitLab, Task } from '@accel-shooter/node-shared';
 import {
   Body,
   Controller,
@@ -33,6 +33,15 @@ export class AppController {
     const path = this.configService.get<string>('MySummarizedTasksFile');
     const tasks = JSON.parse(readFileSync(path, { encoding: 'utf-8' }));
     return { tasks };
+  }
+
+  @Get('task/:id')
+  async getTask(@Param('id') taskId: string): Promise<{ task: Task }> {
+    const clickUp = new ClickUp(taskId);
+    const task = await clickUp.getTask();
+    return {
+      task,
+    };
   }
 
   @Get('markdown/:id')

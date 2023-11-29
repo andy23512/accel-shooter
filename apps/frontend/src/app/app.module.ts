@@ -12,6 +12,7 @@ import { LoadingBarModule } from '@ngx-loading-bar/core';
 import { LoadingBarHttpClientModule } from '@ngx-loading-bar/http-client';
 import { LoadingBarRouterModule } from '@ngx-loading-bar/router';
 import { AgGridModule } from 'ag-grid-angular';
+import { AccelUpPageComponent } from './accel-up-page/accel-up-page.component';
 import { AppComponent } from './app.component';
 import { EditorComponent } from './editor/editor.component';
 import { MarkdownPageComponent } from './markdown-page/markdown-page.component';
@@ -33,6 +34,7 @@ import { TasksPageComponent } from './tasks-page/tasks-page.component';
     PriorityCellRendererComponent,
     TaskStatusCellRendererComponent,
     MergeRequestDescriptionPageComponent,
+    AccelUpPageComponent,
   ],
   imports: [
     BrowserModule,
@@ -56,6 +58,10 @@ import { TasksPageComponent } from './tasks-page/tasks-page.component';
       {
         path: 'merge_request_description/:id',
         component: MergeRequestDescriptionPageComponent,
+      },
+      {
+        path: 'accel-up/:id',
+        component: AccelUpPageComponent,
       },
       {
         path: '',
