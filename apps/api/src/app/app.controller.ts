@@ -1,5 +1,11 @@
 import { SummarizedTask } from '@accel-shooter/api-interfaces';
-import { ClickUp, CONFIG, GitLab, Task } from '@accel-shooter/node-shared';
+import {
+  ClickUp,
+  Comment,
+  CONFIG,
+  GitLab,
+  Task,
+} from '@accel-shooter/node-shared';
 import {
   Body,
   Controller,
@@ -41,6 +47,17 @@ export class AppController {
     const task = await clickUp.getTask();
     return {
       task,
+    };
+  }
+
+  @Get('task/:id/comments')
+  async getTaskComments(
+    @Param('id') taskId: string
+  ): Promise<{ comments: Comment[] }> {
+    const clickUp = new ClickUp(taskId);
+    const comments = await clickUp.getTaskComments();
+    return {
+      comments,
     };
   }
 

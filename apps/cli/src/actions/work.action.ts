@@ -3,7 +3,7 @@ import kexec from '@jcoreio/kexec';
 import { Action } from '../classes/action.class';
 
 import { Todo } from '../classes/todo.class';
-import { openUrlsInTabGroup } from '../utils';
+import { OpenAction } from './open.action';
 
 export class WorkAction extends Action {
   public command = 'work';
@@ -26,9 +26,8 @@ export class WorkAction extends Action {
     const clickUp = new ClickUp(clickUpTaskId);
     const { gitLabProject } =
       await clickUp.getGitLabProjectAndMergeRequestIId();
-    // Open Task Page
-    const urls = [`localhost:8112/task/${clickUpTaskId}`];
-    openUrlsInTabGroup(urls, clickUpTaskId);
+    // Open Task Pages
+    await new OpenAction().run(clickUpTaskId);
     // Open tmux
     const folder = gitLabProject.path;
     const shortName = gitLabProject.shortName;

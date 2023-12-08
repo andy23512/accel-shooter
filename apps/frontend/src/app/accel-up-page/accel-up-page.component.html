@@ -8,3 +8,12 @@
   <pre>{{ task.text_content }}</pre>
   <br />
 </ng-container>
+<ng-container *ngIf="comments$ | async as comments">
+  Comments: <br />
+  <ng-container *ngFor="let comment of comments">
+    <pre>
+&gt; {{ comment.user.username }}
+{{ comment.comment_text }}</pre
+    >
+  </ng-container>
+</ng-container>

@@ -6,7 +6,7 @@
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b, _c, _d, _e, _f, _g, _h;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AppController = void 0;
 const tslib_1 = __webpack_require__("tslib");
@@ -40,6 +40,15 @@ let AppController = class AppController {
             const task = yield clickUp.getTask();
             return {
                 task,
+            };
+        });
+    }
+    getTaskComments(taskId) {
+        return tslib_1.__awaiter(this, void 0, void 0, function* () {
+            const clickUp = new node_shared_1.ClickUp(taskId);
+            const comments = yield clickUp.getTaskComments();
+            return {
+                comments,
             };
         });
     }
@@ -148,11 +157,18 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:returntype", typeof (_c = typeof Promise !== "undefined" && Promise) === "function" ? _c : Object)
 ], AppController.prototype, "getTask", null);
 tslib_1.__decorate([
-    (0, common_1.Get)('markdown/:id'),
+    (0, common_1.Get)('task/:id/comments'),
     tslib_1.__param(0, (0, common_1.Param)('id')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String]),
     tslib_1.__metadata("design:returntype", typeof (_d = typeof Promise !== "undefined" && Promise) === "function" ? _d : Object)
+], AppController.prototype, "getTaskComments", null);
+tslib_1.__decorate([
+    (0, common_1.Get)('markdown/:id'),
+    tslib_1.__param(0, (0, common_1.Param)('id')),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [String]),
+    tslib_1.__metadata("design:returntype", typeof (_e = typeof Promise !== "undefined" && Promise) === "function" ? _e : Object)
 ], AppController.prototype, "getMarkdown", null);
 tslib_1.__decorate([
     (0, common_1.Put)('markdown/:id'),
@@ -167,7 +183,7 @@ tslib_1.__decorate([
     tslib_1.__param(0, (0, common_1.Param)('id')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String]),
-    tslib_1.__metadata("design:returntype", typeof (_e = typeof Promise !== "undefined" && Promise) === "function" ? _e : Object)
+    tslib_1.__metadata("design:returntype", typeof (_f = typeof Promise !== "undefined" && Promise) === "function" ? _f : Object)
 ], AppController.prototype, "getChecklist", null);
 tslib_1.__decorate([
     (0, common_1.Put)('task/:id/checklist'),
@@ -182,7 +198,7 @@ tslib_1.__decorate([
     tslib_1.__param(0, (0, common_1.Param)('id')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String]),
-    tslib_1.__metadata("design:returntype", typeof (_f = typeof Promise !== "undefined" && Promise) === "function" ? _f : Object)
+    tslib_1.__metadata("design:returntype", typeof (_g = typeof Promise !== "undefined" && Promise) === "function" ? _g : Object)
 ], AppController.prototype, "getMRDescription", null);
 tslib_1.__decorate([
     (0, common_1.Put)('task/:id/mr_description'),
@@ -197,13 +213,13 @@ tslib_1.__decorate([
     tslib_1.__param(0, (0, common_1.Param)('id')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String]),
-    tslib_1.__metadata("design:returntype", typeof (_g = typeof Promise !== "undefined" && Promise) === "function" ? _g : Object)
+    tslib_1.__metadata("design:returntype", typeof (_h = typeof Promise !== "undefined" && Promise) === "function" ? _h : Object)
 ], AppController.prototype, "getMRPipelineStatus", null);
 tslib_1.__decorate([
     (0, common_1.Sse)('todo-sse'),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", []),
-    tslib_1.__metadata("design:returntype", typeof (_h = typeof rxjs_1.Observable !== "undefined" && rxjs_1.Observable) === "function" ? _h : Object)
+    tslib_1.__metadata("design:returntype", typeof (_j = typeof rxjs_1.Observable !== "undefined" && rxjs_1.Observable) === "function" ? _j : Object)
 ], AppController.prototype, "todoSse", null);
 AppController = tslib_1.__decorate([
     (0, common_1.Controller)(),
@@ -1017,6 +1033,15 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
+/***/ "./libs/node-shared/src/lib/models/clickup/comment.models.ts":
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+
+/***/ }),
+
 /***/ "./libs/node-shared/src/lib/models/clickup/space.models.ts":
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -1114,7 +1139,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sleep = exports.formatDate = exports.DateFormat = exports.getTaskIdFromBranchName = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.titleCase = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.IHoliday = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Approval = exports.ClickUpUser = exports.Task = exports.TaskStatus = exports.Space = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.Google = exports.GitLab = exports.ClickUp = void 0;
+exports.sleep = exports.formatDate = exports.DateFormat = exports.getTaskIdFromBranchName = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.titleCase = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.IHoliday = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Approval = exports.ClickUpUser = exports.Task = exports.TaskStatus = exports.Space = exports.Comment = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.Google = exports.GitLab = exports.ClickUp = void 0;
 var clickup_class_1 = __webpack_require__("./libs/node-shared/src/lib/classes/clickup.class.ts");
 Object.defineProperty(exports, "ClickUp", ({ enumerable: true, get: function () { return clickup_class_1.ClickUp; } }));
 var gitlab_class_1 = __webpack_require__("./libs/node-shared/src/lib/classes/gitlab.class.ts");
@@ -1126,6 +1151,8 @@ Object.defineProperty(exports, "CONFIG", ({ enumerable: true, get: function () {
 Object.defineProperty(exports, "getConfig", ({ enumerable: true, get: function () { return config_1.getConfig; } }));
 var checklist_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/checklist.models.ts");
 Object.defineProperty(exports, "ChecklistItem", ({ enumerable: true, get: function () { return checklist_models_1.ChecklistItem; } }));
+var comment_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/comment.models.ts");
+Object.defineProperty(exports, "Comment", ({ enumerable: true, get: function () { return comment_models_1.Comment; } }));
 var space_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/space.models.ts");
 Object.defineProperty(exports, "Space", ({ enumerable: true, get: function () { return space_models_1.Space; } }));
 var task_status_enum_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/task-status.enum.ts");

@@ -1770,7 +1770,7 @@ const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
 const kexec_1 = tslib_1.__importDefault(__webpack_require__("@jcoreio/kexec"));
 const action_class_1 = __webpack_require__("./apps/cli/src/classes/action.class.ts");
 const todo_class_1 = __webpack_require__("./apps/cli/src/classes/todo.class.ts");
-const utils_1 = __webpack_require__("./apps/cli/src/utils.ts");
+const open_action_1 = __webpack_require__("./apps/cli/src/actions/open.action.ts");
 class WorkAction extends action_class_1.Action {
     constructor() {
         super(...arguments);
@@ -1795,9 +1795,8 @@ class WorkAction extends action_class_1.Action {
             const clickUpTaskId = matchResult[1];
             const clickUp = new node_shared_1.ClickUp(clickUpTaskId);
             const { gitLabProject } = yield clickUp.getGitLabProjectAndMergeRequestIId();
-            // Open Task Page
-            const urls = [`localhost:8112/task/${clickUpTaskId}`];
-            (0, utils_1.openUrlsInTabGroup)(urls, clickUpTaskId);
+            // Open Task Pages
+            yield new open_action_1.OpenAction().run(clickUpTaskId);
             // Open tmux
             const folder = gitLabProject.path;
             const shortName = gitLabProject.shortName;
@@ -3515,6 +3514,15 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
+/***/ "./libs/node-shared/src/lib/models/clickup/comment.models.ts":
+/***/ ((__unused_webpack_module, exports) => {
+
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+
+
+/***/ }),
+
 /***/ "./libs/node-shared/src/lib/models/clickup/space.models.ts":
 /***/ ((__unused_webpack_module, exports) => {
 
@@ -3612,7 +3620,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
-exports.sleep = exports.formatDate = exports.DateFormat = exports.getTaskIdFromBranchName = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.titleCase = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.IHoliday = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Approval = exports.ClickUpUser = exports.Task = exports.TaskStatus = exports.Space = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.Google = exports.GitLab = exports.ClickUp = void 0;
+exports.sleep = exports.formatDate = exports.DateFormat = exports.getTaskIdFromBranchName = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.titleCase = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.IHoliday = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Approval = exports.ClickUpUser = exports.Task = exports.TaskStatus = exports.Space = exports.Comment = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.Google = exports.GitLab = exports.ClickUp = void 0;
 var clickup_class_1 = __webpack_require__("./libs/node-shared/src/lib/classes/clickup.class.ts");
 Object.defineProperty(exports, "ClickUp", ({ enumerable: true, get: function () { return clickup_class_1.ClickUp; } }));
 var gitlab_class_1 = __webpack_require__("./libs/node-shared/src/lib/classes/gitlab.class.ts");
@@ -3624,6 +3632,8 @@ Object.defineProperty(exports, "CONFIG", ({ enumerable: true, get: function () {
 Object.defineProperty(exports, "getConfig", ({ enumerable: true, get: function () { return config_1.getConfig; } }));
 var checklist_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/checklist.models.ts");
 Object.defineProperty(exports, "ChecklistItem", ({ enumerable: true, get: function () { return checklist_models_1.ChecklistItem; } }));
+var comment_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/comment.models.ts");
+Object.defineProperty(exports, "Comment", ({ enumerable: true, get: function () { return comment_models_1.Comment; } }));
 var space_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/space.models.ts");
 Object.defineProperty(exports, "Space", ({ enumerable: true, get: function () { return space_models_1.Space; } }));
 var task_status_enum_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/task-status.enum.ts");

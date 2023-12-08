@@ -3,6 +3,7 @@ export { GitLab } from './classes/gitlab.class';
 export { Google } from './classes/google.class';
 export { CONFIG, getConfig } from './config';
 export { ChecklistItem } from './models/clickup/checklist.models';
+export { Comment } from './models/clickup/comment.models';
 export { Space } from './models/clickup/space.models';
 export { TaskStatus } from './models/clickup/task-status.enum';
 export { Task } from './models/clickup/task.models';

@@ -1,4 +1,4 @@
-import { Task } from '@accel-shooter/node-shared';
+import { Comment, Task } from '@accel-shooter/node-shared';
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
@@ -13,6 +13,7 @@ import { map, Observable } from 'rxjs';
 export class AccelUpPageComponent implements OnInit {
   public taskId = '';
   public task$!: Observable<Task>;
+  public comments$!: Observable<Comment[]>;
 
   constructor(private route: ActivatedRoute, private http: HttpClient) {}
 
@@ -21,5 +22,8 @@ export class AccelUpPageComponent implements OnInit {
     this.task$ = this.http
       .get<{ task: Task }>(`/api/task/${this.taskId}`)
       .pipe(map((r) => r.task));
+    this.comments$ = this.http
+      .get<{ comments: Comment[] }>(`/api/task/${this.taskId}/comments`)
+      .pipe(map((r) => r.comments));
   }
 }
