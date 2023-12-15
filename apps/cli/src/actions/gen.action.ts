@@ -53,7 +53,9 @@ export class GenAction extends Action {
         `--module=${moduleRelativePath}`,
         name,
       ];
-    } else if (['s', 'service', 'g', 'guard'].includes(generator)) {
+    } else if (
+      ['s', 'service', 'g', 'guard', 'm', 'module'].includes(generator)
+    ) {
       args = [
         'nx',
         'g',

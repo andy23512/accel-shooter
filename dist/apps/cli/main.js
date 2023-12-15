@@ -675,7 +675,7 @@ class GenAction extends action_class_1.Action {
                     name,
                 ];
             }
-            else if (['s', 'service', 'g', 'guard'].includes(generator)) {
+            else if (['s', 'service', 'g', 'guard', 'm', 'module'].includes(generator)) {
                 args = [
                     'nx',
                     'g',
