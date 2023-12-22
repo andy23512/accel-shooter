@@ -29,6 +29,7 @@ const CONFIG_KEY_MAP = {
 
 const FIGMA_REGEX =
   /(?:https:\/\/)?(?:www\.)?figma\.com\/(file|proto)\/([0-9a-zA-Z]{22,128})(?:\/([^\?\n\r\/]+)?((?:\?[^\/]*?node-id=([^&\n\r\/]+))?[^\/]*?)(\/duplicate)?)?/g;
+const MARKDOWN_LINK_REGEX = /\[([\w\s\d]+)\]\((https?:\/\/[\w\d./?=#]+)\)/g;
 
 @Controller()
 export class AppController {
@@ -94,6 +95,7 @@ export class AppController {
     content: string;
     frameUrl: string;
     fullTaskName: string;
+    links: { name: string; url: string }[];
   }> {
     const clickUp = new ClickUp(taskId);
     const task = await clickUp.getTask();
@@ -109,11 +111,18 @@ export class AppController {
     [...content.matchAll(FIGMA_REGEX)].forEach(([url]) => {
       frameUrls.push(url);
     });
+    const links = [...content.matchAll(MARKDOWN_LINK_REGEX)].map(
+      ([, name, url]) => ({
+        name,
+        url,
+      })
+    );
     return {
       mergeRequestLink: mergeRequest.web_url,
       taskLink: task.url,
       content,
       frameUrl: frameUrls.length ? frameUrls[0] : null,
+      links,
       fullTaskName,
     };
   }

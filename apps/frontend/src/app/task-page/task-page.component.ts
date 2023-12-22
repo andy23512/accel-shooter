@@ -43,6 +43,7 @@ export class TaskPageComponent implements OnInit {
   public mrPipelineStatus = '';
   public changeSubject = new Subject<void>();
   public saveSubject = new Subject<void>();
+  public links: { name: string; url: string }[] = [];
 
   constructor(
     private route: ActivatedRoute,
@@ -63,16 +64,25 @@ export class TaskPageComponent implements OnInit {
         content: string;
         frameUrl: string;
         fullTaskName: string;
+        links: { name: string; url: string }[];
       }>(`/api/task/${this.taskId}/checklist`)
       .pipe(take(1))
       .subscribe(
-        ({ taskLink, mergeRequestLink, content, frameUrl, fullTaskName }) => {
+        ({
+          taskLink,
+          mergeRequestLink,
+          content,
+          frameUrl,
+          fullTaskName,
+          links,
+        }) => {
           this.taskLink = taskLink;
           this.mergeRequestLink = mergeRequestLink;
           this.frameUrl = frameUrl;
           this.checklistMarkDown = content;
           this.fullTaskName = fullTaskName;
           this.loaded = true;
+          this.links = links;
           this.startSync();
         }
       );
