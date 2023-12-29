@@ -187,47 +187,6 @@ export class ClickUp {
     );
   }
 
-  public async getFrameUrls(task?: Task) {
-    let t = task || (await this.getTask());
-    let rootTaskId = this.taskId;
-    const frameUrls: string[] = [];
-    while (t.parent) {
-      t = await new ClickUp(t.parent).getTask();
-      rootTaskId = t.id;
-    }
-    const taskQueue: string[] = [rootTaskId as string, this.taskId];
-    while (taskQueue.length > 0) {
-      const taskId = taskQueue.shift() as string;
-      const clickUp = new ClickUp(taskId);
-      const task = await clickUp.getTask();
-      if (task.description) {
-        [...task.description.matchAll(FIGMA_REGEX)].forEach(([url]) => {
-          frameUrls.push(url);
-        });
-      }
-      const comments = await clickUp.getTaskComments();
-      comments.forEach((co) => {
-        co.comment
-          .filter((c) => c.type === 'frame')
-          .forEach((c) => {
-            if (c?.frame?.url) {
-              frameUrls.push(c.frame.url);
-            }
-          });
-        co.comment
-          .filter(
-            (c) => c.type === 'bookmark' && c.bookmark?.service === 'figma'
-          )
-          .forEach((c) => {
-            if (c?.bookmark?.url) {
-              frameUrls.push(c.bookmark.url);
-            }
-          });
-      });
-    }
-    return frameUrls;
-  }
-
   public async getGitLabProjectAndMergeRequestIId(task?: Task) {
     const t = task || (await this.getTask());
     const clickUpChecklist = t.checklists.find((c) =>

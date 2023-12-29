@@ -836,15 +836,11 @@ class OpenAction extends action_class_1.Action {
     run(clickUpTaskIdArg) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const { mergeRequest, clickUp, clickUpTask, clickUpTaskId } = yield (0, utils_1.getInfoFromArgument)(clickUpTaskIdArg);
-            const frameUrls = yield clickUp.getFrameUrls();
             const urls = [
                 `localhost:8112/task/${clickUpTaskId}`,
                 mergeRequest.web_url,
                 clickUpTask.url,
             ];
-            if (frameUrls.length) {
-                urls.push(frameUrls[0]);
-            }
             (0, utils_1.openUrlsInTabGroup)(urls, clickUpTaskId);
         });
     }
@@ -2899,48 +2895,6 @@ class ClickUp {
     }
     deleteChecklistItem(checklistId, checklistItemId) {
         return callApi('delete', `/checklist/${checklistId}/checklist_item/${checklistItemId}`);
-    }
-    getFrameUrls(task) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            let t = task || (yield this.getTask());
-            let rootTaskId = this.taskId;
-            const frameUrls = [];
-            while (t.parent) {
-                t = yield new ClickUp(t.parent).getTask();
-                rootTaskId = t.id;
-            }
-            const taskQueue = [rootTaskId, this.taskId];
-            while (taskQueue.length > 0) {
-                const taskId = taskQueue.shift();
-                const clickUp = new ClickUp(taskId);
-                const task = yield clickUp.getTask();
-                if (task.description) {
-                    [...task.description.matchAll(FIGMA_REGEX)].forEach(([url]) => {
-                        frameUrls.push(url);
-                    });
-                }
-                const comments = yield clickUp.getTaskComments();
-                comments.forEach((co) => {
-                    co.comment
-                        .filter((c) => c.type === 'frame')
-                        .forEach((c) => {
-                        var _a;
-                        if ((_a = c === null || c === void 0 ? void 0 : c.frame) === null || _a === void 0 ? void 0 : _a.url) {
-                            frameUrls.push(c.frame.url);
-                        }
-                    });
-                    co.comment
-                        .filter((c) => { var _a; return c.type === 'bookmark' && ((_a = c.bookmark) === null || _a === void 0 ? void 0 : _a.service) === 'figma'; })
-                        .forEach((c) => {
-                        var _a;
-                        if ((_a = c === null || c === void 0 ? void 0 : c.bookmark) === null || _a === void 0 ? void 0 : _a.url) {
-                            frameUrls.push(c.bookmark.url);
-                        }
-                    });
-                });
-            }
-            return frameUrls;
-        });
     }
     getGitLabProjectAndMergeRequestIId(task) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {

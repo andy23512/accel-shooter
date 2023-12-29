@@ -93,14 +93,12 @@ export class AppController {
     mergeRequestLink: string;
     taskLink: string;
     content: string;
-    frameUrl: string;
     fullTaskName: string;
     links: { name: string; url: string }[];
   }> {
     const clickUp = new ClickUp(taskId);
     const task = await clickUp.getTask();
     const fullTaskName = await clickUp.getFullTaskName(task);
-    const frameUrls = await clickUp.getFrameUrls(task);
     const { gitLabProject, mergeRequestIId } =
       await clickUp.getGitLabProjectAndMergeRequestIId(task);
     const gitLab = new GitLab(gitLabProject.id);
@@ -108,9 +106,6 @@ export class AppController {
     const folderPath = this.configService.get<string>('TaskTodoFolder');
     const path = join(folderPath, taskId + '.md');
     const content = readFileSync(path, { encoding: 'utf-8' });
-    [...content.matchAll(FIGMA_REGEX)].forEach(([url]) => {
-      frameUrls.push(url);
-    });
     const links = [...content.matchAll(MARKDOWN_LINK_REGEX)].map(
       ([, name, url]) => ({
         name,
@@ -121,7 +116,6 @@ export class AppController {
       mergeRequestLink: mergeRequest.web_url,
       taskLink: task.url,
       content,
-      frameUrl: frameUrls.length ? frameUrls[0] : null,
       links,
       fullTaskName,
     };

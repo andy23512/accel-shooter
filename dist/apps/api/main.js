@@ -79,16 +79,12 @@ let AppController = class AppController {
             const clickUp = new node_shared_1.ClickUp(taskId);
             const task = yield clickUp.getTask();
             const fullTaskName = yield clickUp.getFullTaskName(task);
-            const frameUrls = yield clickUp.getFrameUrls(task);
             const { gitLabProject, mergeRequestIId } = yield clickUp.getGitLabProjectAndMergeRequestIId(task);
             const gitLab = new node_shared_1.GitLab(gitLabProject.id);
             const mergeRequest = yield gitLab.getMergeRequest(mergeRequestIId);
             const folderPath = this.configService.get('TaskTodoFolder');
             const path = (0, path_1.join)(folderPath, taskId + '.md');
             const content = (0, fs_1.readFileSync)(path, { encoding: 'utf-8' });
-            [...content.matchAll(FIGMA_REGEX)].forEach(([url]) => {
-                frameUrls.push(url);
-            });
             const links = [...content.matchAll(MARKDOWN_LINK_REGEX)].map(([, name, url]) => ({
                 name,
                 url,
@@ -97,7 +93,6 @@ let AppController = class AppController {
                 mergeRequestLink: mergeRequest.web_url,
                 taskLink: task.url,
                 content,
-                frameUrl: frameUrls.length ? frameUrls[0] : null,
                 links,
                 fullTaskName,
             };
@@ -424,48 +419,6 @@ class ClickUp {
     }
     deleteChecklistItem(checklistId, checklistItemId) {
         return callApi('delete', `/checklist/${checklistId}/checklist_item/${checklistItemId}`);
-    }
-    getFrameUrls(task) {
-        return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            let t = task || (yield this.getTask());
-            let rootTaskId = this.taskId;
-            const frameUrls = [];
-            while (t.parent) {
-                t = yield new ClickUp(t.parent).getTask();
-                rootTaskId = t.id;
-            }
-            const taskQueue = [rootTaskId, this.taskId];
-            while (taskQueue.length > 0) {
-                const taskId = taskQueue.shift();
-                const clickUp = new ClickUp(taskId);
-                const task = yield clickUp.getTask();
-                if (task.description) {
-                    [...task.description.matchAll(FIGMA_REGEX)].forEach(([url]) => {
-                        frameUrls.push(url);
-                    });
-                }
-                const comments = yield clickUp.getTaskComments();
-                comments.forEach((co) => {
-                    co.comment
-                        .filter((c) => c.type === 'frame')
-                        .forEach((c) => {
-                        var _a;
-                        if ((_a = c === null || c === void 0 ? void 0 : c.frame) === null || _a === void 0 ? void 0 : _a.url) {
-                            frameUrls.push(c.frame.url);
-                        }
-                    });
-                    co.comment
-                        .filter((c) => { var _a; return c.type === 'bookmark' && ((_a = c.bookmark) === null || _a === void 0 ? void 0 : _a.service) === 'figma'; })
-                        .forEach((c) => {
-                        var _a;
-                        if ((_a = c === null || c === void 0 ? void 0 : c.bookmark) === null || _a === void 0 ? void 0 : _a.url) {
-                            frameUrls.push(c.bookmark.url);
-                        }
-                    });
-                });
-            }
-            return frameUrls;
-        });
     }
     getGitLabProjectAndMergeRequestIId(task) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
