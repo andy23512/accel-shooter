@@ -27,9 +27,7 @@ const CONFIG_KEY_MAP = {
   work_note: 'WorkNoteFile',
 } as const;
 
-const FIGMA_REGEX =
-  /(?:https:\/\/)?(?:www\.)?figma\.com\/(file|proto)\/([0-9a-zA-Z]{22,128})(?:\/([^\?\n\r\/]+)?((?:\?[^\/]*?node-id=([^&\n\r\/]+))?[^\/]*?)(\/duplicate)?)?/g;
-const MARKDOWN_LINK_REGEX = /\[([\w\s\d]+)\]\((https?:\/\/[\w\d./?=#]+)\)/g;
+const MARKDOWN_LINK_REGEX = /\[([\w\s]+)\]\((https?:\/\/[\w./?=#&-]+)\)/g;
 
 @Controller()
 export class AppController {
