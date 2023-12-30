@@ -52,7 +52,9 @@ export class CommitAction extends Action {
     ).stdout
       .trim()
       .split('\n')
-      .map(preprocess);
+      .map(preprocess)
+      .filter(Boolean);
+
     if (stagedFiles.length === 0) {
       console.log('Nothing to commit.');
       return;

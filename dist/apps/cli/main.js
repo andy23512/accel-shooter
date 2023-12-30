@@ -171,7 +171,8 @@ class CommitAction extends action_class_1.Action {
             const stagedFiles = (yield (0, utils_1.promiseSpawn)('git', ['diff', '--name-only', '--cached'], 'pipe')).stdout
                 .trim()
                 .split('\n')
-                .map(preprocess);
+                .map(preprocess)
+                .filter(Boolean);
             if (stagedFiles.length === 0) {
                 console.log('Nothing to commit.');
                 return;
