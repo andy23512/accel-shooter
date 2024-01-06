@@ -1,5 +1,11 @@
 <ng-container *ngIf="previewMode; else elseTemplate">
-  <markdown class="markdown-preview" [data]="content"></markdown>
+  <markdown
+    lineNumbers
+    clipboard
+    [clipboardButtonTemplate]="clipboardButtonTemplate"
+    class="markdown-preview"
+    [data]="content"
+  ></markdown>
 </ng-container>
 <ng-template #elseTemplate>
   <ngx-codemirror
@@ -15,3 +21,8 @@
 >
   <mat-icon>{{ previewMode ? 'edit' : 'visibility' }}</mat-icon>
 </button>
+<ng-template #clipboardButtonTemplate>
+  <button mat-icon-button>
+    <mat-icon>content_copy</mat-icon>
+  </button>
+</ng-template>

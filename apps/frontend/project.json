@@ -20,8 +20,20 @@
           "apps/frontend/src/favicon-32x32.png",
           "apps/frontend/src/assets"
         ],
-        "styles": ["apps/frontend/src/styles.scss"],
-        "scripts": ["node_modules/marked/marked.min.js"]
+        "styles": [
+          "apps/frontend/src/styles.scss",
+          "node_modules/prismjs/themes/prism-dark.css",
+          "node_modules/prismjs/plugins/line-numbers/prism-line-numbers.css"
+        ],
+        "scripts": [
+          "node_modules/marked/marked.min.js",
+          "node_modules/prismjs/prism.js",
+          "node_modules/prismjs/components/prism-bash.min.js",
+          "node_modules/prismjs/components/prism-python.min.js",
+          "node_modules/prismjs/components/prism-typescript.min.js",
+          "node_modules/prismjs/plugins/line-numbers/prism-line-numbers.js",
+          "node_modules/clipboard/dist/clipboard.min.js"
+        ]
       },
       "configurations": {
         "production": {
