@@ -2,7 +2,7 @@
 /******/ 	"use strict";
 /******/ 	var __webpack_modules__ = ({
 
-/***/ "./apps/api/src/app/app.controller.ts":
+/***/ "./src/app/app.controller.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -10,7 +10,7 @@ var _a, _b, _c, _d, _e, _f, _g, _h, _j;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AppController = void 0;
 const tslib_1 = __webpack_require__("tslib");
-const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const node_shared_1 = __webpack_require__("../../libs/node-shared/src/index.ts");
 const common_1 = __webpack_require__("@nestjs/common");
 const config_1 = __webpack_require__("@nestjs/config");
 const fs_1 = __webpack_require__("fs");
@@ -230,20 +230,20 @@ exports.AppController = AppController;
 
 /***/ }),
 
-/***/ "./apps/api/src/app/app.module.ts":
+/***/ "./src/app/app.module.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AppModule = void 0;
 const tslib_1 = __webpack_require__("tslib");
-const node_shared_1 = __webpack_require__("./libs/node-shared/src/index.ts");
+const node_shared_1 = __webpack_require__("../../libs/node-shared/src/index.ts");
 const common_1 = __webpack_require__("@nestjs/common");
 const config_1 = __webpack_require__("@nestjs/config");
 const serve_static_1 = __webpack_require__("@nestjs/serve-static");
 const path_1 = __webpack_require__("path");
-const app_controller_1 = __webpack_require__("./apps/api/src/app/app.controller.ts");
-const app_service_1 = __webpack_require__("./apps/api/src/app/app.service.ts");
+const app_controller_1 = __webpack_require__("./src/app/app.controller.ts");
+const app_service_1 = __webpack_require__("./src/app/app.service.ts");
 let AppModule = class AppModule {
 };
 AppModule = tslib_1.__decorate([
@@ -264,7 +264,7 @@ exports.AppModule = AppModule;
 
 /***/ }),
 
-/***/ "./apps/api/src/app/app.service.ts":
+/***/ "./src/app/app.service.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -282,18 +282,18 @@ exports.AppService = AppService;
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/index.ts":
+/***/ "../../libs/node-shared/src/index.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__("tslib");
-tslib_1.__exportStar(__webpack_require__("./libs/node-shared/src/lib/node-shared.ts"), exports);
+tslib_1.__exportStar(__webpack_require__("../../libs/node-shared/src/lib/node-shared.ts"), exports);
 
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/classes/clickup.class.ts":
+/***/ "../../libs/node-shared/src/lib/classes/clickup.class.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -303,11 +303,11 @@ const tslib_1 = __webpack_require__("tslib");
 const cli_progress_1 = __webpack_require__("cli-progress");
 const fs_1 = __webpack_require__("fs");
 const path_1 = __webpack_require__("path");
-const config_1 = __webpack_require__("./libs/node-shared/src/lib/config.ts");
-const node_shared_1 = __webpack_require__("./libs/node-shared/src/lib/node-shared.ts");
-const api_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/api.utils.ts");
-const case_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/case.utils.ts");
-const checklist_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/checklist.utils.ts");
+const config_1 = __webpack_require__("../../libs/node-shared/src/lib/config.ts");
+const node_shared_1 = __webpack_require__("../../libs/node-shared/src/lib/node-shared.ts");
+const api_utils_1 = __webpack_require__("../../libs/node-shared/src/lib/utils/api.utils.ts");
+const case_utils_1 = __webpack_require__("../../libs/node-shared/src/lib/utils/case.utils.ts");
+const checklist_utils_1 = __webpack_require__("../../libs/node-shared/src/lib/utils/checklist.utils.ts");
 const FIGMA_REGEX = /(?:https:\/\/)?(?:www\.)?figma\.com\/(file|proto)\/([0-9a-zA-Z]{22,128})(?:\/([^\?\n\r\/]+)?((?:\?[^\/]*?node-id=([^&\n\r\/]+))?[^\/]*?)(\/duplicate)?)?/g;
 const callApi = (0, api_utils_1.callApiFactory)('ClickUp');
 class ClickUp {
@@ -604,16 +604,16 @@ exports.ClickUp = ClickUp;
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/classes/gitlab.class.ts":
+/***/ "../../libs/node-shared/src/lib/classes/gitlab.class.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.GitLab = void 0;
 const tslib_1 = __webpack_require__("tslib");
-const config_1 = __webpack_require__("./libs/node-shared/src/lib/config.ts");
-const api_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/api.utils.ts");
-const date_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/date.utils.ts");
+const config_1 = __webpack_require__("../../libs/node-shared/src/lib/config.ts");
+const api_utils_1 = __webpack_require__("../../libs/node-shared/src/lib/utils/api.utils.ts");
+const date_utils_1 = __webpack_require__("../../libs/node-shared/src/lib/utils/date.utils.ts");
 const callApi = (0, api_utils_1.callApiFactory)('GitLab');
 class GitLab {
     constructor(projectId) {
@@ -804,7 +804,7 @@ exports.GitLab = GitLab;
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/classes/google.class.ts":
+/***/ "../../libs/node-shared/src/lib/classes/google.class.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -815,7 +815,7 @@ const fs_1 = tslib_1.__importDefault(__webpack_require__("fs"));
 const googleapis_1 = __webpack_require__("googleapis");
 const local_auth_1 = __webpack_require__("@google-cloud/local-auth");
 const date_fns_1 = __webpack_require__("date-fns");
-const config_1 = __webpack_require__("./libs/node-shared/src/lib/config.ts");
+const config_1 = __webpack_require__("../../libs/node-shared/src/lib/config.ts");
 class Google {
     constructor() {
         this.scopes = [
@@ -852,25 +852,25 @@ class Google {
     }
     authorize() {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
-            let client = yield this.loadSavedCredentialsIfExist();
+            const client = yield this.loadSavedCredentialsIfExist();
             if (client) {
                 return client;
             }
-            client = (yield (0, local_auth_1.authenticate)({
+            const oauthClient = yield (0, local_auth_1.authenticate)({
                 scopes: this.scopes,
                 keyfilePath: this.credentialsFile,
-            }));
-            if (client.credentials) {
-                yield this.saveCredentials(client);
+            });
+            if (oauthClient.credentials) {
+                yield this.saveCredentials(oauthClient);
             }
-            return client;
+            return oauthClient;
         });
     }
     listAttendingEvent(timeMin, timeMax) {
         var _a;
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             try {
-                const auth = yield this.authorize();
+                const auth = (yield this.authorize());
                 const calendar = googleapis_1.google.calendar({ version: 'v3', auth });
                 const res = yield calendar.events.list({
                     calendarId: 'primary',
@@ -928,7 +928,7 @@ exports.Google = Google;
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/config.ts":
+/***/ "../../libs/node-shared/src/lib/config.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -982,7 +982,7 @@ exports.CONFIG = getConfig();
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/models/clickup/checklist.models.ts":
+/***/ "../../libs/node-shared/src/lib/models/clickup/checklist.models.ts":
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -991,7 +991,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/models/clickup/comment.models.ts":
+/***/ "../../libs/node-shared/src/lib/models/clickup/comment.models.ts":
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1000,7 +1000,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/models/clickup/space.models.ts":
+/***/ "../../libs/node-shared/src/lib/models/clickup/space.models.ts":
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1009,7 +1009,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/models/clickup/task-status.enum.ts":
+/***/ "../../libs/node-shared/src/lib/models/clickup/task-status.enum.ts":
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1038,7 +1038,7 @@ var TaskStatus;
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/models/clickup/task.models.ts":
+/***/ "../../libs/node-shared/src/lib/models/clickup/task.models.ts":
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1047,7 +1047,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/models/clickup/user.models.ts":
+/***/ "../../libs/node-shared/src/lib/models/clickup/user.models.ts":
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1056,7 +1056,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/models/gitlab/approval.models.ts":
+/***/ "../../libs/node-shared/src/lib/models/gitlab/approval.models.ts":
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1065,7 +1065,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/models/gitlab/job.models.ts":
+/***/ "../../libs/node-shared/src/lib/models/gitlab/job.models.ts":
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1074,7 +1074,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/models/gitlab/merge-request.models.ts":
+/***/ "../../libs/node-shared/src/lib/models/gitlab/merge-request.models.ts":
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1083,7 +1083,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/models/models.ts":
+/***/ "../../libs/node-shared/src/lib/models/models.ts":
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1092,63 +1092,63 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/node-shared.ts":
+/***/ "../../libs/node-shared/src/lib/node-shared.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.sleep = exports.formatDate = exports.DateFormat = exports.getTaskIdFromBranchName = exports.normalizeMarkdownChecklist = exports.normalizeClickUpChecklist = exports.getSyncChecklistActions = exports.titleCase = exports.ProjectCheckItem = exports.NormalizedChecklist = exports.IHoliday = exports.GitLabProject = exports.FullMergeRequest = exports.Change = exports.Job = exports.Approval = exports.ClickUpUser = exports.Task = exports.TaskStatus = exports.Space = exports.Comment = exports.ChecklistItem = exports.getConfig = exports.CONFIG = exports.Google = exports.GitLab = exports.ClickUp = void 0;
-var clickup_class_1 = __webpack_require__("./libs/node-shared/src/lib/classes/clickup.class.ts");
+var clickup_class_1 = __webpack_require__("../../libs/node-shared/src/lib/classes/clickup.class.ts");
 Object.defineProperty(exports, "ClickUp", ({ enumerable: true, get: function () { return clickup_class_1.ClickUp; } }));
-var gitlab_class_1 = __webpack_require__("./libs/node-shared/src/lib/classes/gitlab.class.ts");
+var gitlab_class_1 = __webpack_require__("../../libs/node-shared/src/lib/classes/gitlab.class.ts");
 Object.defineProperty(exports, "GitLab", ({ enumerable: true, get: function () { return gitlab_class_1.GitLab; } }));
-var google_class_1 = __webpack_require__("./libs/node-shared/src/lib/classes/google.class.ts");
+var google_class_1 = __webpack_require__("../../libs/node-shared/src/lib/classes/google.class.ts");
 Object.defineProperty(exports, "Google", ({ enumerable: true, get: function () { return google_class_1.Google; } }));
-var config_1 = __webpack_require__("./libs/node-shared/src/lib/config.ts");
+var config_1 = __webpack_require__("../../libs/node-shared/src/lib/config.ts");
 Object.defineProperty(exports, "CONFIG", ({ enumerable: true, get: function () { return config_1.CONFIG; } }));
 Object.defineProperty(exports, "getConfig", ({ enumerable: true, get: function () { return config_1.getConfig; } }));
-var checklist_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/checklist.models.ts");
+var checklist_models_1 = __webpack_require__("../../libs/node-shared/src/lib/models/clickup/checklist.models.ts");
 Object.defineProperty(exports, "ChecklistItem", ({ enumerable: true, get: function () { return checklist_models_1.ChecklistItem; } }));
-var comment_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/comment.models.ts");
+var comment_models_1 = __webpack_require__("../../libs/node-shared/src/lib/models/clickup/comment.models.ts");
 Object.defineProperty(exports, "Comment", ({ enumerable: true, get: function () { return comment_models_1.Comment; } }));
-var space_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/space.models.ts");
+var space_models_1 = __webpack_require__("../../libs/node-shared/src/lib/models/clickup/space.models.ts");
 Object.defineProperty(exports, "Space", ({ enumerable: true, get: function () { return space_models_1.Space; } }));
-var task_status_enum_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/task-status.enum.ts");
+var task_status_enum_1 = __webpack_require__("../../libs/node-shared/src/lib/models/clickup/task-status.enum.ts");
 Object.defineProperty(exports, "TaskStatus", ({ enumerable: true, get: function () { return task_status_enum_1.TaskStatus; } }));
-var task_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/task.models.ts");
+var task_models_1 = __webpack_require__("../../libs/node-shared/src/lib/models/clickup/task.models.ts");
 Object.defineProperty(exports, "Task", ({ enumerable: true, get: function () { return task_models_1.Task; } }));
-var user_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/clickup/user.models.ts");
+var user_models_1 = __webpack_require__("../../libs/node-shared/src/lib/models/clickup/user.models.ts");
 Object.defineProperty(exports, "ClickUpUser", ({ enumerable: true, get: function () { return user_models_1.User; } }));
-var approval_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/gitlab/approval.models.ts");
+var approval_models_1 = __webpack_require__("../../libs/node-shared/src/lib/models/gitlab/approval.models.ts");
 Object.defineProperty(exports, "Approval", ({ enumerable: true, get: function () { return approval_models_1.Approval; } }));
-var job_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/gitlab/job.models.ts");
+var job_models_1 = __webpack_require__("../../libs/node-shared/src/lib/models/gitlab/job.models.ts");
 Object.defineProperty(exports, "Job", ({ enumerable: true, get: function () { return job_models_1.Job; } }));
-var merge_request_models_1 = __webpack_require__("./libs/node-shared/src/lib/models/gitlab/merge-request.models.ts");
+var merge_request_models_1 = __webpack_require__("../../libs/node-shared/src/lib/models/gitlab/merge-request.models.ts");
 Object.defineProperty(exports, "Change", ({ enumerable: true, get: function () { return merge_request_models_1.Change; } }));
 Object.defineProperty(exports, "FullMergeRequest", ({ enumerable: true, get: function () { return merge_request_models_1.FullMergeRequest; } }));
-var models_1 = __webpack_require__("./libs/node-shared/src/lib/models/models.ts");
+var models_1 = __webpack_require__("../../libs/node-shared/src/lib/models/models.ts");
 Object.defineProperty(exports, "GitLabProject", ({ enumerable: true, get: function () { return models_1.GitLabProject; } }));
 Object.defineProperty(exports, "IHoliday", ({ enumerable: true, get: function () { return models_1.IHoliday; } }));
 Object.defineProperty(exports, "NormalizedChecklist", ({ enumerable: true, get: function () { return models_1.NormalizedChecklist; } }));
 Object.defineProperty(exports, "ProjectCheckItem", ({ enumerable: true, get: function () { return models_1.ProjectCheckItem; } }));
-var case_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/case.utils.ts");
+var case_utils_1 = __webpack_require__("../../libs/node-shared/src/lib/utils/case.utils.ts");
 Object.defineProperty(exports, "titleCase", ({ enumerable: true, get: function () { return case_utils_1.titleCase; } }));
-var checklist_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/checklist.utils.ts");
+var checklist_utils_1 = __webpack_require__("../../libs/node-shared/src/lib/utils/checklist.utils.ts");
 Object.defineProperty(exports, "getSyncChecklistActions", ({ enumerable: true, get: function () { return checklist_utils_1.getSyncChecklistActions; } }));
 Object.defineProperty(exports, "normalizeClickUpChecklist", ({ enumerable: true, get: function () { return checklist_utils_1.normalizeClickUpChecklist; } }));
 Object.defineProperty(exports, "normalizeMarkdownChecklist", ({ enumerable: true, get: function () { return checklist_utils_1.normalizeMarkdownChecklist; } }));
-var clickup_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/clickup.utils.ts");
+var clickup_utils_1 = __webpack_require__("../../libs/node-shared/src/lib/utils/clickup.utils.ts");
 Object.defineProperty(exports, "getTaskIdFromBranchName", ({ enumerable: true, get: function () { return clickup_utils_1.getTaskIdFromBranchName; } }));
-var date_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/date.utils.ts");
+var date_utils_1 = __webpack_require__("../../libs/node-shared/src/lib/utils/date.utils.ts");
 Object.defineProperty(exports, "DateFormat", ({ enumerable: true, get: function () { return date_utils_1.DateFormat; } }));
 Object.defineProperty(exports, "formatDate", ({ enumerable: true, get: function () { return date_utils_1.formatDate; } }));
-var sleep_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/sleep.utils.ts");
+var sleep_utils_1 = __webpack_require__("../../libs/node-shared/src/lib/utils/sleep.utils.ts");
 Object.defineProperty(exports, "sleep", ({ enumerable: true, get: function () { return sleep_utils_1.sleep; } }));
 
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/utils/api.utils.ts":
+/***/ "../../libs/node-shared/src/lib/utils/api.utils.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -1157,8 +1157,8 @@ exports.callApiFactory = void 0;
 const tslib_1 = __webpack_require__("tslib");
 const node_fetch_1 = tslib_1.__importDefault(__webpack_require__("node-fetch"));
 const qs_1 = tslib_1.__importDefault(__webpack_require__("qs"));
-const config_1 = __webpack_require__("./libs/node-shared/src/lib/config.ts");
-const sleep_utils_1 = __webpack_require__("./libs/node-shared/src/lib/utils/sleep.utils.ts");
+const config_1 = __webpack_require__("../../libs/node-shared/src/lib/config.ts");
+const sleep_utils_1 = __webpack_require__("../../libs/node-shared/src/lib/utils/sleep.utils.ts");
 const RETRY_SETTING = {
     retry: 5,
     pause: 12 * 1000,
@@ -1243,7 +1243,7 @@ exports.callApiFactory = callApiFactory;
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/utils/case.utils.ts":
+/***/ "../../libs/node-shared/src/lib/utils/case.utils.ts":
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1295,7 +1295,7 @@ exports.titleCase = titleCase;
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/utils/checklist.utils.ts":
+/***/ "../../libs/node-shared/src/lib/utils/checklist.utils.ts":
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1355,7 +1355,7 @@ exports.getSyncChecklistActions = getSyncChecklistActions;
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/utils/clickup.utils.ts":
+/***/ "../../libs/node-shared/src/lib/utils/clickup.utils.ts":
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1370,7 +1370,7 @@ exports.getTaskIdFromBranchName = getTaskIdFromBranchName;
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/utils/date.utils.ts":
+/***/ "../../libs/node-shared/src/lib/utils/date.utils.ts":
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
@@ -1392,7 +1392,7 @@ exports.formatDate = formatDate;
 
 /***/ }),
 
-/***/ "./libs/node-shared/src/lib/utils/sleep.utils.ts":
+/***/ "../../libs/node-shared/src/lib/utils/sleep.utils.ts":
 /***/ ((__unused_webpack_module, exports) => {
 
 
@@ -1572,7 +1572,7 @@ Object.defineProperty(exports, "__esModule", ({ value: true }));
 const tslib_1 = __webpack_require__("tslib");
 const common_1 = __webpack_require__("@nestjs/common");
 const core_1 = __webpack_require__("@nestjs/core");
-const app_module_1 = __webpack_require__("./apps/api/src/app/app.module.ts");
+const app_module_1 = __webpack_require__("./src/app/app.module.ts");
 function bootstrap() {
     return tslib_1.__awaiter(this, void 0, void 0, function* () {
         const app = yield core_1.NestFactory.create(app_module_1.AppModule);

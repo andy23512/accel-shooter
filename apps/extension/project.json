@@ -1,0 +1,75 @@
+{
+  "name": "extension",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "projectType": "application",
+  "sourceRoot": "apps/extension/src",
+  "targets": {
+    "build": {
+      "executor": "@nx/webpack:webpack",
+      "outputs": ["{options.outputPath}"],
+      "options": {
+        "outputPath": "dist/apps/extension",
+        "index": "apps/extension/src/index.html",
+        "main": "apps/extension/src/main.ts",
+        "tsConfig": "apps/extension/tsconfig.app.json",
+        "assets": [
+          "apps/extension/src/favicon.ico",
+          "apps/extension/src/assets"
+        ],
+        "styles": ["apps/extension/src/styles.css"],
+        "scripts": []
+      },
+      "configurations": {
+        "production": {
+          "fileReplacements": [
+            {
+              "replace": "apps/extension/src/environments/environment.ts",
+              "with": "apps/extension/src/environments/environment.prod.ts"
+            }
+          ],
+          "optimization": false,
+          "outputHashing": "all",
+          "sourceMap": false,
+          "extractCss": true,
+          "namedChunks": false,
+          "extractLicenses": true,
+          "vendorChunk": false,
+          "budgets": [
+            {
+              "type": "initial",
+              "maximumWarning": "2mb",
+              "maximumError": "5mb"
+            }
+          ]
+        }
+      }
+    },
+    "serve": {
+      "executor": "@nx/webpack:dev-server",
+      "options": {
+        "buildTarget": "extension:build"
+      },
+      "configurations": {
+        "production": {
+          "buildTarget": "extension:build:production"
+        }
+      }
+    },
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "options": {
+        "lintFilePatterns": ["apps/extension/**/*.ts"]
+      },
+      "outputs": ["{options.outputFile}"]
+    },
+    "test": {
+      "executor": "@nx/jest:jest",
+      "outputs": ["{workspaceRoot}/coverage/apps/extension"],
+      "options": {
+        "jestConfig": "apps/extension/jest.config.js",
+        "passWithNoTests": true
+      }
+    }
+  },
+  "tags": []
+}

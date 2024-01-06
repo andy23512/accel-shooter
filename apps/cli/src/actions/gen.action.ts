@@ -37,7 +37,7 @@ export class GenAction extends Action {
       args = [
         'nx',
         'g',
-        `@nrwl/angular:${generator}`,
+        `@nx/angular:${generator}`,
         `--path=${cwdRelativePath}`,
         `--module=${moduleRelativePath}`,
         `--changeDetection=OnPush`,
@@ -48,7 +48,7 @@ export class GenAction extends Action {
       args = [
         'nx',
         'g',
-        `@nrwl/angular:${generator}`,
+        `@nx/angular:${generator}`,
         `--path=${cwdRelativePath}`,
         `--module=${moduleRelativePath}`,
         name,
@@ -59,7 +59,7 @@ export class GenAction extends Action {
       args = [
         'nx',
         'g',
-        `@nrwl/angular:${generator}`,
+        `@nx/angular:${generator}`,
         `--path=${cwdRelativePath}`,
         name,
       ];

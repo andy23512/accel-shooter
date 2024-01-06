@@ -24,7 +24,7 @@ export class Google {
     }
   }
 
-  private async saveCredentials(client: JSONClient) {
+  private async saveCredentials(client: any) {
     const content = await fs.promises.readFile(this.credentialsFile, 'utf-8');
     const keys = JSON.parse(content);
     const key = keys.installed || keys.web;
@@ -38,18 +38,18 @@ export class Google {
   }
 
   private async authorize() {
-    let client = await this.loadSavedCredentialsIfExist();
+    const client = await this.loadSavedCredentialsIfExist();
     if (client) {
       return client;
     }
-    client = (await authenticate({
+    const oauthClient = await authenticate({
       scopes: this.scopes,
       keyfilePath: this.credentialsFile,
-    })) as JSONClient;
-    if (client.credentials) {
-      await this.saveCredentials(client);
+    });
+    if (oauthClient.credentials) {
+      await this.saveCredentials(oauthClient);
     }
-    return client;
+    return oauthClient;
   }
 
   public async listAttendingEvent(
@@ -57,7 +57,7 @@ export class Google {
     timeMax: string
   ): Promise<(calendar_v3.Schema$Event & { isStudyGroup: boolean })[]> {
     try {
-      const auth = await this.authorize();
+      const auth = (await this.authorize()) as any;
       const calendar = google.calendar({ version: 'v3', auth });
       const res = await calendar.events.list({
         calendarId: 'primary',

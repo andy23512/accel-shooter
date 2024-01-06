@@ -2,7 +2,7 @@ import { ChecklistItem, NormalizedChecklist } from '@accel-shooter/node-shared';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
 import { interval, merge, Subject } from 'rxjs';
 import {
