@@ -2,8 +2,8 @@ import { ClipboardModule } from '@angular/cdk/clipboard';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { MatLegacySnackBarModule as MatSnackBarModule } from '@angular/material/legacy-snack-bar';
-import { MatLegacyTooltipModule as MatTooltipModule } from '@angular/material/legacy-tooltip';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { RouterModule } from '@angular/router';
@@ -22,6 +22,9 @@ import { PriorityCellRendererComponent } from './tasks-page/priority-cell-render
 import { TaskNameCellRendererComponent } from './tasks-page/task-name-cell-renderer.component';
 import { TaskStatusCellRendererComponent } from './tasks-page/task-status-cell-renderer.component';
 import { TasksPageComponent } from './tasks-page/tasks-page.component';
+import { MarkdownModule } from 'ngx-markdown';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
   declarations: [
@@ -71,6 +74,8 @@ import { TasksPageComponent } from './tasks-page/tasks-page.component';
     ]),
     MatSnackBarModule,
     MatTooltipModule,
+    MatIconModule,
+    MatButtonModule,
     LoadingBarHttpClientModule,
     LoadingBarRouterModule,
     LoadingBarModule,
@@ -80,6 +85,7 @@ import { TasksPageComponent } from './tasks-page/tasks-page.component';
       PriorityCellRendererComponent,
       TaskStatusCellRendererComponent,
     ]),
+    MarkdownModule.forRoot(),
   ],
   providers: [],
   bootstrap: [AppComponent],

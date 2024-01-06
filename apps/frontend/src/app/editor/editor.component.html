@@ -1,5 +1,17 @@
-<ngx-codemirror
-  [ngModel]="content"
-  [options]="option"
-  (ngModelChange)="contentChange.emit($event)"
-></ngx-codemirror>
+<ng-container *ngIf="previewMode; else elseTemplate">
+  <markdown class="markdown-preview" [data]="content"></markdown>
+</ng-container>
+<ng-template #elseTemplate>
+  <ngx-codemirror
+    [ngModel]="content"
+    [options]="option"
+    (ngModelChange)="contentChange.emit($event)"
+  ></ngx-codemirror>
+</ng-template>
+<button
+  class="toggle-preview-button"
+  mat-icon-button
+  (click)="previewMode = !previewMode"
+>
+  <mat-icon>{{ previewMode ? 'edit' : 'visibility' }}</mat-icon>
+</button>

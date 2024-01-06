@@ -4,10 +4,17 @@ import { filter, map, take } from 'rxjs/operators';
 
 import { Clipboard } from '@angular/cdk/clipboard';
 import {
-    AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges,
-    ViewChild
+  AfterViewInit,
+  Component,
+  ElementRef,
+  EventEmitter,
+  Input,
+  OnChanges,
+  Output,
+  SimpleChanges,
+  ViewChild,
 } from '@angular/core';
-import { MatLegacySnackBar as MatSnackBar } from '@angular/material/legacy-snack-bar';
+import { MatSnackBar } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { CodemirrorComponent } from '@ctrl/ngx-codemirror';
 
@@ -23,6 +30,7 @@ export class EditorComponent implements AfterViewInit, OnChanges {
   @Output() public save = new EventEmitter<void>();
   @ViewChild(CodemirrorComponent)
   public codemirrorComponent?: CodemirrorComponent;
+  public previewMode = false;
   public option: EditorConfiguration = {
     lineNumbers: true,
     theme: 'one-dark',

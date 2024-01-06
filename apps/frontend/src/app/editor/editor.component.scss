@@ -1,4 +1,23 @@
+:host {
+  display: block;
+  height: 100%;
+  position: relative;
+}
+
+.markdown-preview {
+  display: block;
+  padding: 5px 10px;
+  height: 100%;
+  overflow: auto;
+}
+
 ngx-codemirror {
   display: block;
   height: 100%;
+}
+
+.toggle-preview-button {
+  position: absolute;
+  right: 0;
+  bottom: 0;
 }
