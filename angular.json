@@ -46,7 +46,7 @@
         },
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/api"],
+          "outputs": ["{workspaceRoot}/coverage/apps/api"],
           "options": {
             "jestConfig": "apps/api/jest.config.ts",
             "passWithNoTests": true
@@ -115,7 +115,7 @@
         },
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/cli"],
+          "outputs": ["{workspaceRoot}/coverage/apps/cli"],
           "options": {
             "jestConfig": "apps/cli/jest.config.ts",
             "passWithNoTests": true
@@ -189,7 +189,7 @@
         },
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/extension"],
+          "outputs": ["{workspaceRoot}/coverage/apps/extension"],
           "options": {
             "jestConfig": "apps/extension/jest.config.js",
             "passWithNoTests": true
@@ -316,7 +316,7 @@
         },
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/apps/frontend"],
+          "outputs": ["{workspaceRoot}/coverage/apps/frontend"],
           "options": {
             "jestConfig": "apps/frontend/jest.config.ts",
             "passWithNoTests": true
@@ -368,7 +368,7 @@
         },
         "test": {
           "builder": "@nrwl/jest:jest",
-          "outputs": ["coverage/libs/node-shared"],
+          "outputs": ["{workspaceRoot}/coverage/libs/node-shared"],
           "options": {
             "jestConfig": "libs/node-shared/jest.config.ts",
             "passWithNoTests": true
