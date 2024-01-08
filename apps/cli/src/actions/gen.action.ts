@@ -1,4 +1,4 @@
-import { existsSync } from 'fs';
+import { existsSync, readFileSync } from 'fs';
 import { glob } from 'glob';
 import path from 'path';
 import { Action } from '../classes/action.class';
@@ -32,12 +32,28 @@ export class GenAction extends Action {
     }
     const moduleRelativePath = path.relative(cwd, modulePath);
     const cwdRelativePath = path.relative(rootPath, cwd);
+    const packageJsonPath = path.join(rootPath, 'package.json');
+    const packageJsonObject = JSON.parse(
+      readFileSync(packageJsonPath, {
+        encoding: 'utf-8',
+      })
+    );
+    let packageName: string = null;
+    if (packageJsonObject.devDependencies['@nrwl/angular']) {
+      packageName = '@nrwl/angular';
+    } else if (packageJsonObject.devDependencies['@nx/angular']) {
+      packageName = '@nx/angular';
+    } else {
+      throw Error(
+        'Both @nrwl/angular and @nx/angular are not exist in project.'
+      );
+    }
     let args = [];
     if (['c', 'component'].includes(generator)) {
       args = [
         'nx',
         'g',
-        `@nx/angular:${generator}`,
+        `${packageName}:${generator}`,
         `--path=${cwdRelativePath}`,
         `--module=${moduleRelativePath}`,
         `--changeDetection=OnPush`,
@@ -48,7 +64,7 @@ export class GenAction extends Action {
       args = [
         'nx',
         'g',
-        `@nx/angular:${generator}`,
+        `${packageName}:${generator}`,
         `--path=${cwdRelativePath}`,
         `--module=${moduleRelativePath}`,
         name,
@@ -59,7 +75,7 @@ export class GenAction extends Action {
       args = [
         'nx',
         'g',
-        `@nx/angular:${generator}`,
+        `${packageName}:${generator}`,
         `--path=${cwdRelativePath}`,
         name,
       ];

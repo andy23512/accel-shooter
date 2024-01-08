@@ -653,12 +653,26 @@ class GenAction extends action_class_1.Action {
             }
             const moduleRelativePath = path_1.default.relative(cwd, modulePath);
             const cwdRelativePath = path_1.default.relative(rootPath, cwd);
+            const packageJsonPath = path_1.default.join(rootPath, 'package.json');
+            const packageJsonObject = JSON.parse((0, fs_1.readFileSync)(packageJsonPath, {
+                encoding: 'utf-8',
+            }));
+            let packageName = null;
+            if (packageJsonObject.devDependencies['@nrwl/angular']) {
+                packageName = '@nrwl/angular';
+            }
+            else if (packageJsonObject.devDependencies['@nx/angular']) {
+                packageName = '@nx/angular';
+            }
+            else {
+                throw Error('Both @nrwl/angular and @nx/angular are not exist in project.');
+            }
             let args = [];
             if (['c', 'component'].includes(generator)) {
                 args = [
                     'nx',
                     'g',
-                    `@nx/angular:${generator}`,
+                    `${packageName}:${generator}`,
                     `--path=${cwdRelativePath}`,
                     `--module=${moduleRelativePath}`,
                     `--changeDetection=OnPush`,
@@ -670,7 +684,7 @@ class GenAction extends action_class_1.Action {
                 args = [
                     'nx',
                     'g',
-                    `@nx/angular:${generator}`,
+                    `${packageName}:${generator}`,
                     `--path=${cwdRelativePath}`,
                     `--module=${moduleRelativePath}`,
                     name,
@@ -680,7 +694,7 @@ class GenAction extends action_class_1.Action {
                 args = [
                     'nx',
                     'g',
-                    `@nx/angular:${generator}`,
+                    `${packageName}:${generator}`,
                     `--path=${cwdRelativePath}`,
                     name,
                 ];
