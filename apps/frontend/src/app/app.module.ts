@@ -2,6 +2,8 @@ import { ClipboardModule } from '@angular/cdk/clipboard';
 import { HttpClientModule } from '@angular/common/http';
 import { NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { BrowserModule } from '@angular/platform-browser';
@@ -12,6 +14,7 @@ import { LoadingBarModule } from '@ngx-loading-bar/core';
 import { LoadingBarHttpClientModule } from '@ngx-loading-bar/http-client';
 import { LoadingBarRouterModule } from '@ngx-loading-bar/router';
 import { AgGridModule } from 'ag-grid-angular';
+import { MarkdownModule } from 'ngx-markdown';
 import { AccelUpPageComponent } from './accel-up-page/accel-up-page.component';
 import { AppComponent } from './app.component';
 import { EditorComponent } from './editor/editor.component';
@@ -22,9 +25,6 @@ import { PriorityCellRendererComponent } from './tasks-page/priority-cell-render
 import { TaskNameCellRendererComponent } from './tasks-page/task-name-cell-renderer.component';
 import { TaskStatusCellRendererComponent } from './tasks-page/task-status-cell-renderer.component';
 import { TasksPageComponent } from './tasks-page/tasks-page.component';
-import { MarkdownModule } from 'ngx-markdown';
-import { MatIconModule } from '@angular/material/icon';
-import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
   declarations: [
@@ -80,11 +80,7 @@ import { MatButtonModule } from '@angular/material/button';
     LoadingBarRouterModule,
     LoadingBarModule,
     ClipboardModule,
-    AgGridModule.withComponents([
-      TaskNameCellRendererComponent,
-      PriorityCellRendererComponent,
-      TaskStatusCellRendererComponent,
-    ]),
+    AgGridModule,
     MarkdownModule.forRoot(),
   ],
   providers: [],

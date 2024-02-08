@@ -30,7 +30,7 @@ const comparator = (a: null | string, b: null | string) => {
 export class TasksPageComponent implements OnInit {
   public columnDefs: ColDef[] = [
     {
-      width: 36,
+      width: 40,
       cellRenderer: TaskStatusCellRendererComponent,
       valueGetter: (p) => p.data.status?.orderindex,
       comparator,
