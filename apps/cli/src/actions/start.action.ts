@@ -163,7 +163,7 @@ export class StartAction extends Action {
     );
     p.next(); // Create Checklist at ClickUp
     const clickUpChecklistTitle = `Synced checklist [${answers.gitLabProject.id.replace(
-      '%2F',
+      /%2F/g,
       '/'
     )} !${gitLabMergeRequestIId}]`;
     let clickUpChecklist = clickUpTask.checklists.find(
