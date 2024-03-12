@@ -4,13 +4,14 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { ActivatedRoute, Router } from '@angular/router';
-import { interval, merge, Subject } from 'rxjs';
+import { Subject, interval, merge } from 'rxjs';
 import {
   concatMap,
   debounceTime,
   startWith,
   switchMap,
   take,
+  takeWhile,
   tap,
 } from 'rxjs/operators';
 import { PageTitleService } from '../page-title.service';
@@ -40,6 +41,7 @@ export class TaskPageComponent implements OnInit {
   public mergeRequestLink = '';
   public fullTaskName = '';
   public mrPipelineStatus = '';
+  public mrLinked = false;
   public changeSubject = new Subject<void>();
   public saveSubject = new Subject<void>();
   public links: { name: string; url: string }[] = [];
@@ -86,6 +88,20 @@ export class TaskPageComponent implements OnInit {
         ),
         tap((r) => {
           this.mrPipelineStatus = r.content;
+        })
+      )
+      .subscribe();
+    interval(30000)
+      .pipe(
+        startWith(0),
+        switchMap(() =>
+          this.http.get<{ linked: boolean }>(
+            `/api/task/${this.taskId}/mr_link_status`
+          )
+        ),
+        takeWhile(({ linked }) => !linked, true),
+        tap(({ linked }) => {
+          this.mrLinked = linked;
         })
       )
       .subscribe();

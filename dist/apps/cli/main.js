@@ -956,6 +956,9 @@ class GitLab {
     getMergeRequest(mergeRequestNumber) {
         return callApi('get', `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}`);
     }
+    getMergeRequestNotes(mergeRequestNumber) {
+        return callApi('get', `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}/notes`);
+    }
     getMergeRequestChanges(mergeRequestNumber) {
         return callApi('get', `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}/changes`);
     }

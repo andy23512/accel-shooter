@@ -761,6 +761,9 @@ class GitLab {
     getMergeRequest(mergeRequestNumber) {
         return callApi('get', `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}`);
     }
+    getMergeRequestNotes(mergeRequestNumber) {
+        return callApi('get', `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}/notes`);
+    }
     getMergeRequestChanges(mergeRequestNumber) {
         return callApi('get', `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}/changes`);
     }
@@ -1167,7 +1170,7 @@ module.exports = require("@nestjs/serve-static");
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b, _c, _d, _e, _f, _g, _h, _j;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AppController = void 0;
 const tslib_1 = __webpack_require__(4);
@@ -1277,6 +1280,15 @@ let AppController = exports.AppController = class AppController {
         const mergeRequest = await this.getMRFromTaskId(taskId);
         return { content: mergeRequest.head_pipeline?.status || 'none' };
     }
+    async getMRLinkStatus(taskId) {
+        const clickUp = new node_shared_1.ClickUp(taskId);
+        const { gitLabProject, mergeRequestIId } = await clickUp.getGitLabProjectAndMergeRequestIId();
+        const gitLab = new node_shared_1.GitLab(gitLabProject.id);
+        const notes = await gitLab.getMergeRequestNotes(mergeRequestIId);
+        return {
+            linked: notes.some(n => n.body.startsWith('Task linked:'))
+        };
+    }
     todoSse() {
         return (0, watch_rx_1.watchRx)(node_shared_1.CONFIG.TodoChangeNotificationFile).pipe((0, operators_1.map)(() => (0, fs_1.readFileSync)(node_shared_1.CONFIG.TodoFile, { encoding: 'utf-8' })));
     }
@@ -1354,10 +1366,17 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:returntype", typeof (_h = typeof Promise !== "undefined" && Promise) === "function" ? _h : Object)
 ], AppController.prototype, "getMRPipelineStatus", null);
 tslib_1.__decorate([
+    (0, common_1.Get)('task/:id/mr_link_status'),
+    tslib_1.__param(0, (0, common_1.Param)('id')),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [String]),
+    tslib_1.__metadata("design:returntype", typeof (_j = typeof Promise !== "undefined" && Promise) === "function" ? _j : Object)
+], AppController.prototype, "getMRLinkStatus", null);
+tslib_1.__decorate([
     (0, common_1.Sse)('todo-sse'),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", []),
-    tslib_1.__metadata("design:returntype", typeof (_j = typeof rxjs_1.Observable !== "undefined" && rxjs_1.Observable) === "function" ? _j : Object)
+    tslib_1.__metadata("design:returntype", typeof (_k = typeof rxjs_1.Observable !== "undefined" && rxjs_1.Observable) === "function" ? _k : Object)
 ], AppController.prototype, "todoSse", null);
 exports.AppController = AppController = tslib_1.__decorate([
     (0, common_1.Controller)(),

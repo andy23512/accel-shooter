@@ -1,5 +1,5 @@
 import { CONFIG } from '../config';
-import { Branch, MergeRequest, Project, User } from '../models/gitlab.models';
+import { Branch, MergeRequest, Note, Project, User } from '../models/gitlab.models';
 import { Approval } from '../models/gitlab/approval.models';
 import { Commit } from '../models/gitlab/commit.models';
 import { Compare } from '../models/gitlab/compare.models';
@@ -60,6 +60,13 @@ export class GitLab {
       'get',
       `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}`
     );
+  }
+
+  public getMergeRequestNotes(mergeRequestNumber: string | number) {
+    return callApi<Note[]>(
+      'get',
+      `/projects/${this.projectId}/merge_requests/${mergeRequestNumber}/notes`
+    )
   }
 
   public getMergeRequestChanges(mergeRequestNumber: string | number) {
