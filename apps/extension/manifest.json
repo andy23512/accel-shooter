@@ -11,6 +11,10 @@
     {
       "matches": ["https://gitlab.com/*/*/-/merge_requests/*"],
       "js": ["content_scripts.js"]
+    },
+    {
+      "css": [ "clickup.css" ],
+      "matches": [ "https://app.clickup.com/*" ]
     }
   ]
 }

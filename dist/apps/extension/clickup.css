@@ -1,0 +1,6 @@
+[data-test="task-recent-item__status-ready to verify"]::before {
+  content: 'R';
+  color: black;
+  font-size: 10px;
+  font-weight: bold;
+}

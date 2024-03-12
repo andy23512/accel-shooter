@@ -16,7 +16,7 @@
     "start-frontend": "nx serve frontend --port 4203",
     "start": "nx serve cli",
     "build": "nx build cli",
-    "build-ext": "tsc --project apps/extension/tsconfig.app.json && cp apps/extension/manifest.json dist/apps/extension",
+    "build-ext": "tsc --project apps/extension/tsconfig.app.json && cp apps/extension/manifest.json dist/apps/extension && cp apps/extension/clickup.css dist/apps/extension",
     "build-frontend": "nx build frontend",
     "build-api": "nx build api",
     "precommit-build": "rm -rf ./node_modules/.cache/nx && yarn build && yarn build-ext && yarn build-frontend && yarn build-api && git add dist/",
