@@ -1186,7 +1186,7 @@ const CONFIG_KEY_MAP = {
     todo: 'TodoFile',
     work_note: 'WorkNoteFile',
 };
-const MARKDOWN_LINK_REGEX = /\[([\w\s]+)\]\((https?:\/\/[\w./?=#&-]+)\)/g;
+const MARKDOWN_LINK_REGEX = /\[([\w\s]+)\]\((https?:\/\/[\w./?=#&()-]+)\)/g;
 let AppController = exports.AppController = class AppController {
     constructor(configService) {
         this.configService = configService;
@@ -1286,7 +1286,7 @@ let AppController = exports.AppController = class AppController {
         const gitLab = new node_shared_1.GitLab(gitLabProject.id);
         const notes = await gitLab.getMergeRequestNotes(mergeRequestIId);
         return {
-            linked: notes.some(n => n.body.startsWith('Task linked:'))
+            linked: notes.some((n) => n.body.startsWith('Task linked:')),
         };
     }
     todoSse() {

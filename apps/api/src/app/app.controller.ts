@@ -27,7 +27,7 @@ const CONFIG_KEY_MAP = {
   work_note: 'WorkNoteFile',
 } as const;
 
-const MARKDOWN_LINK_REGEX = /\[([\w\s]+)\]\((https?:\/\/[\w./?=#&-]+)\)/g;
+const MARKDOWN_LINK_REGEX = /\[([\w\s]+)\]\((https?:\/\/[\w./?=#&()-]+)\)/g;
 
 @Controller()
 export class AppController {
@@ -176,15 +176,15 @@ export class AppController {
   @Get('task/:id/mr_link_status')
   async getMRLinkStatus(
     @Param('id') taskId: string
-  ): Promise<{linked: boolean}> {
+  ): Promise<{ linked: boolean }> {
     const clickUp = new ClickUp(taskId);
     const { gitLabProject, mergeRequestIId } =
       await clickUp.getGitLabProjectAndMergeRequestIId();
     const gitLab = new GitLab(gitLabProject.id);
     const notes = await gitLab.getMergeRequestNotes(mergeRequestIId);
     return {
-      linked: notes.some(n => n.body.startsWith('Task linked:'))
-    }
+      linked: notes.some((n) => n.body.startsWith('Task linked:')),
+    };
   }
 
   @Sse('todo-sse')
