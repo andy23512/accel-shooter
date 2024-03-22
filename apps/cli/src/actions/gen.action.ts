@@ -12,17 +12,33 @@ export class GenAction extends Action {
     { name: 'generator', description: 'generator name' },
     { name: 'name', description: 'instance name' },
   ];
+  public options = [
+    { flags: '-m, --module <string>', description: 'module name' },
+  ];
 
-  public async run(generator: string, name: string) {
+  public async run(
+    generator: string,
+    name: string,
+    { module: inputModuleName }: { module: string }
+  ) {
     const cwd = process.cwd();
     let modulePath = '';
     let rootPath = '';
     let folder = cwd;
     while (folder !== '/') {
       if (!modulePath) {
-        const findModuleResult = await glob(path.join(folder, '*.module.ts'));
-        if (findModuleResult.length > 0) {
-          modulePath = findModuleResult[0];
+        if (!inputModuleName) {
+          const findModuleResult = await glob(path.join(folder, '*.module.ts'));
+          if (findModuleResult.length > 0) {
+            modulePath = findModuleResult[0];
+          }
+        } else {
+          const findModuleResult = await glob(
+            path.join(folder, `${inputModuleName}.module.ts`)
+          );
+          if (findModuleResult.length > 0) {
+            modulePath = findModuleResult[0];
+          }
         }
       }
       if (existsSync(path.join(folder, 'nx.json'))) {

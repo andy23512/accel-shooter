@@ -2852,8 +2852,11 @@ class GenAction extends action_class_1.Action {
             { name: 'generator', description: 'generator name' },
             { name: 'name', description: 'instance name' },
         ];
+        this.options = [
+            { flags: '-m, --module <string>', description: 'module name' },
+        ];
     }
-    run(generator, name) {
+    run(generator, name, { module: inputModuleName }) {
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const cwd = process.cwd();
             let modulePath = '';
@@ -2861,9 +2864,17 @@ class GenAction extends action_class_1.Action {
             let folder = cwd;
             while (folder !== '/') {
                 if (!modulePath) {
-                    const findModuleResult = yield (0, glob_1.glob)(path_1.default.join(folder, '*.module.ts'));
-                    if (findModuleResult.length > 0) {
-                        modulePath = findModuleResult[0];
+                    if (!inputModuleName) {
+                        const findModuleResult = yield (0, glob_1.glob)(path_1.default.join(folder, '*.module.ts'));
+                        if (findModuleResult.length > 0) {
+                            modulePath = findModuleResult[0];
+                        }
+                    }
+                    else {
+                        const findModuleResult = yield (0, glob_1.glob)(path_1.default.join(folder, `${inputModuleName}.module.ts`));
+                        if (findModuleResult.length > 0) {
+                            modulePath = findModuleResult[0];
+                        }
                     }
                 }
                 if ((0, fs_1.existsSync)(path_1.default.join(folder, 'nx.json'))) {
