@@ -29,3 +29,9 @@ export interface TimeTrack {
   start: string;
   end: string;
 }
+
+export enum TddStage {
+  Test = 'test',
+  Code = 'code',
+  Refactor = 'refactor',
+}

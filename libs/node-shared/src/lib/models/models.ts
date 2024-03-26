@@ -31,6 +31,7 @@ export interface Config {
   TrackIntervalInMinutes: number;
   ClickUpTeam: string;
   TaskTodoFolder: string;
+  TaskTddStageFolder: string;
   TodoFile: string;
   TodoChangeNotificationFile: string;
   WorkNoteFile: string;

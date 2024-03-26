@@ -2,6 +2,7 @@
   [content]="checklistMarkDown"
   (contentChange)="onContentChange($event)"
   (save)="onSave()"
+  (externalAction)="goToNextTddStage()"
 ></accel-shooter-editor>
 <div class="refs" *ngIf="loaded">
   <span>{{ fullTaskName }}</span
@@ -19,3 +20,7 @@
   <span>{{ mrLinked ? 'Linked' : 'Unlinked' }}</span> <br />
   <span *ngIf="mrPipelineStatus">{{ mrPipelineStatus }}</span>
 </div>
+<accel-shooter-tdd-widget
+  [currentStage]="currentTddStage"
+  (stageClick)="saveStage($event)"
+></accel-shooter-tdd-widget>

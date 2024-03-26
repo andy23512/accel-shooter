@@ -26,6 +26,7 @@ export function getConfig(): Config {
   }));
   const filePathKeys = [
     'TaskTodoFolder',
+    'TaskTddStageFolder',
     'TaskTimeTrackFolder',
     'TodoFile',
     'TodoChangeNotificationFile',

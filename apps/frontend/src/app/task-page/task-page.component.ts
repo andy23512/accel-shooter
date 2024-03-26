@@ -1,3 +1,4 @@
+import { TddStage } from '@accel-shooter/api-interfaces';
 import { ChecklistItem, NormalizedChecklist } from '@accel-shooter/node-shared';
 import { Clipboard } from '@angular/cdk/clipboard';
 import { HttpClient } from '@angular/common/http';
@@ -15,6 +16,7 @@ import {
   tap,
 } from 'rxjs/operators';
 import { PageTitleService } from '../page-title.service';
+import { TDD_STAGES } from '../tdd-stages.consts';
 
 export function normalizeClickUpChecklist(
   checklist: ChecklistItem[]
@@ -45,6 +47,7 @@ export class TaskPageComponent implements OnInit {
   public changeSubject = new Subject<void>();
   public saveSubject = new Subject<void>();
   public links: { name: string; url: string }[] = [];
+  public currentTddStage: TddStage = TddStage.Test;
 
   constructor(
     private route: ActivatedRoute,
@@ -78,6 +81,11 @@ export class TaskPageComponent implements OnInit {
           this.startSync();
         }
       );
+    this.http
+      .get<{ stage: TddStage }>(`/api/task/${this.taskId}/tdd_stage`)
+      .subscribe(({ stage }) => {
+        this.currentTddStage = stage;
+      });
     interval(30000)
       .pipe(
         startWith(0),
@@ -152,6 +160,20 @@ export class TaskPageComponent implements OnInit {
     this.matSnackBar.open(`Task ID ${this.taskId} copied!`, '', {
       duration: 5000,
     });
+  }
+
+  public saveStage(stage: TddStage) {
+    this.http
+      .put(`/api/task/${this.taskId}/tdd_stage`, { stage })
+      .subscribe(() => {
+        this.currentTddStage = stage;
+      });
+  }
+
+  public goToNextTddStage() {
+    const nextStage = TDD_STAGES.find((s) => s.name === this.currentTddStage)
+      ?.next as TddStage;
+    this.saveStage(nextStage);
   }
 
   private getMergeRequestDescriptionLink(id: string) {

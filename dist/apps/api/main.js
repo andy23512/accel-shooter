@@ -27,7 +27,7 @@ const config_1 = __webpack_require__(37);
 const serve_static_1 = __webpack_require__(38);
 const path_1 = __webpack_require__(10);
 const app_controller_1 = __webpack_require__(39);
-const app_service_1 = __webpack_require__(43);
+const app_service_1 = __webpack_require__(45);
 let AppModule = exports.AppModule = class AppModule {
 };
 exports.AppModule = AppModule = tslib_1.__decorate([
@@ -452,6 +452,7 @@ function getConfig() {
     }));
     const filePathKeys = [
         'TaskTodoFolder',
+        'TaskTddStageFolder',
         'TaskTimeTrackFolder',
         'TodoFile',
         'TodoChangeNotificationFile',
@@ -1170,18 +1171,19 @@ module.exports = require("@nestjs/serve-static");
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 
-var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l, _m;
 Object.defineProperty(exports, "__esModule", ({ value: true }));
 exports.AppController = void 0;
 const tslib_1 = __webpack_require__(4);
+const api_interfaces_1 = __webpack_require__(40);
 const node_shared_1 = __webpack_require__(5);
 const common_1 = __webpack_require__(1);
 const config_1 = __webpack_require__(37);
 const fs_1 = __webpack_require__(9);
 const path_1 = __webpack_require__(10);
-const rxjs_1 = __webpack_require__(40);
-const operators_1 = __webpack_require__(41);
-const watch_rx_1 = __webpack_require__(42);
+const rxjs_1 = __webpack_require__(42);
+const operators_1 = __webpack_require__(43);
+const watch_rx_1 = __webpack_require__(44);
 const CONFIG_KEY_MAP = {
     todo: 'TodoFile',
     work_note: 'WorkNoteFile',
@@ -1248,6 +1250,19 @@ let AppController = exports.AppController = class AppController {
             links,
             fullTaskName,
         };
+    }
+    async getTddStage(taskId) {
+        const folderPath = this.configService.get('TaskTddStageFolder');
+        const path = (0, path_1.join)(folderPath, taskId + '.txt');
+        const stage = (0, fs_1.existsSync)(path)
+            ? (0, fs_1.readFileSync)(path, { encoding: 'utf-8' }).trim()
+            : api_interfaces_1.TddStage.Test;
+        return { stage };
+    }
+    async putTddStage(taskId, stage) {
+        const folderPath = this.configService.get('TaskTddStageFolder');
+        const path = (0, path_1.join)(folderPath, taskId + '.txt');
+        (0, fs_1.writeFileSync)(path, stage);
     }
     async putChecklist(taskId, checklist) {
         const folderPath = this.configService.get('TaskTodoFolder');
@@ -1336,6 +1351,21 @@ tslib_1.__decorate([
     tslib_1.__metadata("design:returntype", typeof (_f = typeof Promise !== "undefined" && Promise) === "function" ? _f : Object)
 ], AppController.prototype, "getChecklist", null);
 tslib_1.__decorate([
+    (0, common_1.Get)('task/:id/tdd_stage'),
+    tslib_1.__param(0, (0, common_1.Param)('id')),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [String]),
+    tslib_1.__metadata("design:returntype", typeof (_g = typeof Promise !== "undefined" && Promise) === "function" ? _g : Object)
+], AppController.prototype, "getTddStage", null);
+tslib_1.__decorate([
+    (0, common_1.Put)('task/:id/tdd_stage'),
+    tslib_1.__param(0, (0, common_1.Param)('id')),
+    tslib_1.__param(1, (0, common_1.Body)('stage')),
+    tslib_1.__metadata("design:type", Function),
+    tslib_1.__metadata("design:paramtypes", [String, typeof (_h = typeof api_interfaces_1.TddStage !== "undefined" && api_interfaces_1.TddStage) === "function" ? _h : Object]),
+    tslib_1.__metadata("design:returntype", Promise)
+], AppController.prototype, "putTddStage", null);
+tslib_1.__decorate([
     (0, common_1.Put)('task/:id/checklist'),
     tslib_1.__param(0, (0, common_1.Param)('id')),
     tslib_1.__param(1, (0, common_1.Body)('checklist')),
@@ -1348,7 +1378,7 @@ tslib_1.__decorate([
     tslib_1.__param(0, (0, common_1.Param)('id')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String]),
-    tslib_1.__metadata("design:returntype", typeof (_g = typeof Promise !== "undefined" && Promise) === "function" ? _g : Object)
+    tslib_1.__metadata("design:returntype", typeof (_j = typeof Promise !== "undefined" && Promise) === "function" ? _j : Object)
 ], AppController.prototype, "getMRDescription", null);
 tslib_1.__decorate([
     (0, common_1.Put)('task/:id/mr_description'),
@@ -1363,20 +1393,20 @@ tslib_1.__decorate([
     tslib_1.__param(0, (0, common_1.Param)('id')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String]),
-    tslib_1.__metadata("design:returntype", typeof (_h = typeof Promise !== "undefined" && Promise) === "function" ? _h : Object)
+    tslib_1.__metadata("design:returntype", typeof (_k = typeof Promise !== "undefined" && Promise) === "function" ? _k : Object)
 ], AppController.prototype, "getMRPipelineStatus", null);
 tslib_1.__decorate([
     (0, common_1.Get)('task/:id/mr_link_status'),
     tslib_1.__param(0, (0, common_1.Param)('id')),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", [String]),
-    tslib_1.__metadata("design:returntype", typeof (_j = typeof Promise !== "undefined" && Promise) === "function" ? _j : Object)
+    tslib_1.__metadata("design:returntype", typeof (_l = typeof Promise !== "undefined" && Promise) === "function" ? _l : Object)
 ], AppController.prototype, "getMRLinkStatus", null);
 tslib_1.__decorate([
     (0, common_1.Sse)('todo-sse'),
     tslib_1.__metadata("design:type", Function),
     tslib_1.__metadata("design:paramtypes", []),
-    tslib_1.__metadata("design:returntype", typeof (_k = typeof rxjs_1.Observable !== "undefined" && rxjs_1.Observable) === "function" ? _k : Object)
+    tslib_1.__metadata("design:returntype", typeof (_m = typeof rxjs_1.Observable !== "undefined" && rxjs_1.Observable) === "function" ? _m : Object)
 ], AppController.prototype, "todoSse", null);
 exports.AppController = AppController = tslib_1.__decorate([
     (0, common_1.Controller)(),
@@ -1386,24 +1416,49 @@ exports.AppController = AppController = tslib_1.__decorate([
 
 /***/ }),
 /* 40 */
-/***/ ((module) => {
+/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
-module.exports = require("rxjs");
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+const tslib_1 = __webpack_require__(4);
+tslib_1.__exportStar(__webpack_require__(41), exports);
+
 
 /***/ }),
 /* 41 */
-/***/ ((module) => {
+/***/ ((__unused_webpack_module, exports) => {
 
-module.exports = require("rxjs/operators");
+
+Object.defineProperty(exports, "__esModule", ({ value: true }));
+exports.TddStage = void 0;
+var TddStage;
+(function (TddStage) {
+    TddStage["Test"] = "test";
+    TddStage["Code"] = "code";
+    TddStage["Refactor"] = "refactor";
+})(TddStage || (exports.TddStage = TddStage = {}));
+
 
 /***/ }),
 /* 42 */
 /***/ ((module) => {
 
-module.exports = require("watch-rx");
+module.exports = require("rxjs");
 
 /***/ }),
 /* 43 */
+/***/ ((module) => {
+
+module.exports = require("rxjs/operators");
+
+/***/ }),
+/* 44 */
+/***/ ((module) => {
+
+module.exports = require("watch-rx");
+
+/***/ }),
+/* 45 */
 /***/ ((__unused_webpack_module, exports, __webpack_require__) => {
 
 

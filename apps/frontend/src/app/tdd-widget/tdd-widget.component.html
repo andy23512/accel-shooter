@@ -1,0 +1,20 @@
+<svg width="100%" height="100%" [attr.viewBox]="viewBox">
+  <g
+    *ngFor="let stage of stages; let i = index"
+    [class.active]="stage.name === currentStage"
+    (click)="stageClick.emit(stage.name)"
+  >
+    <path [attr.d]="getPathD(i)" [attr.fill]="stage.color"></path>
+    <text
+      [attr.x]="getStageCenterX(i)"
+      [attr.y]="getStageCenterY(i)"
+      dominant-baseline="central"
+      text-anchor="middle"
+      [attr.font-size]="stageRadius * 1.5 + 'px'"
+      font-weight="bold"
+      fill="white"
+    >
+      {{ stage.label }}
+    </text>
+  </g>
+</svg>

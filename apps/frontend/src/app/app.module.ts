@@ -25,6 +25,7 @@ import { PriorityCellRendererComponent } from './tasks-page/priority-cell-render
 import { TaskNameCellRendererComponent } from './tasks-page/task-name-cell-renderer.component';
 import { TaskStatusCellRendererComponent } from './tasks-page/task-status-cell-renderer.component';
 import { TasksPageComponent } from './tasks-page/tasks-page.component';
+import { TddWidgetComponent } from './tdd-widget/tdd-widget.component';
 
 @NgModule({
   declarations: [
@@ -38,6 +39,7 @@ import { TasksPageComponent } from './tasks-page/tasks-page.component';
     TaskStatusCellRendererComponent,
     MergeRequestDescriptionPageComponent,
     AccelUpPageComponent,
+    TddWidgetComponent,
   ],
   imports: [
     BrowserModule,

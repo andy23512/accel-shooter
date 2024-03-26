@@ -1,8 +1,8 @@
-import { SummarizedTask } from '@accel-shooter/api-interfaces';
+import { SummarizedTask, TddStage } from '@accel-shooter/api-interfaces';
 import {
+  CONFIG,
   ClickUp,
   Comment,
-  CONFIG,
   GitLab,
   Task,
 } from '@accel-shooter/node-shared';
@@ -16,7 +16,7 @@ import {
   Sse,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { readFileSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -117,6 +117,28 @@ export class AppController {
       links,
       fullTaskName,
     };
+  }
+
+  @Get('task/:id/tdd_stage')
+  async getTddStage(@Param('id') taskId: string): Promise<{
+    stage: TddStage;
+  }> {
+    const folderPath = this.configService.get<string>('TaskTddStageFolder');
+    const path = join(folderPath, taskId + '.txt');
+    const stage = existsSync(path)
+      ? (readFileSync(path, { encoding: 'utf-8' }).trim() as TddStage)
+      : TddStage.Test;
+    return { stage };
+  }
+
+  @Put('task/:id/tdd_stage')
+  async putTddStage(
+    @Param('id') taskId: string,
+    @Body('stage') stage: TddStage
+  ) {
+    const folderPath = this.configService.get<string>('TaskTddStageFolder');
+    const path = join(folderPath, taskId + '.txt');
+    writeFileSync(path, stage);
   }
 
   @Put('task/:id/checklist')

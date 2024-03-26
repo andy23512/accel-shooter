@@ -649,6 +649,7 @@ function getConfig() {
     config.GitLabProjects = config.GitLabProjects.map((p) => (Object.assign(Object.assign({}, p), { path: (0, untildify_1.default)(p.path) })));
     const filePathKeys = [
         'TaskTodoFolder',
+        'TaskTddStageFolder',
         'TaskTimeTrackFolder',
         'TodoFile',
         'TodoChangeNotificationFile',

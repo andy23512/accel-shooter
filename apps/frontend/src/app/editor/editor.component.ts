@@ -28,6 +28,7 @@ export class EditorComponent implements AfterViewInit, OnChanges {
   @Input() public lineWrapping = false;
   @Output() public contentChange = new EventEmitter<string>();
   @Output() public save = new EventEmitter<void>();
+  @Output() public externalAction = new EventEmitter<void>();
   @ViewChild(CodemirrorComponent)
   public codemirrorComponent?: CodemirrorComponent;
   public previewMode = false;
@@ -168,8 +169,12 @@ export class EditorComponent implements AfterViewInit, OnChanges {
             Vim.handleKey(cm, 'j');
           }
         });
+        Vim.defineAction('externalAction', () => {
+          this.externalAction.emit();
+        });
         Vim.mapCommand('z', 'action', 'checkMdCheckbox');
         Vim.mapCommand('Z', 'action', 'uncheckMdCheckbox');
+        Vim.mapCommand('\\', 'action', 'externalAction');
         Vim.defineEx('w', null, () => {
           this.save.next();
         });

@@ -1,0 +1,12 @@
+:host {
+  display: block;
+}
+
+g {
+  opacity: 0.1;
+
+  &:hover,
+  &.active {
+    opacity: 0.8;
+  }
+}
